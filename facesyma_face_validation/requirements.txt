@@ -1,0 +1,47 @@
+# Face Validation Microservice Requirements
+
+# Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Image Processing
+opencv-python==4.8.1.78
+Pillow==10.1.0
+numpy==1.24.3
+
+# Face Detection & Recognition
+mediapipe==0.10.9  # Google's face detection + object detection (handles angles, sizes well)
+# Alternative: google-ai-edge-torch (Google's ML Kit alternative)
+
+# ML Models
+tensorflow-lite==2.14.0
+onnxruntime==1.16.3
+
+# Database & Caching
+redis==5.0.0
+pymongo==4.5.0
+
+# Utilities
+pydantic==2.5.0
+python-dotenv==1.0.0
+python-jose[cryptography]==3.3.0
+aiofiles==23.2.1
+
+# Async
+aiohttp==3.9.1
+asyncio-contextmanager==1.0.0
+
+# Monitoring & Logging
+prometheus-client==0.18.0
+python-json-logger==2.0.7
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Development
+black==23.12.0
+flake8==6.1.0
+mypy==1.7.1
