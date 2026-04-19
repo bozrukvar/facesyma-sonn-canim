@@ -1,0 +1,281 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-users %}active{% endblock %}
+
+{% block title %}Kullanıcı Yönetimi{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Kullanıcı Listesi</div>
+
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <input type="text" id="searchInput" placeholder="E-posta veya kullanıcı adına göre ara..."
+               style="flex: 1; min-width: 200px; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+        <select id="planFilter" style="padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+            <option value="">Tüm Planlar</option>
+            <option value="free">Ücretsiz</option>
+            <option value="premium">Premium</option>
+        </select>
+        <button onclick="loadUsers()" class="btn btn-primary">Ara</button>
+    </div>
+
+    <!-- Bulk Actions Section (hidden by default) -->
+    <div id="bulkActionsSection" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 4px;">
+        <span id="selectedCount" style="margin-right: 15px; color: #d4af37;">Seçili: 0</span>
+        <select id="bulkActionSelect" style="padding: 8px; background: #2a2928; border: 1px solid #444; color: #fff; border-radius: 4px; margin-right: 10px;">
+            <option value="">-- İşlem Seçin --</option>
+            <option value="set_premium">Premium Yap</option>
+            <option value="set_free">Ücretsiz Yap</option>
+            <option value="deactivate">Deaktif Et</option>
+            <option value="delete">Sil</option>
+            <option value="export">Dışa Aktar (CSV)</option>
+        </select>
+        <button onclick="executeBulkAction()" class="btn btn-primary">Uygula</button>
+        <button onclick="clearSelection()" class="btn btn-secondary">İptal</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"></th>
+                <th>ID</th>
+                <th>E-Posta</th>
+                <th>Kullanıcı Adı</th>
+                <th>Plan</th>
+                <th>Durum</th>
+                <th>Katılma</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="usersTable">
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Plan Güncelleme Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #1a1918; border: 1px solid #2a2928; border-radius: 8px; max-width: 500px; margin: 50px auto; padding: 30px;">
+        <h2 style="color: #d4af37; margin-bottom: 20px;">Kullanıcı Düzenle</h2>
+
+        <div class="form-group">
+            <label>E-Posta</label>
+            <input type="email" id="editEmail" readonly style="background: #3a3632; cursor: not-allowed;">
+        </div>
+
+        <div class="form-group">
+            <label>Plan</label>
+            <select id="editPlan" style="padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="free">Ücretsiz</option>
+                <option value="premium">Premium</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Durum</label>
+            <select id="editActive" style="padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="true">Aktif</option>
+                <option value="false">İnaktif</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="closeEditModal()" class="btn btn-secondary">İptal</button>
+            <button onclick="saveUserChanges()" class="btn btn-primary">Kaydet</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let currentUserId = null;
+
+    async function loadUsers(page = 1) {
+        try {
+            currentPage = page;
+            const search = document.getElementById('searchInput').value.trim();
+            const planFilter = document.getElementById('planFilter').value;
+
+            let endpoint = `/users/?page=${page}&limit=20`;
+            if (search) endpoint += `&search=${encodeURIComponent(search)}`;
+            if (planFilter) endpoint += `&plan=${planFilter}`;
+
+            const data = await apiCall(endpoint);
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+
+            if (data.users && data.users.length > 0) {
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    const statusBadge = user.is_active ? '<span style="background: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Aktif</span>' : '<span style="background: #F44336; padding: 4px 8px; border-radius: 4px; font-size: 12px;">İnaktif</span>';
+                    const planBadge = `<span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${user.plan || 'free'}</span>`;
+
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="userCheckbox" value="${user.id}" onchange="updateSelectedCount()"></td>
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.username || '-'}</td>
+                        <td>${planBadge}</td>
+                        <td>${statusBadge}</td>
+                        <td>${new Date(user.date_joined).toLocaleDateString('tr-TR')}</td>
+                        <td>
+                            <button onclick="editUser(${user.id}, '${user.email}', '${user.plan}', ${user.is_active})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Düzenle</button> |
+                            <button onclick="deleteUser(${user.id})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Kullanıcı bulunamadı.</td></tr>';
+            }
+
+            // Pagination
+            if (data.pagination) {
+                const paginationDiv = document.getElementById('pagination');
+                paginationDiv.innerHTML = '';
+
+                for (let i = 1; i <= data.pagination.pages; i++) {
+                    const link = document.createElement('a');
+                    if (i === currentPage) {
+                        link.innerHTML = `<span class="active">${i}</span>`;
+                    } else {
+                        link.textContent = i;
+                        link.href = '#';
+                        link.onclick = (e) => { e.preventDefault(); loadUsers(i); };
+                    }
+                    paginationDiv.appendChild(link);
+                }
+            }
+        } catch (error) {
+            console.error('Kullanıcı yükleme hatası:', error);
+            document.getElementById('usersTable').innerHTML = `
+                <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
+                    Hata: ${error.message}
+                </td></tr>
+            `;
+        }
+    }
+
+    function editUser(userId, email, plan, isActive) {
+        currentUserId = userId;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPlan').value = plan || 'free';
+        document.getElementById('editActive').value = isActive ? 'true' : 'false';
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        currentUserId = null;
+    }
+
+    async function saveUserChanges() {
+        try {
+            const plan = document.getElementById('editPlan').value;
+            const isActive = document.getElementById('editActive').value === 'true';
+
+            const response = await apiCall(`/users/${currentUserId}/update/`, 'PATCH', {
+                plan,
+                is_active: isActive
+            });
+
+            closeEditModal();
+            loadUsers(currentPage);
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function deleteUser(userId) {
+        if (confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) {
+            try {
+                await apiCall(`/users/${userId}/delete/`, 'DELETE');
+                loadUsers(currentPage);
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+    }
+
+    function updateSelectedCount() {
+        const checkboxes = document.querySelectorAll('.userCheckbox:checked');
+        const count = checkboxes.length;
+        const bulkSection = document.getElementById('bulkActionsSection');
+
+        if (count > 0) {
+            bulkSection.style.display = 'block';
+            document.getElementById('selectedCount').textContent = `Seçili: ${count}`;
+        } else {
+            bulkSection.style.display = 'none';
+            document.getElementById('selectAllCheckbox').checked = false;
+        }
+    }
+
+    function toggleSelectAll() {
+        const isChecked = document.getElementById('selectAllCheckbox').checked;
+        document.querySelectorAll('.userCheckbox').forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateSelectedCount();
+    }
+
+    function clearSelection() {
+        document.getElementById('selectAllCheckbox').checked = false;
+        document.querySelectorAll('.userCheckbox').forEach(cb => {
+            cb.checked = false;
+        });
+        document.getElementById('bulkActionsSection').style.display = 'none';
+    }
+
+    async function executeBulkAction() {
+        const action = document.getElementById('bulkActionSelect').value;
+        const checkboxes = document.querySelectorAll('.userCheckbox:checked');
+        const userIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (!action || userIds.length === 0) {
+            alert('İşlem ve kullanıcı seçin');
+            return;
+        }
+
+        try {
+            if (action === 'set_premium') {
+                if (!confirm(`${userIds.length} kullanıcıyı premium yapacaksınız. Emin misiniz?`)) return;
+                await apiCall('/users/bulk/update/', 'POST', { user_ids: userIds, plan: 'premium' });
+                alert('Kullanıcılar premium yapıldı');
+                clearSelection();
+                loadUsers(currentPage);
+            } else if (action === 'set_free') {
+                if (!confirm(`${userIds.length} kullanıcıyı ücretsiz yapacaksınız. Emin misiniz?`)) return;
+                await apiCall('/users/bulk/update/', 'POST', { user_ids: userIds, plan: 'free' });
+                alert('Kullanıcılar ücretsiz yapıldı');
+                clearSelection();
+                loadUsers(currentPage);
+            } else if (action === 'deactivate') {
+                if (!confirm(`${userIds.length} kullanıcıyı deaktif edeceksiniz. Emin misiniz?`)) return;
+                await apiCall('/users/bulk/update/', 'POST', { user_ids: userIds, is_active: false });
+                alert('Kullanıcılar deaktif edildi');
+                clearSelection();
+                loadUsers(currentPage);
+            } else if (action === 'delete') {
+                if (!confirm(`${userIds.length} kullanıcıyı sileceksiniz. Bu işlem geri alınamaz. Emin misiniz?`)) return;
+                await apiCall('/users/bulk/delete/', 'DELETE', { user_ids: userIds });
+                alert('Kullanıcılar silindi');
+                clearSelection();
+                loadUsers(currentPage);
+            } else if (action === 'export') {
+                window.location.href = `/api/v1/admin/users/bulk/export/?format=csv&limit=${userIds.length}`;
+                clearSelection();
+            }
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    window.addEventListener('load', () => loadUsers());
+</script>
+{% endblock %}

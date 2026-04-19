@@ -10,17 +10,23 @@ from admin_api.views.user_views import (
     UserListView, UserStatsView, UserDetailView,
     UserUpdateView, UserDeleteView
 )
+from admin_api.views.user_insights_views import (
+    UserRegistrationTimelineView, UserRegistrationPatternsView, UserModuleUsageView
+)
+from admin_api.views.app_management_views import (
+    AppListView, AppDetailView, AppConfigUpdateView, AppStatsView
+)
 from admin_api.views.database_views import (
     SifatListView, SifatDetailView, SifatCreateView,
     SifatUpdateView, SifatDeleteView, SifatAddCumleView,
-    SifatAutoTranslateView
+    SifatAutoTranslateView, SifatSyncStatusView, SifatBatchSyncView
 )
 from admin_api.views.purchase_views import (
     PremiumListView, PurchaseStatsView, PlanChangeLogView
 )
 from admin_api.views.review_views import (
     ReviewListView, ReviewCreateView, ReviewStatsView,
-    ReviewUpdateView, ReviewExportView
+    ReviewUpdateView, ReviewExportView, ReviewTrendView, ReviewTagsView
 )
 from admin_api.views.coach_views import (
     CoachOverallStatsView,
@@ -28,12 +34,26 @@ from admin_api.views.coach_views import (
     CoachGoalListView, CoachGoalStatsView, CoachGoalDetailView,
     CoachAttributeListView, CoachAttributeLangView, CoachAttributeDetailView,
 )
+from admin_api.views.bulk_views import (
+    BulkUserUpdateView, BulkUserDeleteView, BulkUserExportView
+)
+from admin_api.views.audit_log_views import (
+    AuditLogListView, AuditLogStatsView
+)
+from admin_api.views.alert_management_views import (
+    AlertRulesListView, AlertRuleDetailView, AlertHistoryListView, AlertStatsView
+)
+from admin_api.views.renewal_views import (
+    RenewalJobStatusView, ManualRenewalTriggerView, RenewalEventsView,
+    SubscriptionNotificationsView
+)
 
 # Phase 1: Analytics, Payment, Monitoring
 from admin_api.views.analytics_views import (
     AnalyticsDashboardView, UserGrowthMetricsView, RevenueMetricsView,
-    CommunityMetricsView, CompatibilityMetricsView
+    CommunityMetricsView, CompatibilityMetricsView, AnalysisActivityView
 )
+from admin_api.views.live_analytics_views import LiveStatsView
 from admin_api.views.payment_views import (
     PaymentTransactionsView, PaymentWebhookStripeView, PaymentWebhookIyzicoView,
     RefundView, PaymentStatsView, PaymentSettingsView
@@ -137,6 +157,22 @@ api_patterns = [
     path('users/<int:uid>/', UserDetailView.as_view(), name='user-detail'),
     path('users/<int:uid>/update/', UserUpdateView.as_view(), name='user-update'),
     path('users/<int:uid>/delete/', UserDeleteView.as_view(), name='user-delete'),
+    path('users/bulk/update/', BulkUserUpdateView.as_view(), name='bulk-user-update'),
+    path('users/bulk/delete/', BulkUserDeleteView.as_view(), name='bulk-user-delete'),
+    path('users/bulk/export/', BulkUserExportView.as_view(), name='bulk-user-export'),
+
+    # User Insights (Feature #5: Date/Time/Module Analysis)
+    path('users/timeline/', UserRegistrationTimelineView.as_view(), name='users-timeline'),
+    path('users/patterns/', UserRegistrationPatternsView.as_view(), name='users-patterns'),
+    path('users/module-usage/', UserModuleUsageView.as_view(), name='users-module-usage'),
+
+    # ═══════════════════════════════════════════════════════════════════
+    # MULTI-APP SUPPORT
+    # ═══════════════════════════════════════════════════════════════════
+    path('apps/', AppListView.as_view(), name='apps-list'),
+    path('apps/<str:app_id>/', AppDetailView.as_view(), name='apps-detail'),
+    path('apps/<str:app_id>/config/', AppConfigUpdateView.as_view(), name='apps-config-update'),
+    path('apps/<str:app_id>/stats/', AppStatsView.as_view(), name='apps-stats'),
 
     # Database Management (Aşama 3)
     path('database/sifatlar/', SifatListView.as_view(), name='sifat-list'),
@@ -146,6 +182,8 @@ api_patterns = [
     path('database/sifatlar/<int:no>/delete/', SifatDeleteView.as_view(), name='sifat-delete'),
     path('database/sifatlar/<int:no>/cumle/', SifatAddCumleView.as_view(), name='sifat-add-cumle'),
     path('database/sifatlar/<int:no>/translate/', SifatAutoTranslateView.as_view(), name='sifat-translate'),
+    path('database/sync/status/', SifatSyncStatusView.as_view(), name='sifat-sync-status'),
+    path('database/sync/trigger/', SifatBatchSyncView.as_view(), name='sifat-batch-sync'),
 
     # Purchase Management (Aşama 4)
     path('purchases/premium/', PremiumListView.as_view(), name='premium-list'),
@@ -158,6 +196,8 @@ api_patterns = [
     path('reviews/stats/', ReviewStatsView.as_view(), name='reviews-stats'),
     path('reviews/<int:rid>/update/', ReviewUpdateView.as_view(), name='reviews-update'),
     path('reviews/export/', ReviewExportView.as_view(), name='reviews-export'),
+    path('reviews/trend/', ReviewTrendView.as_view(), name='reviews-trend'),
+    path('reviews/tags/', ReviewTagsView.as_view(), name='reviews-tags'),
 
     # Coach DB Management (Aşama 7)
     path('coach/stats/', CoachOverallStatsView.as_view(), name='coach-overall-stats'),
@@ -181,6 +221,14 @@ api_patterns = [
     path('analytics/revenue/', RevenueMetricsView.as_view(), name='revenue-metrics'),
     path('analytics/communities/', CommunityMetricsView.as_view(), name='community-metrics'),
     path('analytics/compatibility/', CompatibilityMetricsView.as_view(), name='compatibility-metrics'),
+    path('analytics/analysis/', AnalysisActivityView.as_view(), name='analysis-activity'),
+
+    # Live Analytics (30-second polling dashboard)
+    path('live/stats/', LiveStatsView.as_view(), name='live-stats'),
+
+    # Audit Logging (Activity Trail)
+    path('audit/logs/', AuditLogListView.as_view(), name='audit-logs'),
+    path('audit/stats/', AuditLogStatsView.as_view(), name='audit-stats'),
 
     # Payment Integration (PHASE 1)
     path('payments/transactions/', PaymentTransactionsView.as_view(), name='payment-transactions'),
@@ -201,6 +249,12 @@ api_patterns = [
     path('subscriptions/search/', SubscriptionSearchView.as_view(), name='subscription-search'),
     path('subscriptions/churn/', ChurnAnalysisView.as_view(), name='subscription-churn'),
     path('subscriptions/<int:user_id>/', UserSubscriptionDetailView.as_view(), name='subscription-detail'),
+
+    # Subscription Renewal Automation (PHASE 1.5)
+    path('renewals/status/', RenewalJobStatusView.as_view(), name='renewal-status'),
+    path('renewals/trigger/', ManualRenewalTriggerView.as_view(), name='renewal-trigger'),
+    path('renewals/events/', RenewalEventsView.as_view(), name='renewal-events'),
+    path('renewals/notifications/', SubscriptionNotificationsView.as_view(), name='renewal-notifications'),
 
     # Monitoring & Health (PHASE 1)
     path('monitoring/health/', HealthCheckView.as_view(), name='health-check'),
@@ -265,7 +319,12 @@ api_patterns = [
     # Health Monitoring & Alerts (PHASE 4)
     path('health/services/', HealthMonitoringView.as_view(), name='health-services'),
     path('alerts/config/', AlertConfigView.as_view(), name='alerts-config'),
-    path('alerts/history/', AlertHistoryView.as_view(), name='alerts-history'),
+
+    # Alert Rules Management (Feature 3 - NEW)
+    path('alerts/rules/', AlertRulesListView.as_view(), name='alerts-rules-list'),
+    path('alerts/rules/<int:rule_id>/', AlertRuleDetailView.as_view(), name='alerts-rules-detail'),
+    path('alerts/history/', AlertHistoryListView.as_view(), name='alerts-history'),
+    path('alerts/stats/', AlertStatsView.as_view(), name='alerts-stats'),
 
     # Report Generation (PHASE 4)
     path('reports/generate/', ReportGeneratorView.as_view(), name='reports-generate'),
