@@ -1,0 +1,398 @@
+# Tiếng Việt translations for Gamification Phase 2
+# Copyright (C) 2026
+# This file is distributed under the same license as the package.
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin_api/services/translation_service.py
+msgid "%d days tracked"
+msgstr "%d ngày được theo dõi"
+
+#: admin_api/services/translation_service.py
+msgid "%d snapshots"
+msgstr "%d ảnh chụp"
+
+#: admin_api/services/translation_service.py
+msgid "%s moved from rank %d to rank %d"
+msgstr "%s đã di chuyển từ xếp hạng %d đến xếp hạng %d"
+
+#: admin_api/services/translation_service.py
+msgid "Accuracy"
+msgstr "Độ chính xác"
+
+#: admin_api/services/translation_service.py
+msgid "Ascending"
+msgstr "Tăng"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:303
+msgid "Auto-refresh (5s)"
+msgstr "Làm mới tự động (5 giây)"
+
+#: admin_api/services/translation_service.py
+msgid "Average"
+msgstr "Trung bình"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:336
+msgid "Average Query Time"
+msgstr "Thời gian truy vấn trung bình"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:433
+msgid "Avg Time"
+msgstr "Thời gian trung bình"
+
+#: admin_api/services/translation_service.py
+msgid "Badge unlocked"
+msgstr "Huy hiệu được mở khóa"
+
+#: admin_api/services/translation_service.py
+msgid "Badges"
+msgstr "Huy hiệu"
+
+#: admin_api/services/translation_service.py
+msgid "Badges Unlocked"
+msgstr "Huy hiệu được mở khóa"
+
+#: admin_api/services/translation_service.py
+msgid "Cache cleared"
+msgstr "Bộ nhớ cache được xóa"
+
+#: admin_api/services/translation_service.py
+msgid "Cache error: %s"
+msgstr "Lỗi bộ nhớ cache: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Cache invalidation failed (non-critical): %s"
+msgstr "Vô hiệu hóa bộ nhớ cache không thành công (không quan trọng): %s"
+
+#: admin_api/services/translation_service.py
+msgid "Challenges Won"
+msgstr "Thử thách đã thắng"
+
+#: admin_api/services/translation_service.py
+msgid "Coins"
+msgstr "Xu"
+
+#: admin_api/services/translation_service.py
+msgid "Coins Gained"
+msgstr "Xu được kiếm"
+
+#: admin_api/services/translation_service.py
+msgid "Coins awarded"
+msgstr "Xu được trao"
+
+#: admin_api/services/translation_service.py
+msgid "Community Leaderboard"
+msgstr "Bảng xếp hạng cộng đồng"
+
+#: admin_api/services/translation_service.py
+msgid "Components"
+msgstr "Thành phần"
+
+#: admin_api/services/translation_service.py
+msgid "Connected to %s leaderboard"
+msgstr "Kết nối với bảng xếp hạng %s"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:358
+msgid "Connections (Last Hour)"
+msgstr "Kết nối (giờ cuối cùng)"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:354
+msgid "Current Connections"
+msgstr "Kết nối hiện tại"
+
+#: admin_api/services/translation_service.py
+msgid "Database error: %s"
+msgstr "Lỗi cơ sở dữ liệu: %s"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Degraded"
+msgstr "Bị hỏng"
+
+#: admin_api/services/translation_service.py
+msgid "Descending"
+msgstr "Giảm dần"
+
+#: admin_api/services/translation_service.py
+msgid "Disconnected from leaderboard"
+msgstr "Ngắt kết nối khỏi bảng xếp hạng"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Error"
+msgstr "Lỗi"
+
+#: admin_api/services/translation_service.py
+msgid "Error: %s"
+msgstr "Lỗi: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Failed to connect"
+msgstr "Kết nối không thành công"
+
+#: admin_api/services/translation_service.py
+msgid "Forbidden"
+msgstr "Bị cấm"
+
+#: admin_api/templates/gamification_dashboard.html:6
+msgid "Gamification Monitoring Dashboard"
+msgstr "Bảng điều khiển giám sát Gamification"
+
+#: admin_api/services/translation_service.py
+msgid "Global Leaderboard"
+msgstr "Bảng xếp hạng toàn cầu"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Healthy"
+msgstr "Lành mạnh"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:315
+msgid "Hit Rate"
+msgstr "Tỷ lệ truy cập"
+
+#: admin_api/services/translation_service.py
+msgid "Internal server error"
+msgstr "Lỗi máy chủ nội bộ"
+
+#: admin_api/services/translation_service.py
+msgid "Invalid JSON in request body"
+msgstr "JSON không hợp lệ trong phần thân yêu cầu"
+
+#: admin_api/services/translation_service.py
+msgid "Invalid parameter: %s"
+msgstr "Tham số không hợp lệ: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Keep-alive ping confirmed"
+msgstr "Xác nhận ping không gián đoạn"
+
+#: admin_api/templates/gamification_dashboard.html:299
+msgid "Last updated:"
+msgstr "Cập nhật lần cuối:"
+
+#: admin_api/services/translation_service.py
+msgid "Last updated: %s"
+msgstr "Cập nhật lần cuối: %s"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:376
+msgid "Latest Snapshot Age"
+msgstr "Tuổi của ảnh chụp gần đây nhất"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard Statistics"
+msgstr "Thống kê bảng xếp hạng"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:411
+msgid "Leaderboard Type"
+msgstr "Loại bảng xếp hạng"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard error: %s"
+msgstr "Lỗi bảng xếp hạng: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard updated, please refresh"
+msgstr "Bảng xếp hạng đã được cập nhật, vui lòng làm mới"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:297, admin_api/templates/gamification_dashboard.html:392
+msgid "Loading..."
+msgstr "Đang tải..."
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:435
+msgid "Max"
+msgstr "Tối đa"
+
+#: admin_api/services/translation_service.py
+msgid "Meals Completed"
+msgstr "Bữa ăn hoàn thành"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:326
+msgid "Memory Used"
+msgstr "Bộ nhớ được sử dụng"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:434
+msgid "Min"
+msgstr "Tối thiểu"
+
+#: admin_api/services/translation_service.py
+msgid "Mission completed"
+msgstr "Nhiệm vụ hoàn thành"
+
+#: admin_api/services/translation_service.py
+msgid "MongoDB"
+msgstr "MongoDB"
+
+#: admin_api/services/translation_service.py
+msgid "Most Active"
+msgstr "Hoạt động nhất"
+
+#: admin_api/services/translation_service.py
+msgid "Most Improved"
+msgstr "Cải thiện nhất"
+
+#: admin_api/services/translation_service.py
+msgid "No trend data found for user %d"
+msgstr "Không tìm thấy dữ liệu xu hướng cho người dùng %d"
+
+#: admin_api/services/translation_service.py
+msgid "Not found"
+msgstr "Không tìm thấy"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:340
+msgid "P95 Latency"
+msgstr "Độ trễ P95"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:362
+msgid "Peak Today"
+msgstr "Đỉnh hôm nay"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:432
+msgid "Queries"
+msgstr "Truy vấn"
+
+#: admin_api/services/translation_service.py
+msgid "Rank"
+msgstr "Hạng"
+
+#: admin_api/services/translation_service.py
+msgid "Rank Change"
+msgstr "Thay đổi xếp hạng"
+
+#: admin_api/services/translation_service.py
+msgid "Redis"
+msgstr "Redis"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
+msgid "Retention Policy"
+msgstr "Chính sách lưu giữ"
+
+#: admin_api/services/translation_service.py
+msgid "Running"
+msgstr "Đang chạy"
+
+#: admin_api/services/translation_service.py
+msgid "Scheduler"
+msgstr "Bộ lập lịch"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:412
+msgid "Snapshots"
+msgstr "Ảnh chụp"
+
+#: admin_api/services/translation_service.py
+msgid "Stable"
+msgstr "Ổn định"
+
+#: admin_api/services/translation_service.py
+msgid "Status"
+msgstr "Trạng thái"
+
+#: admin_api/services/translation_service.py
+msgid "Stopped"
+msgstr "Dừng"
+
+#: admin_api/services/translation_service.py
+msgid "Subscribed to leaderboard updates"
+msgstr "Đã đăng ký cập nhật bảng xếp hạng"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:322
+msgid "Total Queries"
+msgstr "Tổng truy vấn"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:372
+msgid "Total Snapshots"
+msgstr "Tổng ảnh chụp"
+
+#: admin_api/services/translation_service.py
+msgid "Trait-Based Leaderboard"
+msgstr "Bảng xếp hạng dựa trên đặc điểm"
+
+#: admin_api/services/translation_service.py
+msgid "Trending Users"
+msgstr "Người dùng nổi bật"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:431
+msgid "Type"
+msgstr "Loại"
+
+#: admin_api/services/translation_service.py
+msgid "Unauthorized"
+msgstr "Chưa được phép"
+
+#: admin_api/services/translation_service.py
+msgid "Unavailable"
+msgstr "Không có sẵn"
+
+#: admin_api/services/translation_service.py
+msgid "Unknown"
+msgstr "Không xác định"
+
+#: admin_api/services/translation_service.py
+msgid "Unsubscribed from leaderboard updates"
+msgstr "Đã hủy đăng ký cập nhật bảng xếp hạng"
+
+#: admin_api/services/translation_service.py
+msgid "User Trend"
+msgstr "Xu hướng người dùng"
+
+#: admin_api/services/translation_service.py
+msgid "Username"
+msgstr "Tên người dùng"
+
+#: admin_api/services/translation_service.py
+msgid "WebSocket error: %s"
+msgstr "Lỗi WebSocket: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Your Rank"
+msgstr "Xếp hạng của bạn"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:381
+msgid "days"
+msgstr "ngày"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:377
+msgid "h"
+msgstr "giờ"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:300
+msgid "↻ Refresh Now"
+msgstr "↻ Làm mới ngay"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:334
+msgid "⚡ Leaderboard Performance"
+msgstr "⚡ Hiệu suất bảng xếp hạng"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:293
+msgid "🎮 Gamification Phase 2 — Monitoring Dashboard"
+msgstr "🎮 Giai đoạn Gamification 2 — Bảng điều khiển Giám sát"
+
+#: admin_api/templates/gamification_dashboard.html:426
+msgid "🎯 Performance by Leaderboard Type"
+msgstr "🎯 Hiệu suất theo Loại Bảng xếp hạng"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
+msgid "🏥 System Health"
+msgstr "🏥 Sức khỏe hệ thống"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:400
+msgid "📈 Query Performance Trend"
+msgstr "📈 Xu hướng hiệu suất truy vấn"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:370
+msgid "📊 Trend Analysis"
+msgstr "📊 Phân tích xu hướng"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:352
+msgid "📡 WebSocket Connections"
+msgstr "📡 Kết nối WebSocket"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:313
+msgid "📦 Cache Performance"
+msgstr "📦 Hiệu suất bộ nhớ cache"
+
+#: admin_api/templates/gamification_dashboard.html:406
+msgid "📷 Snapshot Breakdown"
+msgstr "📷 Phân tích Ảnh chụp"
+

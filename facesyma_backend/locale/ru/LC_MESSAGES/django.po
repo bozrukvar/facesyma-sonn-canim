@@ -1,0 +1,398 @@
+# Русский translations for Gamification Phase 2
+# Copyright (C) 2026
+# This file is distributed under the same license as the package.
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin_api/services/translation_service.py
+msgid "%d days tracked"
+msgstr "%d дней отслеживаемых"
+
+#: admin_api/services/translation_service.py
+msgid "%d snapshots"
+msgstr "%d снимков"
+
+#: admin_api/services/translation_service.py
+msgid "%s moved from rank %d to rank %d"
+msgstr "%s переместился с ранга %d на ранг %d"
+
+#: admin_api/services/translation_service.py
+msgid "Accuracy"
+msgstr "Точность"
+
+#: admin_api/services/translation_service.py
+msgid "Ascending"
+msgstr "По возрастанию"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:303
+msgid "Auto-refresh (5s)"
+msgstr "Автоматическое обновление (5 сек)"
+
+#: admin_api/services/translation_service.py
+msgid "Average"
+msgstr "Среднее"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:336
+msgid "Average Query Time"
+msgstr "Среднее время запроса"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:433
+msgid "Avg Time"
+msgstr "Среднее время"
+
+#: admin_api/services/translation_service.py
+msgid "Badge unlocked"
+msgstr "Значок разблокирован"
+
+#: admin_api/services/translation_service.py
+msgid "Badges"
+msgstr "Значки"
+
+#: admin_api/services/translation_service.py
+msgid "Badges Unlocked"
+msgstr "Значки разблокированы"
+
+#: admin_api/services/translation_service.py
+msgid "Cache cleared"
+msgstr "Кэш очищен"
+
+#: admin_api/services/translation_service.py
+msgid "Cache error: %s"
+msgstr "Ошибка кэша: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Cache invalidation failed (non-critical): %s"
+msgstr "Ошибка инвалидации кэша (некритично): %s"
+
+#: admin_api/services/translation_service.py
+msgid "Challenges Won"
+msgstr "Выигранные вызовы"
+
+#: admin_api/services/translation_service.py
+msgid "Coins"
+msgstr "Монеты"
+
+#: admin_api/services/translation_service.py
+msgid "Coins Gained"
+msgstr "Полученные монеты"
+
+#: admin_api/services/translation_service.py
+msgid "Coins awarded"
+msgstr "Выданные монеты"
+
+#: admin_api/services/translation_service.py
+msgid "Community Leaderboard"
+msgstr "Таблица лидеров сообщества"
+
+#: admin_api/services/translation_service.py
+msgid "Components"
+msgstr "Компоненты"
+
+#: admin_api/services/translation_service.py
+msgid "Connected to %s leaderboard"
+msgstr "Подключено к таблице лидеров %s"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:358
+msgid "Connections (Last Hour)"
+msgstr "Соединения (последний час)"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:354
+msgid "Current Connections"
+msgstr "Текущие соединения"
+
+#: admin_api/services/translation_service.py
+msgid "Database error: %s"
+msgstr "Ошибка базы данных: %s"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Degraded"
+msgstr "Деградирован"
+
+#: admin_api/services/translation_service.py
+msgid "Descending"
+msgstr "По убыванию"
+
+#: admin_api/services/translation_service.py
+msgid "Disconnected from leaderboard"
+msgstr "Отключено от таблицы лидеров"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Error"
+msgstr "Ошибка"
+
+#: admin_api/services/translation_service.py
+msgid "Error: %s"
+msgstr "Ошибка: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Failed to connect"
+msgstr "Ошибка подключения"
+
+#: admin_api/services/translation_service.py
+msgid "Forbidden"
+msgstr "Запрещено"
+
+#: admin_api/templates/gamification_dashboard.html:6
+msgid "Gamification Monitoring Dashboard"
+msgstr "Панель мониторинга геймификации"
+
+#: admin_api/services/translation_service.py
+msgid "Global Leaderboard"
+msgstr "Глобальная таблица лидеров"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py
+msgid "Healthy"
+msgstr "Здоров"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:315
+msgid "Hit Rate"
+msgstr "Коэффициент попадания"
+
+#: admin_api/services/translation_service.py
+msgid "Internal server error"
+msgstr "Внутренняя ошибка сервера"
+
+#: admin_api/services/translation_service.py
+msgid "Invalid JSON in request body"
+msgstr "Неверный JSON в теле запроса"
+
+#: admin_api/services/translation_service.py
+msgid "Invalid parameter: %s"
+msgstr "Неверный параметр: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Keep-alive ping confirmed"
+msgstr "Keep-alive ping подтвержден"
+
+#: admin_api/templates/gamification_dashboard.html:299
+msgid "Last updated:"
+msgstr ""
+
+#: admin_api/services/translation_service.py
+msgid "Last updated: %s"
+msgstr "Последнее обновление: %s"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:376
+msgid "Latest Snapshot Age"
+msgstr "Возраст последнего снимка"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard Statistics"
+msgstr "Статистика таблицы лидеров"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:411
+msgid "Leaderboard Type"
+msgstr "Тип таблицы лидеров"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard error: %s"
+msgstr "Ошибка таблицы лидеров: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Leaderboard updated, please refresh"
+msgstr "Таблица лидеров обновлена, пожалуйста обновите"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:297, admin_api/templates/gamification_dashboard.html:392
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:435
+msgid "Max"
+msgstr "Максимум"
+
+#: admin_api/services/translation_service.py
+msgid "Meals Completed"
+msgstr "Завершенные приемы пищи"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:326
+msgid "Memory Used"
+msgstr "Используемая память"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:434
+msgid "Min"
+msgstr "Минимум"
+
+#: admin_api/services/translation_service.py
+msgid "Mission completed"
+msgstr "Миссия выполнена"
+
+#: admin_api/services/translation_service.py
+msgid "MongoDB"
+msgstr ""
+
+#: admin_api/services/translation_service.py
+msgid "Most Active"
+msgstr "Наиболее активный"
+
+#: admin_api/services/translation_service.py
+msgid "Most Improved"
+msgstr "Наиболее улучшенный"
+
+#: admin_api/services/translation_service.py
+msgid "No trend data found for user %d"
+msgstr "Данные тренда не найдены для пользователя %d"
+
+#: admin_api/services/translation_service.py
+msgid "Not found"
+msgstr "Не найдено"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:340
+msgid "P95 Latency"
+msgstr "Задержка P95"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:362
+msgid "Peak Today"
+msgstr "Пик сегодня"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:432
+msgid "Queries"
+msgstr "Запросы"
+
+#: admin_api/services/translation_service.py
+msgid "Rank"
+msgstr "Ранг"
+
+#: admin_api/services/translation_service.py
+msgid "Rank Change"
+msgstr "Изменение рейтинга"
+
+#: admin_api/services/translation_service.py
+msgid "Redis"
+msgstr ""
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
+msgid "Retention Policy"
+msgstr "Политика удержания"
+
+#: admin_api/services/translation_service.py
+msgid "Running"
+msgstr "Работает"
+
+#: admin_api/services/translation_service.py
+msgid "Scheduler"
+msgstr "Планировщик"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:412
+msgid "Snapshots"
+msgstr "Снимки"
+
+#: admin_api/services/translation_service.py
+msgid "Stable"
+msgstr "Стабильный"
+
+#: admin_api/services/translation_service.py
+msgid "Status"
+msgstr "Статус"
+
+#: admin_api/services/translation_service.py
+msgid "Stopped"
+msgstr ""
+
+#: admin_api/services/translation_service.py
+msgid "Subscribed to leaderboard updates"
+msgstr "Подписан на обновления таблицы лидеров"
+
+#: admin_api/services/translation_service.py, admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:322
+msgid "Total Queries"
+msgstr "Всего запросов"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:372
+msgid "Total Snapshots"
+msgstr "Всего снимков"
+
+#: admin_api/services/translation_service.py
+msgid "Trait-Based Leaderboard"
+msgstr "Таблица лидеров на основе признаков"
+
+#: admin_api/services/translation_service.py
+msgid "Trending Users"
+msgstr "Популярные пользователи"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:431
+msgid "Type"
+msgstr "Тип"
+
+#: admin_api/services/translation_service.py
+msgid "Unauthorized"
+msgstr "Неавторизованный"
+
+#: admin_api/services/translation_service.py
+msgid "Unavailable"
+msgstr "Недоступно"
+
+#: admin_api/services/translation_service.py
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: admin_api/services/translation_service.py
+msgid "Unsubscribed from leaderboard updates"
+msgstr "Отписан от обновлений таблицы лидеров"
+
+#: admin_api/services/translation_service.py
+msgid "User Trend"
+msgstr "Тренд пользователя"
+
+#: admin_api/services/translation_service.py
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: admin_api/services/translation_service.py
+msgid "WebSocket error: %s"
+msgstr "Ошибка WebSocket: %s"
+
+#: admin_api/services/translation_service.py
+msgid "Your Rank"
+msgstr "Ваш ранг"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:381
+msgid "days"
+msgstr "дней"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:377
+msgid "h"
+msgstr "ч"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:300
+msgid "↻ Refresh Now"
+msgstr "↻ Обновить сейчас"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:334
+msgid "⚡ Leaderboard Performance"
+msgstr "⚡ Производительность таблицы лидеров"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:293
+msgid "🎮 Gamification Phase 2 — Monitoring Dashboard"
+msgstr "🎮 Геймификация Этап 2 — Панель мониторинга"
+
+#: admin_api/templates/gamification_dashboard.html:426
+msgid "🎯 Performance by Leaderboard Type"
+msgstr ""
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
+msgid "🏥 System Health"
+msgstr "🏥 Здоровье системы"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:400
+msgid "📈 Query Performance Trend"
+msgstr "📈 Тренд производительности запроса"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:370
+msgid "📊 Trend Analysis"
+msgstr "📊 Анализ тренда"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:352
+msgid "📡 WebSocket Connections"
+msgstr "📡 Соединения WebSocket"
+
+#: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:313
+msgid "📦 Cache Performance"
+msgstr "📦 Производительность кэша"
+
+#: admin_api/templates/gamification_dashboard.html:406
+msgid "📷 Snapshot Breakdown"
+msgstr ""
+
