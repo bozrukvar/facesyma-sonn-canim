@@ -170,7 +170,7 @@ msgstr "Keep-alive ping 확인됨"
 
 #: admin_api/templates/gamification_dashboard.html:299
 msgid "Last updated:"
-msgstr ""
+msgstr "마지막 업데이트:"
 
 #: admin_api/services/translation_service.py
 msgid "Last updated: %s"
@@ -222,7 +222,7 @@ msgstr "임무 완료"
 
 #: admin_api/services/translation_service.py
 msgid "MongoDB"
-msgstr ""
+msgstr "MongoDB"
 
 #: admin_api/services/translation_service.py
 msgid "Most Active"
@@ -262,7 +262,7 @@ msgstr "순위 변경"
 
 #: admin_api/services/translation_service.py
 msgid "Redis"
-msgstr ""
+msgstr "Redis"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
 msgid "Retention Policy"
@@ -290,7 +290,7 @@ msgstr "상태"
 
 #: admin_api/services/translation_service.py
 msgid "Stopped"
-msgstr ""
+msgstr "중지됨"
 
 #: admin_api/services/translation_service.py
 msgid "Subscribed to leaderboard updates"
@@ -370,7 +370,7 @@ msgstr "🎮 게임화 페이즈 2 — 모니터링 대시보드"
 
 #: admin_api/templates/gamification_dashboard.html:426
 msgid "🎯 Performance by Leaderboard Type"
-msgstr ""
+msgstr "🎯 리더보드 유형별 성능"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
 msgid "🏥 System Health"
@@ -394,5 +394,5 @@ msgstr "📦 캐시 성능"
 
 #: admin_api/templates/gamification_dashboard.html:406
 msgid "📷 Snapshot Breakdown"
-msgstr ""
+msgstr "📷 스냅샷 분석"
 

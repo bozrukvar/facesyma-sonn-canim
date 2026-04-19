@@ -170,7 +170,7 @@ msgstr "キープアライブpingが確認されました"
 
 #: admin_api/templates/gamification_dashboard.html:299
 msgid "Last updated:"
-msgstr ""
+msgstr "最終更新:"
 
 #: admin_api/services/translation_service.py
 msgid "Last updated: %s"
@@ -222,7 +222,7 @@ msgstr "ミッション完了"
 
 #: admin_api/services/translation_service.py
 msgid "MongoDB"
-msgstr ""
+msgstr "MongoDB"
 
 #: admin_api/services/translation_service.py
 msgid "Most Active"
@@ -262,7 +262,7 @@ msgstr "ランク変更"
 
 #: admin_api/services/translation_service.py
 msgid "Redis"
-msgstr ""
+msgstr "Redis"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
 msgid "Retention Policy"
@@ -290,7 +290,7 @@ msgstr "ステータス"
 
 #: admin_api/services/translation_service.py
 msgid "Stopped"
-msgstr ""
+msgstr "停止"
 
 #: admin_api/services/translation_service.py
 msgid "Subscribed to leaderboard updates"
@@ -370,7 +370,7 @@ msgstr "🎮 ゲーム化フェーズ 2 — 監視ダッシュボード"
 
 #: admin_api/templates/gamification_dashboard.html:426
 msgid "🎯 Performance by Leaderboard Type"
-msgstr ""
+msgstr "🎯 リーダーボードタイプ別パフォーマンス"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
 msgid "🏥 System Health"
@@ -394,5 +394,5 @@ msgstr "📦 キャッシュ性能"
 
 #: admin_api/templates/gamification_dashboard.html:406
 msgid "📷 Snapshot Breakdown"
-msgstr ""
+msgstr "📷 スナップショット分析"
 

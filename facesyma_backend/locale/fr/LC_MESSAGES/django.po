@@ -170,7 +170,7 @@ msgstr "Ping de maintien confirmé"
 
 #: admin_api/templates/gamification_dashboard.html:299
 msgid "Last updated:"
-msgstr ""
+msgstr "Dernière mise à jour:"
 
 #: admin_api/services/translation_service.py
 msgid "Last updated: %s"
@@ -222,7 +222,7 @@ msgstr "Mission Complète"
 
 #: admin_api/services/translation_service.py
 msgid "MongoDB"
-msgstr ""
+msgstr "MongoDB"
 
 #: admin_api/services/translation_service.py
 msgid "Most Active"
@@ -262,7 +262,7 @@ msgstr "Changement de Rang"
 
 #: admin_api/services/translation_service.py
 msgid "Redis"
-msgstr ""
+msgstr "Redis"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
 msgid "Retention Policy"
@@ -370,7 +370,7 @@ msgstr "🎮 Gamification Phase 2 — Tableau de Bord de Surveillance"
 
 #: admin_api/templates/gamification_dashboard.html:426
 msgid "🎯 Performance by Leaderboard Type"
-msgstr ""
+msgstr "🎯 Performances par Type de Classement"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
 msgid "🏥 System Health"
@@ -394,5 +394,5 @@ msgstr "📦 Performance du Cache"
 
 #: admin_api/templates/gamification_dashboard.html:406
 msgid "📷 Snapshot Breakdown"
-msgstr ""
+msgstr "📷 Détail des Instantanés"
 

@@ -170,7 +170,7 @@ msgstr "تم تأكيد ping المراقبة"
 
 #: admin_api/templates/gamification_dashboard.html:299
 msgid "Last updated:"
-msgstr ""
+msgstr "آخر تحديث:"
 
 #: admin_api/services/translation_service.py
 msgid "Last updated: %s"
@@ -222,7 +222,7 @@ msgstr "تم إكمال المهمة"
 
 #: admin_api/services/translation_service.py
 msgid "MongoDB"
-msgstr ""
+msgstr "MongoDB"
 
 #: admin_api/services/translation_service.py
 msgid "Most Active"
@@ -262,7 +262,7 @@ msgstr "تغيير الرتبة"
 
 #: admin_api/services/translation_service.py
 msgid "Redis"
-msgstr ""
+msgstr "Redis"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:380
 msgid "Retention Policy"
@@ -290,7 +290,7 @@ msgstr "الحالة"
 
 #: admin_api/services/translation_service.py
 msgid "Stopped"
-msgstr ""
+msgstr "متوقف"
 
 #: admin_api/services/translation_service.py
 msgid "Subscribed to leaderboard updates"
@@ -366,11 +366,11 @@ msgstr "⚡ أداء لوحة الترتيب"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:293
 msgid "🎮 Gamification Phase 2 — Monitoring Dashboard"
-msgstr ""
+msgstr "🎮 مرحلة المقامرة 2 — لوحة المراقبة"
 
 #: admin_api/templates/gamification_dashboard.html:426
 msgid "🎯 Performance by Leaderboard Type"
-msgstr ""
+msgstr "🎯 الأداء حسب نوع لوحة الترتيب"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
 msgid "🏥 System Health"
@@ -394,5 +394,5 @@ msgstr "📦 أداء الذاكرة المؤقتة"
 
 #: admin_api/templates/gamification_dashboard.html:406
 msgid "📷 Snapshot Breakdown"
-msgstr ""
+msgstr "📷 تفصيل اللقطة"
 

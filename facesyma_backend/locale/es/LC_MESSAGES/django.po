@@ -170,7 +170,7 @@ msgstr "Ping de mantener vivo confirmado"
 
 #: admin_api/templates/gamification_dashboard.html:299
 msgid "Last updated:"
-msgstr ""
+msgstr "Última actualización:"
 
 #: admin_api/services/translation_service.py
 msgid "Last updated: %s"
@@ -370,7 +370,7 @@ msgstr "🎮 Gamificación Fase 2 — Panel de Monitoreo"
 
 #: admin_api/templates/gamification_dashboard.html:426
 msgid "🎯 Performance by Leaderboard Type"
-msgstr ""
+msgstr "🎯 Desempeño por Tipo de Clasificación"
 
 #: admin_api/services/translation_service.py, admin_api/templates/gamification_dashboard.html:388
 msgid "🏥 System Health"
@@ -394,5 +394,5 @@ msgstr "📦 Rendimiento de Caché"
 
 #: admin_api/templates/gamification_dashboard.html:406
 msgid "📷 Snapshot Breakdown"
-msgstr ""
+msgstr "📷 Desglose de Instantánea"
 
