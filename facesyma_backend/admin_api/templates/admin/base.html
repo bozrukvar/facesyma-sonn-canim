@@ -1,0 +1,382 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facesyma Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0e0e;
+            color: #ffffff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #1a1918;
+            border-right: 1px solid #2a2928;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #2a2928;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d4af37;
+            letter-spacing: 2px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin: 0;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #b0b0b0;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #2a2928;
+            color: #d4af37;
+        }
+
+        .sidebar-nav a.active {
+            border-left-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2928;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #ffffff;
+        }
+
+        .logout-btn {
+            background: #d4af37;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #c19a2d;
+        }
+
+        .content {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: #1a1918;
+            border: 1px solid #2a2928;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table thead {
+            background: rgba(212, 175, 55, 0.1);
+            border-bottom: 2px solid #2a2928;
+        }
+
+        table th {
+            text-align: left;
+            padding: 12px;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #2a2928;
+            color: #b0b0b0;
+        }
+
+        table tr:hover {
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1a1918;
+            border: 1px solid #2a2928;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: #2a2928;
+            border: 1px solid #3a3632;
+            color: #ffffff;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #c19a2d;
+        }
+
+        .btn-secondary {
+            background: #3a3632;
+            color: #d4af37;
+            border: 1px solid #d4af37;
+        }
+
+        .btn-secondary:hover {
+            background: #4a4642;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            background: #2a2928;
+            border: 1px solid #3a3632;
+            color: #d4af37;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .pagination .active {
+            background: #d4af37;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .alert-danger {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+            color: #F44336;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #2a2928;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stat-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">FACESYMA</div>
+            <div style="font-size: 12px; color: #707070; margin-top: 5px;">Admin Panel</div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li><a href="/admin/" class="{% block nav-dashboard %}{% endblock %}">📊 Dashboard</a></li>
+            <li><a href="/admin/users/" class="{% block nav-users %}{% endblock %}">👥 Kullanıcılar</a></li>
+            <li><a href="/admin/database/" class="{% block nav-database %}{% endblock %}">🗄️ Veritabanı</a></li>
+            <li><a href="/admin/reviews/" class="{% block nav-reviews %}{% endblock %}">💬 Yorumlar</a></li>
+            <li><a href="/admin/coach/" class="{% block nav-coach %}{% endblock %}">🤖 Coach DB</a></li>
+            <li><a href="/admin/subscriptions/" class="{% block nav-subscriptions %}{% endblock %}">💰 Abonelikler</a></li>
+            <li><a href="/admin/logout/" style="color: #F44336;">🚪 Çıkış</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>{% block title %}Dashboard{% endblock %}</h1>
+            <button class="logout-btn" onclick="location.href='/admin/logout/'">Çıkış Yap</button>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // API isteği yardımcısı
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const token = localStorage.getItem('admin_token');
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            if (body) options.body = JSON.stringify(body);
+
+            const response = await fetch(`/api/v1/admin${endpoint}`, options);
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    // Token geçersiz, login'e yönlendir
+                    localStorage.removeItem('admin_token');
+                    window.location.href = '/admin/login/';
+                }
+                throw new Error(data.detail || 'API hatası');
+            }
+
+            return data;
+        }
+
+        // Token varsa sayfada kalma, yoksa login'e yönlendir
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('admin_token');
+            if (!token && window.location.pathname !== '/admin/login/') {
+                window.location.href = '/admin/login/';
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

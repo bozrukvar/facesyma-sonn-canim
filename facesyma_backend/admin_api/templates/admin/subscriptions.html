@@ -1,0 +1,386 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-subscriptions %}active{% endblock %}
+
+{% block title %}Subscription Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💰 Subscription Management</h1>
+    <p>Real-time metrics, user lookup, and subscription management</p>
+</div>
+
+<!-- METRICS DASHBOARD -->
+<div class="stat-cards">
+    <div class="stat-card">
+        <div class="stat-label">Active Subscriptions</div>
+        <div class="stat-value" id="activeCount">-</div>
+        <div class="stat-subtext">premium users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Monthly Recurring Revenue (MRR)</div>
+        <div class="stat-value" id="mrrValue">-</div>
+        <div class="stat-subtext">estimated</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Annual Recurring Revenue (ARR)</div>
+        <div class="stat-value" id="arrValue">-</div>
+        <div class="stat-subtext">estimated</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Churn Rate (30d)</div>
+        <div class="stat-value" id="churnRate">-</div>
+        <div class="stat-subtext">% of active</div>
+    </div>
+</div>
+
+<div class="stat-cards">
+    <div class="stat-card">
+        <div class="stat-label">New (Last 7d)</div>
+        <div class="stat-value" id="new7d">-</div>
+        <div class="stat-subtext">subscriptions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Conversion Rate</div>
+        <div class="stat-value" id="conversionRate">-</div>
+        <div class="stat-subtext">trial to paid</div>
+    </div>
+</div>
+
+<!-- BY TIER BREAKDOWN -->
+<div class="card">
+    <div class="card-title">📊 Active Subscriptions by Tier</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Tier</th>
+                <th>Active Count</th>
+                <th>Est. Monthly Revenue</th>
+                <th>% of Total</th>
+            </tr>
+        </thead>
+        <tbody id="tierTable">
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px;">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- USER SEARCH -->
+<div class="card">
+    <div class="card-title">🔍 Search User Subscriptions</div>
+    <div style="padding: 20px;">
+        <form id="searchForm" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input
+                type="text"
+                id="searchQuery"
+                placeholder="Email or username..."
+                style="flex: 1; padding: 8px 12px; border: 1px solid #444; background: #1a1a1a; color: #fff; border-radius: 4px;"
+            >
+            <select id="statusFilter" style="padding: 8px 12px; border: 1px solid #444; background: #1a1a1a; color: #fff; border-radius: 4px;">
+                <option value="all">All Status</option>
+                <option value="premium">Premium Only</option>
+                <option value="free">Free Only</option>
+            </select>
+            <button type="button" onclick="searchSubscriptions()" style="padding: 8px 16px; background: #d4af37; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                Search
+            </button>
+        </form>
+
+        <div id="searchResults" style="display: none;">
+            <h3 style="margin-top: 20px;">Search Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Plan</th>
+                        <th>Tier</th>
+                        <th>Expires</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- AT-RISK USERS -->
+<div class="card">
+    <div class="card-title">⚠️ At-Risk Users (Expiring Soon)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Tier</th>
+                <th>Expires In</th>
+                <th>Days</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="atRiskTable">
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<style>
+.stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #d4af37;
+    margin-bottom: 5px;
+}
+
+.stat-subtext {
+    font-size: 11px;
+    color: #666;
+}
+
+.card {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #d4af37;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #2a2a2a;
+    color: #d4af37;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    color: #ccc;
+}
+
+tr:hover {
+    background: #252525;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    background: #d4af37;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-small:hover {
+    background: #e8c547;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    color: #d4af37;
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.page-header p {
+    color: #999;
+}
+</style>
+
+<script>
+const API_BASE = '/api';
+
+async function apiCall(endpoint) {
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('admin_token') || ''}`
+            }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`API Error: ${endpoint}`, error);
+        return null;
+    }
+}
+
+async function loadMetrics() {
+    const data = await apiCall('/monitoring/subscriptions/');
+    if (!data) return;
+
+    const metrics = data.metrics || {};
+    document.getElementById('activeCount').textContent = metrics.active_subscriptions || 0;
+    document.getElementById('mrrValue').textContent = '$' + (metrics.mrr || 0).toFixed(2);
+    document.getElementById('arrValue').textContent = '$' + (metrics.arr || 0).toFixed(2);
+    document.getElementById('churnRate').textContent = (metrics.churn_rate_30d || 0).toFixed(1) + '%';
+    document.getElementById('new7d').textContent = metrics.new_subscriptions_7d || 0;
+    document.getElementById('conversionRate').textContent = (metrics.conversion_rate || 0).toFixed(1) + '%';
+
+    // Load tier breakdown
+    const tiers = data.by_tier || [];
+    const tierTable = document.getElementById('tierTable');
+    tierTable.innerHTML = '';
+
+    const totalCount = tiers.reduce((sum, t) => sum + t.count, 0);
+    const totalMrr = tiers.reduce((sum, t) => sum + t.estimated_mrr, 0);
+
+    tiers.forEach(tier => {
+        const percentage = totalCount > 0 ? ((tier.count / totalCount) * 100).toFixed(1) : 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="font-weight: bold; color: #d4af37;">${tier.tier}</td>
+            <td>${tier.count}</td>
+            <td>$${tier.estimated_mrr.toFixed(2)}</td>
+            <td>${percentage}%</td>
+        `;
+        tierTable.appendChild(row);
+    });
+
+    // Load at-risk users
+    const churnData = await apiCall('/subscriptions/churn/');
+    if (churnData && churnData.at_risk_users) {
+        const atRiskTable = document.getElementById('atRiskTable');
+        atRiskTable.innerHTML = '';
+
+        churnData.at_risk_users.forEach(user => {
+            const expiresDate = new Date(user.expires_date);
+            const daysLeft = Math.ceil((expiresDate - new Date()) / (1000 * 60 * 60 * 24));
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${user.user_id}</strong></td>
+                <td>${user.tier}</td>
+                <td>${expiresDate.toLocaleDateString()}</td>
+                <td style="color: ${daysLeft <= 3 ? '#ff6b6b' : '#ffa500'}; font-weight: bold;">${daysLeft} days</td>
+                <td>
+                    <button class="btn-small" onclick="grantExtension(${user.user_id})">Extend 30d</button>
+                </td>
+            `;
+            atRiskTable.appendChild(row);
+        });
+    }
+}
+
+async function searchSubscriptions() {
+    const query = document.getElementById('searchQuery').value.trim();
+    const status = document.getElementById('statusFilter').value;
+
+    if (!query && status === 'all') {
+        alert('Enter search query or select status filter');
+        return;
+    }
+
+    const endpoint = `/subscriptions/search/?q=${encodeURIComponent(query)}&status=${status}&limit=50`;
+    const data = await apiCall(endpoint);
+
+    if (!data) return;
+
+    const resultsDiv = document.getElementById('searchResults');
+    const resultsTable = document.getElementById('resultsTable');
+    resultsTable.innerHTML = '';
+
+    if (data.results.length === 0) {
+        resultsTable.innerHTML = '<tr><td colspan="7" style="text-align: center;">No results found</td></tr>';
+    } else {
+        data.results.forEach(user => {
+            const row = document.createElement('tr');
+            const expiresDate = user.expires_date ? new Date(user.expires_date).toLocaleDateString() : '-';
+            row.innerHTML = `
+                <td>${user.user_id}</td>
+                <td>${user.email}</td>
+                <td>${user.username || '-'}</td>
+                <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#666'}; padding: 4px 8px; border-radius: 4px;">${user.plan}</span></td>
+                <td>${user.tier || '-'}</td>
+                <td>${expiresDate}</td>
+                <td>
+                    <button class="btn-small" onclick="viewUserDetail(${user.user_id})">Manage</button>
+                </td>
+            `;
+            resultsTable.appendChild(row);
+        });
+    }
+
+    resultsDiv.style.display = 'block';
+}
+
+async function grantExtension(userId) {
+    if (!confirm('Grant 30 days premium extension to this user?')) return;
+
+    const data = await apiCall(`/subscriptions/${userId}/`, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'grant_premium',
+            days: 30
+        })
+    });
+
+    if (data && data.success) {
+        alert('✅ ' + data.message);
+        loadMetrics();
+    }
+}
+
+function viewUserDetail(userId) {
+    window.location.href = `/admin/subscriptions/${userId}/`;
+}
+
+// Load on page load
+document.addEventListener('DOMContentLoaded', loadMetrics);
+
+// Refresh every 5 minutes
+setInterval(loadMetrics, 5 * 60 * 1000);
+</script>
+{% endblock %}
