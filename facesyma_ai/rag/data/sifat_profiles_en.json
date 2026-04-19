@@ -1,0 +1,1017 @@
+{
+  "metadata": {
+    "title": "Facesyma 201 Personality Traits Profiles - English",
+    "count": 201,
+    "description": "RAG (Retrieval-Augmented Generation) profiles for 201 personality traits",
+    "language": "en",
+    "generated_at": "2026-04-18T11:56:15.264604",
+    "version": "1.0"
+  },
+  "sifatlar": [
+    {
+      "no": 1,
+      "name": "deliberate decision maker",
+      "description": "Karar alırken en ince ayrıntısına kadar düşünenlerdensin Karar verirken her türlü olasılığı gözden geçirdiğinden dolayı biraz zaman kaybetsen de bu kararlarında daha dikkatli olmanı sağlar Kararlarını acele almaz, ihtimalleri enine boyuna değerlendirirsin"
+    },
+    {
+      "no": 2,
+      "name": "cautious decision taker",
+      "description": "Herhangi bir karar vermeden önce durumu tüm yönleriyle değerlendirme alışkanlığın var Adım atmadan önce olası riskleri ve fırsatları göz önünde bulundurursun Temkinli karar alma yaklaşımın seni pek çok hatadan koruyor"
+    },
+    {
+      "no": 3,
+      "name": "thoughtful actor",
+      "description": "Adım atmadan önce düşünmek senin için vazgeçilmez bir alışkanlık Her hareketten önce zihinsel bir hazırlık süreci yaşıyorsun Anlık tepkilerle değil, olgun düşüncelerle hareket etmeyi tercih edersin"
+    },
+    {
+      "no": 4,
+      "name": "candid speaker",
+      "description": "Çoğunlukla düşündüklerini açıkça ifade ederek çevrende anlaşılır ve net bir iletişim kuruyorsun Dürüst ve açık bir tavır güçlü ilişkiler kurmana yardımcı oluyor Açık sözlü olmak senin temel özelliklerindendir"
+    },
+    {
+      "no": 5,
+      "name": "honest and direct",
+      "description": "Dürüstlük senin için soyut bir değer değil; her gün yaşadığın somut bir tutum Gerçeği doğrudan söylemek bazen zor olsa da sen bundan kaçınmıyorsun Doğrudan iletişim tarzın çevrende şeffaf ve güvenilir bir imaj yaratıyor"
+    },
+    {
+      "no": 6,
+      "name": "sincere in expression",
+      "description": "Söylediklerin her zaman içinden geldiği hissini uyandırıyor; bu seni özgün kılıyor Kelimelerinde sahte bir ton yok; bu samimilik insanları sana çekiyor Samimi bir şekilde ifade etmek seni hem sevilmiş hem de güvenilir yapıyor"
+    },
+    {
+      "no": 7,
+      "name": "family-oriented and devoted",
+      "description": "Ailenle sağlam ve sıcak bağlar kurmaya özen gösteriyorsun Aile senin için en öncelikli konularından biridir Aile değerlerine önem vermen karakterini güçlendiriyor"
+    },
+    {
+      "no": 8,
+      "name": "values family bonds",
+      "description": "Aile bağlarını beslemek ve güçlendirmek senin için sürekli devam eden bir öncelik Akrabalık ve aile ilişkilerini anlamlı bulmak seni sıcak ve bağlı biri yapıyor Aile bağlarına verdiğin değer ilişkilerine süreklilik ve derinlik katıyor"
+    },
+    {
+      "no": 9,
+      "name": "home-loving and family-focused",
+      "description": "Ev ve aile senin için dünyanın en güvenli ve en anlamlı yeri Yuvanı özenle yaratmak ve korumak senin için temel bir öncelik Aile odaklı bir yaşam tarzı sana hem huzur hem de anlam veriyor"
+    },
+    {
+      "no": 10,
+      "name": "spontaneous decision maker",
+      "description": "Ani kararlar alabilme yeteneğin hızlı düşünme ve etkili eyleme geçme yetilerini yansıtıyor Zorlu durumlarda hızlı bir şekilde karar verebiliyorsun Esnek düşünce yapın sayesinde anında kararlar alarak değişen koşullara hızla uyum sağlayabiliyorsun"
+    },
+    {
+      "no": 11,
+      "name": "quick decision taker",
+      "description": "Hızlı karar alabilmek dinamik ortamlarda seni rakiplerine göre bir adım öne geçiriyor Kararsızlık içinde bekleme sana göre değil; çabuk karar verip harekete geçmek istersin Hızlı karar alma yeteneğin kriz ve baskı anlarında seni güçlü kılıyor"
+    },
+    {
+      "no": 12,
+      "name": "intuitive actor",
+      "description": "Sezgilerine güvenmek ve ona göre hareket etmek senin için doğal bir yol Verilerden çok içgüdülerinle yönlenen biri olarak bazen şaşırtıcı doğru sonuçlar elde ediyorsun Sezgisel hareket etmek seni hızlı ve akıcı bir karar alıcı yapıyor"
+    },
+    {
+      "no": 13,
+      "name": "understanding",
+      "description": "Başkalarının duygusal durumlarını anlamada çok iyisin Diğer kişilerin bakış açısını anlamak ve hissetmek senin için kolaydır Etkin dinleme yapabilmen sayesinde insanları, olayları, durumları anlama ve kavrama hızın yüksek"
+    },
+    {
+      "no": 14,
+      "name": "empathetic",
+      "description": "Başkalarının hislerini sanki kendi hislerin gibi yaşama yeteneğin var Empatin seni hem iyi bir dinleyici hem de güçlü bir destek kaynağı yapıyor Karşındakinin duygusal dünyasına kolayca girebiliyorsun; bu nadir bir yetenek"
+    },
+    {
+      "no": 15,
+      "name": "tolerant",
+      "description": "Farklılıklara ve hatalara karşı gösterdiğin hoşgörü seni olgun ve büyük kalpli yapıyor Başkalarını oldukları gibi kabul etmek senin için bilinçli bir yaşam tercihi Hoşgörün çevrendekilerin kendilerini rahat hissetmelerini sağlıyor"
+    },
+    {
+      "no": 16,
+      "name": "unsympathetic",
+      "description": "Başkalarının duygularını kavramakta zaman zaman güçlük çekiyorsun Karşındakinin bakış açısını anlamadan hareket etme eğilimin zaman zaman sürtüşmelere yol açabiliyor Empati kurma konusundaki zorlanman ilişkilerini zaman zaman zorlayabiliyor"
+    },
+    {
+      "no": 17,
+      "name": "struggles with empathy",
+      "description": "Başkalarının hislerini anlamak bazen sana karmaşık ve zor geliyor Empati kurmakta yaşadığın zorluk iletişimde zaman zaman boşluklar yaratıyor Başkalarının bakış açısını içselleştirmek senin için bilinçli bir çaba gerektiriyor"
+    },
+    {
+      "no": 18,
+      "name": "indifferent",
+      "description": "Başkalarının hislerine gösterdiğin ilgisizlik ilişkilerini zaman zaman yıpratıyor Duygusal sinyalleri fark etmemek insanların senden uzaklaşmasına zemin hazırlıyor Duyarsız bir tutum çevrende yalnızlık ve kopukluk yaratabilir"
+    },
+    {
+      "no": 19,
+      "name": "friendly",
+      "description": "Yeni insanlarla tanışmak ve sosyal bağ kurmak senin için doğal bir süreç Güleryüzlü ve samimi tutumun insanların sana çabuk ısınmasını sağlıyor Arkadaşlarına değer verirsin; bu onları kendilerini özel hissettiriyor"
+    },
+    {
+      "no": 20,
+      "name": "social and cheerful",
+      "description": "Neşen her ortama renk katıyor ve insanları kendine çekiyor Sosyal ortamlarda doğal bir enerji taşıyorsun; bu seni grup dinamiklerinde vazgeçilmez kılıyor Neşeli yapın insanlara iyimserlik ve motivasyon aşılıyor"
+    },
+    {
+      "no": 21,
+      "name": "open and warm-hearted",
+      "description": "İnsanlara kapını açmak senin için hem doğal hem de anlamlı Sıcak ve samimi tutumun insanları sana güvenle yaklaştırıyor İnsana açık olmak seni her ortamda erişilebilir ve değerli kılıyor"
+    },
+    {
+      "no": 22,
+      "name": "loves independence",
+      "description": "Kendi kararlarını kendin verme konusundaki ısrarın özgürlük anlayışının bir parçası Başkalarına bağımlı olmadan yaşamayı tercih ediyor, kendi yolunu kendisi çiziyorsun Özgürlük senin için temel bir yaşam değeri"
+    },
+    {
+      "no": 23,
+      "name": "freedom-loving",
+      "description": "Özgürlük senin için sadece bir kelime değil; derin bir yaşam ihtiyacı Kısıtlamalar ve sınırlamalar seni içten sıkıştırıyor; açık alan seni besliyor Özgür hissetmek senin için temel bir motivasyon kaynağı"
+    },
+    {
+      "no": 24,
+      "name": "carves own path",
+      "description": "Başkalarının rotasını değil, kendi rotanı belirlemeyi tercih edersin Kendi yolunu çizmek hem özgürlük hem de sorumluluk gerektiriyor; sen ikisini de taşıyorsun Alışılmış yollarda yürümek yerine kendi izini oluşturmak senin tarzın"
+    },
+    {
+      "no": 25,
+      "name": "selfish",
+      "description": "Kendi ihtiyaçlarını ve çıkarlarını ön planda tutma eğilimin ilişkilerini olumsuz etkileyebilir Başkalarının hislerini göz ardı etme alışkanlığın zamanla yalnızlık yaratabilir Paylaşmakta güçlük çekmen çevrendeki insanların senden uzaklaşmasına neden olabilir"
+    },
+    {
+      "no": 26,
+      "name": "self-centered",
+      "description": "Kendi çıkarlarını ve ihtiyaçlarını merkeze alma eğilimin güçlü Her durumda önce kendinle ilgilenmeyi tercih etme eğilimindesin Self-merkezli bir yapı bazen başkalarının ihtiyaçlarını göz ardı etmenle sonuçlanıyor"
+    },
+    {
+      "no": 27,
+      "name": "puts self-interest first",
+      "description": "Kendi çıkarını öne almak bazen doğal ve gerekli; sürekli yapıldığında ise ilişkileri zedeliyor Her durumda önce kendi yararını düşünmek bazen başkalarına güvensizlik hissi veriyor Kendi çıkarını öne almak kısa vadede işe yarıyor; uzun vadede güven kaybına yol açıyor"
+    },
+    {
+      "no": 28,
+      "name": "big-picture focused",
+      "description": "Stratejik ve uzun vadeli planlar yapmakta başarılısın Olaylara geniş pencereden bakabiliyorsun Büyük resmi görmekte iyisin"
+    },
+    {
+      "no": 29,
+      "name": "holistic thinker",
+      "description": "Olayları parçalara ayırmak yerine bir bütün olarak değerlendirmek senin doğal yaklaşımın Bütüncül düşünmek seni hem stratejik hem de yaratıcı kılıyor Parçalar arasındaki bağlantıları görmek senin en güçlü analitik yeteneğin"
+    },
+    {
+      "no": 30,
+      "name": "visionary outlook",
+      "description": "Geleceği bugünden görmek ve ona göre hareket etmek senin doğal bir yeteneğin Vizyoner bir bakış açısı seni hem ilham verici hem de yönlendirici kılıyor Bugünün ötesini görmek seni stratejik ve değerli bir lider yapıyor"
+    },
+    {
+      "no": 31,
+      "name": "quick-tempered",
+      "description": "Başkalarının seni sinirlendirmesine izin veriyorsun Çok çabuk öfkeleniyorsun Sakin kalmayı beceremiyorsun"
+    },
+    {
+      "no": 32,
+      "name": "impatient and tense",
+      "description": "Sabırsız yapın hem enerjini hem de çevreni zaman zaman yoruyor Bekleme sürecini tolere etmekte güçlük çekiyorsun; bu bazen gerginliğe yol açıyor Sabırsız olmak hız ve aksiyon isteğinin güçlü bir göstergesi"
+    },
+    {
+      "no": 33,
+      "name": "easily angered",
+      "description": "Öfke eşiğin düşük; küçük şeyler bile tepkini tetikleyebiliyor Kolay öfkelenmek bazen güçlü değerlerin ve yüksek beklentilerin göstergesi Öfke tepkilerin bazen çevrende gerginlik atmosferi yaratıyor"
+    },
+    {
+      "no": 34,
+      "name": "ignorant",
+      "description": "Bilgi eksikliğin konuşmalarını sınırlayabiliyor Gündemdeki konular hakkında pek bilgi sahibi değilsin Bazı temel kavramlara ilişkin bilgi eksikliği seni zor durumda bırakabiliyor"
+    },
+    {
+      "no": 35,
+      "name": "closed to learning",
+      "description": "Yeni bilgi ve fikirlere kapıyı kapalı tutmak seni değişen dünyadan geri bırakıyor Öğrenmeye kapalı olmak mevcut kalıpların içinde sıkışıp kalmak demek Yeni bilgiye direnç göstermek uzun vadede rekabet gücünü zayıflatıyor"
+    },
+    {
+      "no": 36,
+      "name": "distant from knowledge",
+      "description": "Bilgiden uzak durmak seni hem bilgi hem de güç eksikliğine sürüklüyor Güncel bilgiye ulaşmamak zaman içinde hem kariyer hem de sosyal hayatında boşluklar yaratıyor Bilgiden uzak kalmak belirsiz ve yanlış kararlar almana zemin hazırlıyor"
+    },
+    {
+      "no": 37,
+      "name": "not afraid of hard work",
+      "description": "Görevlerini yerine getirme konusunda özverili ve kararlısındır Çok çalışmak senin için hiç korkutucu değil, aksine motive edicidir Güçlü bir iş ahlakı ve sorumluluk bilincine sahipsin"
+    },
+    {
+      "no": 38,
+      "name": "determined and hardworking",
+      "description": "Hedeflerine ulaşmak için gösterdiğin azim seni başarıya taşıyan en güçlü araç Çalışkanlığın hem seni hem de çevreni besliyor ve motive ediyor Azmin zorluklar karşısında pes etmemeni sağlıyor"
+    },
+    {
+      "no": 39,
+      "name": "willing to put in effort",
+      "description": "Emek harcamak sana hem tatmin hem de öz saygı veriyor Çaba göstermekten kaçınmamak güçlü bir sorumluluk ve öz disiplin göstergesi Emek harcama isteğin seni çevrende güvenilir ve değerli biri yapıyor"
+    },
+    {
+      "no": 40,
+      "name": "generous",
+      "description": "Kaynaklarını zamanlarını veya bilgilerini başkalarıyla paylaşmaya isteklisindir Paylaşma konusundaki cömert tavırların seni gerçekten özel kılıyor Sadece maddi değil duygusal olarak da cömert birisindir"
+    },
+    {
+      "no": 41,
+      "name": "open-handed and sharing",
+      "description": "Sahip olduklarını başkalarıyla paylaşmak senin için hem doğal hem de anlamlı Eli açık bir karakter taşımak seni hem sevilmiş hem de güvenilen biri yapıyor Paylaşımcı yapın çevrende güçlü bağlar ve güven oluşturuyor"
+    },
+    {
+      "no": 42,
+      "name": "magnanimous",
+      "description": "Bonkörlüğün seni hem sevilmiş hem de saygı duyulan biri yapıyor Cömertçe harcamak ve vermek senin için doğal bir yaşam tarzı Bonkör bir kişilik taşımak çevrende güçlü bir sempati ve güven yaratıyor"
+    },
+    {
+      "no": 43,
+      "name": "balanced character",
+      "description": "Hayatında duygusal ruhsal ve sosyal alanlarda sağlıklı bir denge kurmak senin için önemlidir Duygusal tepkilerini kontrol edebilme ve çeşitli durumlarla başa çıkabilme becerin yüksektir Olumsuz duygularını yönetebilir ve olumlu duygularını sürdürebilirsin"
+    },
+    {
+      "no": 44,
+      "name": "emotionally balanced",
+      "description": "Duygusal dengeni korumak hem kendine hem de çevrenine güven veriyor Duygusal olarak dengeli olmak zor anlarda bile aklını başında tutmanı sağlıyor Hislerini yönetmek ve dengede tutmak güçlü bir duygusal zekânın göstergesi"
+    },
+    {
+      "no": 45,
+      "name": "stable and consistent",
+      "description": "İstikrarlı bir karakter taşımak seni güvenilir ve saygın kılıyor Tutarlı davranmak uzun vadede en güçlü güven inşa aracı İstikrarlı olmak hem ilişkilerinde hem kariyer hayatında süreklilik yaratıyor"
+    },
+    {
+      "no": 46,
+      "name": "detail-oriented",
+      "description": "Çevrendeki detayları dikkatlice gözlemleyerek küçük ayrıntıları fark edebilirsin İşlerini dikkatle planlar ve titiz bir şekilde uygularsın, hata yapmaktan kaçınırsın Görev ve projeleri planlarken ayrıntılı ve sistemlisindir"
+    },
+    {
+      "no": 47,
+      "name": "meticulous and careful",
+      "description": "Her işi özenle yapmak senin için vazgeçilmez bir standart Titizliğin yaptığın her işin kalitesini yükseltiyor Özenli bir çalışma tarzı hataları minimize ederek güvenilir sonuçlar üretiyor"
+    },
+    {
+      "no": 48,
+      "name": "pays attention to detail",
+      "description": "Küçük detayları fark etmek senin için doğal bir refleks Ayrıntılara dikkat etmek hataları en aza indirmenin en etkili yolu Her ayrıntıyı görmek seni hem güvenilir hem de değerli kılıyor"
+    },
+    {
+      "no": 49,
+      "name": "dominant",
+      "description": "Grupları yönetme kararlar alma konusunda yeteneklisindir Dominant karakterinle liderlik rollerini üstlenmeye eğilimlisindir Kendine güvenin tamdır ve düşüncelerini açıkça ifade etme konusunda rahatsındır"
+    },
+    {
+      "no": 50,
+      "name": "strong-willed character",
+      "description": "Baskın bir karakter taşımak seni doğal bir lider ve karar alıcı yapıyor Güçlü kişiliğin çevrenizde hem saygı hem de mesafe uyandırabiliyor Baskın bir karakter hem güç hem de sorumluluk gerektiriyor; sen ikisini de taşıyorsun"
+    },
+    {
+      "no": 51,
+      "name": "directing and strong-willed",
+      "description": "Yönlendirici bir kişilik taşımak seni doğal bir lider yapıyor Güçlü iradeniz hem hedeflere ulaşmada hem de zorluklarla baş etmede kritik Yönlendirici olmak bazen başkalarına alan açmayı zorlaştırıyor; farkında olmak önemli"
+    },
+    {
+      "no": 52,
+      "name": "lost in thought",
+      "description": "Konuları derinlemesine düşünme yeteneğin vardır Düşüncelere dalarak zamanın farkına varmadığın sık olur Genellikle kendi başına düşünmeyi tercih eder ve bu düşüncelerden kolayca çıkamazsın"
+    },
+    {
+      "no": 53,
+      "name": "dreamer",
+      "description": "Hayaller senin için ilham kaynağı ve yaratıcılığının tohumları Hayal gücün seni hem özgün hem de yaratıcı bir insan yapıyor Hayalperest olmak bazen pratik sorumluluklardan uzaklaşmana neden olabilir; denge önemli"
+    },
+    {
+      "no": 54,
+      "name": "introverted and absent-minded",
+      "description": "İç dünyan zengin ve derindir; bu seni hem özgün hem de anlayışlı kılıyor Dalgın bir yapıya sahip olmak bazen pratikte zorluk yaratsa da yaratıcılığını besliyor İçe dönük olmak yalnız olmak değil; kendine ait bir derinlikle yaşamak"
+    },
+    {
+      "no": 55,
+      "name": "puts feelings before thoughts",
+      "description": "Kararlar alırken nasıl hissettiğini de hesaba katarsın Sorunlara çözüm bulurken duygusal yaklaşımları tercih edebilirsin Profesyonel ilişkilerinde bile fark etmeden duygusal bağ kurarsın"
+    },
+    {
+      "no": 56,
+      "name": "feeling-based decision maker",
+      "description": "Kararlarını verirken duygularının rehberliğine güvenirsin Duygu odaklı kararlar bazen çok isabetli bazen de yeniden gözden geçirilmesi gereken sonuçlar üretiyor Duygularının yönlendirmesiyle aldığın kararlar çoğunlukla değerlerinle örtüşüyor"
+    },
+    {
+      "no": 57,
+      "name": "acts from the heart",
+      "description": "Kalpten hareket etmek seni hem insancıl hem de özgün kılıyor Her kararının arkasında gerçek bir duygu ve niyet yatıyor; bu seni değerli yapıyor Kalpten hareket etmek bazen mantıktan uzaklaşmana neden olabilir; dengeyi bulmak önemli"
+    },
+    {
+      "no": 58,
+      "name": "fun-loving",
+      "description": "İnsanlarla etkileşimde bulunmayı eğlenceli grup etkinliklerine katılmayı ve sosyal çevreni genişletmeyi seversin Eğlenceli aktivitelerle meşgul olmaktan keyif alırsın ve çevrendeki kişileri enerjinle canlandırırsın Macera ve heyecan dolu aktiviteleri seversin ve sıkıcı rutinlere karşı direnç gösterirsin"
+    },
+    {
+      "no": 59,
+      "name": "cheerful and merry",
+      "description": "Şen bir karakter taşımak etrafındakileri hem canlandırıyor hem de kendine çekiyor Şen bir karakter taşımak çevrende pozitif bir atmosfer oluşturuyor Neşeli olmak hem seni hem de çevreni besleyen güçlü bir özellik"
+    },
+    {
+      "no": 60,
+      "name": "enjoys life",
+      "description": "Her anın tadını çıkarmak senin için hem bir alışkanlık hem de bir yaşam felsefesi Hayatın güzel yanlarını fark etmek ve onlara değer vermek seni zenginleştiriyor Tadını çıkarma yeteneğin seni hem mutlu hem de ilham verici yapıyor"
+    },
+    {
+      "no": 61,
+      "name": "influential",
+      "description": "Sözlerin ve duruşunla çevrendeki insanları kolayca etkilersin Çevrende karizmatik tavırların ve liderlik özelliklerinle anılırsın İletişim becerilerin güçlü açık sözlü ve ikna edici birisindir"
+    },
+    {
+      "no": 62,
+      "name": "charismatic",
+      "description": "Karizman seni her ortamda doğal olarak öne çıkarıyor Karizmatik bir kişilik taşımak hem güç hem de sorumluluk gerektiriyor Karizma özgün olmaktan kaynaklanıyor; sen bunu doğal taşıyorsun"
+    },
+    {
+      "no": 63,
+      "name": "striking and attention-grabbing",
+      "description": "Çarpıcı bir varlık taşımak seni her ortamda öne çıkarıyor Dikkat çekici olmak hem güç hem de sorumluluk gerektiriyor Çarpıcı bir kişilik taşımak insanların sana ilgi duymasını sağlıyor"
+    },
+    {
+      "no": 64,
+      "name": "realistic",
+      "description": "Hayattan gerçekçi beklentilerin vardır Geleceğe dair planların bugünkü gerçeklerle uyumlu ve ulaşılabilirdir Hem büyük resmi görüp hem de detaylara dikkat ederek gerçekçi hedefler belirlersin"
+    },
+    {
+      "no": 65,
+      "name": "pragmatic",
+      "description": "Pragmatik bir yaklaşım taşımak seni hem etkili hem de güvenilir kılıyor İşe yarayan çözümlere odaklanmak seni güçlü bir problem çözücü yapıyor Pragmatizm hem bireysel hem de kurumsal süreçlerde seni değerli kılıyor"
+    },
+    {
+      "no": 66,
+      "name": "feet on the ground",
+      "description": "Gerçeklikle barışık olmak seni güçlü kararlar alabilen biri yapıyor Ayakları yere basan bir yaklaşım taşımak seni hem güvenilir hem de saygın kılıyor Somut gerçeklerle çalışmak seni hem etkili hem de güçlü bir karar alıcı yapıyor"
+    },
+    {
+      "no": 67,
+      "name": "enjoys showing off",
+      "description": "Yaşam tarzın dikkat çekici etkinliklere ve lüks mekânlara odaklı gibi görünüyor Lüks marka ürünlere ve hizmetlere olan ilgin belirgin Özel etkinlikler ve davetlerde bulunarak gösterişli bir sosyal hayatı tercih ediyorsun"
+    },
+    {
+      "no": 68,
+      "name": "image-focused",
+      "description": "İmajına verdiğin önem seni bakımlı ve özenli gösteriyor Başkalarına nasıl göründüğün senin için önemli bir öncelik İmaj odaklı olmak bazen gerçek benliğinden uzaklaşmana yol açabilir; özgünlüğünü koru"
+    },
+    {
+      "no": 69,
+      "name": "outwardly status-seeking",
+      "description": "Statü ve tanınma arayışın seni hem dinamik hem de hırslı yapıyor Dışa dönük statü arayışı bazen içsel değerleri gölgeleyebilir; farkında olmak önemli Statü peşinde koşmak bazen gerçek mutluluğun önüne geçebilir; dengeyi bulmak kritik"
+    },
+    {
+      "no": 70,
+      "name": "doesn't inspire trust",
+      "description": "Çevren seninle ilgili bazı konularda güven sorunu yaşayabiliyor Yakın arkadaşların seninle olan iletişimlerinde zaman zaman güven eksikliği hissedebiliyor Bazı durumlarda söylediklerinle eylemlerin arasında uyumsuzluk olabiliyor"
+    },
+    {
+      "no": 71,
+      "name": "gives untrustworthy impression",
+      "description": "Güvenilmez bir izlenim bırakmak fırsatları ve ilişkileri zedeliyor Tutarsız davranmak insanların sende güven bulmasını zorlaştırıyor Güvenilmez görünmek bazen kasıtsız; ama etkisi aynı şekilde hissediliyor"
+    },
+    {
+      "no": 72,
+      "name": "raises suspicion",
+      "description": "Şüphe uyandırmak hem seni hem de ilişkilerini zorluyor İnsanlarda soru işareti bırakmak uzun vadede güven inşasını engelliyor Şüphe uyandıran davranışlar bazen farkında olmadan gerçekleşiyor; öz farkındalık kritik"
+    },
+    {
+      "no": 73,
+      "name": "pleasure-seeker",
+      "description": "Yaşam tarzının temelinde zevk ve keyif arayışı olduğu fark ediliyor Zevkleri ve keyifleri ön planda tutan bir yaşam tarzın var gibi görünüyor Hayatın tadını çıkarma isteğin dikkat çekicidir"
+    },
+    {
+      "no": 74,
+      "name": "lives for enjoyment",
+      "description": "Zevk odaklı bir yaşam sürmek hayatı dolu dolu yaşama isteğinin yansıması Keyifli anları ve deneyimleri ön planda tutmak seni enerjik ve canlı kılıyor Zevk odaklı yaşamak bazen uzun vadeli hedefleri geri planda bırakmanla sonuçlanıyor"
+    },
+    {
+      "no": 75,
+      "name": "chases pleasure",
+      "description": "Haz peşinde koşmak yaşamın güzel yanlarına açık olmanın güçlü bir göstergesi Keyifli deneyimleri aramak seni hem enerjik hem de canlı kılıyor Haz peşinde koşmak bazen uzun vadeli hedefleri geri planda bırakmanla sonuçlanıyor"
+    },
+    {
+      "no": 76,
+      "name": "persuasive",
+      "description": "Argümanlarını mantıklı bir şekilde sunabiliyorsun Fikirlerini net bir şekilde ifade ederek insanları ikna etme yeteneğin var İkna edici bir dil kullanma konusunda yeteneklisin"
+    },
+    {
+      "no": 77,
+      "name": "highly persuasive",
+      "description": "Yüksek ikna kabiliyetin seni her ortamda etkili bir iletişimci yapıyor İnsanları fikirlerine inandırma konusundaki gücün hem iş hem sosyal hayatta kapı açıyor İkna kabiliyetin güçlü olduğunda en zorlu müzakerelerde bile başarı elde ediyorsun"
+    },
+    {
+      "no": 78,
+      "name": "has powerful words",
+      "description": "Söz kuvvetin her ortamda insanları etkileyen güçlü bir iletişim aracı Güçlü bir söz kuvveti taşımak seni hem etkileyici hem de saygın bir konuşmacı yapıyor Söz kuvvetin insanlarda güven ve ilham uyandırıyor"
+    },
+    {
+      "no": 79,
+      "name": "far-sighted",
+      "description": "Zaman içinde değişen koşullara karşı hazırlıklı olman ileri görüşlülüğünü yansıtıyor Kararlarını uzun vadeli sonuçları göz önünde bulundurarak alabiliyorsun İlerleyen zamanlarda ortaya çıkabilecek potansiyel zorluklara karşı önceden plan yapabiliyorsun"
+    },
+    {
+      "no": 80,
+      "name": "strategic thinker",
+      "description": "Stratejik düşünme yeteneğin seni hem bireysel hem kurumsal süreçlerde güçlü kılıyor Büyük resmi görerek adım atmak seni hem etkili hem de güvenilir bir karar alıcı yapıyor Stratejik düşünmek hem kısa hem uzun vadeli başarının en güçlü garantisi"
+    },
+    {
+      "no": 81,
+      "name": "visionary",
+      "description": "Vizyoner bir bakış açısı taşımak seni hem ilham verici hem de güçlü bir lider yapıyor Geleceği bugünden görmek seni proaktif ve değerli bir karar alıcı yapıyor Vizyoner olmak bazen mevcut gerçeklikle çatışabilir; dengeyi bulmak önemli"
+    },
+    {
+      "no": 82,
+      "name": "sees into people's souls",
+      "description": "İnsanların ruhsal durumlarına duyarlı bir yaklaşım sergilersin Çevrendekilerin duygusal ihtiyaçlarına dikkat eden birisin İnsanların iç dünyalarını anlama çabası içindesin"
+    },
+    {
+      "no": 83,
+      "name": "insightful",
+      "description": "İçgörü sahibi olmak olayların yüzeyinin altını görebilme yeteneğinin işareti Derin bir içgörü taşımak seni hem anlayışlı hem de değerli bir danışman yapıyor İçgörünüz başkalarının fark edemediği bağlantıları kurmanı sağlıyor"
+    },
+    {
+      "no": 84,
+      "name": "penetrates deeply",
+      "description": "Derinlere nüfuz etmek insanların ve durumların özüne ulaşma yeteneğinin göstergesi Yüzeyin altını görmek seni hem güçlü bir analist hem de değerli bir danışman yapıyor Derinlere nüfuz etme yeteneğin başkalarının fark edemediği bağlantıları kurmanı sağlıyor"
+    },
+    {
+      "no": 85,
+      "name": "works well with control",
+      "description": "Süreçleri yönetirken kontrolü elinde tutma konusunda yeteneklisindir Sorumlulukları üstlenme ve başarıyla yönetme becerin vardır Kontrolü elinde tutma konusunda etkili bir liderlik sergiliyorsun"
+    },
+    {
+      "no": 86,
+      "name": "prefers autonomous work",
+      "description": "Özerk çalışmayı tercih etmek güçlü bir bağımsızlık ve öz yönetim anlayışının göstergesi Kendi kararlarını alarak çalışmak seni hem daha üretken hem de daha mutlu yapıyor Özerk çalışma tercihin güçlü bir girişimcilik ve sorumluluk bilincinin yansıması"
+    },
+    {
+      "no": 87,
+      "name": "productive in independent work",
+      "description": "Bağımsız çalışmada verimli olmak güçlü bir öz yönetim ve disiplin anlayışının göstergesi Kendi kendine çalışırken en iyi performansını sergilemek güçlü bir iç motivasyonun işareti Bağımsız çalışmada verimlilik hem yaratıcılığını hem de üretkenliğini artırıyor"
+    },
+    {
+      "no": 88,
+      "name": "can control work environment",
+      "description": "İş ortamını etkili bir şekilde kontrol edebiliyorsun İş ortamındaki değişiklikleri yönetebiliyor ve kontrol edebiliyorsun İş ortamında dengeyi sağlayabiliyor ve kontrolü elde tutabiliyorsun"
+    },
+    {
+      "no": 89,
+      "name": "can manage work setting",
+      "description": "Çalışma ortamını yönetebilmek güçlü bir liderlik ve organizasyon yeteneğinin göstergesi İş ortamını etkili yönetmek hem verimliliğini hem de ekip uyumunu artırıyor Çalışma ortamını yönetebilmek seni güçlü bir profesyonel ve güvenilir bir lider yapıyor"
+    },
+    {
+      "no": 90,
+      "name": "commands professional presence",
+      "description": "Profesyonel ortamda hâkimiyet kurmak güçlü bir liderlik ve yetkinlik anlayışının göstergesi İş ortamında hâkim olabilmek seni güvenilir ve saygın bir profesyonel yapıyor Profesyonel ortamda hâkimiyet kurmak hem bireysel hem kurumsal başarı için kritik"
+    },
+    {
+      "no": 91,
+      "name": "workaholic",
+      "description": "İşe olan bağlılığın ve özverin dikkat çekicidir İşe karşı büyük bir sorumluluk duygusu taşıyorsun İşkoliksin"
+    },
+    {
+      "no": 92,
+      "name": "dedicated to work",
+      "description": "İşine olan bağlılığın ve adanmışlığın seni hem güçlü hem de güvenilir yapıyor Kendini işine adamak güçlü bir sorumluluk ve öz disiplin göstergesi İşine adanmış olmak çevrende seni saygın ve değerli biri olarak tanıtıyor"
+    },
+    {
+      "no": 93,
+      "name": "passionate about work",
+      "description": "Çalışmaya duyduğun tutku seni hem güçlü hem de ilham verici kılıyor İşe olan tutkun seni sürekli öğrenmeye ve gelişmeye açık tutuyor Çalışmaya tutkun olmak güçlü bir motivasyon ve anlam arayışının göstergesi"
+    },
+    {
+      "no": 94,
+      "name": "good-hearted",
+      "description": "İyi niyetli tavırların sıcakkanlı ve iyi kalpli bir kişiliği yansıtıyor Yardımseverliğin ve duyarlılığın iyi kalpli bir insan olduğunu gösteriyor Çevrendekilere karşı gösterdiğin anlayış ve samimiyetle iyi kalpli bir yaklaşım sergiliyorsun"
+    },
+    {
+      "no": 95,
+      "name": "compassionate",
+      "description": "Şefkat göstermek hem güçlü hem de güzel bir erdem; sen bu erdemi taşıyorsun Şefkatli bir karakter taşımak seni hem sevilmiş hem de güvenilen biri yapıyor Şefkat güçlü bir empati ve anlayışın en güzel dışavurumu"
+    },
+    {
+      "no": 96,
+      "name": "merciful",
+      "description": "Merhamet güçlü bir insanlık değeri; sen bu değeri taşıyorsun Merhametli olmak insanlarda güvenlik ve değer hissi yaratıyor Merhamet güçlü bir empati ve anlayışın en güzel ifadesi"
+    },
+    {
+      "no": 97,
+      "name": "rude",
+      "description": "İletişim tarzın bazen doğrudan ve sert olabiliyor Geri bildirimlerinde daha yumuşak bir dil kullanman gerekebilir Dışa vurduğun düşünceler bazen kaba bir ton içerebiliyor"
+    },
+    {
+      "no": 98,
+      "name": "lacking politeness",
+      "description": "Nezaketten yoksun bir tutum ilişkilerinde zaman zaman gerginlik ve kopukluk yaratıyor Nezaket eksikliği bazen stres ya da engellenme duygusunun bir yansıması olabilir Nezaketten yoksun görünmek bazen insanları uzaklaştırıyor; farkında olmak önemli"
+    },
+    {
+      "no": 99,
+      "name": "crude and disrespectful",
+      "description": "Hoyrat bir tutum ilişkilerini hem kısa hem de uzun vadede olumsuz etkiliyor Saygısız davranışlar güven ve saygınlığı hızla aşındırıyor Hoyrat ve saygısız görünmek bazen stres ya da çözülmemiş bir öfkenin dışavurumu"
+    },
+    {
+      "no": 100,
+      "name": "polite",
+      "description": "İletişim tarzın oldukça nazik ve saygılı Karşındakilere karşı düşünceli bir tutum sergiliyorsun Duyarlılığın ve nazik tavırların kibar bir kişilik özelliği taşıdığını gösteriyor"
+    },
+    {
+      "no": 101,
+      "name": "kind and respectful",
+      "description": "Nazik ve saygılı tutumun çevrendekilere huzur ve güven veriyor Her ortamda saygıyı korumak hem sevilmeni hem de saygı görmeni sağlıyor Nazik bir dil kullanmak iletişimini hem daha etkili hem daha samimi kılıyor"
+    },
+    {
+      "no": 102,
+      "name": "thoughtful and refined",
+      "description": "İnce düşünceli tutumun insanlarda kendilerini değerli hissettiriyor Başkalarının ihtiyaçlarını fark etmek ve küçük jestlerle karşılamak seni özel kılıyor İnce düşünceli olmak güçlü bir empati ve dikkat yeteneğinin göstergesi"
+    },
+    {
+      "no": 103,
+      "name": "brief and concise speaker",
+      "description": "Konuşmaların genellikle kısa ve özdür İfadelerinde sade ve anlaşılır bir dil kullanırsın Konuşmalarında gereksiz detaylara girmeden direkt konuya odaklanıyorsun"
+    },
+    {
+      "no": 104,
+      "name": "speaks clearly and to the point",
+      "description": "Özlü bir dil kullanmak seni hem etkili hem de saygın bir iletişimci yapıyor Net konuşmak mesajının tam olarak algılanmasını sağlıyor Özlü ve net iletişim hem zamanı hem enerjiyi verimli kullanmanı sağlıyor"
+    },
+    {
+      "no": 105,
+      "name": "expresses little but meaningfully",
+      "description": "Az kelimeyle büyük anlam yaratmak senin özel bir yeteneğin Az ama öz ifade etmek güçlü bir düşünce disiplini ve öz farkındalığının göstergesi Her kelimeni özenle seçmek mesajını güçlü kılıyor"
+    },
+    {
+      "no": 106,
+      "name": "kıskanç",
+      "description": "Başkalarının başarıları rekabet duygunu tetikleyebiliyor İlgini çeken konularda çevrendekilere karşı bir rekabet hissi taşıyorsun Çoğunlukla kendini başkalarına kanıtlama çabası içindesin"
+    },
+    {
+      "no": 107,
+      "name": "envious",
+      "description": "Başkalarının sahip olduklarına duyduğun haset seni mutsuz ediyor Haset başkalarının başarısını kendi eksikliğin olarak görmene neden oluyor Haset etmek hem seni hem de ilişkilerini zedeliyor"
+    },
+    {
+      "no": 108,
+      "name": "can't stand rivals",
+      "description": "Başkalarının başarısını çekememek kendi gelişimini engelliyor Çekemez bir yapıya sahip olmak ilişkilerini zorluyor ve yalnızlık yaratıyor Başkalarının iyiliğine sevinememek kendi mutluluğuna da zarar veriyor"
+    },
+    {
+      "no": 109,
+      "name": "easily controlled",
+      "description": "Kendi kararlarını vermede zorlandığın için başkalarının senin yerine karar almasını onaylayabiliyorsun Başkalarının fikirlerine bağlı kalıp bu fikirler doğrultusunda hareket edebiliyorsun İstemeden de olsa başkalarının isteklerine evet deme eğilimindesin"
+    },
+    {
+      "no": 110,
+      "name": "open to guidance",
+      "description": "Başkalarının yönlendirmelerine açık olmak bazen kendi iradenden ödün verdirir Yönlendirilmeye hazır yapın grup ortamlarında uyumu kolaylaştırıyor Başkalarının tavsiye ve yönlendirmelerine açık olmak öğrenmeye istekliliğinin göstergesi"
+    },
+    {
+      "no": 111,
+      "name": "easily convinced",
+      "description": "Kolay ikna olmak bazen seni savunmasız bırakabiliyor; eleştirel düşünceyi geliştirmek önemli İkna olmaya açık olmak hem öğrenmeye istekli hem de bazen etkilenebilir olduğunu gösteriyor Kolay ikna olmak bazen doğru fikirlere hızla açılmak anlamına geliyor; bu değerli"
+    },
+    {
+      "no": 112,
+      "name": "wants control and authoritarian",
+      "description": "İlgilendiğin konularda liderlik rolünü üstlenmek istersin Çalıştığın işlerde söz sahibi olma konusunda isteklisin Sık sık emir verme eğiliminde olabiliyorsun"
+    },
+    {
+      "no": 113,
+      "name": "authoritarian and controlling",
+      "description": "Otoriter bir yapı taşımak bazen ekip uyumunu zorlaştırıyor Denetimci bir tutum süreci güvenilir kılıyor ama bazen aşırıya kaçabiliyor Otoriter bir liderlik tarzı kısa vadede etkili; uzun vadede ise değişmesi gereken bir alan"
+    },
+    {
+      "no": 114,
+      "name": "wants to manage everything",
+      "description": "Her şeyi yönetme isteğin güçlü bir sorumluluk ve düzen ihtiyacının yansıması Her şeyin kontrolünde olmasını istemek bazen seni tüketiyor; delege etmek güçlendiriyor Her şeyi yönetmek istemek hem bir güç hem de zaman zaman bir yük"
+    },
+    {
+      "no": 115,
+      "name": "inclined to cowardice",
+      "description": "Riskli durumlarda çekimser bir tavır sergilersin Olaylar karşısında genellikle ilk tepkin endişe ve kaygı olur Zorlu durumlar karşısında çekingen kalabiliyorsun"
+    },
+    {
+      "no": 116,
+      "name": "avoids risk",
+      "description": "Riskten kaçınmak seni bazı hatalardan koruyor ama bazı fırsatları da kaçırmanla sonuçlanıyor Güvenli seçeneklere yönelmek hem bir koruma hem de bazen bir kısıtlama Riskten kaçınmak bazen en akıllıca strateji; bazen ise seni olduğun yerde tutuyor"
+    },
+    {
+      "no": 117,
+      "name": "shy and reserved",
+      "description": "Çekingen bir yapıya sahip olmak bazen fırsatları kaçırmanla sonuçlanıyor Çekinimli olmak bazen seni hem güvenli hem de görünmez kılıyor Çekingen bir karakter taşımak sosyal ortamlarda zorlanmana yol açabiliyor"
+    },
+    {
+      "no": 118,
+      "name": "inclined to break rules",
+      "description": "Belli kurallar dahilinde yaşamak çoğu zaman seni zorluyor Kuraltanımaz olarak bilinen yapın insanlar tarafından asi ya da bildiğini okuyan bir tip olarak algılanmana sebep olabiliyor Kuralları hemen kabul etmek yerine başkaldırmayı tercih ediyorsun"
+    },
+    {
+      "no": 119,
+      "name": "goes against rules",
+      "description": "Kurallara karşı gelmek özgürlük arayışının güçlü bir dışavurumu Kurallara direnmek bazen değişimin öncüsü olabiliyor Kurallara karşı gelmek bazen cesaret bazen de pervasızlık; bu farkı bilmek önemli"
+    },
+    {
+      "no": 120,
+      "name": "goes beyond convention",
+      "description": "Alışılmışın dışına çıkmak seni hem özgün hem de ilgi çekici yapıyor Sıradışı olmak bazen yalnızlık getirebilir; özgünlüğünü kaybetme Alışılmışın dışına çıkmak güçlü bir yaratıcılık ve cesaret gerektiriyor"
+    },
+    {
+      "no": 121,
+      "name": "luxury-loving",
+      "description": "Kaliteli ve lüks ürünlere ilgin vardır Estetik ve şıklık senin için önemlidir Belirli marka ve tasarımlara karşı bir eğilim gösteriyorsun"
+    },
+    {
+      "no": 122,
+      "name": "seeks comfort",
+      "description": "Konfor arayışı hem sağlıklı bir ihtiyaç hem de bazen büyümenin önünde engel Rahat ve güvenli ortamlar senin için hem verimlilik hem de mutluluk kaynağı Konfor arayışı bazen gelişiminin önünde durabilir; dengeyi bulmak kritik"
+    },
+    {
+      "no": 123,
+      "name": "adopts ostentatious lifestyle",
+      "description": "Gösterişli bir yaşam tarzı benimsemek bazen içsel değerleri gölgeleyebilir Dışarıdan etkileyici görünen bir yaşam tarzı bazen büyük bir boşluğu gizliyor olabilir Gösterişli yaşamak bazen gerçek mutluluğun önüne geçebilir; dengeyi bulmak kritik"
+    },
+    {
+      "no": 124,
+      "name": "successful when motivated",
+      "description": "Bir işe başlayıp başarıyla sonuçlandırman için motivasyon kaynağın oldukça önemlidir Gerçekten motive olduğunda başarı için son derece odaklı ve etkileyici bir enerji ortaya koyuyorsun Motivasyonunu sağladığında hedeflere ulaşmak için kararlılık ve azim gösterirsin"
+    },
+    {
+      "no": 125,
+      "name": "needs encouragement",
+      "description": "Teşvik ve destek aldığında en iyi performansını sergiliyorsun Teşvike ihtiyaç duymak hem insani hem de güçlü bir öz farkındalık göstergesi Başkalarından destek almak seni hem güçlendiriyor hem de motive ediyor"
+    },
+    {
+      "no": 126,
+      "name": "shines in right environment",
+      "description": "Doğru ortamda potansiyelinin tamamını ortaya koyuyorsun Seni destekleyen ve besleyen bir ortamda en iyi halini sergiliyorsun Doğru koşullar sağlandığında parlamak için gerekli her şey sende var"
+    },
+    {
+      "no": 127,
+      "name": "perfectionist",
+      "description": "Yaptığın işlerde detaylara büyük bir önem veriyorsun Hedeflerine ulaşmak için kendine yüksek standartlar belirliyorsun İşlerini titizlikle planlayıp uygulama konusunda başarılısın"
+    },
+    {
+      "no": 128,
+      "name": "seeks perfection",
+      "description": "Kusursuzluk arayışı güçlü bir kalite standartlarının işareti Kusursuz olmak istemek hem bir güç hem de zaman zaman bir kısıtlama Kusursuzluk arayışı bazen en iyi sonuçları getiriyor; bazen ise tüketiyor"
+    },
+    {
+      "no": 129,
+      "name": "aims for the best",
+      "description": "En iyisini hedeflemek güçlü bir motivasyon ve standartların işareti En iyi olmak için çabalamak hem seni hem de çıktılarını değerli kılıyor En iyisini hedeflemek bazen seni tüketiyor; dengeyi bulmak kritik"
+    },
+    {
+      "no": 130,
+      "name": "objective",
+      "description": "Olaylara tarafsız bir şekilde bakabiliyor olman pek çok zaman takdir edilir Herhangi bir durumla ilgili olumlu ve olumsuz yanların ikisini birden değerlendirmen seni bir adım öne çıkarıyor Durumları objektif bir perspektiften ele alırsın"
+    },
+    {
+      "no": 131,
+      "name": "unbiased and fair",
+      "description": "Tarafsız olmak güçlü bir adalet anlayışının ve etik değerlerin göstergesi Adil davranmak hem güven hem de saygı inşa ediyor Tarafsız bir tutum çatışma ortamlarında dengeleyici bir rol üstlenmeni sağlıyor"
+    },
+    {
+      "no": 132,
+      "name": "evaluates objectively",
+      "description": "Nesnel değerlendirme yapmak güçlü bir analitik zekânın ve öz disiplinin göstergesi Olgulara dayalı değerlendirme hem güven hem de etkinlik inşa ediyor Nesnel olmak duygusal önyargıdan arınmış kararlar almanı sağlıyor"
+    },
+    {
+      "no": 133,
+      "name": "focused",
+      "description": "Hedefe kilitlenme konusunda oldukça başarılısın Bir hedefe varmak için elinden gelen her şeyi yapma gücüne sahipsin Amaç hedefe ulaşmak ise bu doğrultuda kendini sürekli geliştirirsin"
+    },
+    {
+      "no": 134,
+      "name": "high concentration",
+      "description": "Yüksek konsantrasyon yeteneğin hem verimliliğini hem de kaliteni artırıyor Odaklanma kapasiten seni rakiplerine göre önemli bir avantaj sağlıyor Konsantrasyonun güçlü olduğunda en karmaşık problemleri bile çözebiliyorsun"
+    },
+    {
+      "no": 135,
+      "name": "works deeply and intensely",
+      "description": "Derin çalışma kapasiten seni hem verimli hem de etkili yapıyor Yoğun çalışmak hem seni hem de çıktılarını değerli kılıyor Derin ve yoğun çalışmak güçlü bir öz disiplin ve motivasyonun göstergesi"
+    },
+    {
+      "no": 136,
+      "name": "foresighted",
+      "description": "Öngörülü yapın sayesinde birçok problemin üstesinden gelebiliyorsun Gelecekteki hedeflerini belirleyip bu hedeflere yönelik planlar yapabiliyorsun Olayların olası sonuçlarını önceden düşünüp buna göre hareket edebiliyorsun"
+    },
+    {
+      "no": 137,
+      "name": "strong intuition",
+      "description": "Güçlü sezgilerin seni hem hızlı hem de isabetli kararlar almada güçlü kılıyor İçgüdülerine duyduğun güven pek çok durumda seni doğru yere taşıyor Güçlü sezgilerin bazen sözcüklerle ifade edilemeyen şeyleri sana fısıldıyor"
+    },
+    {
+      "no": 138,
+      "name": "prepared for future",
+      "description": "İlerisi için hazırlıklı olmak güçlü bir öngörü ve planlama yeteneğinin göstergesi Geleceğe hazırlıklı olmak hem güven hem de güç veriyor İlerisi için hazırlıklı olmak bazen aşırı kaygıya yol açabilir; dengeyi bulmak önemli"
+    },
+    {
+      "no": 139,
+      "name": "more observer than player",
+      "description": "Olaylara genellikle izleyici olarak yaklaşıyorsun Çatışmalardan uzak durma eğilimindesin Sorumluluk almaktan kaçınma eğilimin var gibi görünüyor"
+    },
+    {
+      "no": 140,
+      "name": "observant and passive",
+      "description": "Gözlemci bir yapıya sahip olmak derin bir analiz ve anlayış yeteneği geliştiriyor Pasif kalmak bazen fırsatları kaçırmanla sonuçlanabiliyor Gözlemci olmak güçlü bir öğrenme ve anlama becerisinin göstergesi"
+    },
+    {
+      "no": 141,
+      "name": "prefers to stay in background",
+      "description": "Arka planda kalmayı tercih etmek güçlü bir öz farkındalık ve tercih bilinçinin göstergesi Sahnede olmak yerine arka planda kalmak bazen en akıllıca strateji Arka planda kalmayı tercih etmek derin bir gözlemci yeteneği geliştiriyor"
+    },
+    {
+      "no": 142,
+      "name": "loves sharing",
+      "description": "Mutluluğun formülünün paylaşmak olduğunu erkenden fark edenlerden birisin Deneyimlerini ve bilgilerini diğerleriyle paylaşmaktan keyif alırsın Çevrendeki insanlarla duygularını ve düşüncelerini rahatça paylaşabilen birisin"
+    },
+    {
+      "no": 143,
+      "name": "loves giving",
+      "description": "Vermek senin için hem anlam hem de derin bir tatmin kaynağı Başkalarına vermek seni hem güçlü hem de özgür hissettiriyor Vermeyi sevmek güçlü bir özgüven ve bereket anlayışının dışavurumu"
+    },
+    {
+      "no": 144,
+      "name": "happy to share",
+      "description": "Bölüşmek sana hem anlam hem de derin bir mutluluk veriyor Paylaşarak yaşamak senin için en güçlü mutluluk kaynaklarından biri Bölüşmekten mutluluk duymak güçlü bir cömertlik ve empati anlayışının göstergesi"
+    },
+    {
+      "no": 145,
+      "name": "makes own plans",
+      "description": "Başkalarının yaptığı planlara dahil olmak yerine kendi planlarını uygulamaya koymayı tercih edersin Hedefe ulaşmak için kendi çizdiğin yol ve yöntemleri uygulamayı tercih edersin Planlama işini başkalarından ziyade kendin yaptığında daha emin adımlarla ilerliyorsun"
+    },
+    {
+      "no": 146,
+      "name": "determines own route",
+      "description": "Kendi rotanı belirlemek güçlü bir özgürlük ve özerklik anlayışının göstergesi Kendi yolunu çizmek hem bir güç hem de büyük bir sorumluluk Kendi rotanı belirlemek seni hem özgün hem de cesur kılıyor"
+    },
+    {
+      "no": 147,
+      "name": "takes initiative",
+      "description": "İnisiyatif almak güçlü bir liderlik ve sorumluluk bilincinin göstergesi Harekete geçmek için beklememek seni hem proaktif hem de güvenilir kılıyor İnisiyatif almak bazen başkalarını şaşırtabiliyor; ama uzun vadede saygınlık kazandırıyor"
+    },
+    {
+      "no": 148,
+      "name": "planned",
+      "description": "Pekçok konuda başarıya ulaşman planlı şekilde ilerlemenin bir sonucudur Yaptığın işleri belirli bir düzene göre sıralamayı seversin Planlı ve programlı olman hemen her konuda kafanın rahat olmasını sağlar"
+    },
+    {
+      "no": 149,
+      "name": "organized and orderly",
+      "description": "Organize ve düzenli olmak güçlü bir öz disiplin ve verimlilik anlayışının göstergesi Düzenli bir yapıya sahip olmak hem zamanını hem enerjini daha verimli kullanmanı sağlıyor Organize olmak karmaşık projeleri bile yönetilebilir parçalara dönüştürüyor"
+    },
+    {
+      "no": 150,
+      "name": "systematic planner",
+      "description": "Sistematik planlama güçlü bir öz disiplin ve verimlilik anlayışının göstergesi Adım adım ve sistematik ilerlemek karmaşık hedeflere bile ulaşmanı mümkün kılıyor Sistematik planlama hem hataları minimize ediyor hem de kaliteyi artırıyor"
+    },
+    {
+      "no": 151,
+      "name": "has sincere nature",
+      "description": "Samimi bir yapıya sahipsin İnsanların samimiyetsiz ve yapmacık davranışlarına sözlerine çoğu zaman tahammül etmekte zorluk yaşarsın İnsanlarla kısa zamanda samimi olabiliyorsun"
+    },
+    {
+      "no": 152,
+      "name": "genuine and real",
+      "description": "İçtenlik her eyleminde ve sözünde kendini belli ediyor Gerçek olmak senin için bir tercih değil doğal bir hal İçten davranmak insanlarda güvende hissetme duygusu yaratıyor"
+    },
+    {
+      "no": 153,
+      "name": "authentic and original",
+      "description": "Sahici olmak senin için bir seçim değil; içten gelen bir tutum Özgün bir karakter taşımak seni hem farklı hem de değerli kılıyor Sahici ve özgün olmak güçlü bir öz güven ve kimlik netliğinin göstergesi"
+    },
+    {
+      "no": 154,
+      "name": "respectful",
+      "description": "Başkalarının görüşlerine saygı gösterme konusunda başarılısın Karşındakilere daima saygılı bir dil kullanırsın Farklı perspektiflere saygı gösterirsin"
+    },
+    {
+      "no": 155,
+      "name": "shows respect",
+      "description": "Hürmet etmek senin için derin bir değer ve yaşam tutumunun göstergesi Büyüklere ve otoriteye saygı göstermek senin için doğal bir refleks Hürmet etmek güçlü bir kültürel ve insani değer anlayışının işareti"
+    },
+    {
+      "no": 156,
+      "name": "values others",
+      "description": "Başkalarına değer vermek güçlü bir empati ve insanlık anlayışının göstergesi İnsanları önemsemek ve onlara değer göstermek seni güvenilir ve sevilen biri yapıyor Başkalarına değer vermek bazen kendi ihtiyaçlarını ikinci plana atmanla sonuçlanabiliyor; dengeyi korumak önemli"
+    },
+    {
+      "no": 157,
+      "name": "selective",
+      "description": "Her insanla hemen bağ kuramaz ve seçici davranırsın Hayatında özel bir yere sahip olan insanları titizlikle belirlersin Arkadaş çevrendeki kişileri özenle seçer ve sadece güvendiklerinle yakın ilişkiler kurarsın"
+    },
+    {
+      "no": 158,
+      "name": "carefully choosy",
+      "description": "Titizce seçmek güçlü bir kalite anlayışı ve öz disiplinin göstergesi Her seçimi dikkatli ve özenle yapmak seni hem güvenilir hem de saygın kılıyor Titizce seçmek bazen yavaşlatıcı görünür; ama uzun vadede en doğru yaklaşım"
+    },
+    {
+      "no": 159,
+      "name": "doesn't compromise standards",
+      "description": "Standartlarından ödün vermemek güçlü bir değer bütünlüğünün ve öz disiplinin göstergesi Kaliteden taviz vermemek seni hem saygın hem de güvenilir kılıyor Standartlarından ödün vermemek bazen ilişkilerde gerilim yaratabilir; açık iletişim dengeyi sağlıyor"
+    },
+    {
+      "no": 160,
+      "name": "protective of loved ones",
+      "description": "Sevdiğin insanları korur ve sahiplenirsin Sevdiklerine karşı koruyucu davranmak seni çok mutlu eder Sevdiklerinin duygusal ve fiziksel ihtiyaçlarını özenle karşılamaya çalışırsın"
+    },
+    {
+      "no": 161,
+      "name": "protective and attached",
+      "description": "Koruyucu ve bağlı olmak güçlü bir sevgi ve sorumluluk anlayışının göstergesi Sevdiklerine bağlılık ve koruma sunmak seni hem sevilmiş hem de güvenilen biri yapıyor Koruyucu ve bağlı olmak bazen aşırı sahiplenmeye dönüşebilir; dengeyi korumak önemli"
+    },
+    {
+      "no": 162,
+      "name": "strong sense of ownership",
+      "description": "Güçlü sahiplenme duygusu derin bir sevgi ve bağlılığın yansıması Sevdiklerini sahiplenmek onlara güven ve değer hissettiriyor Sahiplenme duygusu güçlü olmak bazen özgürlük kısıtlaması olarak algılanabilir; dengeyi bulmak önemli"
+    },
+    {
+      "no": 163,
+      "name": "spoiled",
+      "description": "Bazen tatlı şımarıklıklar ile kendini motive edebiliyorsun Şımarık tavırların yerine göre sevimli olsa da genellikle eleştirildiğin bir noktadır Sana göre sempatik olan şımarıkça davranışların birçoklarına göre itici olabilmektedir"
+    },
+    {
+      "no": 164,
+      "name": "pampered",
+      "description": "Şımartılmış olmak çoğunlukla bir tercih değil; bir yetiştiriliş biçiminin ürünü Şımartılmış bir yapıya sahip olmak emek ve sonuç arasındaki bağı kurmayı zorlaştırıyor Şımartılmışlık bazen bir korunma mekanizmasına dönüşüyor; kökünü keşfetmek değerli"
+    },
+    {
+      "no": 165,
+      "name": "accustomed to ease",
+      "description": "Kolayı tercih etmek hem bir rahatlık hem de bazen büyümenin önünde engel Kolaya alışmış olmak emek gerektiren süreçlerde zorluk yaratıyor Kolayı seçme alışkanlığı uzun vadede rekabet gücünü zayıflatabiliyor"
+    },
+    {
+      "no": 166,
+      "name": "systematic",
+      "description": "Herhangi bir işi gerçekleştirme sürecinde adım adım ve çok dikkatli şekilde ilerleyebiliyorsun Sistematik olmayı hayatının hemen her alanına uygulayabilme yeteneğini gösterirsin Her işini sistematiğe bağlamış davranışlarınla kendini gösteriyorsun"
+    },
+    {
+      "no": 167,
+      "name": "methodological",
+      "description": "Metodolojik bir yaklaşım taşımak seni hem güvenilir hem de etkili kılıyor Her süreci belirli bir yöntemle yönetmek hem verimliliğini hem de kaliteni artırıyor Metodolojik olmak bazen esnekliği kısıtlayabiliyor; dengeyi bulmak önemli"
+    },
+    {
+      "no": 168,
+      "name": "moves step by step",
+      "description": "Her şeyi adım adım yapmak hem güven hem de istikrar sağlıyor Acele etmeden ilerlemek uzun vadede en sağlam sonuçları getiriyor Adım adım ilerlemek güçlü bir sabır ve disiplinin göstergesi"
+    },
+    {
+      "no": 169,
+      "name": "results-focused",
+      "description": "Projeleri tamamlama konusunda odaklı ve etkili bir yaklaşımın vardır Hedeflere ulaşmak için kararlı bir çaba gösterme eğilimin fark ediliyor İşlerini planlayıp gerçekleştirirken sonuca odaklanma konusunda başarılısın"
+    },
+    {
+      "no": 170,
+      "name": "goal-focused",
+      "description": "Hedef odaklı olmak güçlü bir motivasyon ve anlam arayışının göstergesi Net hedefler koymak ve onlara odaklanmak seni hem verimli hem de etkili kılıyor Hedef odaklı bir yapıya sahip olmak seni hem güvenilir hem de kararlı yapıyor"
+    },
+    {
+      "no": 171,
+      "name": "output-based thinker",
+      "description": "Çıktıya dayalı düşünmek güçlü bir sonuç ve değer anlayışının göstergesi Her kararı çıktısıyla değerlendirmek seni hem etkili hem de güvenilir kılıyor Çıktıya dayalı düşünmek bazen sürecin değerini görmezden gelmeye yol açabiliyor; dengeyi korumak önemli"
+    },
+    {
+      "no": 172,
+      "name": "skeptical",
+      "description": "İnsanlara karşı şüpheci yaklaşımın dolayısıyla anlaşmazlıklar ve tartışmalar yaşayabilirsin Her insan bir miktar şüphe taşır; ancak seninki biraz daha fazla gibi İnsanlara veya bilgilere güvenmekte zorlanıyorsun ve bu nedenle sürekli şüphe içinde olabiliyorsun"
+    },
+    {
+      "no": 173,
+      "name": "doubtful",
+      "description": "Kuşkuyla yaklaşmak bazen seni koruyor bazen ise fırsatları kaçırmanla sonuçlanıyor Her şeyi sorgulamak güçlü bir eleştirel düşüncenin göstergesi Kuşkulu bir yapıya sahip olmak bazen güven inşasını zorlaştırıyor"
+    },
+    {
+      "no": 174,
+      "name": "insecure and questioning",
+      "description": "Güvensizlik bazen geçmiş deneyimlerin bir yansıması; bunu fark etmek iyileştirici Her şeyi sorgulamak güçlü bir analitik zekanın dışavurumu olabilir Güvensiz bir yapıya sahip olmak ilişkilerde zorluklara yol açabiliyor"
+    },
+    {
+      "no": 175,
+      "name": "cautious",
+      "description": "Bir işe başlarken yeni bir arkadaşlık kurarken oldukça temkinli davranırsın Yeni bir ortama girdiğinde hemen uyum sağlamak yerine önce durumları olayları kişileri anlamaya çalışıyorsun Yoğurdu üfleyerek yiyenlerdensin seni hemen bir işe ikna etmek kolay değildir"
+    },
+    {
+      "no": 176,
+      "name": "prudent",
+      "description": "İhtiyatlı olmak güçlü bir risk yönetimi ve öngörü anlayışının göstergesi Her adımı dikkatli değerlendirmek seni pek çok hatadan koruyor İhtiyatlı bir yapıya sahip olmak bazen fırsatları kaçırmanla sonuçlanabiliyor; dengeyi bulmak önemli"
+    },
+    {
+      "no": 177,
+      "name": "careful and measured",
+      "description": "Dikkatli ve ölçülü olmak güçlü bir öz disiplin ve denge anlayışının göstergesi Her adımda dikkat ve ölçü seni hem güvenilir hem de saygın kılıyor Dikkatli ve ölçülü olmak bazen yavaşlatıcı görünür; ama uzun vadede en doğru yaklaşım"
+    },
+    {
+      "no": 178,
+      "name": "looks down on others",
+      "description": "Sosyal ortamlarda genellikle başkalarının görüşlerini önemsemez gibi gözüküyorsun Ekip içinde ya da arkadaşlarınlayken kendi düşüncelerini genellikle öne çıkarıyorsun Herhangi bir etkinlikte arkadaşlarının katkılarına fazla değer vermezsin"
+    },
+    {
+      "no": 179,
+      "name": "arrogant and condescending",
+      "description": "Kibir bazen derin bir güvensizliğin ya da onay ihtiyacının örtbası olabilir Başkalarını küçümsemek uzun vadede yalnızlık ve kopukluk yaratıyor Kibirli bir tutum ilişkilerde güven ve saygınlığı aşındırıyor"
+    },
+    {
+      "no": 180,
+      "name": "sees self as superior",
+      "description": "Kendini üstün görmek bazen derin bir güvensizliğin ya da onay ihtiyacının yansıması Üstünlük algısı uzun vadede yalnızlık ve kopukluk yaratıyor Kendini üstün görmek ilişkilerde güven ve saygınlığı zedeliyor"
+    },
+    {
+      "no": 181,
+      "name": "productive",
+      "description": "İşleyen demir pas tutmaz hesabı sürekli bir şeyler ortaya çıkarmaya çalışmak senin işin Yeni projeler ve fikirler üretme konusunda yeteneğin var Her zaman işe koyulma isteğin ve enerjin yüksektir"
+    },
+    {
+      "no": 182,
+      "name": "efficient and active",
+      "description": "Verimli ve aktif olmak güçlü bir öz disiplin ve motivasyonun göstergesi Her işi verimli yapmak seni hem güvenilir hem de değerli kılıyor Verimli ve aktif bir yapıya sahip olmak seni sürekli büyüyen ve gelişen biri yapıyor"
+    },
+    {
+      "no": 183,
+      "name": "produces much work",
+      "description": "Çok iş çıkarmak güçlü bir üretkenlik ve verimlilik anlayışının göstergesi Her zaman çok iş yapmak seni hem güvenilir hem de değerli kılıyor Çok iş çıkaran bir yapıya sahip olmak seni hem bireysel hem kurumsal süreçlerde güçlü kılıyor"
+    },
+    {
+      "no": 184,
+      "name": "sluggish",
+      "description": "Bazı durumlarda oldukça uyuşuk ve ilgisiz bir tavır sergiliyorsun Enerjin genellikle düşük ve isteksiz gibi görünüyorsun Herhangi bir konuya ilgin olsa bile duyarsız ve hareketsiz kalabiliyorsun"
+    },
+    {
+      "no": 185,
+      "name": "inactive and reluctant",
+      "description": "Hareketsiz ve isteksiz bir tavır sergilemek bazen derin bir yorgunluk ya da anlamsızlık hissinin işareti İsteksizlik bazen güçlü bir motivasyon eksikliğinin ya da yön kaybının yansıması Hareketsiz kalmak bazen en büyük fırsatları kaçırmanla sonuçlanıyor"
+    },
+    {
+      "no": 186,
+      "name": "inclined to laziness",
+      "description": "Tembelliğe meyilli olmak bazen yorgunluk ya da motivasyon eksikliğinin yansıması Tembel olmaya eğilimli bir yapı taşımak uzun vadede hem bireysel hem kariyer gelişimini sekteye uğratıyor Tembelliğe meyilli olmak bazen en büyük fırsatları kaçırmanla sonuçlanıyor"
+    },
+    {
+      "no": 187,
+      "name": "efficient",
+      "description": "İşlerini hızlı ve etkili bir şekilde tamamlarsın Verimli çalışma yöntemleri kullanarak projeleri başarıyla sonuçlandırırsın Zamanı verimli kullanmada beceriklisindir"
+    },
+    {
+      "no": 188,
+      "name": "effective and useful",
+      "description": "Etkin olmak güçlü bir verimlilik ve değer anlayışının göstergesi Her durumda işe yarar olmak seni hem güvenilir hem de değerli kılıyor Etkin ve işe yarar bir yapıya sahip olmak seni sürekli büyüyen biri yapıyor"
+    },
+    {
+      "no": 189,
+      "name": "produces much with little",
+      "description": "Az kaynakla çok üretmek güçlü bir stratejik zekânın ve verimliliğin göstergesi Sınırlı kaynaklarla büyük çıktılar elde etmek seni hem güçlü hem de yaratıcı kılıyor Az kaynakla çok üretebilmek güçlü bir problem çözme ve optimizasyon anlayışının işareti"
+    },
+    {
+      "no": 190,
+      "name": "poor time management",
+      "description": "Arkadaşların dakik olmadığın konusunda seni eleştirebilirler Bazı işleri gerçekleştirmede geç kalıyor olman zamanı daha iyi yönetmen konusunda seni harekete geçirebilir Günlük işlerini sıralı ve planlı bir şekilde uygularsan zamanı iyi yönetme konusunda oldukça güçlü bir adım atmış olacaksın"
+    },
+    {
+      "no": 191,
+      "name": "inadequate time management",
+      "description": "Zaman yönetiminde yetersiz olmak hem kariyer hem kişisel hayatında büyük kayıplara yol açıyor Zaman yönetimi becerisini geliştirmek hem verimliliğini hem de mutluluğunu artırıyor Zaman yönetiminde yetersiz kalmak farkında olmakla değişim başlıyor"
+    },
+    {
+      "no": 192,
+      "name": "procrastinating and scattered",
+      "description": "Erteleme alışkanlığı hem verimliliğini hem de yaşam kaliteni sekteye uğratıyor Dağınık bir yapıya sahip olmak bazen en büyük fırsatları kaçırmanla sonuçlanıyor Erteleyici ve dağınık olmak farkında olmakla değişim başlıyor"
+    },
+    {
+      "no": 193,
+      "name": "weak character",
+      "description": "Zorluklar karşısında direnç göstermekte zorlanabilirsin Sorumlulukları yerine getirmekte ve taahhütleri sürdürmekte zorlanabilirsin Güçlü liderlik yeteneklerine sahip olma konusunda eksiklik yaşayabilirsin"
+    },
+    {
+      "no": 194,
+      "name": "willless",
+      "description": "İrade eksikliği bazen derin bir motivasyon kaybının ya da anlamsızlık hissinin yansıması İradesiz olmak hem kısa hem uzun vadede hedeflere ulaşmayı zorlaştırıyor İrade geliştirmek öğrenilebilir; küçük disiplin adımları büyük farklar yaratıyor"
+    },
+    {
+      "no": 195,
+      "name": "indecisive and unprincipled",
+      "description": "Kararsızlık bazen derin bir belirsizlik hissinin ya da güvensizliğin yansıması İlkesiz bir yapı taşımak uzun vadede güven ve saygınlık kaybına yol açıyor Kararsız ve ilkesiz olmak farkında olmakla değişim başlıyor"
+    },
+    {
+      "no": 196,
+      "name": "intelligent",
+      "description": "Gelişmiş espri yeteneğin sayesinde yapılan espirileri daha çabuk kavrayabiliyorsun Zekice aldığın kararlar seni başarıya götürüyor Küçükken okulda öğretmenlerin gözünde zeka ışığı gördüğü öğrencilerden biriydin"
+    },
+    {
+      "no": 197,
+      "name": "high intelligence",
+      "description": "Yüksek zeka düzeyi hem bir armağan hem de büyük bir sorumluluk Zeka düzeyin seni hem analitik hem de yaratıcı süreçlerde güçlü kılıyor Yüksek zeka hem hız hem de derinlik gerektiriyor; sen her ikisine de sahipsin"
+    },
+    {
+      "no": 198,
+      "name": "quick-witted and sharp",
+      "description": "Kavrayış hızın seni hem öğrenme hem de karar alma süreçlerinde güçlü kılıyor Kıvrak bir zeka taşımak seni hem analitik hem de yaratıcı biri yapıyor Kavrayışlı olmak seni yeni bilgilere hızla uyum sağlayan biri yapıyor"
+    },
+    {
+      "no": 199,
+      "name": "impatient",
+      "description": "Her aklına geleni hemen söylediğinde sıkıntılı ve zor durumların içerisinde kalma olasılığın artabilir Hemen işe koyulmak isteyebiliyorsun Sabırsızlıkla aldığın acele karar seni zor durumlara sokabilir"
+    },
+    {
+      "no": 200,
+      "name": "hasty",
+      "description": "Aceleci bir yapıya sahip olmak bazen acele kararların pişmanlık getirdiği anlara yol açıyor Hızlı hareket etmek bazen değerli fırsatları anında değerlendirmeni sağlıyor Aceleci olmak bazen düşünmeden harekete geçmenle sonuçlanıyor; bir dur ve düşün pratiği yardımcı olabilir"
+    },
+    {
+      "no": 201,
+      "name": "can't wait",
+      "description": "Bekleyememek bazen en büyük fırsatları anında değerlendirmeni sağlıyor Sabırsızca bekleme güçlü bir enerji ve motivasyonun dışavurumu Bekleyememek bazen düşünmeden harekete geçmenle sonuçlanıyor; bir dur ve düşün pratiği yardımcı olabilir"
+    }
+  ]
+}

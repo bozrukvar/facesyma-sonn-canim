@@ -1,0 +1,1062 @@
+{
+  "country_name": "Italy",
+  "language_code": "it",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "it_breakfast_001",
+        "name_tr": "Cappuccino & Cornetto",
+        "name_en": "Cappuccino & Cornetto",
+        "description": "Sıcak cappuccino with a buttery croissant (cornetto). Italian breakfast classic, sweet and creamy.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 35,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based milk cappuccino with vegan cornetto",
+        "sifat_appeal": ["sosyal_comertkane", "luks_seven", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "it_breakfast_002",
+        "name_tr": "Espresso & Biscotti",
+        "name_en": "Espresso & Biscotti",
+        "description": "Strong espresso with crunchy almond biscotti for dipping. Simple and energizing.",
+        "nutrition": {
+          "calories": 150,
+          "protein": 4,
+          "carbs": 18,
+          "fat": 6
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Almond biscotti with dairy-free butter",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "it_breakfast_003",
+        "name_tr": "Omlet & Pomodoro",
+        "name_en": "Omelet & Tomato",
+        "description": "Fresh tomato omelet with basil and mozzarella. Light but satisfying.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 14,
+          "carbs": 8,
+          "fat": 14
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Chickpea flour omelet with vegan mozzarella",
+        "sifat_appeal": ["saglik_bilinc", "pratikci_zaman", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_breakfast_004",
+        "name_tr": "Pancetta & Uova",
+        "name_en": "Pancetta & Eggs",
+        "description": "Crispy pancetta with fried eggs. Traditional Italian breakfast, rich and savory.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 2,
+          "fat": 31
+        },
+        "prep_time_min": 12,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tempeh bacon with tofu scramble",
+        "sifat_appeal": ["enerjik", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_breakfast_005",
+        "name_tr": "Pane Tostato & Marmellata",
+        "name_en": "Toasted Bread & Jam",
+        "description": "Crispy toasted bread with Italian jam and butter. Simple, comforting, traditional.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 5,
+          "carbs": 32,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan butter and fruit spread",
+        "sifat_appeal": ["gelenekci", "pratikci_zaman", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_breakfast_006",
+        "name_tr": "Granola & Yogurt Greco",
+        "name_en": "Granola & Greek Yogurt",
+        "description": "Greek yogurt with Italian honey and granola. Fresh, creamy, and nutritious.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 12,
+          "carbs": 28,
+          "fat": 8
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based yogurt with maple syrup",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "it_breakfast_007",
+        "name_tr": "Frittata Verdure",
+        "name_en": "Vegetable Frittata",
+        "description": "Baked egg dish with zucchini, spinach, and cheese. Hearty and wholesome.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 15,
+          "carbs": 10,
+          "fat": 16
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu frittata with nutritional yeast",
+        "sifat_appeal": ["saglik_bilinc", "aile_odakli", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_breakfast_008",
+        "name_tr": "Panettone Dilim",
+        "name_en": "Panettone Slice",
+        "description": "Sweet bread with dried fruits and nuts. Festive, rich, aromatic Italian classic.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 42,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan panettone alternative",
+        "sifat_appeal": ["luks_seven", "gelenekci", "sevgi_dolu"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_breakfast_009",
+        "name_tr": "Focaccia & Prosciutto",
+        "name_en": "Focaccia & Prosciutto",
+        "description": "Soft olive oil focaccia bread with prosciutto. Savory and satisfying.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 28,
+          "fat": 17
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Focaccia with plant-based meat alternative",
+        "sifat_appeal": ["luks_seven", "macera_seven", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_breakfast_010",
+        "name_tr": "Risotto Dolce",
+        "name_en": "Sweet Risotto",
+        "description": "Creamy rice dish with milk, sugar, and cinnamon. Comfort food for breakfast.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 42,
+          "fat": 7
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Risotto made with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_breakfast_011",
+        "name_tr": "Mozzarella & Pomodoro Sandwich",
+        "name_en": "Mozzarella & Tomato Sandwich",
+        "description": "Fresh mozzarella, tomato, basil, and olive oil on bread. Simple summer delight.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 10,
+          "carbs": 24,
+          "fat": 13
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based mozzarella with vegan mayo",
+        "sifat_appeal": ["doganın_cocugu", "pratikci_zaman", "ekonomik"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_breakfast_012",
+        "name_tr": "Melone & Prosciutto",
+        "name_en": "Melon & Prosciutto",
+        "description": "Sweet cantaloupe melon with salty prosciutto. Classic appetizer turned breakfast.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 8,
+          "carbs": 20,
+          "fat": 6
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Melon with smoked tempeh",
+        "sifat_appeal": ["luks_seven", "macera_seven", "meraklı"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_breakfast_013",
+        "name_tr": "Pane e Olio",
+        "name_en": "Bread & Olive Oil",
+        "description": "Rustic bread dipped in premium olive oil with salt. Simple, authentic, minimalist.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 5,
+          "carbs": 26,
+          "fat": 11
+        },
+        "prep_time_min": 3,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use with vegan bread",
+        "sifat_appeal": ["centil_kibri", "gelenekci", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_breakfast_014",
+        "name_tr": "Uova Strapazzate & Tartufo",
+        "name_en": "Scrambled Eggs & Truffle",
+        "description": "Creamy scrambled eggs with black truffle. Luxurious, earthy, indulgent.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 14,
+          "carbs": 3,
+          "fat": 19
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu scramble with mushroom truffle oil",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "it_breakfast_015",
+        "name_tr": "Caffè & Crostata",
+        "name_en": "Coffee & Jam Tart",
+        "description": "Strong coffee with a slice of jam-filled crostata (tart). Sweet and satisfying.",
+        "nutrition": {
+          "calories": 310,
+          "protein": 5,
+          "carbs": 42,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan crostata with plant-based filling",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      }
+    ],
+    "lunch": [
+      {
+        "id": "it_lunch_001",
+        "name_tr": "Spaghetti Carbonara",
+        "name_en": "Spaghetti Carbonara",
+        "description": "Creamy pasta with guanciale (cured meat), egg, and Pecorino Romano. Roman classic, rich and savory.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 18,
+          "carbs": 48,
+          "fat": 22
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Carbonara with plant-based pancetta and vegan cream",
+        "sifat_appeal": ["luks_seven", "gelenekci", "sosyal_comertkane"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "it_lunch_002",
+        "name_tr": "Risotto Milanese",
+        "name_en": "Risotto Milanese",
+        "description": "Creamy saffron risotto with butter and Parmesan. Golden, aromatic, luxurious.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 14,
+          "carbs": 52,
+          "fat": 15
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Risotto with vegetable broth and nutritional yeast",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_lunch_003",
+        "name_tr": "Lasagna Bolognese",
+        "name_en": "Lasagna Bolognese",
+        "description": "Layered pasta with rich meat sauce and béchamel. Hearty, comforting classic.",
+        "nutrition": {
+          "calories": 520,
+          "protein": 22,
+          "carbs": 48,
+          "fat": 25
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lasagna with lentil sauce and plant-based béchamel",
+        "sifat_appeal": ["aile_odakli", "sevgi_dolu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_lunch_004",
+        "name_tr": "Osso Buco",
+        "name_en": "Braised Veal Shanks",
+        "description": "Slow-braised veal shanks with wine and vegetables. Tender, rich, aromatic.",
+        "nutrition": {
+          "calories": 450,
+          "protein": 28,
+          "carbs": 8,
+          "fat": 35
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and root vegetable osso buco",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_lunch_005",
+        "name_tr": "Pasta all'Amatriciana",
+        "name_en": "Pasta all'Amatriciana",
+        "description": "Pasta with guanciale, tomato, and pecorino. Spicy, savory Roman dish.",
+        "nutrition": {
+          "calories": 440,
+          "protein": 16,
+          "carbs": 46,
+          "fat": 19
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Amatriciana with plant-based cured meat",
+        "sifat_appeal": ["macera_seven", "gelenekci", "cesur_atılgan"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_lunch_006",
+        "name_tr": "Ragu Napoletano",
+        "name_en": "Neapolitan Meat Sauce",
+        "description": "Slow-cooked meat sauce over pasta. Deep, complex, traditional Naples flavor.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 20,
+          "carbs": 46,
+          "fat": 20
+        },
+        "prep_time_min": 180,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable ragù with lentils",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_lunch_007",
+        "name_tr": "Pappardelle Cinghiale",
+        "name_en": "Pappardelle with Wild Boar",
+        "description": "Wide ribbon pasta with slow-cooked wild boar. Rustic, gamey, seasonal.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 24,
+          "carbs": 44,
+          "fat": 21
+        },
+        "prep_time_min": 150,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pappardelle with mushroom and walnut sauce",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "luks_seven"],
+        "season": "autumn",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_lunch_008",
+        "name_tr": "Saltimbocca alla Romana",
+        "name_en": "Saltimbocca alla Romana",
+        "description": "Veal with prosciutto and sage, pan-fried. Elegant, savory, light.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 26,
+          "carbs": 8,
+          "fat": 28
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu saltimbocca with plant-based prosciutto",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_lunch_009",
+        "name_tr": "Branzino al Forno",
+        "name_en": "Sea Bass Baked",
+        "description": "Whole sea bass baked with olive oil, lemon, and herbs. Delicate, fresh, elegant.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 6,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Baked tofu with lemon herb glaze",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_lunch_010",
+        "name_tr": "Polenta Taragna",
+        "name_en": "Polenta Taragna",
+        "description": "Creamy polenta with butter, cheese, and buckwheat. Northern Italian comfort food.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 12,
+          "carbs": 50,
+          "fat": 16
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Polenta with plant-based butter and nutritional yeast",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_lunch_011",
+        "name_tr": "Cacio e Pepe",
+        "name_en": "Cheese & Pepper Pasta",
+        "description": "Simple pasta with Pecorino Romano and black pepper. Minimalist, creamy, peppery.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 14,
+          "carbs": 44,
+          "fat": 20
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Cacio e pepe with plant-based Parmesan",
+        "sifat_appeal": ["centil_kibri", "gelenekci", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "it_lunch_012",
+        "name_tr": "Cassoulet Italiano",
+        "name_en": "Italian Cassoulet",
+        "description": "Slow-cooked beans with meat and vegetables. Hearty, warming, peasant classic.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 20,
+          "carbs": 52,
+          "fat": 20
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Beans with mushrooms and plant-based sausage",
+        "sifat_appeal": ["gelenekci", "aile_odakli", "sevgi_dolu"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_lunch_013",
+        "name_tr": "Pasta Primavera",
+        "name_en": "Spring Vegetable Pasta",
+        "description": "Fresh pasta with seasonal spring vegetables. Light, fresh, colorful.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 12,
+          "carbs": 42,
+          "fat": 14
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use with gluten-free pasta",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "yaratici_sanat"],
+        "season": "spring",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_lunch_014",
+        "name_tr": "Penne all'Arrabbiata",
+        "name_en": "Penne all'Arrabbiata",
+        "description": "Penne with tomato, garlic, and red chili. Spicy, simple, authentic Roman.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 12,
+          "carbs": 46,
+          "fat": 16
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use gluten-free pasta option",
+        "sifat_appeal": ["cesur_atılgan", "macera_seven", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_lunch_015",
+        "name_tr": "Riso e Bisi",
+        "name_en": "Rice & Peas",
+        "description": "Creamy rice soup with fresh peas. Venetian comfort, simple yet elegant.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 48,
+          "fat": 10
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Rice and peas with plant-based broth",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "spring",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_lunch_016",
+        "name_tr": "Vitello Tonnato",
+        "name_en": "Veal with Tuna Sauce",
+        "description": "Cold sliced veal with creamy tuna-caper sauce. Classic summer appetizer turned main.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 28,
+          "carbs": 8,
+          "fat": 26
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu vitello with plant-based tuna sauce",
+        "sifat_appeal": ["luks_seven", "macera_seven", "centil_kibri"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_lunch_017",
+        "name_tr": "Minestrone Invernale",
+        "name_en": "Winter Vegetable Soup",
+        "description": "Hearty vegetable and bean soup. Rustic, warming, peasant classic.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 42,
+          "fat": 6
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_lunch_018",
+        "name_tr": "Orata al Cartoccio",
+        "name_en": "Bream in Parchment",
+        "description": "Whole fish baked in parchment with vegetables. Tender, moist, aromatic.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 30,
+          "carbs": 10,
+          "fat": 20
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu and vegetable en papillote",
+        "sifat_appeal": ["yaratici_sanat", "centil_kibri", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_lunch_019",
+        "name_tr": "Tagliatelle al Tartufo",
+        "name_en": "Tagliatelle with Truffle",
+        "description": "Wide egg noodles with black truffle and butter. Luxurious, earthy, indulgent.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 16,
+          "carbs": 42,
+          "fat": 20
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tagliatelle with truffle oil and plant-based cream",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "it_lunch_020",
+        "name_tr": "Insalata Mista Italiana",
+        "name_en": "Mixed Italian Salad",
+        "description": "Mixed greens with tomato, mozzarella, olives, and balsamic. Fresh, light, healthy.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 9,
+          "carbs": 12,
+          "fat": 17
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Salad with plant-based mozzarella",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      }
+    ],
+    "dinner": [
+      {
+        "id": "it_dinner_001",
+        "name_tr": "Pasta Aglio e Olio",
+        "name_en": "Pasta with Garlic & Oil",
+        "description": "Simple pasta with garlic, red chili, and olive oil. Quick, minimalist, midnight snack classic.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 11,
+          "carbs": 44,
+          "fat": 18
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["pratikci_zaman", "ekonomik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "it_dinner_002",
+        "name_tr": "Piccata al Limone",
+        "name_en": "Piccata with Lemon",
+        "description": "Thin pounded veal with lemon-caper sauce. Light, elegant, simple.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 24,
+          "carbs": 6,
+          "fat": 22
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu piccata with lemon sauce",
+        "sifat_appeal": ["centil_kibri", "saglik_bilinc", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_dinner_003",
+        "name_tr": "Melanzane alla Parmigiana",
+        "name_en": "Eggplant Parmesan",
+        "description": "Baked eggplant with tomato sauce and cheese. Rich, comforting, vegetarian classic.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 12,
+          "carbs": 32,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Eggplant parmigiana with plant-based cheese",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_dinner_004",
+        "name_tr": "Orata Farcita",
+        "name_en": "Stuffed Sea Bream",
+        "description": "Whole bream stuffed with herbs and lemon. Delicate, aromatic, elegant.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 20
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Stuffed tofu steaks with herb filling",
+        "sifat_appeal": ["centil_kibri", "yaratici_sanat", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_dinner_005",
+        "name_tr": "Zuppa di Pesce",
+        "name_en": "Seafood Stew",
+        "description": "Mixed seafood in tomato broth. Luxurious, aromatic, coast-inspired.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 34,
+          "carbs": 12,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Seafood stew with mixed vegetables and tofu",
+        "sifat_appeal": ["luks_seven", "macera_seven", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_dinner_006",
+        "name_tr": "Coniglio in Umido",
+        "name_en": "Braised Rabbit",
+        "description": "Slow-braised rabbit with wine and herbs. Tender, gamey, rustic.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 28,
+          "carbs": 10,
+          "fat": 22
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and root vegetable braise",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "gelenekci"],
+        "season": "autumn",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "it_dinner_007",
+        "name_tr": "Ratatouille",
+        "name_en": "Ratatouille",
+        "description": "Mixed summer vegetables in tomato sauce. Provençal-Italian, rustic, seasonal.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "yaratici_sanat"],
+        "season": "summer",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_dinner_008",
+        "name_tr": "Brodetto Marchigiano",
+        "name_en": "Marche Fish Soup",
+        "description": "Regional fish soup with multiple varieties. Complex, aromatic, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 14,
+          "fat": 14
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable brodetto with mushrooms",
+        "sifat_appeal": ["meraklı", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_dinner_009",
+        "name_tr": "Pappardelle Funghi",
+        "name_en": "Pappardelle with Mushrooms",
+        "description": "Wide noodles with mixed wild mushrooms. Earthy, simple, seasonal.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 14,
+          "carbs": 46,
+          "fat": 15
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["doganın_cocugu", "yaratici_sanat", "gelenekci"],
+        "season": "autumn",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_dinner_010",
+        "name_tr": "Risotto Nero",
+        "name_en": "Black Risotto (Squid Ink)",
+        "description": "Creamy risotto with squid ink. Dramatic, elegant, Venetian specialty.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 16,
+          "carbs": 52,
+          "fat": 14
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Black risotto with squid ink alternative",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "it_dinner_011",
+        "name_tr": "Polpettone",
+        "name_en": "Italian Meatloaf",
+        "description": "Seasoned ground meat baked in loaf form. Hearty, homestyle, comforting.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 24,
+          "carbs": 16,
+          "fat": 28
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil and mushroom loaf",
+        "sifat_appeal": ["aile_odakli", "sevgi_dolu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "it_dinner_012",
+        "name_tr": "Cavolfiore al Forno",
+        "name_en": "Roasted Cauliflower",
+        "description": "Roasted cauliflower with garlic and olive oil. Simple, healthy, vegetarian.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 8,
+          "carbs": 20,
+          "fat": 12
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "it_dinner_013",
+        "name_tr": "Scampi all'Aglio",
+        "name_en": "Garlic Shrimp",
+        "description": "Large shrimp sautéed with garlic and wine. Elegant, quick, succulent.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 28,
+          "carbs": 6,
+          "fat": 16
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "King oyster mushrooms with garlic",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_dinner_014",
+        "name_tr": "Penne Vodka",
+        "name_en": "Penne Vodka",
+        "description": "Penne in creamy tomato-vodka sauce. Luxurious, smooth, restaurant-quality.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 14,
+          "carbs": 46,
+          "fat": 19
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Penne vodka with plant-based cream",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "sosyal_comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "it_dinner_015",
+        "name_tr": "Salmone Affumicato & Verdure",
+        "name_en": "Smoked Salmon & Vegetables",
+        "description": "Smoked salmon with roasted vegetables. Elegant, light, healthy.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 32,
+          "carbs": 12,
+          "fat": 21
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Smoked tofu with roasted vegetables",
+        "sifat_appeal": ["centil_kibri", "saglik_bilinc", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ]
+  }
+}

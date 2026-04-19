@@ -1,0 +1,1062 @@
+{
+  "country_name": "Spain",
+  "language_code": "es",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "es_breakfast_001",
+        "name_tr": "Café & Churro",
+        "name_en": "Coffee & Churro",
+        "description": "Strong Spanish coffee with a long fried pastry for dipping. Quick, sweet, traditional breakfast.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 28,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based milk coffee with vegan churro",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "es_breakfast_002",
+        "name_tr": "Pan con Tomate",
+        "name_en": "Bread with Tomato",
+        "description": "Toasted bread rubbed with tomato and olive oil. Simple, fresh, summer morning classic.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 5,
+          "carbs": 26,
+          "fat": 8
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["doganın_cocugu", "ekonomik", "centil_kibri"],
+        "season": "summer",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "es_breakfast_003",
+        "name_tr": "Jamón Serrano & Queso",
+        "name_en": "Serrano Ham & Cheese",
+        "description": "Cured Spanish ham with aged cheese and bread. Salty, rich, satisfying.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 18,
+          "fat": 22
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based ham with vegan cheese",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_breakfast_004",
+        "name_tr": "Tortilla Española Dilim",
+        "name_en": "Spanish Omelet Slice",
+        "description": "Thick potato and egg omelet, sliced cold or warm. Hearty, versatile, Spanish staple.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 20,
+          "fat": 17
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu-based tortilla with potatoes",
+        "sifat_appeal": ["aile_odakli", "pratikci_zaman", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_breakfast_005",
+        "name_tr": "Magdalenas & Kahve",
+        "name_en": "Muffins & Coffee",
+        "description": "Spanish sweet muffins with coffee. Simple, sweet, casual breakfast.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 4,
+          "carbs": 36,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan muffins with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "pratikci_zaman", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_breakfast_006",
+        "name_tr": "Churros Rellenos Chocolate",
+        "name_en": "Chocolate-Filled Churros",
+        "description": "Fried pastry filled with chocolate. Indulgent, warm, comfort breakfast.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 5,
+          "carbs": 38,
+          "fat": 16
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan churros with dairy-free chocolate",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "es_breakfast_007",
+        "name_tr": "Tostada & Mermelada Naranja",
+        "name_en": "Toast & Orange Jam",
+        "description": "Toasted bread with Spanish orange jam. Bright, sweet, simple.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 4,
+          "carbs": 32,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan butter with fruit spread",
+        "sifat_appeal": ["pratikci_zaman", "ekonomik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_breakfast_008",
+        "name_tr": "Bocadillo Jamón & Tomate",
+        "name_en": "Ham & Tomato Sandwich",
+        "description": "Spanish sandwich with ham, tomato, and olive oil. Quick, satisfying, portable.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 24,
+          "fat": 14
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Sandwich with plant-based ham",
+        "sifat_appeal": ["pratikci_zaman", "ekonomik", "cesur_atılgan"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_breakfast_009",
+        "name_tr": "Huevo Frito & Patatas",
+        "name_en": "Fried Egg & Potatoes",
+        "description": "Crispy fried egg with hot oil-fried potatoes. Rustic, hearty, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 28,
+          "fat": 21
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu fried with crispy potatoes",
+        "sifat_appeal": ["enerjik", "praktikci_zaman", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_breakfast_010",
+        "name_tr": "Açaí Bowl España",
+        "name_en": "Acai Bowl",
+        "description": "Açaí berry bowl with granola and coconut. Modern, healthy, colorful.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegan granola",
+        "sifat_appeal": ["saglik_bilinc", "yaratici_sanat", "doganın_cocugu"],
+        "season": "summer",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_breakfast_011",
+        "name_tr": "Gazpacho Soğuk",
+        "name_en": "Cold Gazpacho",
+        "description": "Cold tomato soup as breakfast. Summer refreshment, unusual but authentic in some regions.",
+        "nutrition": {
+          "calories": 140,
+          "protein": 4,
+          "carbs": 16,
+          "fat": 6
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "meraklı"],
+        "season": "summer",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "es_breakfast_012",
+        "name_tr": "Tostada Aguacate",
+        "name_en": "Avocado Toast",
+        "description": "Toast with fresh avocado, olive oil, and lime. Modern, healthy, elegant.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 7,
+          "carbs": 24,
+          "fat": 14
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use vegan butter",
+        "sifat_appeal": ["saglik_bilinc", "yaratici_sanat", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_breakfast_013",
+        "name_tr": "Buñuelos Bacalao",
+        "name_en": "Cod Fritters",
+        "description": "Fried cod and potato fritters. Hearty, savory, Spanish specialty.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 14,
+          "carbs": 20,
+          "fat": 18
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Chickpea and potato fritters",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "es_breakfast_014",
+        "name_tr": "Yoğurt Meyveli",
+        "name_en": "Fruity Yogurt",
+        "description": "Spanish yogurt with fresh berries and honey. Light, healthy, simple.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 10,
+          "carbs": 28,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based yogurt with fruit",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_breakfast_015",
+        "name_tr": "Churros Köpüklü Sıcak Çikolata",
+        "name_en": "Churros & Hot Chocolate",
+        "description": "Fried churros with thick hot chocolate for dipping. Indulgent winter breakfast.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 6,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan churros with plant-based chocolate",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "gelenekci"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      }
+    ],
+    "lunch": [
+      {
+        "id": "es_lunch_001",
+        "name_tr": "Paella Valenciana",
+        "name_en": "Valencian Paella",
+        "description": "Saffron rice with chicken, seafood, and vegetables. Iconic Spanish dish, aromatic, festive.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 20,
+          "carbs": 52,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Paella with mushrooms and tofu",
+        "sifat_appeal": ["aile_odakli", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "es_lunch_002",
+        "name_tr": "Gazpacho Andaluz",
+        "name_en": "Andalusian Gazpacho",
+        "description": "Chilled tomato soup. Refreshing summer classic, simple, vegetarian.",
+        "nutrition": {
+          "calories": 160,
+          "protein": 5,
+          "carbs": 18,
+          "fat": 7
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "macera_seven"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_lunch_003",
+        "name_tr": "Cocido Madrileño",
+        "name_en": "Madrid Stew",
+        "description": "Traditional Spanish stew with meat, chickpeas, vegetables. Hearty, warming, comfort food.",
+        "nutrition": {
+          "calories": 520,
+          "protein": 24,
+          "carbs": 48,
+          "fat": 24
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Stew with beans and mushrooms",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "winter",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_lunch_004",
+        "name_tr": "Jamón Croquetas",
+        "name_en": "Ham Croquettes",
+        "description": "Creamy ham croquettes, fried golden. Elegant tapa-style, savory, luxurious.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 18,
+          "fat": 22
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable croquettes with plant-based cream",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_005",
+        "name_tr": "Rabo de Toro",
+        "name_en": "Oxtail Stew",
+        "description": "Slow-cooked oxtail with vegetables. Rich, tender, traditional Spanish.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 26,
+          "carbs": 20,
+          "fat": 32
+        },
+        "prep_time_min": 180,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Root vegetable and bean stew",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "doganın_cocugu"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "es_lunch_006",
+        "name_tr": "Espetos Balık",
+        "name_en": "Grilled Sardines",
+        "description": "Fresh sardines grilled on beach. Coastal, simple, healthy.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 28,
+          "carbs": 2,
+          "fat": 17
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled tofu steaks with herb glaze",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "pratikci_zaman"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_lunch_007",
+        "name_tr": "Albondigas Espana",
+        "name_en": "Spanish Meatballs",
+        "description": "Meatballs in tomato sauce. Savory, rich, classic Spanish tapa.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 16,
+          "fat": 26
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom meatballs in tomato sauce",
+        "sifat_appeal": ["sevgi_dolu", "aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_lunch_008",
+        "name_tr": "Pulpo a la Gallega",
+        "name_en": "Galician Octopus",
+        "description": "Tender octopus with paprika and olive oil. Coastal, elegant, famous.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 16
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom pulpo with paprika oil",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_009",
+        "name_tr": "Ensalada Andaluza",
+        "name_en": "Andalusian Salad",
+        "description": "Tomato, cucumber, and bell pepper salad with olive oil. Fresh, light, vegetarian.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 4,
+          "carbs": 16,
+          "fat": 11
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil dressing",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "yaphal"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_lunch_010",
+        "name_tr": "Merluza a la Sal",
+        "name_en": "Salt-Crusted Hake",
+        "description": "Fish baked in salt crust. Dramatic, elegant, tender, coastal specialty.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 34,
+          "carbs": 4,
+          "fat": 15
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in herb crust",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_011",
+        "name_tr": "Caldo Gallego",
+        "name_en": "Galician Broth",
+        "description": "Traditional Galician soup with beans and greens. Warming, hearty, peasant classic.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 38,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_lunch_012",
+        "name_tr": "Carne Asada",
+        "name_en": "Grilled Meat",
+        "description": "Grilled meat with simple seasonings. Festive, social, traditional.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 4,
+          "fat": 32
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled vegetable skewers",
+        "sifat_appeal": ["cesur_atılgan", "enerjik", "macera_seven"],
+        "season": "summer",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "es_lunch_013",
+        "name_tr": "Fideuà",
+        "name_en": "Fideuà (Noodle Paella)",
+        "description": "Thin noodle paella with seafood. Coastal specialty, similar to paella but with noodles.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 22,
+          "carbs": 50,
+          "fat": 18
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Fideuà with mushrooms and tofu",
+        "sifat_appeal": ["meraklı", "macera_seven", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_014",
+        "name_tr": "Migas Extremeñas",
+        "name_en": "Extremaduran Fried Breadcrumbs",
+        "description": "Fried breadcrumbs with meat and vegetables. Rustic peasant dish, hearty.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 14,
+          "carbs": 32,
+          "fat": 26
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Migas with vegetables and plant-based sausage",
+        "sifat_appeal": ["gelenekci", "doganın_cocugu", "macera_seven"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "es_lunch_015",
+        "name_tr": "Tarta Tatin Sebze",
+        "name_en": "Vegetable Tart",
+        "description": "Savory vegetable tart. Light, elegant, vegetarian main course.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 17
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tart with plant-based cream",
+        "sifat_appeal": ["yaratici_sanat", "centil_kibri", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_016",
+        "name_tr": "Dorado Izgarası",
+        "name_en": "Grilled Dorado",
+        "description": "Grilled sea bream. Fresh, coastal, healthy.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 34,
+          "carbs": 4,
+          "fat": 20
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled tofu with lemon herb",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "centil_kibri"],
+        "season": "summer",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_lunch_017",
+        "name_tr": "Morcilla Fried",
+        "name_en": "Fried Blood Sausage",
+        "description": "Spanish blood sausage, pan-fried. Rich, traditional, acquired taste.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 16,
+          "carbs": 8,
+          "fat": 32
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based sausage fried",
+        "sifat_appeal": ["macera_seven", "gelenekci", "cesur_atılgan"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "es_lunch_018",
+        "name_tr": "Espinacas Garbanzos",
+        "name_en": "Spinach & Chickpeas",
+        "description": "Sautéed spinach with chickpeas. Healthy, vegetarian, simple.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 11,
+          "carbs": 28,
+          "fat": 12
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_lunch_019",
+        "name_tr": "Pulpeta Española",
+        "name_en": "Spanish Meatloaf",
+        "description": "Seasoned ground meat baked. Hearty, homestyle, comforting.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 24,
+          "carbs": 12,
+          "fat": 32
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil and mushroom loaf",
+        "sifat_appeal": ["aile_odakli", "sevgi_dolu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_lunch_020",
+        "name_tr": "Langosta Termidor",
+        "name_en": "Lobster Thermidor",
+        "description": "Lobster in cream sauce. Luxurious, elegant, special occasion.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 36,
+          "carbs": 8,
+          "fat": 36
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Lobster mushroom thermidor",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.5
+      }
+    ],
+    "dinner": [
+      {
+        "id": "es_dinner_001",
+        "name_tr": "Sopa de Ajo",
+        "name_en": "Garlic Soup",
+        "description": "Simple garlic soup with bread. Rustic, warming, peasant classic.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 6,
+          "carbs": 22,
+          "fat": 8
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["gelenekci", "ekonomik", "centil_kibri"],
+        "season": "winter",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_dinner_002",
+        "name_tr": "Bacalao a la Vizcaína",
+        "name_en": "Basque Cod",
+        "description": "Dried cod with peppers in sauce. Hearty, traditional Basque dish.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 30,
+          "carbs": 16,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and pepper stew",
+        "sifat_appeal": ["gelenekci", "meraklı", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_003",
+        "name_tr": "Camarones al Ajillo",
+        "name_en": "Garlic Shrimp",
+        "description": "Shrimp sautéed with garlic and olive oil. Simple, elegant, quick.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 28,
+          "carbs": 6,
+          "fat": 16
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and garlic sauté",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_dinner_004",
+        "name_tr": "Chuletas Cordero",
+        "name_en": "Lamb Chops",
+        "description": "Grilled lamb chops. Elegant, tender, Mediterranean.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 4,
+          "fat": 32
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled vegetable steaks",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "cesur_atılgan"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_005",
+        "name_tr": "Croquetas Queso",
+        "name_en": "Cheese Croquettes",
+        "description": "Creamy cheese croquettes, fried. Savory, indulgent, elegant.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 20,
+          "fat": 25
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Croquetas with plant-based cheese",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_006",
+        "name_tr": "Truchas Almendrado",
+        "name_en": "Almond Trout",
+        "description": "Trout topped with almonds. Elegant, nutty, Mediterranean.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 22
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with almond topping",
+        "sifat_appeal": ["centil_kibri", "yaratici_sanat", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_007",
+        "name_tr": "Berenjenas Rellenas",
+        "name_en": "Stuffed Eggplants",
+        "description": "Eggplant halves stuffed with meat or vegetables. Hearty, elegant, vegetarian option.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 24,
+          "fat": 20
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Stuffed eggplant with vegetables",
+        "sifat_appeal": ["yaratici_sanat", "sevgi_dolu", "doganın_cocugu"],
+        "season": "summer",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_dinner_008",
+        "name_tr": "Caldo de Puchero",
+        "name_en": "Puchero Broth",
+        "description": "Simple meat and vegetable broth. Warming, comforting, peasant classic.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 16,
+          "carbs": 20,
+          "fat": 14
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable and bean broth",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_009",
+        "name_tr": "Atún Encebollado",
+        "name_en": "Tuna with Onions",
+        "description": "Tuna steak with caramelized onions. Simple, hearty, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 32,
+          "carbs": 12,
+          "fat": 16
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with caramelized onions",
+        "sifat_appeal": ["pratikci_zaman", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "es_dinner_010",
+        "name_tr": "Habas Jamón",
+        "name_en": "Fava Beans with Ham",
+        "description": "Fresh fava beans with cured ham. Spring specialty, simple, elegant.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 14,
+          "carbs": 22,
+          "fat": 12
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Fava beans with plant-based ham",
+        "sifat_appeal": ["doganın_cocugu", "gelenekci", "sevgi_dolu"],
+        "season": "spring",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_011",
+        "name_tr": "Vaca Vieja Salsa Champiñón",
+        "name_en": "Beef in Mushroom Sauce",
+        "description": "Tender beef with mushroom sauce. Rich, elegant, comforting.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 28,
+          "carbs": 10,
+          "fat": 31
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom sauce with vegetable base",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_012",
+        "name_tr": "Pez Espada Salsa Verde",
+        "name_en": "Scabbardfish in Green Sauce",
+        "description": "White fish with parsley sauce. Light, healthy, Atlantic specialty.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 30,
+          "carbs": 8,
+          "fat": 16
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with green sauce",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "es_dinner_013",
+        "name_tr": "Judías Verdes Almendra",
+        "name_en": "Green Beans with Almonds",
+        "description": "Sautéed green beans with sliced almonds. Light, vegetarian, healthy.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 8,
+          "carbs": 18,
+          "fat": 15
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "es_dinner_014",
+        "name_tr": "Mejillones Vapor",
+        "name_en": "Steamed Mussels",
+        "description": "Mussels steamed in white wine and herbs. Simple, elegant, coastal.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 32,
+          "carbs": 10,
+          "fat": 10
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Steamed mushrooms with herbs",
+        "sifat_appeal": ["centil_kibri", "saglik_bilinc", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "es_dinner_015",
+        "name_tr": "Rizado Española",
+        "name_en": "Spanish Kale",
+        "description": "Sautéed Spanish kale with garlic. Simple, healthy, traditional.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 7,
+          "carbs": 16,
+          "fat": 12
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      }
+    ]
+  }
+}

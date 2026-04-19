@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "id_breakfast_001",
+    "name_tr": "Nasi Kuning",
+    "name_en": "Yellow Rice",
+    "description": "Traditional Indonesian golden rice cooked with turmeric, coconut milk, and spices. Served with fried shallots and fresh cucumber. A festive breakfast staple bringing warmth and comfort.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 6,
+      "carbs": 48,
+      "fat": 7
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["gelenekci", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "id_breakfast_002",
+    "name_tr": "Martabak Telur",
+    "name_en": "Egg Stuffed Pancake",
+    "description": "Crispy stuffed pancake filled with egg, minced meat, and scallions. Served with sweet soy sauce and crushed peanuts. A savory breakfast favorite in Indonesian street food culture.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 16
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan Martabak with tofu scramble and mushrooms",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_breakfast_003",
+    "name_tr": "Perkedel",
+    "name_en": "Potato Croquettes",
+    "description": "Golden-fried potato and egg croquettes, soft inside with crispy exterior. Seasoned with onion and garlic. Traditionally served with sambal and fresh tomato.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 7,
+      "carbs": 28,
+      "fat": 11
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Potato croquettes with aquafaba instead of eggs",
+    "sifat_appeal": ["saglik_bilinc", "ev_hanımı", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_breakfast_004",
+    "name_tr": "Lumpia Goreng",
+    "name_en": "Fried Spring Rolls",
+    "description": "Crispy spring rolls filled with cabbage, shrimp, and chicken. Served with sweet chili sauce. A beloved Indonesian breakfast that combines texture and flavor.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable and tofu lumpia with soy wrapper",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_breakfast_005",
+    "name_tr": "Tahu Goreng",
+    "name_en": "Fried Tofu",
+    "description": "Crispy golden tofu cubes served with warm peanut sauce and fresh vegetables. A protein-rich breakfast option reflecting Indonesian vegetarian traditions.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 14,
+      "carbs": 20,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_breakfast_006",
+    "name_tr": "Telur Dadar Nasi",
+    "name_en": "Omelette with Rice",
+    "description": "Thin folded omelette served over steamed jasmine rice with sambal ulek and pickled vegetables. Simple yet satisfying traditional breakfast.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 11
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Chickpea flour omelette with turmeric",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_breakfast_007",
+    "name_tr": "Bubur Ayam",
+    "name_en": "Chicken Rice Porridge",
+    "description": "Creamy rice porridge topped with shredded chicken, fried shallots, and ginger. A comforting breakfast beloved for its warmth and digestibility.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 44,
+      "fat": 6
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and coconut milk porridge with tofu",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_breakfast_008",
+    "name_tr": "Kue Putu",
+    "name_en": "Steamed Rice Cake",
+    "description": "Cylindrical steamed rice cake filled with palm sugar and coconut, served with warm curry sauce. An aromatic traditional breakfast treat.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 3,
+      "carbs": 45,
+      "fat": 5
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["tatli_dostum", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_breakfast_009",
+    "name_tr": "Soto Ayam",
+    "name_en": "Turmeric Chicken Soup",
+    "description": "Golden turmeric-infused broth with shredded chicken, hard-boiled egg, and potato. Served with rice and lime. A warming breakfast soup bursting with aromatic spices.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 18,
+      "carbs": 30,
+      "fat": 10
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and turmeric broth with tofu and mushroom",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "id_breakfast_010",
+    "name_tr": "Nasi Kuning Lemak",
+    "name_en": "Rich Yellow Rice",
+    "description": "Yellow rice cooked in coconut cream with anchovies, peanuts, and sambal. Richly aromatic and deeply flavorful traditional Malaysian-influenced dish.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 7,
+      "carbs": 42,
+      "fat": 14
+    },
+    "prep_time_min": 22,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same base recipe with plant-based sambal and omit anchovies",
+    "sifat_appeal": ["macera_seven", "gelenekci", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_breakfast_011",
+    "name_tr": "Bakso Kuah",
+    "name_en": "Meatball Soup",
+    "description": "Tender beef meatballs in clear aromatic broth with noodles, mushrooms, and greens. Served with lime and sambal. A hearty breakfast preparation.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 16,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Chickpea and vegetable meatballs in vegetable broth",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_breakfast_012",
+    "name_tr": "Tahu Goreng Sambel",
+    "name_en": "Spicy Fried Tofu",
+    "description": "Crispy tofu served with bold sambal matah (shallot and chili paste) and fresh vegetables. A vegetarian power breakfast packed with protein and flavor.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 16,
+      "carbs": 18,
+      "fat": 13
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_breakfast_013",
+    "name_tr": "Pisang Goreng",
+    "name_en": "Fried Banana",
+    "description": "Golden-battered fried banana served with honey drizzle and sometimes condensed milk. A sweet and savory breakfast treat beloved across Indonesia.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 2,
+      "carbs": 42,
+      "fat": 8
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["tatli_dostum", "heyecan_arayan", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_breakfast_014",
+    "name_tr": "Telur Mata Sapi",
+    "name_en": "Fried Egg",
+    "description": "Sunny-side fried egg with crispy edges served over rice, fried shallots, and sambal. A simple yet satisfying Indonesian breakfast staple.",
+    "nutrition": {
+      "calories": 250,
+      "protein": 8,
+      "carbs": 38,
+      "fat": 10
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu scramble with turmeric over rice",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_breakfast_015",
+    "name_tr": "Nasi Goreng Sederhana",
+    "name_en": "Simple Fried Rice",
+    "description": "Fragrant fried rice with egg, shallots, and a touch of soy sauce. Topped with fried onions and served with cucumber and tomato. An easy weekday breakfast.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 8,
+      "carbs": 46,
+      "fat": 9
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Fried rice with tofu scramble and vegetables",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_lunch_001",
+    "name_tr": "Rendang Daging",
+    "name_en": "Beef Rendang",
+    "description": "Slow-cooked beef in rich coconut milk spiced with chilies, garlic, ginger, and galangal. A UNESCO-recognized iconic Indonesian dish with deep, complex flavors.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 28
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Jackfruit or mushroom rendang with coconut milk",
+    "sifat_appeal": ["macera_seven", "centil_kibri", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "id_lunch_002",
+    "name_tr": "Nasi Goreng",
+    "name_en": "Indonesian Fried Rice",
+    "description": "Aromatic fried rice with shrimp, chicken, and vegetables in sweet soy sauce. Topped with crispy fried shallots, served with fried egg and cucumber.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 16,
+      "carbs": 54,
+      "fat": 16
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu fried rice with soy sauce",
+    "sifat_appeal": ["basit_sevici", "heyecan_arayan", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "id_lunch_003",
+    "name_tr": "Gado-Gado",
+    "name_en": "Mixed Vegetable Salad",
+    "description": "Blanched vegetables, tofu, and boiled eggs smothered in peanut sauce. A wholesome vegetarian lunch celebrated for its nutritional balance and bold peanut flavor.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 18
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Gado-gado without egg, extra tofu and peanut sauce",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "id_lunch_004",
+    "name_tr": "Sate Ayam",
+    "name_en": "Chicken Satay",
+    "description": "Grilled marinated chicken skewers served with rich peanut sauce, cucumber, and lontong (rice cake). An iconic Indonesian grilled specialty beloved for tender meat and bold flavors.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 26,
+      "carbs": 18,
+      "fat": 24
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu satay with peanut sauce and grilled vegetables",
+    "sifat_appeal": ["macera_seven", "sosyal_kelebek", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.15
+  },
+  {
+    "id": "id_lunch_005",
+    "name_tr": "Lumpia Shanghai",
+    "name_en": "Crispy Spring Rolls",
+    "description": "Thin crispy rolls filled with pork, shrimp, and vegetables. Served with sweet chili sauce and pickled vegetables. A beloved lunch item reflecting Chinese-Indonesian fusion.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 14
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable and tofu lumpia with sweet chili dipping",
+    "sifat_appeal": ["heyecan_arayan", "sosyal_kelebek", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_lunch_006",
+    "name_tr": "Ikan Bakar",
+    "name_en": "Grilled Fish",
+    "description": "Whole fish grilled with aromatic spices, turmeric, and lemongrass. Served with sambal and fresh lime. A coastal specialty showcasing Indonesian seafaring traditions.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 32,
+      "carbs": 10,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu or jackfruit with same spice profile",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "id_lunch_007",
+    "name_tr": "Bakso",
+    "name_en": "Beef Meatballs",
+    "description": "Tender beef meatballs in aromatic broth with noodles, vegetables, and tofu. Finished with fresh herbs and lime. A beloved comfort lunch reflecting street food traditions.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 16
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Chickpea and vegetable meatballs in vegetable broth",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_lunch_008",
+    "name_tr": "Kari Ayam",
+    "name_en": "Chicken Curry",
+    "description": "Tender chicken in mild curry sauce with potatoes, coconut milk, and warm spices. A comfort lunch favorite brought to tables across Indonesia daily.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 24,
+      "carbs": 24,
+      "fat": 18
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and chickpea curry with coconut milk",
+    "sifat_appeal": ["sevgi_dolu", "macera_seven", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_lunch_009",
+    "name_tr": "Pepes Ikan",
+    "name_en": "Steamed Fish in Leaf",
+    "description": "Fish fillet steamed in banana leaf with spice paste, coconut, and aromatics. The leaf imparts subtle flavor while keeping the fish incredibly tender and aromatic.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 28,
+      "carbs": 8,
+      "fat": 14
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu or mushroom steamed in banana leaf with spice paste",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_lunch_010",
+    "name_tr": "Oxtail Soup",
+    "name_en": "Sop Buntut",
+    "description": "Rich slow-cooked oxtail in aromatic broth with vegetables, turmeric, and warm spices. A celebratory lunch dish reflecting Indonesian special occasion cooking.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 32,
+      "carbs": 16,
+      "fat": 22
+    },
+    "prep_time_min": 150,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Root vegetable and mushroom broth with tofu",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_lunch_011",
+    "name_tr": "Gule Kambing",
+    "name_en": "Goat Curry",
+    "description": "Tender young goat meat in rich spiced curry with coconut milk. A festive dish served at celebrations, known for deep flavors and tender meat.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 30,
+      "carbs": 18,
+      "fat": 22
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Jackfruit and vegetable curry with coconut milk",
+    "sifat_appeal": ["centil_kibri", "macera_seven", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "id_lunch_012",
+    "name_tr": "Udang Sambal",
+    "name_en": "Spicy Shrimp",
+    "description": "Large shrimp cooked in bold sambal with fresh chilies, garlic, and lime juice. Packed with flavor and heat, this is adventurous seafood cooking at its finest.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 26,
+      "carbs": 8,
+      "fat": 10
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and tofu in bold sambal with fresh chilies",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_lunch_013",
+    "name_tr": "Sayur Asem",
+    "name_en": "Sour Vegetable Soup",
+    "description": "Tangy soup with mixed vegetables, tamarind, and aromatic spices. A refreshing and light lunch favorite across Indonesian households and warungs.",
+    "nutrition": {
+      "calories": 180,
+      "protein": 8,
+      "carbs": 24,
+      "fat": 6
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_lunch_014",
+    "name_tr": "Nasi Kunyit Ayam",
+    "name_en": "Turmeric Rice with Chicken",
+    "description": "Golden rice cooked with turmeric served alongside tender chicken cooked in coconut milk. A complete one-dish meal reflecting Southeast Asian warmth.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 20,
+      "carbs": 52,
+      "fat": 14
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Turmeric rice with mushroom and tofu curry",
+    "sifat_appeal": ["gelenekci", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_lunch_015",
+    "name_tr": "Chicken Teriyaki Noodle",
+    "name_en": "Mie Ayam Teriyaki",
+    "description": "Yellow noodles with grilled chicken glazed in sweet soy sauce, topped with fried shallots and fresh herbs. A modern Indonesian lunch blending tradition with ease.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 48,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu teriyaki noodles with mushrooms and greens",
+    "sifat_appeal": ["heyecan_arayan", "basit_sevici", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_lunch_016",
+    "name_tr": "Perkedel Gulai Daging",
+    "name_en": "Potato Croquettes with Beef Curry",
+    "description": "Crispy potato croquettes paired with rich beef curry. A combination dish showing Indonesian comfort food creativity and traditional flavors.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 22,
+      "carbs": 44,
+      "fat": 18
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Potato croquettes with mushroom and vegetable curry",
+    "sifat_appeal": ["sevgi_dolu", "gelenekci", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_lunch_017",
+    "name_tr": "Ayam Taliwang",
+    "name_en": "Spicy Smashed Chicken",
+    "description": "Flattened chicken fried crispy and tossed in bold sambal and spices. A West Nusa Tenggara specialty showing Indonesian regional diversity and bold flavors.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Cauliflower smashed and fried in bold sambal",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_lunch_018",
+    "name_tr": "Soto Banjar",
+    "name_en": "Banjarese Soup",
+    "description": "Clear soup with chicken, yolk, and potato in fragrant broth seasoned with turmeric. A South Kalimantan specialty bringing regional Indonesian depth to the table.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 28,
+      "fat": 12
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu broth with turmeric and aromatics",
+    "sifat_appeal": ["gelenekci", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_lunch_019",
+    "name_tr": "Gule Tanjung",
+    "name_en": "Beef Cheek Curry",
+    "description": "Slow-cooked beef cheeks in rich spiced curry until melt-in-mouth tender. A special occasion dish reflecting Indonesian skill in transforming humble cuts.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 32,
+      "carbs": 14,
+      "fat": 26
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and root vegetable curry with tofu",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "id_lunch_020",
+    "name_tr": "Cakalang Fufu",
+    "name_en": "Smoked Pork Ribs",
+    "description": "Smoked pork ribs braised in rich sauce with aromatic spices. A North Sulawesi specialty showcasing Indonesian smoking traditions and celebratory cooking.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 10,
+      "fat": 30
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Smoked mushroom and jackfruit with braising sauce",
+    "sifat_appeal": ["centil_kibri", "macera_seven", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "id_dinner_001",
+    "name_tr": "Rendang Jengkol",
+    "name_en": "Stink Bean Rendang",
+    "description": "Aromatic stink beans cooked in rich coconut rendang sauce. A pungent yet beloved Indonesian specialty reflecting adventurous vegetable traditions.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 22,
+      "fat": 16
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["macera_seven", "gelenekci", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "id_dinner_002",
+    "name_tr": "Kencur Soup",
+    "name_en": "Aromatic Ginger Soup",
+    "description": "Warming soup with galangal, turmeric, and aromatic herbs. Served with soft noodles and vegetables. An evening favorite providing comfort and digestive ease.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_dinner_003",
+    "name_tr": "Miso Broth with Noodle",
+    "name_en": "Miso Tonkotsu",
+    "description": "Rich miso-infused broth with tender noodles and vegetables. A Japanese-influenced evening dish popular in modern Indonesian dining.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 42,
+      "fat": 10
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Miso vegetable broth with tofu and noodles",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_dinner_004",
+    "name_tr": "Tahu Telur",
+    "name_en": "Tofu and Egg",
+    "description": "Silken tofu with seasoned scrambled egg in savory sauce. A light, protein-rich dinner reflecting Indonesian vegetarian cooking traditions.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 18,
+      "carbs": 12,
+      "fat": 13
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Extra-firm tofu with chickpea scramble",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_dinner_005",
+    "name_tr": "Tempeh Goreng",
+    "name_en": "Fried Tempeh",
+    "description": "Crispy fermented soybean cake served with sambal and fresh vegetables. A protein-rich dinner staple beloved for its nutty flavor and satisfying texture.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 19,
+      "carbs": 16,
+      "fat": 14
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "id_dinner_006",
+    "name_tr": "Ikan Asap",
+    "name_en": "Smoked Fish",
+    "description": "Whole fish smoked over coconut husks, served with warm spiced sauce. Aromatic and deeply flavorful, representing Indonesian coastal cooking heritage.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 34,
+      "carbs": 8,
+      "fat": 16
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Smoked tofu with warm spiced sauce and vegetables",
+    "sifat_appeal": ["gelenekci", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_dinner_007",
+    "name_tr": "Singgang Ikan",
+    "name_en": "Fish in Turmeric Broth",
+    "description": "Fish cooked in aromatic turmeric-based broth with ginger and lemongrass. A Betawi specialty bringing Jakarta's culinary heritage to dinner tables.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 30,
+      "carbs": 10,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom in turmeric broth",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_dinner_008",
+    "name_tr": "Gulai Telur",
+    "name_en": "Egg Curry",
+    "description": "Hard-boiled eggs in rich spiced coconut curry. A simple yet satisfying dinner dish reflecting Indonesian comfort food wisdom.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 18,
+      "fat": 20
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom curry with coconut milk",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_dinner_009",
+    "name_tr": "Oseng-oseng",
+    "name_en": "Stir-Fried Vegetables",
+    "description": "Quickly stir-fried vegetables with aromatic spices, garlic, and chilies. A light, health-conscious dinner that highlights Indonesian vegetable varieties.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 6,
+      "carbs": 18,
+      "fat": 7
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "id_dinner_010",
+    "name_tr": "Sambal Goreng Hati",
+    "name_en": "Spicy Liver",
+    "description": "Tender chicken liver in bold sambal with fresh chilies and tomato. A daring dinner for adventurous eaters, offering deep savory flavors.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 22,
+      "carbs": 10,
+      "fat": 12
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and vegetable sambal with bold spices",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "id_dinner_011",
+    "name_tr": "Kangkung Tauco",
+    "name_en": "Water Spinach in Bean Sauce",
+    "description": "Water spinach stir-fried with fermented bean paste, garlic, and chilies. A humble yet flavorful vegetable dish celebrating Indonesian greens.",
+    "nutrition": {
+      "calories": 140,
+      "protein": 6,
+      "carbs": 14,
+      "fat": 7
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "id_dinner_012",
+    "name_tr": "Udang Rebus",
+    "name_en": "Boiled Shrimp",
+    "description": "Large shrimp boiled in aromatic spiced broth with turmeric and lime. Served with sambal and fresh herbs. A light, healthy seafood dinner.",
+    "nutrition": {
+      "calories": 180,
+      "protein": 28,
+      "carbs": 6,
+      "fat": 5
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and bean curd in aromatic broth",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_dinner_013",
+    "name_tr": "Nasi Kuning Kecil",
+    "name_en": "Small Turmeric Rice",
+    "description": "Portion-controlled golden rice cooked with turmeric and coconut milk. Perfect for a light evening meal with simple sides.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 4,
+      "carbs": 40,
+      "fat": 5
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "id_dinner_014",
+    "name_tr": "Telur Bumbu",
+    "name_en": "Spiced Egg Curry",
+    "description": "Soft-boiled eggs in lightly spiced coconut sauce. A gentle dinner option balancing flavor with digestibility.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 10,
+      "carbs": 16,
+      "fat": 17
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom in coconut spice sauce",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "id_dinner_015",
+    "name_tr": "Sayur Lodeh",
+    "name_en": "Mild Vegetable Coconut Curry",
+    "description": "Mixed vegetables in mild coconut curry with turmeric. A light, wholesome dinner reflecting Indonesian vegetable wisdom.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 8,
+      "carbs": 26,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  }
+]

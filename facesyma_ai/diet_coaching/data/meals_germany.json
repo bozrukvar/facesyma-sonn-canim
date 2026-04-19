@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "de_breakfast_001",
+    "name_tr": "Muesli Taze Meyve",
+    "name_en": "Muesli with Fresh Fruit",
+    "description": "German-style muesli with yogurt, berries, and honey.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 44,
+      "fat": 8
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Almond milk muesli with coconut yogurt",
+    "sifat_appeal": ["saglikli", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "de_breakfast_002",
+    "name_tr": "Weissbrot Peynir",
+    "name_en": "White Bread with Cheese",
+    "description": "Fresh white bread with butter and German cheese slices.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 36,
+      "fat": 14
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Bread with plant-based butter and cheese",
+    "sifat_appeal": ["basit", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_breakfast_003",
+    "name_tr": "Pumpernickel Sosis",
+    "name_en": "Pumpernickel with Sausage",
+    "description": "Dark pumpernickel bread with German sausage and mustard.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 20
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pumpernickel with plant-based sausage",
+    "sifat_appeal": ["guclü", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_breakfast_004",
+    "name_tr": "Knackebrot Kütüphane",
+    "name_en": "Crispbread with Spreads",
+    "description": "Crunchy crispbread with butter, jam, and honey.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 38,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crispbread with vegan spreads",
+    "sifat_appeal": ["basit", "tatli", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "de_breakfast_005",
+    "name_tr": "Vollkorn Ekmek",
+    "name_en": "Whole Grain Bread",
+    "description": "Hearty whole grain bread with butter and marmalade.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 10,
+      "carbs": 40,
+      "fat": 10
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Whole grain bread with vegan butter and jam",
+    "sifat_appeal": ["saglikli", "basit", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_breakfast_006",
+    "name_tr": "Breakfast Omelet",
+    "name_en": "Cheese and Ham Omelet",
+    "description": "Fluffy omelet with ham, cheese, and fresh herbs.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 8,
+      "fat": 26
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu scramble with plant-based cheese",
+    "sifat_appeal": ["guclü", "tatli", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_breakfast_007",
+    "name_tr": "Soft Boiled Eggs",
+    "name_en": "Soft Boiled Eggs with Soldiers",
+    "description": "Soft boiled eggs served with toasted bread strips.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 24,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu scramble with toast",
+    "sifat_appeal": ["basit", "tatli", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_breakfast_008",
+    "name_tr": "Marmalade Pastry",
+    "name_en": "Jam-Filled Pastry",
+    "description": "Buttery pastry filled with fruit jam and powdered sugar.",
+    "nutrition": {
+      "calories": 330,
+      "protein": 6,
+      "carbs": 44,
+      "fat": 14
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan pastry with jam",
+    "sifat_appeal": ["tatli", "hafif", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "de_breakfast_009",
+    "name_tr": "Müsliriegel Bar",
+    "name_en": "Muesli Bar",
+    "description": "Homemade granola bar with oats, nuts, and honey.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 8,
+      "carbs": 40,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_breakfast_010",
+    "name_tr": "Laugenbrezel",
+    "name_en": "Pretzel with Butter",
+    "description": "Soft pretzel with butter and coarse salt.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 9,
+      "carbs": 42,
+      "fat": 10
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pretzel with vegan butter",
+    "sifat_appeal": ["tatli", "basit", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_breakfast_011",
+    "name_tr": "Yogurt Musli",
+    "name_en": "Greek Yogurt Parfait",
+    "description": "Layered yogurt with granola and fresh berries.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 14,
+      "carbs": 38,
+      "fat": 8
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Coconut yogurt with granola and berries",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "summer",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_breakfast_012",
+    "name_tr": "Kasebrot Toast",
+    "name_en": "Cheese Toast",
+    "description": "Toasted bread with melted cheese and caraway seeds.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Toast with plant-based cheese",
+    "sifat_appeal": ["basit", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_breakfast_013",
+    "name_tr": "Leberwurst Spread",
+    "name_en": "Liver Sausage Spread",
+    "description": "Traditional liver sausage on dark bread with onions.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Plant-based liver spread substitute",
+    "sifat_appeal": ["guclü", "tatli", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "de_breakfast_014",
+    "name_tr": "Fresh Fruit Quark",
+    "name_en": "Quark with Fruit",
+    "description": "Creamy quark cheese with fresh fruit and honey.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 16,
+      "carbs": 32,
+      "fat": 4
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu quark with fruit",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_breakfast_015",
+    "name_tr": "Schwarzbrot Butter",
+    "name_en": "Dark Rye Bread",
+    "description": "Dense dark rye bread with butter and jam.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 9,
+      "carbs": 40,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Rye bread with vegan butter and jam",
+    "sifat_appeal": ["basit", "tatli", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_001",
+    "name_tr": "Schnitzel",
+    "name_en": "Breaded Pork Schnitzel",
+    "description": "Thin, crispy breaded pork chop with lemon and potatoes.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 36,
+      "carbs": 28,
+      "fat": 26
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Breaded tofu cutlet with same sides",
+    "sifat_appeal": ["guclü", "geleneksel", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "de_lunch_002",
+    "name_tr": "Leberkäse",
+    "name_en": "Bavarian Meatloaf",
+    "description": "Baked meatloaf served with mustard, bread, and pickles.",
+    "nutrition": {
+      "calories": 460,
+      "protein": 32,
+      "carbs": 24,
+      "fat": 26
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil and walnut loaf",
+    "sifat_appeal": ["guclü", "sevgi_dolu", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_003",
+    "name_tr": "Rouladen Gulaş",
+    "name_en": "Beef Rouladen",
+    "description": "Beef rolls filled with mustard, onions, and bacon.",
+    "nutrition": {
+      "calories": 500,
+      "protein": 40,
+      "carbs": 20,
+      "fat": 28
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and walnut rouladen",
+    "sifat_appeal": ["guclü", "sofistike", "tatli"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_004",
+    "name_tr": "Eintopf Stew",
+    "name_en": "German Stew",
+    "description": "One-pot stew with vegetables, meat, and potatoes.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 36,
+      "fat": 18
+    },
+    "prep_time_min": 75,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable stew with lentils",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "rahat"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_lunch_005",
+    "name_tr": "Sauerkraut Sosis",
+    "name_en": "Sausage with Sauerkraut",
+    "description": "German sausage served with spicy sauerkraut and mustard.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 16,
+      "fat": 24
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Plant-based sausage with sauerkraut",
+    "sifat_appeal": ["guclü", "macera_seven", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_lunch_006",
+    "name_tr": "Potato Salad",
+    "name_en": "Warm German Potato Salad",
+    "description": "Warm potato salad with bacon, onions, and vinegar dressing.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 14,
+      "carbs": 38,
+      "fat": 14
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Potato salad with plant-based bacon",
+    "sifat_appeal": ["basit", "sevgi_dolu", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_007",
+    "name_tr": "Spätzle Cheese",
+    "name_en": "Cheese Spätzle",
+    "description": "Egg noodles with melted cheese and fried onions.",
+    "nutrition": {
+      "calories": 460,
+      "protein": 18,
+      "carbs": 48,
+      "fat": 22
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Spätzle with nutritional yeast and plant-based butter",
+    "sifat_appeal": ["tatli", "sevgi_dolu", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_lunch_008",
+    "name_tr": "Sauerkraut Eintopf",
+    "name_en": "Sauerkraut Stew",
+    "description": "Hearty stew with sauerkraut, meat, and potatoes.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 26,
+      "carbs": 34,
+      "fat": 18
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Sauerkraut and lentil stew",
+    "sifat_appeal": ["saglikli", "guclü", "rahat"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_009",
+    "name_tr": "Bretzel Cheese",
+    "name_en": "Pretzel with Cheese",
+    "description": "Soft pretzel with melted cheese and mustard.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 44,
+      "fat": 16
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pretzel with plant-based cheese",
+    "sifat_appeal": ["basit", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_lunch_010",
+    "name_tr": "Kalbshaxe",
+    "name_en": "Roasted Veal Knuckle",
+    "description": "Slow-roasted veal shank with herbs and root vegetables.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 44,
+      "carbs": 16,
+      "fat": 30
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Slow-roasted mushroom steaks",
+    "sifat_appeal": ["guclü", "sofistike", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_lunch_011",
+    "name_tr": "Schweinshaxe",
+    "name_en": "Roasted Pork Knuckle",
+    "description": "Crispy roasted pork knuckle with crackling skin.",
+    "nutrition": {
+      "calories": 540,
+      "protein": 46,
+      "carbs": 12,
+      "fat": 32
+    },
+    "prep_time_min": 150,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Roasted cauliflower steaks",
+    "sifat_appeal": ["guclü", "sofistike", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_lunch_012",
+    "name_tr": "Herring Salad",
+    "name_en": "Herring Salad",
+    "description": "Traditional German herring salad with beets and onions.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 28,
+      "carbs": 20,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Beet and walnut salad",
+    "sifat_appeal": ["macera_seven", "zarif", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "de_lunch_013",
+    "name_tr": "Asparagus Sauce",
+    "name_en": "White Asparagus",
+    "description": "Seasonal white asparagus with hollandaise sauce and ham.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 18,
+      "fat": 26
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Asparagus with cashew hollandaise",
+    "sifat_appeal": ["zarif", "sofistike", "mevsim"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "de_lunch_014",
+    "name_tr": "Beef Gulaş",
+    "name_en": "Hungarian Goulash",
+    "description": "Beef stew with paprika, onions, and sour cream.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 36,
+      "carbs": 24,
+      "fat": 26
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil goulash",
+    "sifat_appeal": ["macera_seven", "guclü", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_lunch_015",
+    "name_tr": "Sauerbraten",
+    "name_en": "Sauerbraten",
+    "description": "Pot roast marinated in vinegar with red cabbage.",
+    "nutrition": {
+      "calories": 500,
+      "protein": 42,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 180,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil pot roast",
+    "sifat_appeal": ["guclü", "macera_seven", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_016",
+    "name_tr": "Cabbage Soup",
+    "name_en": "Cabbage Soup",
+    "description": "Hearty cabbage soup with vegetables and meat.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Cabbage soup with beans",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_017",
+    "name_tr": "Lentil Soup",
+    "name_en": "Lentil Soup",
+    "description": "Traditional German lentil soup with sausage.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 20,
+      "carbs": 38,
+      "fat": 10
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Lentil soup with mushrooms",
+    "sifat_appeal": ["saglikli", "guclü", "rahat"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "de_lunch_018",
+    "name_tr": "Rindsroulade",
+    "name_en": "Beef Roulade",
+    "description": "Beef roll with mustard, onions, and herbs.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 40,
+      "carbs": 18,
+      "fat": 26
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and walnut roulade",
+    "sifat_appeal": ["sofistike", "guclü", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_019",
+    "name_tr": "Fish Häring",
+    "name_en": "Pan-Fried Fish",
+    "description": "Pan-fried white fish with lemon and potatoes.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 36,
+      "carbs": 20,
+      "fat": 16
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Pan-fried tofu with same sides",
+    "sifat_appeal": ["saglikli", "basit", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_lunch_020",
+    "name_tr": "Bratwurst Sauerkraut",
+    "name_en": "Bratwurst with Sauerkraut",
+    "description": "Grilled bratwurst with sauerkraut and mustard.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 26,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Plant-based sausage with sauerkraut",
+    "sifat_appeal": ["guclü", "macera_seven", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "de_dinner_001",
+    "name_tr": "Vegetable Soup",
+    "name_en": "Vegetable Soup",
+    "description": "Clear vegetable broth with seasonal vegetables.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 4
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_dinner_002",
+    "name_tr": "Mushroom Soup",
+    "name_en": "Mushroom Soup",
+    "description": "Creamy mushroom soup with fresh herbs.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 24,
+      "fat": 14
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom soup with coconut milk",
+    "sifat_appeal": ["saglikli", "tatli", "rahat"],
+    "season": "autumn",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_dinner_003",
+    "name_tr": "Smoked Salmon",
+    "name_en": "Smoked Salmon with Bread",
+    "description": "Smoked salmon with whole grain bread and cream cheese.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 28,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Smoked tofu with cream cheese alternative",
+    "sifat_appeal": ["sofistike", "zarif", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_004",
+    "name_tr": "Cheese Plate",
+    "name_en": "German Cheese Plate",
+    "description": "Selection of German cheeses with bread and fruits.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 20
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Plant-based cheese selection with bread",
+    "sifat_appeal": ["zarif", "sofistike", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "de_dinner_005",
+    "name_tr": "Bockwurst Light",
+    "name_en": "Bockwurst with Rolls",
+    "description": "Light sausage served in rolls with mustard.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 36,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Plant-based sausage in rolls",
+    "sifat_appeal": ["basit", "tatli", "guclü"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_006",
+    "name_tr": "Ham Cheese Toast",
+    "name_en": "Ham and Cheese Toast",
+    "description": "Toasted bread with ham and melted cheese.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 16,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Toast with plant-based ham and cheese",
+    "sifat_appeal": ["basit", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_007",
+    "name_tr": "Cucumber Salad",
+    "name_en": "Cucumber Salad",
+    "description": "Light cucumber salad with vinegar and herbs.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 4,
+      "carbs": 20,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_dinner_008",
+    "name_tr": "Boiled Vegetables",
+    "name_en": "Boiled Mixed Vegetables",
+    "description": "Seasonal boiled vegetables with butter.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Boiled vegetables with plant-based butter",
+    "sifat_appeal": ["saglikli", "basit", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_009",
+    "name_tr": "Radish Butter Bread",
+    "name_en": "Radish and Bread",
+    "description": "Fresh radishes with butter and salt on dark bread.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Radish with plant-based butter",
+    "sifat_appeal": ["saglikli", "basit", "macera_seven"],
+    "season": "spring",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "de_dinner_010",
+    "name_tr": "Quark Dessert",
+    "name_en": "Quark with Berries",
+    "description": "Creamy quark with fresh berries and honey.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu cream with berries",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_dinner_011",
+    "name_tr": "Bread Cheese Spread",
+    "name_en": "Cheese and Pickle Sandwich",
+    "description": "Bread with cheese, pickles, and mustard.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Sandwich with plant-based cheese",
+    "sifat_appeal": ["basit", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_012",
+    "name_tr": "Yogurt Berries",
+    "name_en": "Yogurt with Berries",
+    "description": "Plain yogurt topped with fresh berries.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 12,
+      "carbs": 30,
+      "fat": 4
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Coconut yogurt with berries",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "de_dinner_013",
+    "name_tr": "Egg Salad Bread",
+    "name_en": "Egg Salad Sandwich",
+    "description": "Bread with homemade egg salad and herbs.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Sandwich with chickpea salad",
+    "sifat_appeal": ["basit", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "de_dinner_014",
+    "name_tr": "Cold Cut Platter",
+    "name_en": "Cold Cuts and Bread",
+    "description": "Assorted German cold cuts with fresh bread.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 20,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Plant-based cold cuts with bread",
+    "sifat_appeal": ["basit", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "de_dinner_015",
+    "name_tr": "Fruit Bread",
+    "name_en": "Whole Grain with Fruit",
+    "description": "Whole grain bread with fresh fruit and honey.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 8,
+      "carbs": 44,
+      "fat": 8
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  }
+]

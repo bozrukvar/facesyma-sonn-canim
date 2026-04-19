@@ -1,0 +1,156 @@
+{
+  "sifat_meal_preferences": {
+    "disiplinli": {
+      "weight": 1.5,
+      "preferences": {
+        "breakfast": ["protein_rich", "low_sugar", "whole_grains", "minimal_oil"],
+        "lunch": ["lean_protein", "vegetables", "minimal_oil", "balanced"],
+        "dinner": ["balanced", "lean_protein", "vegetables", "portion_controlled"]
+      }
+    },
+    "sosyal_comertkane": {
+      "weight": 1.3,
+      "preferences": {
+        "breakfast": ["abundant", "variety", "shareable", "rich"],
+        "lunch": ["hearty", "filling", "portions_large", "doyurucu"],
+        "dinner": ["shareable_dishes", "family_style", "abundance"]
+      }
+    },
+    "yaratici_sanat": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["colorful", "variety", "presentation", "interesting"],
+        "lunch": ["exotic", "different_cuisines", "interesting", "unique"],
+        "dinner": ["beautifully_presented", "unique", "artistic"]
+      }
+    },
+    "saglik_bilinc": {
+      "weight": 1.4,
+      "preferences": {
+        "breakfast": ["organic", "whole_grains", "fruits", "low_fat", "high_protein"],
+        "lunch": ["fresh_vegetables", "minimal_processing", "lean", "nutritious"],
+        "dinner": ["light", "vitamin_rich", "wholesome", "vegetables"]
+      }
+    },
+    "pratikci_zaman": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["quick_5min", "minimal_prep", "ready_to_eat", "portable"],
+        "lunch": ["fast", "ready_to_eat", "quick_prep", "convenient"],
+        "dinner": ["quick_cook", "simple", "fast_to_prepare"]
+      }
+    },
+    "luks_seven": {
+      "weight": 1.3,
+      "preferences": {
+        "breakfast": ["premium", "imported", "expensive", "special"],
+        "lunch": ["special_cuts", "fine_dining", "expensive", "luxury"],
+        "dinner": ["luxury", "special_preparation", "fine_dining", "expensive"]
+      }
+    },
+    "aile_odakli": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["classic", "traditional", "family", "comforting"],
+        "lunch": ["homemade", "comfort", "traditional_recipes", "family"],
+        "dinner": ["family_meals", "gathering_friendly", "traditional", "comforting"]
+      }
+    },
+    "gelenekci": {
+      "weight": 1.15,
+      "preferences": {
+        "breakfast": ["traditional", "classic", "time_honored"],
+        "lunch": ["traditional_recipes", "classic", "cultural"],
+        "dinner": ["traditional", "cultural", "ancestral_recipes"]
+      }
+    },
+    "ekonomik": {
+      "weight": 1.1,
+      "preferences": {
+        "breakfast": ["affordable", "budget_friendly", "filling"],
+        "lunch": ["affordable", "budget_friendly", "protein_packed"],
+        "dinner": ["affordable", "budget_friendly", "economical"]
+      }
+    },
+    "macera_seven": {
+      "weight": 1.25,
+      "preferences": {
+        "breakfast": ["different", "exotic", "interesting", "experimental"],
+        "lunch": ["exotic", "different_cuisines", "international", "adventurous"],
+        "dinner": ["experimental", "international", "exotic", "different"]
+      }
+    },
+    "doganın_cocugu": {
+      "weight": 1.3,
+      "preferences": {
+        "breakfast": ["organic", "natural", "unprocessed", "eco_friendly"],
+        "lunch": ["organic", "natural", "seasonal", "local"],
+        "dinner": ["organic", "natural", "seasonal", "sustainable"]
+      }
+    },
+    "enerjik": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["high_calorie", "energizing", "protein_rich", "carb_loaded"],
+        "lunch": ["high_energy", "filling", "protein_rich", "carbs"],
+        "dinner": ["energy_boosting", "substantial", "hearty"]
+      }
+    },
+    "sevgi_dolu": {
+      "weight": 1.1,
+      "preferences": {
+        "breakfast": ["comforting", "warm", "nourishing"],
+        "lunch": ["comforting", "warm", "family_recipes"],
+        "dinner": ["comforting", "nurturing", "family"]
+      }
+    },
+    "cesur_atılgan": {
+      "weight": 1.15,
+      "preferences": {
+        "breakfast": ["bold", "intense", "spicy", "different"],
+        "lunch": ["bold_flavors", "spicy", "intense", "adventurous"],
+        "dinner": ["bold", "intense", "adventurous", "challenging"]
+      }
+    },
+    "centil_kibri": {
+      "weight": 1.1,
+      "preferences": {
+        "breakfast": ["elegant", "refined", "sophisticated"],
+        "lunch": ["elegant", "refined", "sophisticated", "cultured"],
+        "dinner": ["elegant", "sophisticated", "refined"]
+      }
+    },
+    "meraklı": {
+      "weight": 1.15,
+      "preferences": {
+        "breakfast": ["new", "different", "interesting", "experimental"],
+        "lunch": ["new_dishes", "experimental", "interesting"],
+        "dinner": ["novel", "experimental", "interesting"]
+      }
+    },
+    "kontrol_eden": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["portion_controlled", "measured", "calculated"],
+        "lunch": ["portion_controlled", "balanced", "measured"],
+        "dinner": ["portion_controlled", "balanced", "structured"]
+      }
+    },
+    "yaşamsal_hassas": {
+      "weight": 1.3,
+      "preferences": {
+        "breakfast": ["clean_eating", "wholesome", "pure"],
+        "lunch": ["clean_eating", "pure", "simple"],
+        "dinner": ["clean_eating", "wholesome", "simple"]
+      }
+    },
+    "sosyal_kelebek": {
+      "weight": 1.2,
+      "preferences": {
+        "breakfast": ["social", "shareable", "communal"],
+        "lunch": ["social", "shareable", "communal", "gathering_friendly"],
+        "dinner": ["social", "shareable", "gathering_friendly"]
+      }
+    }
+  }
+}

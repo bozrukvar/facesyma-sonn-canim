@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "ja_breakfast_001",
+    "name_tr": "Tamagoyaki",
+    "name_en": "Rolled Omelet",
+    "description": "Delicate sweet and savory rolled omelet served with steamed rice and miso soup. A classic Japanese breakfast reflecting balance and refinement.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu-based rolled omelet with plant milk",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ja_breakfast_002",
+    "name_tr": "Miso Soup Breakfast",
+    "name_en": "Miso Soup with Tofu",
+    "description": "Aromatic fermented soy paste broth with silken tofu and wakame seaweed. A warming, nutritious traditional Japanese breakfast.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 8,
+      "carbs": 14,
+      "fat": 6
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "ja_breakfast_003",
+    "name_tr": "Tamago Kake Gohan",
+    "name_en": "Egg over Rice",
+    "description": "Raw egg yolk poured over hot rice with soy sauce and nori. A simple yet deeply satisfying Japanese breakfast celebrating pure flavors.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 48,
+      "fat": 9
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu scramble over rice with soy sauce",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_breakfast_004",
+    "name_tr": "Okayaki",
+    "name_en": "Savory Pancake",
+    "description": "Savory Japanese pancake with cabbage, seafood, and mayo. Topped with bonito flakes and takoyaki sauce. A breakfast comfort food.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 12,
+      "carbs": 44,
+      "fat": 16
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable okayaki with vegan mayo",
+    "sifat_appeal": ["heyecan_arayan", "sosyal_kelebek", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_breakfast_005",
+    "name_tr": "Onigiri Breakfast",
+    "name_en": "Rice Ball",
+    "description": "Hand-formed rice ball with umeboshi (pickled plum) or salmon filling. A convenient, portable Japanese breakfast celebrating rice.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 50,
+      "fat": 2
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Onigiri with pickled vegetables filling",
+    "sifat_appeal": ["basit_sevici", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_breakfast_006",
+    "name_tr": "Yakitori Breakfast",
+    "name_en": "Grilled Chicken Skewers",
+    "description": "Grilled chicken pieces on skewers glazed with sweet soy sauce. A protein-rich breakfast for the adventurous.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 28,
+      "carbs": 14,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled vegetable and tofu skewers with soy glaze",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_breakfast_007",
+    "name_tr": "Dorayaki",
+    "name_en": "Red Bean Pancake",
+    "description": "Sweet red bean paste between two soft pancake layers. A beloved Japanese breakfast sweet reflecting traditional confectionery arts.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 5,
+      "carbs": 52,
+      "fat": 4
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["tatli_dostum", "centil_kibri", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "ja_breakfast_008",
+    "name_tr": "Mekabu Gohan",
+    "name_en": "Seaweed Sporophyll Rice",
+    "description": "Sticky seaweed sporophyll served over steamed rice with soy sauce. A nutritious breakfast rich in minerals and umami.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 7,
+      "carbs": 46,
+      "fat": 2
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_breakfast_009",
+    "name_tr": "Natto Gohan",
+    "name_en": "Fermented Soybean Rice",
+    "description": "Sticky fermented soybeans served over rice with soy sauce and nori. An acquired taste breakfast celebrating Japanese fermentation traditions.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 44,
+      "fat": 7
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["macera_seven", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "ja_breakfast_010",
+    "name_tr": "Takoyaki Breakfast",
+    "name_en": "Octopus Balls",
+    "description": "Golden-fried batter balls filled with tender octopus pieces. Topped with mayo and takoyaki sauce. A playful breakfast comfort food.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 38,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable and mushroom takoyaki balls",
+    "sifat_appeal": ["heyecan_arayan", "sosyal_kelebek", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_breakfast_011",
+    "name_tr": "Oroshi Daikon Breakfast",
+    "name_en": "Grated Radish Rice",
+    "description": "Grated spicy daikon radish served over rice with a raw egg. A refreshing, pungent breakfast cleansing the palate.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 7,
+      "carbs": 44,
+      "fat": 4
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grated daikon with tofu scramble",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "ja_breakfast_012",
+    "name_tr": "Tamago Sando",
+    "name_en": "Egg Sandwich",
+    "description": "Creamy egg salad sandwich on soft white bread. A Japanese-style breakfast sandwich celebrating simplicity and care.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 10
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu salad sandwich on vegan bread",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_breakfast_013",
+    "name_tr": "Hashbrown Gohan",
+    "name_en": "Breakfast Set Rice",
+    "description": "Fluffy rice with hashbrowns, vegetable sides, and miso soup. A modern Japanese breakfast set reflecting breakfast evolution.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 8,
+      "carbs": 54,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same set with vegan butter for hashbrowns",
+    "sifat_appeal": ["basit_sevici", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_breakfast_014",
+    "name_tr": "Unagi Gohan",
+    "name_en": "Eel over Rice",
+    "description": "Tender grilled eel glazed in sweet soy sauce served over rice. A luxurious breakfast celebrating Japanese seafood mastery.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 24,
+      "carbs": 44,
+      "fat": 12
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Glazed mushroom and tofu over rice",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_breakfast_015",
+    "name_tr": "Tempura Breakfast",
+    "name_en": "Light Battered Vegetables",
+    "description": "Vegetables in delicate tempura batter served with dipping sauce. A crispy, refreshing breakfast option.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 6,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable tempura with egg-free batter",
+    "sifat_appeal": ["heyecan_arayan", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_lunch_001",
+    "name_tr": "Ramen",
+    "name_en": "Noodle Soup",
+    "description": "Wheat noodles in rich broth topped with pork, egg, and vegetables. A legendary lunch dish embodying Japanese noodle culture.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 54,
+      "fat": 14
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable ramen with miso or vegetable broth",
+    "sifat_appeal": ["sevgi_dolu", "gelenekci", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "ja_lunch_002",
+    "name_tr": "Sushi Set",
+    "name_en": "Sushi Platter",
+    "description": "Assorted fresh fish and vegetable rolls with pickled ginger and wasabi. An iconic lunch celebrating Japanese precision and freshness.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 16,
+      "carbs": 50,
+      "fat": 6
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable and avocado sushi rolls",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.15
+  },
+  {
+    "id": "ja_lunch_003",
+    "name_tr": "Donburi",
+    "name_en": "Rice Bowl",
+    "description": "A large bowl of rice topped with various proteins and vegetables. A complete meal in one bowl celebrating Japanese efficiency.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 20,
+      "carbs": 56,
+      "fat": 12
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable and tofu donburi over rice",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "ja_lunch_004",
+    "name_tr": "Katsudon",
+    "name_en": "Breaded Pork Rice Bowl",
+    "description": "Crispy breaded pork cutlet over rice with egg and onions. A beloved lunch showcasing the art of perfect breading.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 24,
+      "carbs": 48,
+      "fat": 20
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Breaded tofu cutlet donburi with plant egg",
+    "sifat_appeal": ["heyecan_arayan", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_lunch_005",
+    "name_tr": "Udon",
+    "name_en": "Thick Noodle Soup",
+    "description": "Thick, chewy udon noodles in clear or dark broth topped with vegetables and tempura. A comforting lunch celebrating noodle texture.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 58,
+      "fat": 10
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable udon with vegetable broth",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ja_lunch_006",
+    "name_tr": "Tonkatsu",
+    "name_en": "Pork Cutlet",
+    "description": "Crispy breaded pork cutlet served with tonkatsu sauce and shredded cabbage. A Japanese-Western lunch classic.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 26,
+      "carbs": 26,
+      "fat": 24
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Breaded tofu cutlet with tonkatsu sauce",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_007",
+    "name_tr": "Tempura Lunch",
+    "name_en": "Battered and Fried Vegetables",
+    "description": "Light battered vegetables and shrimp served with dipping sauce and daikon radish. A crispy lunch celebrating Japanese batter perfection.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 16
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable tempura with egg-free batter",
+    "sifat_appeal": ["heyecan_arayan", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_lunch_008",
+    "name_tr": "Okonomiyaki",
+    "name_en": "Savory Pancake",
+    "description": "Layered pancake with cabbage, proteins, and toppings. Griddled and served with special sauce. A lunch celebration of layered flavors.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 14,
+      "carbs": 46,
+      "fat": 18
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable okonomiyaki with vegan mayo",
+    "sifat_appeal": ["heyecan_arayan", "sosyal_kelebek", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_009",
+    "name_tr": "Yakisoba",
+    "name_en": "Fried Noodles",
+    "description": "Stir-fried noodles with vegetables and protein in tangy sauce. A lunch embodying Japanese wok cooking mastery.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable yakisoba with tofu",
+    "sifat_appeal": ["basit_sevici", "macera_seven", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_lunch_010",
+    "name_tr": "Sukiyaki",
+    "name_en": "Hot Pot with Beef",
+    "description": "Thinly sliced beef cooked at table in sweet broth with vegetables and tofu. A celebratory lunch experience.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 24,
+      "fat": 26
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and vegetable hot pot with tofu",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_lunch_011",
+    "name_tr": "Shabu-shabu",
+    "name_en": "Hot Pot",
+    "description": "Thinly sliced ingredients cooked at table in clear broth. A social, participatory lunch celebrating communal dining.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 24,
+      "carbs": 28,
+      "fat": 18
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu hot pot with vegetable broth",
+    "sifat_appeal": ["sosyal_kelebek", "sevgi_dolu", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_lunch_012",
+    "name_tr": "Tori Soboro Don",
+    "name_en": "Chicken Rice Bowl",
+    "description": "Ground chicken scrambled with egg over rice, topped with vegetables. A quick, complete lunch in a bowl.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 20,
+      "carbs": 52,
+      "fat": 12
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu soboro don with plant egg",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_013",
+    "name_tr": "Chirashi Don",
+    "name_en": "Scattered Sushi Bowl",
+    "description": "Sushi rice topped with scattered sashimi, vegetables, and omelet strips. A colorful, elegant lunch celebrating Japanese aesthetics.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 16,
+      "carbs": 52,
+      "fat": 10
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable scattered sushi bowl with tofu",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_014",
+    "name_tr": "Gyudon",
+    "name_en": "Beef Rice Bowl",
+    "description": "Thinly sliced beef simmered with onions and served over rice. A hearty, efficient lunch beloved in Japan.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 22,
+      "carbs": 52,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom beef substituted over rice",
+    "sifat_appeal": ["basit_sevici", "macera_seven", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_lunch_015",
+    "name_tr": "Oyakodon",
+    "name_en": "Parent-Child Rice Bowl",
+    "description": "Chicken and egg over rice in soft, comforting layering. A lunch celebrating family connections through food.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 18,
+      "carbs": 54,
+      "fat": 11
+    },
+    "prep_time_min": 22,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu and plant egg donburi",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_016",
+    "name_tr": "Unagi Don",
+    "name_en": "Eel Rice Bowl",
+    "description": "Grilled eel glazed in sweet sauce over steamed rice. A luxurious lunch celebrating Japanese seafood traditions.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 22,
+      "carbs": 52,
+      "fat": 12
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Glazed mushroom donburi",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_lunch_017",
+    "name_tr": "Karaage",
+    "name_en": "Japanese Fried Chicken",
+    "description": "Marinated and fried chicken pieces until golden and crispy. A beloved lunch showcasing Japanese frying technique.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 18,
+      "fat": 22
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Breaded tofu karaage with same marinade",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_lunch_018",
+    "name_tr": "Soba Lunch",
+    "name_en": "Buckwheat Noodle Soup",
+    "description": "Chewy buckwheat noodles in light broth with vegetables. A refined, health-conscious lunch celebrating simplicity.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 52,
+      "fat": 6
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_lunch_019",
+    "name_tr": "Teppanyaki Lunch",
+    "name_en": "Griddle-Cooked Meal",
+    "description": "Meat and vegetables cooked on hot griddle before your eyes. A theatrical, interactive lunch experience.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 26,
+      "carbs": 32,
+      "fat": 20
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable teppanyaki with tofu",
+    "sifat_appeal": ["sosyal_kelebek", "macera_seven", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_lunch_020",
+    "name_tr": "Horumon Yaki",
+    "name_en": "Grilled Offal",
+    "description": "Grilled organ meats including liver and intestines. A daring lunch for adventurous eaters celebrating nose-to-tail cooking.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 30,
+      "carbs": 8,
+      "fat": 24
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled mushroom and vegetable skewers",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "ja_dinner_001",
+    "name_tr": "Miso Soup Dinner",
+    "name_en": "Miso Soup with Rice",
+    "description": "Traditional fermented soy broth served with steamed rice and pickled vegetables. A simple, nourishing dinner ending the day gently.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "carbs": 42,
+      "fat": 5
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ja_dinner_002",
+    "name_tr": "Grilled Fish Dinner",
+    "name_en": "Shioyaki",
+    "description": "Simple salt-grilled whole fish with citrus and soy. A refined dinner celebrating the purity of fish.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 6,
+      "fat": 14
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu with citrus and soy",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_dinner_003",
+    "name_tr": "Nimono",
+    "name_en": "Simmered Vegetables",
+    "description": "Seasonal vegetables simmered in delicate broth. A light, healthy dinner celebrating Japanese vegetable cooking.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 6,
+      "carbs": 22,
+      "fat": 4
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_dinner_004",
+    "name_tr": "Yakimono",
+    "name_en": "Grilled Item",
+    "description": "Grilled fish or meat with minimal seasoning. A dinner category celebrating the essence of ingredients.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 28,
+      "carbs": 8,
+      "fat": 12
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu and vegetables",
+    "sifat_appeal": ["saglik_bilinc", "centil_kibri", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_dinner_005",
+    "name_tr": "Agemono Dinner",
+    "name_en": "Fried Items",
+    "description": "Light fried vegetables and seafood with dipping sauce. A comforting dinner that feels indulgent yet balanced.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 22,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable tempura with egg-free batter",
+    "sifat_appeal": ["heyecan_arayan", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_dinner_006",
+    "name_tr": "Sawamono",
+    "name_en": "Vinegar Dish",
+    "description": "Tangy vinegared vegetables and seafood. A refreshing dinner that aids digestion and awakens the palate.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 14,
+      "carbs": 16,
+      "fat": 6
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable vinegared salad",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_dinner_007",
+    "name_tr": "Tofu Dinner",
+    "name_en": "Cold Tofu",
+    "description": "Silky tofu chilled and served with soy sauce, ginger, and scallions. A light, refreshing dinner.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 16,
+      "carbs": 8,
+      "fat": 12
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ja_dinner_008",
+    "name_tr": "Steamed Dish",
+    "name_en": "Mushimono",
+    "description": "Delicately steamed fish and vegetables preserving natural flavors. A refined, healthy dinner.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 24,
+      "carbs": 12,
+      "fat": 9
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Steamed tofu and vegetables",
+    "sifat_appeal": ["saglik_bilinc", "centil_kibri", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_dinner_009",
+    "name_tr": "Sukimono",
+    "name_en": "Clear Soup",
+    "description": "Delicate clear soup with minimal ingredients and garnish. A refined dinner celebrating simplicity.",
+    "nutrition": {
+      "calories": 120,
+      "protein": 6,
+      "carbs": 12,
+      "fat": 3
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_dinner_010",
+    "name_tr": "Tatsuta-Age Dinner",
+    "name_en": "Marinated Fried Chicken",
+    "description": "Marinated chicken thighs fried until crispy. A comfort dinner that feels special yet simple.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 22
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Marinated tofu cutlet, fried",
+    "sifat_appeal": ["macera_seven", "basit_sevici", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_dinner_011",
+    "name_tr": "Edamame Appetizer",
+    "name_en": "Steamed Soybeans",
+    "description": "Steamed and salted young soybeans. A simple protein-rich dinner starter or side.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 14,
+      "carbs": 12,
+      "fat": 7
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_dinner_012",
+    "name_tr": "Arame Seaweed Salad",
+    "name_en": "Seaweed Salad",
+    "description": "Shredded seaweed dressed in tangy sesame vinaigrette. A mineral-rich, healthy dinner side or light meal.",
+    "nutrition": {
+      "calories": 180,
+      "protein": 4,
+      "carbs": 24,
+      "fat": 8
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ja_dinner_013",
+    "name_tr": "Nikumushi",
+    "name_en": "Steamed Meat",
+    "description": "Tender meat steamed with vegetables and light seasonings. A healthy dinner preserving nutrients.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 32,
+      "carbs": 10,
+      "fat": 16
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Steamed tofu and mushrooms with light sauce",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ja_dinner_014",
+    "name_tr": "Pickled Vegetables",
+    "name_en": "Tsukemono",
+    "description": "Preserved vegetables in tangy brine. A probiotic-rich dinner side supporting digestion.",
+    "nutrition": {
+      "calories": 80,
+      "protein": 2,
+      "carbs": 12,
+      "fat": 2
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ja_dinner_015",
+    "name_tr": "Kayu Porridge",
+    "name_en": "Rice Porridge",
+    "description": "Soft rice porridge with light broth and gentle toppings. A restorative dinner for gentle digestion.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 4,
+      "carbs": 44,
+      "fat": 2
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  }
+]

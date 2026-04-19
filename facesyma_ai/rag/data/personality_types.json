@@ -1,0 +1,2828 @@
+{
+  "metadata": {
+    "title": "Facesyma 201 Personality Types",
+    "count": 201,
+    "description": "Extended personality type mapping with MBTI and Big Five personality dimensions",
+    "mbti_version": "4.0",
+    "big_five_model": "OCEAN (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)",
+    "big_five_scale": "0-100 (0=Low, 100=High)",
+    "generated_at": "2026-04-18T11:56:15.266076",
+    "version": "1.0"
+  },
+  "personality_types": [
+    {
+      "no": 1,
+      "sifat_tr": "acele karar vermeyen",
+      "sifat_en": "deliberate decision maker",
+      "description": "Karar alırken en ince ayrıntısına kadar düşünenlerdensin Karar verirken her türlü olasılığı gözden geçirdiğinden dolayı biraz zaman kaybetsen de bu kararlarında daha dikkatli olmanı sağlar",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 2,
+      "sifat_tr": "temkinli karar alan",
+      "sifat_en": "cautious decision taker",
+      "description": "Herhangi bir karar vermeden önce durumu tüm yönleriyle değerlendirme alışkanlığın var Adım atmadan önce olası riskleri ve fırsatları göz önünde bulundurursun",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 3,
+      "sifat_tr": "düşünerek hareket eden",
+      "sifat_en": "thoughtful actor",
+      "description": "Adım atmadan önce düşünmek senin için vazgeçilmez bir alışkanlık Her hareketten önce zihinsel bir hazırlık süreci yaşıyorsun",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 4,
+      "sifat_tr": "açık sözlü",
+      "sifat_en": "candid speaker",
+      "description": "Çoğunlukla düşündüklerini açıkça ifade ederek çevrende anlaşılır ve net bir iletişim kuruyorsun Dürüst ve açık bir tavır güçlü ilişkiler kurmana yardımcı oluyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 5,
+      "sifat_tr": "dürüst ve doğrudan",
+      "sifat_en": "honest and direct",
+      "description": "Dürüstlük senin için soyut bir değer değil; her gün yaşadığın somut bir tutum Gerçeği doğrudan söylemek bazen zor olsa da sen bundan kaçınmıyorsun",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 6,
+      "sifat_tr": "samimi ifadeli",
+      "sifat_en": "sincere in expression",
+      "description": "Söylediklerin her zaman içinden geldiği hissini uyandırıyor; bu seni özgün kılıyor Kelimelerinde sahte bir ton yok; bu samimilik insanları sana çekiyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 7,
+      "sifat_tr": "aile düşkünü ve ailesine önem veren",
+      "sifat_en": "family-oriented and devoted",
+      "description": "Ailenle sağlam ve sıcak bağlar kurmaya özen gösteriyorsun Aile senin için en öncelikli konularından biridir",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 8,
+      "sifat_tr": "aile bağlarına değer veren",
+      "sifat_en": "values family bonds",
+      "description": "Aile bağlarını beslemek ve güçlendirmek senin için sürekli devam eden bir öncelik Akrabalık ve aile ilişkilerini anlamlı bulmak seni sıcak ve bağlı biri yapıyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 9,
+      "sifat_tr": "yuva seven ve aile odaklı",
+      "sifat_en": "home-loving and family-focused",
+      "description": "Ev ve aile senin için dünyanın en güvenli ve en anlamlı yeri Yuvanı özenle yaratmak ve korumak senin için temel bir öncelik",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 10,
+      "sifat_tr": "ani karar veren",
+      "sifat_en": "spontaneous decision maker",
+      "description": "Ani kararlar alabilme yeteneğin hızlı düşünme ve etkili eyleme geçme yetilerini yansıtıyor Zorlu durumlarda hızlı bir şekilde karar verebiliyorsun",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 11,
+      "sifat_tr": "hızlı karar alan",
+      "sifat_en": "quick decision taker",
+      "description": "Hızlı karar alabilmek dinamik ortamlarda seni rakiplerine göre bir adım öne geçiriyor Kararsızlık içinde bekleme sana göre değil; çabuk karar verip harekete geçmek istersin",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 12,
+      "sifat_tr": "sezgisel hareket eden",
+      "sifat_en": "intuitive actor",
+      "description": "Sezgilerine güvenmek ve ona göre hareket etmek senin için doğal bir yol Verilerden çok içgüdülerinle yönlenen biri olarak bazen şaşırtıcı doğru sonuçlar elde ediyorsun",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 13,
+      "sifat_tr": "anlayışlı",
+      "sifat_en": "understanding",
+      "description": "Başkalarının duygusal durumlarını anlamada çok iyisin Diğer kişilerin bakış açısını anlamak ve hissetmek senin için kolaydır",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 14,
+      "sifat_tr": "empatik",
+      "sifat_en": "empathetic",
+      "description": "Başkalarının hislerini sanki kendi hislerin gibi yaşama yeteneğin var Empatin seni hem iyi bir dinleyici hem de güçlü bir destek kaynağı yapıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 89,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 15,
+      "sifat_tr": "hoşgörülü",
+      "sifat_en": "tolerant",
+      "description": "Farklılıklara ve hatalara karşı gösterdiğin hoşgörü seni olgun ve büyük kalpli yapıyor Başkalarını oldukları gibi kabul etmek senin için bilinçli bir yaşam tercihi",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 16,
+      "sifat_tr": "anlayışsız",
+      "sifat_en": "unsympathetic",
+      "description": "Başkalarının duygularını kavramakta zaman zaman güçlük çekiyorsun Karşındakinin bakış açısını anlamadan hareket etme eğilimin zaman zaman sürtüşmelere yol açabiliyor",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 17,
+      "sifat_tr": "empati kurmakta zorlanan",
+      "sifat_en": "struggles with empathy",
+      "description": "Başkalarının hislerini anlamak bazen sana karmaşık ve zor geliyor Empati kurmakta yaşadığın zorluk iletişimde zaman zaman boşluklar yaratıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 18,
+      "sifat_tr": "duyarsız",
+      "sifat_en": "indifferent",
+      "description": "Başkalarının hislerine gösterdiğin ilgisizlik ilişkilerini zaman zaman yıpratıyor Duygusal sinyalleri fark etmemek insanların senden uzaklaşmasına zemin hazırlıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 19,
+      "sifat_tr": "arkadaş canlısı",
+      "sifat_en": "friendly",
+      "description": "Yeni insanlarla tanışmak ve sosyal bağ kurmak senin için doğal bir süreç Güleryüzlü ve samimi tutumun insanların sana çabuk ısınmasını sağlıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 20,
+      "sifat_tr": "sosyal ve neşeli",
+      "sifat_en": "social and cheerful",
+      "description": "Neşen her ortama renk katıyor ve insanları kendine çekiyor Sosyal ortamlarda doğal bir enerji taşıyorsun; bu seni grup dinamiklerinde vazgeçilmez kılıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 95,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 21,
+      "sifat_tr": "insana açık ve sıcakkanlı",
+      "sifat_en": "open and warm-hearted",
+      "description": "İnsanlara kapını açmak senin için hem doğal hem de anlamlı Sıcak ve samimi tutumun insanları sana güvenle yaklaştırıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 22,
+      "sifat_tr": "bağımsız yaşamayı seven",
+      "sifat_en": "loves independence",
+      "description": "Kendi kararlarını kendin verme konusundaki ısrarın özgürlük anlayışının bir parçası Başkalarına bağımlı olmadan yaşamayı tercih ediyor, kendi yolunu kendisi çiziyorsun",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 23,
+      "sifat_tr": "özgürlüğüne düşkün",
+      "sifat_en": "freedom-loving",
+      "description": "Özgürlük senin için sadece bir kelime değil; derin bir yaşam ihtiyacı Kısıtlamalar ve sınırlamalar seni içten sıkıştırıyor; açık alan seni besliyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 24,
+      "sifat_tr": "kendi yolunu çizen",
+      "sifat_en": "carves own path",
+      "description": "Başkalarının rotasını değil, kendi rotanı belirlemeyi tercih edersin Kendi yolunu çizmek hem özgürlük hem de sorumluluk gerektiriyor; sen ikisini de taşıyorsun",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 25,
+      "sifat_tr": "bencil",
+      "sifat_en": "selfish",
+      "description": "Kendi ihtiyaçlarını ve çıkarlarını ön planda tutma eğilimin ilişkilerini olumsuz etkileyebilir Başkalarının hislerini göz ardı etme alışkanlığın zamanla yalnızlık yaratabilir",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 25,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 26,
+      "sifat_tr": "self-merkezli",
+      "sifat_en": "self-centered",
+      "description": "Kendi çıkarlarını ve ihtiyaçlarını merkeze alma eğilimin güçlü Her durumda önce kendinle ilgilenmeyi tercih etme eğilimindesin",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 27,
+      "sifat_tr": "kendi çıkarını öne alan",
+      "sifat_en": "puts self-interest first",
+      "description": "Kendi çıkarını öne almak bazen doğal ve gerekli; sürekli yapıldığında ise ilişkileri zedeliyor Her durumda önce kendi yararını düşünmek bazen başkalarına güvensizlik hissi veriyor",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 28,
+      "sifat_tr": "büyük resme odaklanan",
+      "sifat_en": "big-picture focused",
+      "description": "Stratejik ve uzun vadeli planlar yapmakta başarılısın Olaylara geniş pencereden bakabiliyorsun",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 29,
+      "sifat_tr": "bütüncül düşünen",
+      "sifat_en": "holistic thinker",
+      "description": "Olayları parçalara ayırmak yerine bir bütün olarak değerlendirmek senin doğal yaklaşımın Bütüncül düşünmek seni hem stratejik hem de yaratıcı kılıyor",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 30,
+      "sifat_tr": "vizyoner bakışlı",
+      "sifat_en": "visionary outlook",
+      "description": "Geleceği bugünden görmek ve ona göre hareket etmek senin doğal bir yeteneğin Vizyoner bir bakış açısı seni hem ilham verici hem de yönlendirici kılıyor",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 80,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 31,
+      "sifat_tr": "çabuk sinirlenen",
+      "sifat_en": "quick-tempered",
+      "description": "Başkalarının seni sinirlendirmesine izin veriyorsun Çok çabuk öfkeleniyorsun",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 32,
+      "sifat_tr": "sabırsız ve gergin",
+      "sifat_en": "impatient and tense",
+      "description": "Sabırsız yapın hem enerjini hem de çevreni zaman zaman yoruyor Bekleme sürecini tolere etmekte güçlük çekiyorsun; bu bazen gerginliğe yol açıyor",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 33,
+      "sifat_tr": "kolay öfkelenen",
+      "sifat_en": "easily angered",
+      "description": "Öfke eşiğin düşük; küçük şeyler bile tepkini tetikleyebiliyor Kolay öfkelenmek bazen güçlü değerlerin ve yüksek beklentilerin göstergesi",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 34,
+      "sifat_tr": "cahil",
+      "sifat_en": "ignorant",
+      "description": "Bilgi eksikliğin konuşmalarını sınırlayabiliyor Gündemdeki konular hakkında pek bilgi sahibi değilsin",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 35,
+      "sifat_tr": "öğrenmeye kapalı",
+      "sifat_en": "closed to learning",
+      "description": "Yeni bilgi ve fikirlere kapıyı kapalı tutmak seni değişen dünyadan geri bırakıyor Öğrenmeye kapalı olmak mevcut kalıpların içinde sıkışıp kalmak demek",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 36,
+      "sifat_tr": "bilgiden uzak",
+      "sifat_en": "distant from knowledge",
+      "description": "Bilgiden uzak durmak seni hem bilgi hem de güç eksikliğine sürüklüyor Güncel bilgiye ulaşmamak zaman içinde hem kariyer hem de sosyal hayatında boşluklar yaratıyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 37,
+      "sifat_tr": "çok çalışmaktan korkmayan",
+      "sifat_en": "not afraid of hard work",
+      "description": "Görevlerini yerine getirme konusunda özverili ve kararlısındır Çok çalışmak senin için hiç korkutucu değil, aksine motive edicidir",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 38,
+      "sifat_tr": "azimli ve çalışkan",
+      "sifat_en": "determined and hardworking",
+      "description": "Hedeflerine ulaşmak için gösterdiğin azim seni başarıya taşıyan en güçlü araç Çalışkanlığın hem seni hem de çevreni besliyor ve motive ediyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 39,
+      "sifat_tr": "emek harcamaktan kaçınmayan",
+      "sifat_en": "willing to put in effort",
+      "description": "Emek harcamak sana hem tatmin hem de öz saygı veriyor Çaba göstermekten kaçınmamak güçlü bir sorumluluk ve öz disiplin göstergesi",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 40,
+      "sifat_tr": "cömert",
+      "sifat_en": "generous",
+      "description": "Kaynaklarını zamanlarını veya bilgilerini başkalarıyla paylaşmaya isteklisindir Paylaşma konusundaki cömert tavırların seni gerçekten özel kılıyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 41,
+      "sifat_tr": "eli açık ve paylaşımcı",
+      "sifat_en": "open-handed and sharing",
+      "description": "Sahip olduklarını başkalarıyla paylaşmak senin için hem doğal hem de anlamlı Eli açık bir karakter taşımak seni hem sevilmiş hem de güvenilen biri yapıyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 42,
+      "sifat_tr": "bonkör",
+      "sifat_en": "magnanimous",
+      "description": "Bonkörlüğün seni hem sevilmiş hem de saygı duyulan biri yapıyor Cömertçe harcamak ve vermek senin için doğal bir yaşam tarzı",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 43,
+      "sifat_tr": "dengeli karakter sahibi",
+      "sifat_en": "balanced character",
+      "description": "Hayatında duygusal ruhsal ve sosyal alanlarda sağlıklı bir denge kurmak senin için önemlidir Duygusal tepkilerini kontrol edebilme ve çeşitli durumlarla başa çıkabilme becerin yüksektir",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 43
+      }
+    },
+    {
+      "no": 44,
+      "sifat_tr": "duygusal olarak dengeli",
+      "sifat_en": "emotionally balanced",
+      "description": "Duygusal dengeni korumak hem kendine hem de çevrenine güven veriyor Duygusal olarak dengeli olmak zor anlarda bile aklını başında tutmanı sağlıyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 94
+      }
+    },
+    {
+      "no": 45,
+      "sifat_tr": "istikrarlı ve tutarlı",
+      "sifat_en": "stable and consistent",
+      "description": "İstikrarlı bir karakter taşımak seni güvenilir ve saygın kılıyor Tutarlı davranmak uzun vadede en güçlü güven inşa aracı",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 46,
+      "sifat_tr": "detaycı",
+      "sifat_en": "detail-oriented",
+      "description": "Çevrendeki detayları dikkatlice gözlemleyerek küçük ayrıntıları fark edebilirsin İşlerini dikkatle planlar ve titiz bir şekilde uygularsın, hata yapmaktan kaçınırsın",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 47,
+      "sifat_tr": "titiz ve özenli",
+      "sifat_en": "meticulous and careful",
+      "description": "Her işi özenle yapmak senin için vazgeçilmez bir standart Titizliğin yaptığın her işin kalitesini yükseltiyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 97,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 48,
+      "sifat_tr": "ayrıntıya dikkat eden",
+      "sifat_en": "pays attention to detail",
+      "description": "Küçük detayları fark etmek senin için doğal bir refleks Ayrıntılara dikkat etmek hataları en aza indirmenin en etkili yolu",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 49,
+      "sifat_tr": "dominant",
+      "sifat_en": "dominant",
+      "description": "Grupları yönetme kararlar alma konusunda yeteneklisindir Dominant karakterinle liderlik rollerini üstlenmeye eğilimlisindir",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 50,
+      "sifat_tr": "baskın karakterli",
+      "sifat_en": "strong-willed character",
+      "description": "Baskın bir karakter taşımak seni doğal bir lider ve karar alıcı yapıyor Güçlü kişiliğin çevrenizde hem saygı hem de mesafe uyandırabiliyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 51,
+      "sifat_tr": "yönlendirici ve güçlü iradenin sahibi",
+      "sifat_en": "directing and strong-willed",
+      "description": "Yönlendirici bir kişilik taşımak seni doğal bir lider yapıyor Güçlü iradeniz hem hedeflere ulaşmada hem de zorluklarla baş etmede kritik",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 52,
+      "sifat_tr": "düşüncelere dalıp giden",
+      "sifat_en": "lost in thought",
+      "description": "Konuları derinlemesine düşünme yeteneğin vardır Düşüncelere dalarak zamanın farkına varmadığın sık olur",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 53,
+      "sifat_tr": "hayalperest",
+      "sifat_en": "dreamer",
+      "description": "Hayaller senin için ilham kaynağı ve yaratıcılığının tohumları Hayal gücün seni hem özgün hem de yaratıcı bir insan yapıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 78,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 54,
+      "sifat_tr": "içe dönük ve dalgın",
+      "sifat_en": "introverted and absent-minded",
+      "description": "İç dünyan zengin ve derindir; bu seni hem özgün hem de anlayışlı kılıyor Dalgın bir yapıya sahip olmak bazen pratikte zorluk yaratsa da yaratıcılığını besliyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 29,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 55,
+      "sifat_tr": "duygularını düşüncelerinin önünde tutan",
+      "sifat_en": "puts feelings before thoughts",
+      "description": "Kararlar alırken nasıl hissettiğini de hesaba katarsın Sorunlara çözüm bulurken duygusal yaklaşımları tercih edebilirsin",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 80
+      }
+    },
+    {
+      "no": 56,
+      "sifat_tr": "duygu odaklı karar veren",
+      "sifat_en": "feeling-based decision maker",
+      "description": "Kararlarını verirken duygularının rehberliğine güvenirsin Duygu odaklı kararlar bazen çok isabetli bazen de yeniden gözden geçirilmesi gereken sonuçlar üretiyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 81
+      }
+    },
+    {
+      "no": 57,
+      "sifat_tr": "kalpten hareket eden",
+      "sifat_en": "acts from the heart",
+      "description": "Kalpten hareket etmek seni hem insancıl hem de özgün kılıyor Her kararının arkasında gerçek bir duygu ve niyet yatıyor; bu seni değerli yapıyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 58,
+      "sifat_tr": "eğlenceye düşkün",
+      "sifat_en": "fun-loving",
+      "description": "İnsanlarla etkileşimde bulunmayı eğlenceli grup etkinliklerine katılmayı ve sosyal çevreni genişletmeyi seversin Eğlenceli aktivitelerle meşgul olmaktan keyif alırsın ve çevrendeki kişileri enerjinle canlandırırsın",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 59,
+      "sifat_tr": "neşeli ve şen",
+      "sifat_en": "cheerful and merry",
+      "description": "Şen bir karakter taşımak etrafındakileri hem canlandırıyor hem de kendine çekiyor Şen bir karakter taşımak çevrende pozitif bir atmosfer oluşturuyor",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 60,
+      "sifat_tr": "hayatın tadını çıkaran",
+      "sifat_en": "enjoys life",
+      "description": "Her anın tadını çıkarmak senin için hem bir alışkanlık hem de bir yaşam felsefesi Hayatın güzel yanlarını fark etmek ve onlara değer vermek seni zenginleştiriyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 61,
+      "sifat_tr": "etkileyici",
+      "sifat_en": "influential",
+      "description": "Sözlerin ve duruşunla çevrendeki insanları kolayca etkilersin Çevrende karizmatik tavırların ve liderlik özelliklerinle anılırsın",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 62,
+      "sifat_tr": "karizmatik",
+      "sifat_en": "charismatic",
+      "description": "Karizman seni her ortamda doğal olarak öne çıkarıyor Karizmatik bir kişilik taşımak hem güç hem de sorumluluk gerektiriyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 87,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 63,
+      "sifat_tr": "çarpıcı ve dikkat çekici",
+      "sifat_en": "striking and attention-grabbing",
+      "description": "Çarpıcı bir varlık taşımak seni her ortamda öne çıkarıyor Dikkat çekici olmak hem güç hem de sorumluluk gerektiriyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 64,
+      "sifat_tr": "gerçekçi",
+      "sifat_en": "realistic",
+      "description": "Hayattan gerçekçi beklentilerin vardır Geleceğe dair planların bugünkü gerçeklerle uyumlu ve ulaşılabilirdir",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 65,
+      "sifat_tr": "pragmatik",
+      "sifat_en": "pragmatic",
+      "description": "Pragmatik bir yaklaşım taşımak seni hem etkili hem de güvenilir kılıyor İşe yarayan çözümlere odaklanmak seni güçlü bir problem çözücü yapıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 66,
+      "sifat_tr": "ayakları yere basan",
+      "sifat_en": "feet on the ground",
+      "description": "Gerçeklikle barışık olmak seni güçlü kararlar alabilen biri yapıyor Ayakları yere basan bir yaklaşım taşımak seni hem güvenilir hem de saygın kılıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 67,
+      "sifat_tr": "gösteriş meraklısı",
+      "sifat_en": "enjoys showing off",
+      "description": "Yaşam tarzın dikkat çekici etkinliklere ve lüks mekânlara odaklı gibi görünüyor Lüks marka ürünlere ve hizmetlere olan ilgin belirgin",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 92,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 68,
+      "sifat_tr": "imaj odaklı",
+      "sifat_en": "image-focused",
+      "description": "İmajına verdiğin önem seni bakımlı ve özenli gösteriyor Başkalarına nasıl göründüğün senin için önemli bir öncelik",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 69,
+      "sifat_tr": "dışa dönük statü peşinde koşan",
+      "sifat_en": "outwardly status-seeking",
+      "description": "Statü ve tanınma arayışın seni hem dinamik hem de hırslı yapıyor Dışa dönük statü arayışı bazen içsel değerleri gölgeleyebilir; farkında olmak önemli",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 70,
+      "sifat_tr": "güven vermeyen",
+      "sifat_en": "doesn't inspire trust",
+      "description": "Çevren seninle ilgili bazı konularda güven sorunu yaşayabiliyor Yakın arkadaşların seninle olan iletişimlerinde zaman zaman güven eksikliği hissedebiliyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 71,
+      "sifat_tr": "güvenilmez izlenimi bırakan",
+      "sifat_en": "gives untrustworthy impression",
+      "description": "Güvenilmez bir izlenim bırakmak fırsatları ve ilişkileri zedeliyor Tutarsız davranmak insanların sende güven bulmasını zorlaştırıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 72,
+      "sifat_tr": "şüphe uyandıran",
+      "sifat_en": "raises suspicion",
+      "description": "Şüphe uyandırmak hem seni hem de ilişkilerini zorluyor İnsanlarda soru işareti bırakmak uzun vadede güven inşasını engelliyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 73,
+      "sifat_tr": "hazcı",
+      "sifat_en": "pleasure-seeker",
+      "description": "Yaşam tarzının temelinde zevk ve keyif arayışı olduğu fark ediliyor Zevkleri ve keyifleri ön planda tutan bir yaşam tarzın var gibi görünüyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 74,
+      "sifat_tr": "zevk odaklı yaşayan",
+      "sifat_en": "lives for enjoyment",
+      "description": "Zevk odaklı bir yaşam sürmek hayatı dolu dolu yaşama isteğinin yansıması Keyifli anları ve deneyimleri ön planda tutmak seni enerjik ve canlı kılıyor",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 75,
+      "sifat_tr": "haz peşinde koşan",
+      "sifat_en": "chases pleasure",
+      "description": "Haz peşinde koşmak yaşamın güzel yanlarına açık olmanın güçlü bir göstergesi Keyifli deneyimleri aramak seni hem enerjik hem de canlı kılıyor",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 76,
+      "sifat_tr": "ikna edici",
+      "sifat_en": "persuasive",
+      "description": "Argümanlarını mantıklı bir şekilde sunabiliyorsun Fikirlerini net bir şekilde ifade ederek insanları ikna etme yeteneğin var",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 77,
+      "sifat_tr": "ikna kabiliyeti yüksek",
+      "sifat_en": "highly persuasive",
+      "description": "Yüksek ikna kabiliyetin seni her ortamda etkili bir iletişimci yapıyor İnsanları fikirlerine inandırma konusundaki gücün hem iş hem sosyal hayatta kapı açıyor",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 78,
+      "sifat_tr": "söz kuvveti olan",
+      "sifat_en": "has powerful words",
+      "description": "Söz kuvvetin her ortamda insanları etkileyen güçlü bir iletişim aracı Güçlü bir söz kuvveti taşımak seni hem etkileyici hem de saygın bir konuşmacı yapıyor",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 79,
+      "sifat_tr": "ileri görüşlü",
+      "sifat_en": "far-sighted",
+      "description": "Zaman içinde değişen koşullara karşı hazırlıklı olman ileri görüşlülüğünü yansıtıyor Kararlarını uzun vadeli sonuçları göz önünde bulundurarak alabiliyorsun",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 80,
+      "sifat_tr": "stratejik düşünen",
+      "sifat_en": "strategic thinker",
+      "description": "Stratejik düşünme yeteneğin seni hem bireysel hem kurumsal süreçlerde güçlü kılıyor Büyük resmi görerek adım atmak seni hem etkili hem de güvenilir bir karar alıcı yapıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 81,
+      "sifat_tr": "vizyoner",
+      "sifat_en": "visionary",
+      "description": "Vizyoner bir bakış açısı taşımak seni hem ilham verici hem de güçlü bir lider yapıyor Geleceği bugünden görmek seni proaktif ve değerli bir karar alıcı yapıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 81,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 82,
+      "sifat_tr": "insanların ruhuna bakan",
+      "sifat_en": "sees into people's souls",
+      "description": "İnsanların ruhsal durumlarına duyarlı bir yaklaşım sergilersin Çevrendekilerin duygusal ihtiyaçlarına dikkat eden birisin",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 83,
+      "sifat_tr": "içgörü sahibi",
+      "sifat_en": "insightful",
+      "description": "İçgörü sahibi olmak olayların yüzeyinin altını görebilme yeteneğinin işareti Derin bir içgörü taşımak seni hem anlayışlı hem de değerli bir danışman yapıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 84,
+      "sifat_tr": "derinlere nüfuz eden",
+      "sifat_en": "penetrates deeply",
+      "description": "Derinlere nüfuz etmek insanların ve durumların özüne ulaşma yeteneğinin göstergesi Yüzeyin altını görmek seni hem güçlü bir analist hem de değerli bir danışman yapıyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 85,
+      "sifat_tr": "işle ilgili kontrol kendisinde olduğunda iyi çalışan",
+      "sifat_en": "works well with control",
+      "description": "Süreçleri yönetirken kontrolü elinde tutma konusunda yeteneklisindir Sorumlulukları üstlenme ve başarıyla yönetme becerin vardır",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 86,
+      "sifat_tr": "özerk çalışmayı tercih eden",
+      "sifat_en": "prefers autonomous work",
+      "description": "Özerk çalışmayı tercih etmek güçlü bir bağımsızlık ve öz yönetim anlayışının göstergesi Kendi kararlarını alarak çalışmak seni hem daha üretken hem de daha mutlu yapıyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 87,
+      "sifat_tr": "bağımsız çalışmada verimli",
+      "sifat_en": "productive in independent work",
+      "description": "Bağımsız çalışmada verimli olmak güçlü bir öz yönetim ve disiplin anlayışının göstergesi Kendi kendine çalışırken en iyi performansını sergilemek güçlü bir iç motivasyonun işareti",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 87,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 88,
+      "sifat_tr": "iş ortamını kontrol edebilen",
+      "sifat_en": "can control work environment",
+      "description": "İş ortamını etkili bir şekilde kontrol edebiliyorsun İş ortamındaki değişiklikleri yönetebiliyor ve kontrol edebiliyorsun",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 89,
+      "sifat_tr": "çalışma ortamını yönetebilen",
+      "sifat_en": "can manage work setting",
+      "description": "Çalışma ortamını yönetebilmek güçlü bir liderlik ve organizasyon yeteneğinin göstergesi İş ortamını etkili yönetmek hem verimliliğini hem de ekip uyumunu artırıyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 90,
+      "sifat_tr": "profesyonel ortamda hâkimiyet kuran",
+      "sifat_en": "commands professional presence",
+      "description": "Profesyonel ortamda hâkimiyet kurmak güçlü bir liderlik ve yetkinlik anlayışının göstergesi İş ortamında hâkim olabilmek seni güvenilir ve saygın bir profesyonel yapıyor",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 91,
+      "sifat_tr": "işkolik",
+      "sifat_en": "workaholic",
+      "description": "İşe olan bağlılığın ve özverin dikkat çekicidir İşe karşı büyük bir sorumluluk duygusu taşıyorsun",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 92,
+      "sifat_tr": "işe kendini adayan",
+      "sifat_en": "dedicated to work",
+      "description": "İşine olan bağlılığın ve adanmışlığın seni hem güçlü hem de güvenilir yapıyor Kendini işine adamak güçlü bir sorumluluk ve öz disiplin göstergesi",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 93,
+      "sifat_tr": "çalışmaya tutkun",
+      "sifat_en": "passionate about work",
+      "description": "Çalışmaya duyduğun tutku seni hem güçlü hem de ilham verici kılıyor İşe olan tutkun seni sürekli öğrenmeye ve gelişmeye açık tutuyor",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 94,
+      "sifat_tr": "İyi kalpli",
+      "sifat_en": "good-hearted",
+      "description": "İyi niyetli tavırların sıcakkanlı ve iyi kalpli bir kişiliği yansıtıyor Yardımseverliğin ve duyarlılığın iyi kalpli bir insan olduğunu gösteriyor",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 95,
+      "sifat_tr": "şefkatli",
+      "sifat_en": "compassionate",
+      "description": "Şefkat göstermek hem güçlü hem de güzel bir erdem; sen bu erdemi taşıyorsun Şefkatli bir karakter taşımak seni hem sevilmiş hem de güvenilen biri yapıyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 95,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 96,
+      "sifat_tr": "merhametli",
+      "sifat_en": "merciful",
+      "description": "Merhamet güçlü bir insanlık değeri; sen bu değeri taşıyorsun Merhametli olmak insanlarda güvenlik ve değer hissi yaratıyor",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 96,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 97,
+      "sifat_tr": "kaba",
+      "sifat_en": "rude",
+      "description": "İletişim tarzın bazen doğrudan ve sert olabiliyor Geri bildirimlerinde daha yumuşak bir dil kullanman gerekebilir",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 47,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 98,
+      "sifat_tr": "nezaketten yoksun",
+      "sifat_en": "lacking politeness",
+      "description": "Nezaketten yoksun bir tutum ilişkilerinde zaman zaman gerginlik ve kopukluk yaratıyor Nezaket eksikliği bazen stres ya da engellenme duygusunun bir yansıması olabilir",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 99,
+      "sifat_tr": "hoyrat ve saygısız",
+      "sifat_en": "crude and disrespectful",
+      "description": "Hoyrat bir tutum ilişkilerini hem kısa hem de uzun vadede olumsuz etkiliyor Saygısız davranışlar güven ve saygınlığı hızla aşındırıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 100,
+      "sifat_tr": "kibar",
+      "sifat_en": "polite",
+      "description": "İletişim tarzın oldukça nazik ve saygılı Karşındakilere karşı düşünceli bir tutum sergiliyorsun",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 101,
+      "sifat_tr": "nazik ve saygılı",
+      "sifat_en": "kind and respectful",
+      "description": "Nazik ve saygılı tutumun çevrendekilere huzur ve güven veriyor Her ortamda saygıyı korumak hem sevilmeni hem de saygı görmeni sağlıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 102,
+      "sifat_tr": "ince düşünceli",
+      "sifat_en": "thoughtful and refined",
+      "description": "İnce düşünceli tutumun insanlarda kendilerini değerli hissettiriyor Başkalarının ihtiyaçlarını fark etmek ve küçük jestlerle karşılamak seni özel kılıyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 103,
+      "sifat_tr": "kısa ve öz sözlü",
+      "sifat_en": "brief and concise speaker",
+      "description": "Konuşmaların genellikle kısa ve özdür İfadelerinde sade ve anlaşılır bir dil kullanırsın",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 104,
+      "sifat_tr": "özlü ve net konuşan",
+      "sifat_en": "speaks clearly and to the point",
+      "description": "Özlü bir dil kullanmak seni hem etkili hem de saygın bir iletişimci yapıyor Net konuşmak mesajının tam olarak algılanmasını sağlıyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 105,
+      "sifat_tr": "az ama öz ifade eden",
+      "sifat_en": "expresses little but meaningfully",
+      "description": "Az kelimeyle büyük anlam yaratmak senin özel bir yeteneğin Az ama öz ifade etmek güçlü bir düşünce disiplini ve öz farkındalığının göstergesi",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 106,
+      "sifat_tr": "kıskanç",
+      "sifat_en": "kıskanç",
+      "description": "Başkalarının başarıları rekabet duygunu tetikleyebiliyor İlgini çeken konularda çevrendekilere karşı bir rekabet hissi taşıyorsun",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 107,
+      "sifat_tr": "haset eden",
+      "sifat_en": "envious",
+      "description": "Başkalarının sahip olduklarına duyduğun haset seni mutsuz ediyor Haset başkalarının başarısını kendi eksikliğin olarak görmene neden oluyor",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 108,
+      "sifat_tr": "çekemez yapılı",
+      "sifat_en": "can't stand rivals",
+      "description": "Başkalarının başarısını çekememek kendi gelişimini engelliyor Çekemez bir yapıya sahip olmak ilişkilerini zorluyor ve yalnızlık yaratıyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 109,
+      "sifat_tr": "kolay kontrol edilen",
+      "sifat_en": "easily controlled",
+      "description": "Kendi kararlarını vermede zorlandığın için başkalarının senin yerine karar almasını onaylayabiliyorsun Başkalarının fikirlerine bağlı kalıp bu fikirler doğrultusunda hareket edebiliyorsun",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 110,
+      "sifat_tr": "yönlendirilmeye açık",
+      "sifat_en": "open to guidance",
+      "description": "Başkalarının yönlendirmelerine açık olmak bazen kendi iradenden ödün verdirir Yönlendirilmeye hazır yapın grup ortamlarında uyumu kolaylaştırıyor",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 111,
+      "sifat_tr": "kolay ikna olan",
+      "sifat_en": "easily convinced",
+      "description": "Kolay ikna olmak bazen seni savunmasız bırakabiliyor; eleştirel düşünceyi geliştirmek önemli İkna olmaya açık olmak hem öğrenmeye istekli hem de bazen etkilenebilir olduğunu gösteriyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 112,
+      "sifat_tr": "kontrolü elinde tutma isteklisi ve otoriter",
+      "sifat_en": "wants control and authoritarian",
+      "description": "İlgilendiğin konularda liderlik rolünü üstlenmek istersin Çalıştığın işlerde söz sahibi olma konusunda isteklisin",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 87,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 113,
+      "sifat_tr": "otoriter ve denetimci",
+      "sifat_en": "authoritarian and controlling",
+      "description": "Otoriter bir yapı taşımak bazen ekip uyumunu zorlaştırıyor Denetimci bir tutum süreci güvenilir kılıyor ama bazen aşırıya kaçabiliyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 114,
+      "sifat_tr": "her şeyi yönetmek isteyen",
+      "sifat_en": "wants to manage everything",
+      "description": "Her şeyi yönetme isteğin güçlü bir sorumluluk ve düzen ihtiyacının yansıması Her şeyin kontrolünde olmasını istemek bazen seni tüketiyor; delege etmek güçlendiriyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 89,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 115,
+      "sifat_tr": "korkak davranmaya eğilimli",
+      "sifat_en": "inclined to cowardice",
+      "description": "Riskli durumlarda çekimser bir tavır sergilersin Olaylar karşısında genellikle ilk tepkin endişe ve kaygı olur",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 116,
+      "sifat_tr": "riskten kaçınan",
+      "sifat_en": "avoids risk",
+      "description": "Riskten kaçınmak seni bazı hatalardan koruyor ama bazı fırsatları da kaçırmanla sonuçlanıyor Güvenli seçeneklere yönelmek hem bir koruma hem de bazen bir kısıtlama",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 117,
+      "sifat_tr": "çekingen ve çekinimli",
+      "sifat_en": "shy and reserved",
+      "description": "Çekingen bir yapıya sahip olmak bazen fırsatları kaçırmanla sonuçlanıyor Çekinimli olmak bazen seni hem güvenli hem de görünmez kılıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 118,
+      "sifat_tr": "kural dışına çıkmaya yatkın",
+      "sifat_en": "inclined to break rules",
+      "description": "Belli kurallar dahilinde yaşamak çoğu zaman seni zorluyor Kuraltanımaz olarak bilinen yapın insanlar tarafından asi ya da bildiğini okuyan bir tip olarak algılanmana sebep olabiliyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 119,
+      "sifat_tr": "kurallara karşı gelen",
+      "sifat_en": "goes against rules",
+      "description": "Kurallara karşı gelmek özgürlük arayışının güçlü bir dışavurumu Kurallara direnmek bazen değişimin öncüsü olabiliyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 120,
+      "sifat_tr": "alışılmışın dışına çıkan",
+      "sifat_en": "goes beyond convention",
+      "description": "Alışılmışın dışına çıkmak seni hem özgün hem de ilgi çekici yapıyor Sıradışı olmak bazen yalnızlık getirebilir; özgünlüğünü kaybetme",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 121,
+      "sifat_tr": "lükse düşkün",
+      "sifat_en": "luxury-loving",
+      "description": "Kaliteli ve lüks ürünlere ilgin vardır Estetik ve şıklık senin için önemlidir",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 122,
+      "sifat_tr": "konfor arayışında olan",
+      "sifat_en": "seeks comfort",
+      "description": "Konfor arayışı hem sağlıklı bir ihtiyaç hem de bazen büyümenin önünde engel Rahat ve güvenli ortamlar senin için hem verimlilik hem de mutluluk kaynağı",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 123,
+      "sifat_tr": "gösterişli bir yaşam tarzı benimseyen",
+      "sifat_en": "adopts ostentatious lifestyle",
+      "description": "Gösterişli bir yaşam tarzı benimsemek bazen içsel değerleri gölgeleyebilir Dışarıdan etkileyici görünen bir yaşam tarzı bazen büyük bir boşluğu gizliyor olabilir",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 124,
+      "sifat_tr": "motive edildiğinde başarılı olan",
+      "sifat_en": "successful when motivated",
+      "description": "Bir işe başlayıp başarıyla sonuçlandırman için motivasyon kaynağın oldukça önemlidir Gerçekten motive olduğunda başarı için son derece odaklı ve etkileyici bir enerji ortaya koyuyorsun",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 125,
+      "sifat_tr": "teşvike ihtiyaç duyan",
+      "sifat_en": "needs encouragement",
+      "description": "Teşvik ve destek aldığında en iyi performansını sergiliyorsun Teşvike ihtiyaç duymak hem insani hem de güçlü bir öz farkındalık göstergesi",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 126,
+      "sifat_tr": "doğru ortamda parlayan",
+      "sifat_en": "shines in right environment",
+      "description": "Doğru ortamda potansiyelinin tamamını ortaya koyuyorsun Seni destekleyen ve besleyen bir ortamda en iyi halini sergiliyorsun",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 127,
+      "sifat_tr": "mükemmeliyetçi",
+      "sifat_en": "perfectionist",
+      "description": "Yaptığın işlerde detaylara büyük bir önem veriyorsun Hedeflerine ulaşmak için kendine yüksek standartlar belirliyorsun",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 128,
+      "sifat_tr": "kusursuzluk arayan",
+      "sifat_en": "seeks perfection",
+      "description": "Kusursuzluk arayışı güçlü bir kalite standartlarının işareti Kusursuz olmak istemek hem bir güç hem de zaman zaman bir kısıtlama",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 129,
+      "sifat_tr": "en iyisini hedefleyen",
+      "sifat_en": "aims for the best",
+      "description": "En iyisini hedeflemek güçlü bir motivasyon ve standartların işareti En iyi olmak için çabalamak hem seni hem de çıktılarını değerli kılıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 130,
+      "sifat_tr": "objektif",
+      "sifat_en": "objective",
+      "description": "Olaylara tarafsız bir şekilde bakabiliyor olman pek çok zaman takdir edilir Herhangi bir durumla ilgili olumlu ve olumsuz yanların ikisini birden değerlendirmen seni bir adım öne çıkarıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 131,
+      "sifat_tr": "tarafsız ve adil",
+      "sifat_en": "unbiased and fair",
+      "description": "Tarafsız olmak güçlü bir adalet anlayışının ve etik değerlerin göstergesi Adil davranmak hem güven hem de saygı inşa ediyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 132,
+      "sifat_tr": "nesnel değerlendiren",
+      "sifat_en": "evaluates objectively",
+      "description": "Nesnel değerlendirme yapmak güçlü bir analitik zekânın ve öz disiplinin göstergesi Olgulara dayalı değerlendirme hem güven hem de etkinlik inşa ediyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 133,
+      "sifat_tr": "odaklanmış",
+      "sifat_en": "focused",
+      "description": "Hedefe kilitlenme konusunda oldukça başarılısın Bir hedefe varmak için elinden gelen her şeyi yapma gücüne sahipsin",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 134,
+      "sifat_tr": "konsantrasyonu yüksek",
+      "sifat_en": "high concentration",
+      "description": "Yüksek konsantrasyon yeteneğin hem verimliliğini hem de kaliteni artırıyor Odaklanma kapasiten seni rakiplerine göre önemli bir avantaj sağlıyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 135,
+      "sifat_tr": "derin ve yoğun çalışan",
+      "sifat_en": "works deeply and intensely",
+      "description": "Derin çalışma kapasiten seni hem verimli hem de etkili yapıyor Yoğun çalışmak hem seni hem de çıktılarını değerli kılıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 136,
+      "sifat_tr": "öngörülü",
+      "sifat_en": "foresighted",
+      "description": "Öngörülü yapın sayesinde birçok problemin üstesinden gelebiliyorsun Gelecekteki hedeflerini belirleyip bu hedeflere yönelik planlar yapabiliyorsun",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 137,
+      "sifat_tr": "sezgileri güçlü",
+      "sifat_en": "strong intuition",
+      "description": "Güçlü sezgilerin seni hem hızlı hem de isabetli kararlar almada güçlü kılıyor İçgüdülerine duyduğun güven pek çok durumda seni doğru yere taşıyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 138,
+      "sifat_tr": "ilerisi için hazırlıklı olan",
+      "sifat_en": "prepared for future",
+      "description": "İlerisi için hazırlıklı olmak güçlü bir öngörü ve planlama yeteneğinin göstergesi Geleceğe hazırlıklı olmak hem güven hem de güç veriyor",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 139,
+      "sifat_tr": "oyuncudan çok izleyici",
+      "sifat_en": "more observer than player",
+      "description": "Olaylara genellikle izleyici olarak yaklaşıyorsun Çatışmalardan uzak durma eğilimindesin",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 140,
+      "sifat_tr": "gözlemci ve pasif",
+      "sifat_en": "observant and passive",
+      "description": "Gözlemci bir yapıya sahip olmak derin bir analiz ve anlayış yeteneği geliştiriyor Pasif kalmak bazen fırsatları kaçırmanla sonuçlanabiliyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 141,
+      "sifat_tr": "arka planda kalmayı tercih eden",
+      "sifat_en": "prefers to stay in background",
+      "description": "Arka planda kalmayı tercih etmek güçlü bir öz farkındalık ve tercih bilinçinin göstergesi Sahnede olmak yerine arka planda kalmak bazen en akıllıca strateji",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 142,
+      "sifat_tr": "paylaşmayı seven",
+      "sifat_en": "loves sharing",
+      "description": "Mutluluğun formülünün paylaşmak olduğunu erkenden fark edenlerden birisin Deneyimlerini ve bilgilerini diğerleriyle paylaşmaktan keyif alırsın",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 143,
+      "sifat_tr": "vermeyi seven",
+      "sifat_en": "loves giving",
+      "description": "Vermek senin için hem anlam hem de derin bir tatmin kaynağı Başkalarına vermek seni hem güçlü hem de özgür hissettiriyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 144,
+      "sifat_tr": "bölüşmekten mutluluk duyan",
+      "sifat_en": "happy to share",
+      "description": "Bölüşmek sana hem anlam hem de derin bir mutluluk veriyor Paylaşarak yaşamak senin için en güçlü mutluluk kaynaklarından biri",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 145,
+      "sifat_tr": "planları kendisi yapan",
+      "sifat_en": "makes own plans",
+      "description": "Başkalarının yaptığı planlara dahil olmak yerine kendi planlarını uygulamaya koymayı tercih edersin Hedefe ulaşmak için kendi çizdiğin yol ve yöntemleri uygulamayı tercih edersin",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 146,
+      "sifat_tr": "kendi rotasını belirleyen",
+      "sifat_en": "determines own route",
+      "description": "Kendi rotanı belirlemek güçlü bir özgürlük ve özerklik anlayışının göstergesi Kendi yolunu çizmek hem bir güç hem de büyük bir sorumluluk",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 147,
+      "sifat_tr": "inisiyatif alan",
+      "sifat_en": "takes initiative",
+      "description": "İnisiyatif almak güçlü bir liderlik ve sorumluluk bilincinin göstergesi Harekete geçmek için beklememek seni hem proaktif hem de güvenilir kılıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 148,
+      "sifat_tr": "planlı",
+      "sifat_en": "planned",
+      "description": "Pekçok konuda başarıya ulaşman planlı şekilde ilerlemenin bir sonucudur Yaptığın işleri belirli bir düzene göre sıralamayı seversin",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 149,
+      "sifat_tr": "organize ve düzenli",
+      "sifat_en": "organized and orderly",
+      "description": "Organize ve düzenli olmak güçlü bir öz disiplin ve verimlilik anlayışının göstergesi Düzenli bir yapıya sahip olmak hem zamanını hem enerjini daha verimli kullanmanı sağlıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 150,
+      "sifat_tr": "sistematik planlayan",
+      "sifat_en": "systematic planner",
+      "description": "Sistematik planlama güçlü bir öz disiplin ve verimlilik anlayışının göstergesi Adım adım ve sistematik ilerlemek karmaşık hedeflere bile ulaşmanı mümkün kılıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 75,
+        "extraversion": 50,
+        "agreeableness": 75,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 151,
+      "sifat_tr": "samimi yapıya sahip",
+      "sifat_en": "has sincere nature",
+      "description": "Samimi bir yapıya sahipsin İnsanların samimiyetsiz ve yapmacık davranışlarına sözlerine çoğu zaman tahammül etmekte zorluk yaşarsın",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 152,
+      "sifat_tr": "içten ve gerçek",
+      "sifat_en": "genuine and real",
+      "description": "İçtenlik her eyleminde ve sözünde kendini belli ediyor Gerçek olmak senin için bir tercih değil doğal bir hal",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 153,
+      "sifat_tr": "sahici ve özgün",
+      "sifat_en": "authentic and original",
+      "description": "Sahici olmak senin için bir seçim değil; içten gelen bir tutum Özgün bir karakter taşımak seni hem farklı hem de değerli kılıyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 154,
+      "sifat_tr": "saygılı",
+      "sifat_en": "respectful",
+      "description": "Başkalarının görüşlerine saygı gösterme konusunda başarılısın Karşındakilere daima saygılı bir dil kullanırsın",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 155,
+      "sifat_tr": "hürmet eden",
+      "sifat_en": "shows respect",
+      "description": "Hürmet etmek senin için derin bir değer ve yaşam tutumunun göstergesi Büyüklere ve otoriteye saygı göstermek senin için doğal bir refleks",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 156,
+      "sifat_tr": "başkalarına değer veren",
+      "sifat_en": "values others",
+      "description": "Başkalarına değer vermek güçlü bir empati ve insanlık anlayışının göstergesi İnsanları önemsemek ve onlara değer göstermek seni güvenilir ve sevilen biri yapıyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 157,
+      "sifat_tr": "seçici",
+      "sifat_en": "selective",
+      "description": "Her insanla hemen bağ kuramaz ve seçici davranırsın Hayatında özel bir yere sahip olan insanları titizlikle belirlersin",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 158,
+      "sifat_tr": "titizce seçen",
+      "sifat_en": "carefully choosy",
+      "description": "Titizce seçmek güçlü bir kalite anlayışı ve öz disiplinin göstergesi Her seçimi dikkatli ve özenle yapmak seni hem güvenilir hem de saygın kılıyor",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 83,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 159,
+      "sifat_tr": "standartlarından ödün vermeyen",
+      "sifat_en": "doesn't compromise standards",
+      "description": "Standartlarından ödün vermemek güçlü bir değer bütünlüğünün ve öz disiplinin göstergesi Kaliteden taviz vermemek seni hem saygın hem de güvenilir kılıyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 160,
+      "sifat_tr": "sevdiklerini koruyucu ve sahiplenici",
+      "sifat_en": "protective of loved ones",
+      "description": "Sevdiğin insanları korur ve sahiplenirsin Sevdiklerine karşı koruyucu davranmak seni çok mutlu eder",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 161,
+      "sifat_tr": "koruyucu ve bağlı",
+      "sifat_en": "protective and attached",
+      "description": "Koruyucu ve bağlı olmak güçlü bir sevgi ve sorumluluk anlayışının göstergesi Sevdiklerine bağlılık ve koruma sunmak seni hem sevilmiş hem de güvenilen biri yapıyor",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 162,
+      "sifat_tr": "sahiplenme duygusu güçlü",
+      "sifat_en": "strong sense of ownership",
+      "description": "Güçlü sahiplenme duygusu derin bir sevgi ve bağlılığın yansıması Sevdiklerini sahiplenmek onlara güven ve değer hissettiriyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 87
+      }
+    },
+    {
+      "no": 163,
+      "sifat_tr": "şımarık",
+      "sifat_en": "spoiled",
+      "description": "Bazen tatlı şımarıklıklar ile kendini motive edebiliyorsun Şımarık tavırların yerine göre sevimli olsa da genellikle eleştirildiğin bir noktadır",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 164,
+      "sifat_tr": "şımartılmış",
+      "sifat_en": "pampered",
+      "description": "Şımartılmış olmak çoğunlukla bir tercih değil; bir yetiştiriliş biçiminin ürünü Şımartılmış bir yapıya sahip olmak emek ve sonuç arasındaki bağı kurmayı zorlaştırıyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 165,
+      "sifat_tr": "kolaya alışmış",
+      "sifat_en": "accustomed to ease",
+      "description": "Kolayı tercih etmek hem bir rahatlık hem de bazen büyümenin önünde engel Kolaya alışmış olmak emek gerektiren süreçlerde zorluk yaratıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 166,
+      "sifat_tr": "sistematik",
+      "sifat_en": "systematic",
+      "description": "Herhangi bir işi gerçekleştirme sürecinde adım adım ve çok dikkatli şekilde ilerleyebiliyorsun Sistematik olmayı hayatının hemen her alanına uygulayabilme yeteneğini gösterirsin",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 91,
+        "extraversion": 50,
+        "agreeableness": 91,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 167,
+      "sifat_tr": "metodolojik",
+      "sifat_en": "methodological",
+      "description": "Metodolojik bir yaklaşım taşımak seni hem güvenilir hem de etkili kılıyor Her süreci belirli bir yöntemle yönetmek hem verimliliğini hem de kaliteni artırıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 92,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 168,
+      "sifat_tr": "adım adım ilerleyen",
+      "sifat_en": "moves step by step",
+      "description": "Her şeyi adım adım yapmak hem güven hem de istikrar sağlıyor Acele etmeden ilerlemek uzun vadede en sağlam sonuçları getiriyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 169,
+      "sifat_tr": "sonuç odaklı",
+      "sifat_en": "results-focused",
+      "description": "Projeleri tamamlama konusunda odaklı ve etkili bir yaklaşımın vardır Hedeflere ulaşmak için kararlı bir çaba gösterme eğilimin fark ediliyor",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 170,
+      "sifat_tr": "hedef odaklı",
+      "sifat_en": "goal-focused",
+      "description": "Hedef odaklı olmak güçlü bir motivasyon ve anlam arayışının göstergesi Net hedefler koymak ve onlara odaklanmak seni hem verimli hem de etkili kılıyor",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 171,
+      "sifat_tr": "çıktıya dayalı düşünen",
+      "sifat_en": "output-based thinker",
+      "description": "Çıktıya dayalı düşünmek güçlü bir sonuç ve değer anlayışının göstergesi Her kararı çıktısıyla değerlendirmek seni hem etkili hem de güvenilir kılıyor",
+      "mbti": "ISFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 172,
+      "sifat_tr": "şüpheci",
+      "sifat_en": "skeptical",
+      "description": "İnsanlara karşı şüpheci yaklaşımın dolayısıyla anlaşmazlıklar ve tartışmalar yaşayabilirsin Her insan bir miktar şüphe taşır; ancak seninki biraz daha fazla gibi",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 173,
+      "sifat_tr": "kuşkulu",
+      "sifat_en": "doubtful",
+      "description": "Kuşkuyla yaklaşmak bazen seni koruyor bazen ise fırsatları kaçırmanla sonuçlanıyor Her şeyi sorgulamak güçlü bir eleştirel düşüncenin göstergesi",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 174,
+      "sifat_tr": "güvensiz ve sorgulayan",
+      "sifat_en": "insecure and questioning",
+      "description": "Güvensizlik bazen geçmiş deneyimlerin bir yansıması; bunu fark etmek iyileştirici Her şeyi sorgulamak güçlü bir analitik zekanın dışavurumu olabilir",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 175,
+      "sifat_tr": "temkinli",
+      "sifat_en": "cautious",
+      "description": "Bir işe başlarken yeni bir arkadaşlık kurarken oldukça temkinli davranırsın Yeni bir ortama girdiğinde hemen uyum sağlamak yerine önce durumları olayları kişileri anlamaya çalışıyorsun",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 176,
+      "sifat_tr": "ihtiyatlı",
+      "sifat_en": "prudent",
+      "description": "İhtiyatlı olmak güçlü bir risk yönetimi ve öngörü anlayışının göstergesi Her adımı dikkatli değerlendirmek seni pek çok hatadan koruyor",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 177,
+      "sifat_tr": "dikkatli ve ölçülü",
+      "sifat_en": "careful and measured",
+      "description": "Dikkatli ve ölçülü olmak güçlü bir öz disiplin ve denge anlayışının göstergesi Her adımda dikkat ve ölçü seni hem güvenilir hem de saygın kılıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 178,
+      "sifat_tr": "tepeden bakan",
+      "sifat_en": "looks down on others",
+      "description": "Sosyal ortamlarda genellikle başkalarının görüşlerini önemsemez gibi gözüküyorsun Ekip içinde ya da arkadaşlarınlayken kendi düşüncelerini genellikle öne çıkarıyorsun",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 179,
+      "sifat_tr": "kibirli ve küçümseyen",
+      "sifat_en": "arrogant and condescending",
+      "description": "Kibir bazen derin bir güvensizliğin ya da onay ihtiyacının örtbası olabilir Başkalarını küçümsemek uzun vadede yalnızlık ve kopukluk yaratıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 180,
+      "sifat_tr": "kendini üstün gören",
+      "sifat_en": "sees self as superior",
+      "description": "Kendini üstün görmek bazen derin bir güvensizliğin ya da onay ihtiyacının yansıması Üstünlük algısı uzun vadede yalnızlık ve kopukluk yaratıyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 181,
+      "sifat_tr": "üretken",
+      "sifat_en": "productive",
+      "description": "İşleyen demir pas tutmaz hesabı sürekli bir şeyler ortaya çıkarmaya çalışmak senin işin Yeni projeler ve fikirler üretme konusunda yeteneğin var",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 182,
+      "sifat_tr": "verimli ve aktif",
+      "sifat_en": "efficient and active",
+      "description": "Verimli ve aktif olmak güçlü bir öz disiplin ve motivasyonun göstergesi Her işi verimli yapmak seni hem güvenilir hem de değerli kılıyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 82,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 183,
+      "sifat_tr": "çok iş çıkaran",
+      "sifat_en": "produces much work",
+      "description": "Çok iş çıkarmak güçlü bir üretkenlik ve verimlilik anlayışının göstergesi Her zaman çok iş yapmak seni hem güvenilir hem de değerli kılıyor",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 184,
+      "sifat_tr": "uyuşuk",
+      "sifat_en": "sluggish",
+      "description": "Bazı durumlarda oldukça uyuşuk ve ilgisiz bir tavır sergiliyorsun Enerjin genellikle düşük ve isteksiz gibi görünüyorsun",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 185,
+      "sifat_tr": "hareketsiz ve isteksiz",
+      "sifat_en": "inactive and reluctant",
+      "description": "Hareketsiz ve isteksiz bir tavır sergilemek bazen derin bir yorgunluk ya da anlamsızlık hissinin işareti İsteksizlik bazen güçlü bir motivasyon eksikliğinin ya da yön kaybının yansıması",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 85,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 186,
+      "sifat_tr": "tembelliğe meyilli",
+      "sifat_en": "inclined to laziness",
+      "description": "Tembelliğe meyilli olmak bazen yorgunluk ya da motivasyon eksikliğinin yansıması Tembel olmaya eğilimli bir yapı taşımak uzun vadede hem bireysel hem kariyer gelişimini sekteye uğratıyor",
+      "mbti": "ESFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 187,
+      "sifat_tr": "verimli",
+      "sifat_en": "efficient",
+      "description": "İşlerini hızlı ve etkili bir şekilde tamamlarsın Verimli çalışma yöntemleri kullanarak projeleri başarıyla sonuçlandırırsın",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 87,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 188,
+      "sifat_tr": "etkin ve işe yarar",
+      "sifat_en": "effective and useful",
+      "description": "Etkin olmak güçlü bir verimlilik ve değer anlayışının göstergesi Her durumda işe yarar olmak seni hem güvenilir hem de değerli kılıyor",
+      "mbti": "ESTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 189,
+      "sifat_tr": "az kaynakla çok üretebilen",
+      "sifat_en": "produces much with little",
+      "description": "Az kaynakla çok üretmek güçlü bir stratejik zekânın ve verimliliğin göstergesi Sınırlı kaynaklarla büyük çıktılar elde etmek seni hem güçlü hem de yaratıcı kılıyor",
+      "mbti": "ISTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 190,
+      "sifat_tr": "zamanı iyi yönetemeyen",
+      "sifat_en": "poor time management",
+      "description": "Arkadaşların dakik olmadığın konusunda seni eleştirebilirler Bazı işleri gerçekleştirmede geç kalıyor olman zamanı daha iyi yönetmen konusunda seni harekete geçirebilir",
+      "mbti": "ESTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 191,
+      "sifat_tr": "zaman yönetiminde yetersiz",
+      "sifat_en": "inadequate time management",
+      "description": "Zaman yönetiminde yetersiz olmak hem kariyer hem kişisel hayatında büyük kayıplara yol açıyor Zaman yönetimi becerisini geliştirmek hem verimliliğini hem de mutluluğunu artırıyor",
+      "mbti": "ISTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 192,
+      "sifat_tr": "erteleyici ve dağınık",
+      "sifat_en": "procrastinating and scattered",
+      "description": "Erteleme alışkanlığı hem verimliliğini hem de yaşam kaliteni sekteye uğratıyor Dağınık bir yapıya sahip olmak bazen en büyük fırsatları kaçırmanla sonuçlanıyor",
+      "mbti": "ENFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 42,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 193,
+      "sifat_tr": "zayıf karakterli",
+      "sifat_en": "weak character",
+      "description": "Zorluklar karşısında direnç göstermekte zorlanabilirsin Sorumlulukları yerine getirmekte ve taahhütleri sürdürmekte zorlanabilirsin",
+      "mbti": "INFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 194,
+      "sifat_tr": "iradesiz",
+      "sifat_en": "willless",
+      "description": "İrade eksikliği bazen derin bir motivasyon kaybının ya da anlamsızlık hissinin yansıması İradesiz olmak hem kısa hem uzun vadede hedeflere ulaşmayı zorlaştırıyor",
+      "mbti": "ENFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 195,
+      "sifat_tr": "kararsız ve ilkesiz",
+      "sifat_en": "indecisive and unprincipled",
+      "description": "Kararsızlık bazen derin bir belirsizlik hissinin ya da güvensizliğin yansıması İlkesiz bir yapı taşımak uzun vadede güven ve saygınlık kaybına yol açıyor",
+      "mbti": "INFJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 196,
+      "sifat_tr": "zeki",
+      "sifat_en": "intelligent",
+      "description": "Gelişmiş espri yeteneğin sayesinde yapılan espirileri daha çabuk kavrayabiliyorsun Zekice aldığın kararlar seni başarıya götürüyor",
+      "mbti": "ENTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 197,
+      "sifat_tr": "zeka düzeyi yüksek",
+      "sifat_en": "high intelligence",
+      "description": "Yüksek zeka düzeyi hem bir armağan hem de büyük bir sorumluluk Zeka düzeyin seni hem analitik hem de yaratıcı süreçlerde güçlü kılıyor",
+      "mbti": "INTP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 198,
+      "sifat_tr": "kavrayışlı ve kıvrak zekalı",
+      "sifat_en": "quick-witted and sharp",
+      "description": "Kavrayış hızın seni hem öğrenme hem de karar alma süreçlerinde güçlü kılıyor Kıvrak bir zeka taşımak seni hem analitik hem de yaratıcı biri yapıyor",
+      "mbti": "ENTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 199,
+      "sifat_tr": "sabırsız",
+      "sifat_en": "impatient",
+      "description": "Her aklına geleni hemen söylediğinde sıkıntılı ve zor durumların içerisinde kalma olasılığın artabilir Hemen işe koyulmak isteyebiliyorsun",
+      "mbti": "INTJ",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 200,
+      "sifat_tr": "aceleci",
+      "sifat_en": "hasty",
+      "description": "Aceleci bir yapıya sahip olmak bazen acele kararların pişmanlık getirdiği anlara yol açıyor Hızlı hareket etmek bazen değerli fırsatları anında değerlendirmeni sağlıyor",
+      "mbti": "ESFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    },
+    {
+      "no": 201,
+      "sifat_tr": "bekleyemeyen",
+      "sifat_en": "can't wait",
+      "description": "Bekleyememek bazen en büyük fırsatları anında değerlendirmeni sağlıyor Sabırsızca bekleme güçlü bir enerji ve motivasyonun dışavurumu",
+      "mbti": "ISFP",
+      "big_five": {
+        "openness": 50,
+        "conscientiousness": 50,
+        "extraversion": 50,
+        "agreeableness": 50,
+        "neuroticism": 50
+      }
+    }
+  ]
+}

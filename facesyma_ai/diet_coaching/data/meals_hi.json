@@ -1,0 +1,1162 @@
+{
+  "country": "India",
+  "language_code": "hi",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "hi_breakfast_001",
+        "name_tr": "İdli",
+        "name_en": "Idli",
+        "description": "Çeltik ve urad undan yapılmış buhar üstü kek",
+        "nutrition": {
+          "calories": 140,
+          "protein_g": 4,
+          "carbs_g": 28,
+          "fat_g": 1
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "hi_breakfast_002",
+        "name_tr": "Dosa",
+        "name_en": "Dosa",
+        "description": "Çeltik ve urad undan yapılmış ince krep",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 5,
+          "carbs_g": 32,
+          "fat_g": 4
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 1.15
+      },
+      {
+        "id": "hi_breakfast_003",
+        "name_tr": "Poha",
+        "name_en": "Poha",
+        "description": "Düz pirinç, patates, yer fıstığı",
+        "nutrition": {
+          "calories": 160,
+          "protein_g": 6,
+          "carbs_g": 28,
+          "fat_g": 3
+        },
+        "prep_time_min": 15,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["pratikci", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_breakfast_004",
+        "name_tr": "Upma",
+        "name_en": "Upma",
+        "description": "Irmik, sebzeler, baharatlar",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 7,
+          "carbs_g": 32,
+          "fat_g": 4
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_breakfast_005",
+        "name_tr": "Paratha",
+        "name_en": "Paratha",
+        "description": "Katmanlı tahıl ekmek, tereyağlı",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 8,
+          "carbs_g": 36,
+          "fat_g": 10
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Paratha",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.05
+      },
+      {
+        "id": "hi_breakfast_006",
+        "name_tr": "Roti & Sabzi",
+        "name_en": "Roti & Vegetables",
+        "description": "Buğday ekmek, pişmiş sebzeler",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 9,
+          "carbs_g": 40,
+          "fat_g": 4
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "hi_breakfast_007",
+        "name_tr": "Uttapam",
+        "name_en": "Uttapam",
+        "description": "Kalın krep, sebzelerle",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 6,
+          "carbs_g": 32,
+          "fat_g": 3
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_breakfast_008",
+        "name_tr": "Kesari",
+        "name_en": "Kesari",
+        "description": "Tatlı irmik, safran, fındık",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 5,
+          "carbs_g": 42,
+          "fat_g": 10
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Kesari",
+        "sifat_appeal": ["luks_seven", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_breakfast_009",
+        "name_tr": "Yumurtalı Dosa",
+        "name_en": "Egg Dosa",
+        "description": "Dosa, yumurta dolgusu",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 8
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["disiplinli"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_breakfast_010",
+        "name_tr": "Aloo Paratha",
+        "name_en": "Potato Paratha",
+        "description": "Patates dolulu paratha",
+        "nutrition": {
+          "calories": 300,
+          "protein_g": 9,
+          "carbs_g": 42,
+          "fat_g": 10
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Aloo Paratha",
+        "sifat_appeal": ["aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_breakfast_011",
+        "name_tr": "Medu Vada",
+        "name_en": "Medu Vada",
+        "description": "Urad undan yapılmış kızarmış tatlı",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 5,
+          "carbs_g": 24,
+          "fat_g": 11
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "hi_breakfast_012",
+        "name_tr": "Sambar & Idli",
+        "name_en": "Sambar & Idli",
+        "description": "Baharat çorbası ile idli",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 7,
+          "carbs_g": 32,
+          "fat_g": 3
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_breakfast_013",
+        "name_tr": "Chivda",
+        "name_en": "Chivda",
+        "description": "Baharatlandırılmış gevrek karışımı",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 8,
+          "carbs_g": 24,
+          "fat_g": 12
+        },
+        "prep_time_min": 15,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["pratikci"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_breakfast_014",
+        "name_tr": "Puri & Aloo",
+        "name_en": "Puri & Potato",
+        "description": "Kızarmış ekmek, patates şerbeti",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 7,
+          "carbs_g": 42,
+          "fat_g": 14
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Puri",
+        "sifat_appeal": ["aile_odakli", "comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_breakfast_015",
+        "name_tr": "Masala Dosa",
+        "name_en": "Masala Dosa",
+        "description": "Baharatlandırılmış patates dolulu dosa",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 6,
+          "carbs_g": 36,
+          "fat_g": 6
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      }
+    ],
+    "lunch": [
+      {
+        "id": "hi_lunch_001",
+        "name_tr": "Tikka Masala",
+        "name_en": "Tikka Masala",
+        "description": "Tavuk/Panir parçaları, krem sosunda",
+        "nutrition": {
+          "calories": 380,
+          "protein_g": 28,
+          "carbs_g": 18,
+          "fat_g": 20
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Panir Tikka Masala",
+        "sifat_appeal": ["yaratici", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "hi_lunch_002",
+        "name_tr": "Biryani",
+        "name_en": "Biryani",
+        "description": "Safran pirinç, tavuk, baharatlar",
+        "nutrition": {
+          "calories": 450,
+          "protein_g": 32,
+          "carbs_g": 48,
+          "fat_g": 16
+        },
+        "prep_time_min": 60,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Sebzeli Biryani",
+        "sifat_appeal": ["luks_seven", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_lunch_003",
+        "name_tr": "Dalı Çorbası",
+        "name_en": "Dal Soup",
+        "description": "Mercimek, baharat, pirinç",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 12,
+          "carbs_g": 32,
+          "fat_g": 4
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.15
+      },
+      {
+        "id": "hi_lunch_004",
+        "name_tr": "Tandoori Tavuk",
+        "name_en": "Tandoori Chicken",
+        "description": "Yakı pişirilmiş tavuk, yoğurt marinesi",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 40,
+          "carbs_g": 6,
+          "fat_g": 14
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["disiplinli", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_lunch_005",
+        "name_tr": "Panir Butter Masala",
+        "name_en": "Panir Butter Masala",
+        "description": "Panir küpleri, krem sosunda",
+        "nutrition": {
+          "calories": 400,
+          "protein_g": 22,
+          "carbs_g": 16,
+          "fat_g": 28
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["luks_seven", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_lunch_006",
+        "name_tr": "Vindaloo",
+        "name_en": "Vindaloo",
+        "description": "Çok baharatlı tavuk/sığır çorbası",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 28,
+          "carbs_g": 12,
+          "fat_g": 18
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["cesur_atilgan"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "hi_lunch_007",
+        "name_tr": "Korma",
+        "name_en": "Korma",
+        "description": "Tavuk, krem, baharat, kuru meyveler",
+        "nutrition": {
+          "calories": 400,
+          "protein_g": 26,
+          "carbs_g": 24,
+          "fat_g": 22
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_lunch_008",
+        "name_tr": "Rogan Josh",
+        "name_en": "Rogan Josh",
+        "description": "Kuzu, domates sosunda, baharatlar",
+        "nutrition": {
+          "calories": 360,
+          "protein_g": 32,
+          "carbs_g": 14,
+          "fat_g": 20
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_lunch_009",
+        "name_tr": "Chole Bhature",
+        "name_en": "Chole Bhature",
+        "description": "Baharatlı nohut, kızarmış ekmek",
+        "nutrition": {
+          "calories": 420,
+          "protein_g": 14,
+          "carbs_g": 56,
+          "fat_g": 14
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Chole Bhature",
+        "sifat_appeal": ["aile_odakli", "comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_lunch_010",
+        "name_tr": "Sambar",
+        "name_en": "Sambar",
+        "description": "Baharat çorbası, sebzeler, dal",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 9,
+          "carbs_g": 28,
+          "fat_g": 5
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_lunch_011",
+        "name_tr": "Chana Masala",
+        "name_en": "Chana Masala",
+        "description": "Nohut, domates, baharatlar",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 12,
+          "carbs_g": 32,
+          "fat_g": 8
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_lunch_012",
+        "name_tr": "Palak Panir",
+        "name_en": "Palak Panir",
+        "description": "Ispanak, panir küpleri, krem",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 18,
+          "carbs_g": 12,
+          "fat_g": 18
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_lunch_013",
+        "name_tr": "Aloo Gobi",
+        "name_en": "Aloo Gobi",
+        "description": "Patates, karnabahar, baharat",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 8,
+          "carbs_g": 26,
+          "fat_g": 6
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_lunch_014",
+        "name_tr": "Bhindi Masala",
+        "name_en": "Bhindi Masala",
+        "description": "Okra, soğan, baharat",
+        "nutrition": {
+          "calories": 160,
+          "protein_g": 6,
+          "carbs_g": 18,
+          "fat_g": 7
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "summer",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_lunch_015",
+        "name_tr": "Baingan Bharta",
+        "name_en": "Baingan Bharta",
+        "description": "Patlıcan, domates, soğan",
+        "nutrition": {
+          "calories": 140,
+          "protein_g": 5,
+          "carbs_g": 16,
+          "fat_g": 6
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "hi_lunch_016",
+        "name_tr": "Rajma",
+        "name_en": "Rajma",
+        "description": "Kırmızı fasulye, domates, baharatlar",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 13,
+          "carbs_g": 32,
+          "fat_g": 3
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_lunch_017",
+        "name_tr": "Matar Panir",
+        "name_en": "Matar Panir",
+        "description": "Bezelye, panir, krem sosunda",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 16,
+          "carbs_g": 14,
+          "fat_g": 18
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "spring",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_lunch_018",
+        "name_tr": "Dal Makhni",
+        "name_en": "Dal Makhni",
+        "description": "Kara dal, buğday, krem, tereyağ",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 14,
+          "carbs_g": 24,
+          "fat_g": 14
+        },
+        "prep_time_min": 60,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["aile_odakli", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_lunch_019",
+        "name_tr": "Shahi Tukda",
+        "name_en": "Shahi Tukda",
+        "description": "Ekmek, krem, kuru meyveler",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 6,
+          "carbs_g": 38,
+          "fat_g": 16
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "hi_lunch_020",
+        "name_tr": "Khaboos (Pirinç Pilavı)",
+        "name_en": "Khichdi",
+        "description": "Pirinç, dal, sebzeler, tereyağ",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 10,
+          "carbs_g": 38,
+          "fat_g": 5
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      }
+    ],
+    "dinner": [
+      {
+        "id": "hi_dinner_001",
+        "name_tr": "Şah Jeera Pirinç",
+        "name_en": "Jeera Rice",
+        "description": "Pirinç, kimyon, tereyağ",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 5,
+          "carbs_g": 42,
+          "fat_g": 4
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["praktikci", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_dinner_002",
+        "name_tr": "Dahi Wala Murgh",
+        "name_en": "Yogurt Chicken",
+        "description": "Tavuk, yoğurt, baharat",
+        "nutrition": {
+          "calories": 300,
+          "protein_g": 32,
+          "carbs_g": 8,
+          "fat_g": 14
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["disiplinli", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_dinner_003",
+        "name_tr": "Sebzeli Pilav",
+        "name_en": "Vegetable Pilaf",
+        "description": "Pirinç, karışık sebzeler",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 7,
+          "carbs_g": 36,
+          "fat_g": 4
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_dinner_004",
+        "name_tr": "Balık Curry",
+        "name_en": "Fish Curry",
+        "description": "Balık, hindistan cevizi, baharat",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 32,
+          "carbs_g": 8,
+          "fat_g": 14
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_005",
+        "name_tr": "Moong Dal",
+        "name_en": "Moong Dal",
+        "description": "Yeşil dal, limon, baharat",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 12,
+          "carbs_g": 26,
+          "fat_g": 2
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.05
+      },
+      {
+        "id": "hi_dinner_006",
+        "name_tr": "Arhar Dal",
+        "name_en": "Arhar Dal",
+        "description": "Sarı dal, soğan, baharat",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 13,
+          "carbs_g": 28,
+          "fat_g": 3
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "hi_dinner_007",
+        "name_tr": "Dum Pukht (Kapalı Pişirme)",
+        "name_en": "Dum Pukht",
+        "description": "Tatlı ve baharatlı tahıl pilavı",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 10,
+          "carbs_g": 42,
+          "fat_g": 6
+        },
+        "prep_time_min": 60,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Dum Pukht",
+        "sifat_appeal": ["aile_odakli", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_dinner_008",
+        "name_tr": "Kadhi Pakoda",
+        "name_en": "Kadhi Pakoda",
+        "description": "Yoğurt çorbası, tandir kızartması",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 9,
+          "carbs_g": 28,
+          "fat_g": 10
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "hi_dinner_009",
+        "name_tr": "Matar Pilav",
+        "name_en": "Peas Pilaf",
+        "description": "Pirinç, bezelye, baharat",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 8,
+          "carbs_g": 40,
+          "fat_g": 3
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "pratikci"],
+        "season": "spring",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_010",
+        "name_tr": "Panir Dö",
+        "name_en": "Panir Do",
+        "description": "Panir, spinach, krem",
+        "nutrition": {
+          "calories": 260,
+          "protein_g": 16,
+          "carbs_g": 12,
+          "fat_g": 16
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_011",
+        "name_tr": "Basmati Pirinç & Raita",
+        "name_en": "Basmati Rice & Raita",
+        "description": "Basmati pirinç, yoğurt salata",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 6,
+          "carbs_g": 44,
+          "fat_g": 3
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Raita",
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_012",
+        "name_tr": "Beslenmiş Sebzeler",
+        "name_en": "Sauteed Vegetables",
+        "description": "Karışık sebzeler, garam masala",
+        "nutrition": {
+          "calories": 160,
+          "protein_g": 5,
+          "carbs_g": 22,
+          "fat_g": 6
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "hi_dinner_013",
+        "name_tr": "Naan & Panir Tikka",
+        "name_en": "Naan & Panir Tikka",
+        "description": "Tandoor ekmek, panir şişi",
+        "nutrition": {
+          "calories": 340,
+          "protein_g": 12,
+          "carbs_g": 36,
+          "fat_g": 16
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Naan",
+        "sifat_appeal": ["aile_odakli", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_014",
+        "name_tr": "Dum Aloo",
+        "name_en": "Dum Aloo",
+        "description": "Patates, yoğurt, baharat",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 6,
+          "carbs_g": 32,
+          "fat_g": 8
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Dum Aloo",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "hi_dinner_015",
+        "name_tr": "Haleem",
+        "name_en": "Haleem",
+        "description": "Tavuk, tahıl, baharatlar (yavaş pişirilmiş)",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 24,
+          "carbs_g": 28,
+          "fat_g": 12
+        },
+        "prep_time_min": 90,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "luks_seven"],
+        "season": "winter",
+        "frequency_weight": 0.75
+      }
+    ]
+  }
+}

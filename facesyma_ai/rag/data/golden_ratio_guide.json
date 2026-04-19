@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "description": "Golden ratio score interpretation guide for facial harmony scoring",
+    "version": "1.0",
+    "scale": "0.0 to 1.01"
+  },
+  "ranges": [
+    {
+      "min": 0.95,
+      "max": 1.01,
+      "interpretations": {
+        "en": "Exceptional facial harmony — rare balance",
+        "tr": "İstisnai yüz uyumu — nadir denge"
+      },
+      "descriptions": {
+        "en": "Scores in this range represent extraordinary facial proportions. The face demonstrates near-perfect mathematical harmony where all features align with the golden ratio principles. Such proportions are exceptionally rare and often found only in the most celebrated beauties and sculptures."
+      }
+    },
+    {
+      "min": 0.9,
+      "max": 0.95,
+      "interpretations": {
+        "en": "Very close to golden ratio — strong symmetry",
+        "tr": "Altın orana çok yakın — güçlü simetri"
+      },
+      "descriptions": {
+        "en": "These scores indicate a face with strong harmonic properties. The proportions are very close to ideal, with excellent balance between features. This level of harmony creates a highly aesthetic appearance that naturally draws admiration."
+      }
+    },
+    {
+      "min": 0.8,
+      "max": 0.9,
+      "interpretations": {
+        "en": "Balanced and harmonious — natural appeal",
+        "tr": "Dengeli ve uyumlu — doğal çekicilik"
+      },
+      "descriptions": {
+        "en": "Faces in this range demonstrate clear balance and proportion. Features work well together creating an attractive, harmonious appearance. This is an excellent range representing natural beauty with good structural harmony."
+      }
+    },
+    {
+      "min": 0.7,
+      "max": 0.8,
+      "interpretations": {
+        "en": "Unique and natural — distinctive character",
+        "tr": "Benzersiz ve doğal — ayırt edici karakter"
+      },
+      "descriptions": {
+        "en": "These proportions show individuality and character. While they diverge from perfect mathematical harmony, they possess their own distinctive charm. The face shows personality and memorable features that create unique appeal."
+      }
+    },
+    {
+      "min": 0.0,
+      "max": 0.7,
+      "interpretations": {
+        "en": "Strong personal expression — memorable appearance",
+        "tr": "Güçlü kişisel ifade — unutulmaz görünüş"
+      },
+      "descriptions": {
+        "en": "Faces with proportions in this range may deviate significantly from golden ratio principles, but they possess powerful character and distinctiveness. These individuals often have unforgettable, striking appearances that convey personality and uniqueness."
+      }
+    }
+  ]
+}

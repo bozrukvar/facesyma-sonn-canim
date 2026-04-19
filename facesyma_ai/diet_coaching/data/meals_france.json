@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "fr_breakfast_001",
+    "name_tr": "Croissant Kahve",
+    "name_en": "Croissant with Coffee",
+    "description": "Buttery croissant with French café au lait.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 7,
+      "carbs": 36,
+      "fat": 16
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan croissant with oat milk coffee",
+    "sifat_appeal": ["zarif", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "fr_breakfast_002",
+    "name_tr": "Pain Chocolat",
+    "name_en": "Pain au Chocolat",
+    "description": "Flaky pastry filled with dark chocolate bars.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 6,
+      "carbs": 42,
+      "fat": 16
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan pain au chocolat with plant-based butter",
+    "sifat_appeal": ["tatli", "hafif", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "fr_breakfast_003",
+    "name_tr": "Jambon Fromage",
+    "name_en": "Ham and Cheese Baguette",
+    "description": "Fresh baguette with ham slices and French cheese.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 34,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Baguette with plant-based ham and cheese",
+    "sifat_appeal": ["basit", "tatli", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "fr_breakfast_004",
+    "name_tr": "Oeufs Brouillés",
+    "name_en": "Scrambled Eggs",
+    "description": "Soft scrambled eggs with fresh herbs and bread.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 16,
+      "carbs": 20,
+      "fat": 18
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu scramble with herbs",
+    "sifat_appeal": ["basit", "saglikli", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_breakfast_005",
+    "name_tr": "Tartin Chutneys",
+    "name_en": "Open-Faced Tartine",
+    "description": "Toasted bread with spreads and fresh cheese.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 11,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tartine with plant-based spreads",
+    "sifat_appeal": ["zarif", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_breakfast_006",
+    "name_tr": "Pain Aux Raisins",
+    "name_en": "Raisin Brioche",
+    "description": "Sweet brioche with plump raisins.",
+    "nutrition": {
+      "calories": 330,
+      "protein": 7,
+      "carbs": 44,
+      "fat": 14
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan raisin brioche",
+    "sifat_appeal": ["tatli", "hafif", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_breakfast_007",
+    "name_tr": "Oeufs Mollet",
+    "name_en": "Soft Boiled Eggs",
+    "description": "Soft boiled eggs with toast soldiers.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 24,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu scramble with toast",
+    "sifat_appeal": ["basit", "tatli", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_breakfast_008",
+    "name_tr": "Yogurt Nature",
+    "name_en": "Plain Yogurt with Jam",
+    "description": "Plain French yogurt with preserves.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 12,
+      "carbs": 36,
+      "fat": 4
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Plant-based yogurt with jam",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_breakfast_009",
+    "name_tr": "Konserve Meyve",
+    "name_en": "Fruit Compote",
+    "description": "Homemade fruit compote with toast.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 5,
+      "carbs": 38,
+      "fat": 6
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_breakfast_010",
+    "name_tr": "Salade Früh",
+    "name_en": "Greens and Herbs",
+    "description": "Light salad of mixed greens and fresh herbs.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 6,
+      "carbs": 12,
+      "fat": 12
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "zarif", "hafif"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_breakfast_011",
+    "name_tr": "Melon Ham",
+    "name_en": "Melon with Prosciutto",
+    "description": "Fresh melon wrapped with thin prosciutto.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 16,
+      "carbs": 24,
+      "fat": 14
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Melon with coconut bacon",
+    "sifat_appeal": ["sofistike", "tatli", "zarif"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_breakfast_012",
+    "name_tr": "Pate Toast",
+    "name_en": "Pâté on Toast",
+    "description": "French pâté spread on toasted bread.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 12,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom pâté on toast",
+    "sifat_appeal": ["sofistike", "zarif", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_breakfast_013",
+    "name_tr": "Berry Tartin",
+    "name_en": "Berry Tartine",
+    "description": "Bread with fresh berries and cream cheese.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 9,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tartine with cashew cream and berries",
+    "sifat_appeal": ["tatli", "zarif", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_breakfast_014",
+    "name_tr": "Fromage Blanc",
+    "name_en": "Fresh Cheese",
+    "description": "Fromage blanc with honey and berries.",
+    "nutrition": {
+      "calories": 250,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 6
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu-based fresh cheese alternative",
+    "sifat_appeal": ["tatli", "saglikli", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_breakfast_015",
+    "name_tr": "Muffin Mirtille",
+    "name_en": "Blueberry Muffin",
+    "description": "Fresh blueberry muffin with tea.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 5,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan blueberry muffin",
+    "sifat_appeal": ["tatli", "hafif", "rahat"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_lunch_001",
+    "name_tr": "Coq au Vin",
+    "name_en": "Coq au Vin",
+    "description": "Chicken braised in red wine with mushrooms and pearl onions.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 38,
+      "carbs": 16,
+      "fat": 26
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil burgundy",
+    "sifat_appeal": ["sevgi_dolu", "sofistike", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "fr_lunch_002",
+    "name_tr": "Boeuf Bourguignon",
+    "name_en": "Beef Bourguignon",
+    "description": "Slow-cooked beef stew in red wine with vegetables.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 42,
+      "carbs": 18,
+      "fat": 30
+    },
+    "prep_time_min": 150,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil burgundy",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "fr_lunch_003",
+    "name_tr": "Duck Confit",
+    "name_en": "Duck Confit",
+    "description": "Slow-cooked duck leg with garlic and herbs.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 40,
+      "carbs": 6,
+      "fat": 38
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Slow-roasted mushroom steaks",
+    "sifat_appeal": ["sofistike", "guclü", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_lunch_004",
+    "name_tr": "Beef Steak Frites",
+    "name_en": "Steak Frites",
+    "description": "Grilled steak with crispy fries and béarnaise sauce.",
+    "nutrition": {
+      "calories": 540,
+      "protein": 40,
+      "carbs": 32,
+      "fat": 32
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom steaks with fries and vegan béarnaise",
+    "sifat_appeal": ["sofistike", "guclü", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "fr_lunch_005",
+    "name_tr": "Sole Meunière",
+    "name_en": "Sole Meunière",
+    "description": "Pan-fried sole with butter, lemon, and capers.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 38,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Pan-fried tofu steaks with same sauce",
+    "sifat_appeal": ["zarif", "sofistike", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_006",
+    "name_tr": "Bouillabaisse Balık",
+    "name_en": "Bouillabaisse",
+    "description": "Provençal fish stew with saffron and aioli.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 36,
+      "carbs": 16,
+      "fat": 22
+    },
+    "prep_time_min": 75,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and mushroom bouillabaisse",
+    "sifat_appeal": ["sofistike", "macera_seven", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_007",
+    "name_tr": "French Onion Soup",
+    "name_en": "French Onion Soup",
+    "description": "Caramelized onion soup with cheese and bread.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 20
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Onion soup with plant-based cheese",
+    "sifat_appeal": ["sevgi_dolu", "rahat", "zarif"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_008",
+    "name_tr": "Coquilles Saint Jacques",
+    "name_en": "Scallops in Shell",
+    "description": "Scallops with mushrooms in cream sauce.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 38,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and tofu in cream sauce",
+    "sifat_appeal": ["sofistike", "zarif", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_lunch_009",
+    "name_tr": "Nicoise Salad",
+    "name_en": "Salade Niçoise",
+    "description": "Tuna, eggs, vegetables, and olives with vinaigrette.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 18,
+      "fat": 22
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Chickpea and vegetable salad",
+    "sifat_appeal": ["saglikli", "zarif", "macera_seven"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_010",
+    "name_tr": "Ratatouille Tarte",
+    "name_en": "Ratatouille",
+    "description": "Layered vegetable gratin with herbs and olive oil.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 32,
+      "fat": 16
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "zarif", "dogu"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_011",
+    "name_tr": "Croque Monsieur",
+    "name_en": "Croque Monsieur",
+    "description": "Grilled ham and cheese sandwich with béchamel.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 36,
+      "fat": 22
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Grilled plant-based ham and cheese",
+    "sifat_appeal": ["tatli", "macera_seven", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_012",
+    "name_tr": "Cassoulet",
+    "name_en": "Cassoulet",
+    "description": "Slow-cooked beans with duck, sausage, and pork.",
+    "nutrition": {
+      "calories": 540,
+      "protein": 36,
+      "carbs": 32,
+      "fat": 32
+    },
+    "prep_time_min": 240,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Slow-cooked beans with mushrooms",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_013",
+    "name_tr": "Blanquette Veal",
+    "name_en": "Blanquette de Veau",
+    "description": "Veal stew in white cream sauce with vegetables.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 36,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and tofu stew with cream",
+    "sifat_appeal": ["sofistike", "sevgi_dolu", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_lunch_014",
+    "name_tr": "Tarte Flambe",
+    "name_en": "Flammekuchen",
+    "description": "Alsatian pizza with crème fraîche, onions, and bacon.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 16,
+      "carbs": 40,
+      "fat": 20
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Flammekuchen with plant-based bacon",
+    "sifat_appeal": ["macera_seven", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_lunch_015",
+    "name_tr": "Moules Marinières",
+    "name_en": "Mussels Marinière",
+    "description": "Mussels steamed in white wine with herbs.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 32,
+      "carbs": 12,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom ragout with herbs",
+    "sifat_appeal": ["zarif", "macera_seven", "sofistike"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_lunch_016",
+    "name_tr": "Asparagus Hollandaise",
+    "name_en": "White Asparagus",
+    "description": "Fresh asparagus with silky hollandaise sauce.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 16,
+      "fat": 28
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Asparagus with cashew hollandaise",
+    "sifat_appeal": ["zarif", "sofistike", "macera_seven"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_lunch_017",
+    "name_tr": "Rabbit Stew",
+    "name_en": "Lapin à la Moutarde",
+    "description": "Rabbit braised with mustard sauce.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 38,
+      "carbs": 10,
+      "fat": 24
+    },
+    "prep_time_min": 80,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil stew with mustard",
+    "sifat_appeal": ["sofistike", "macera_seven", "geleneksel"],
+    "season": "autumn",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "fr_lunch_018",
+    "name_tr": "Beef Stew Daube",
+    "name_en": "Daube Provençale",
+    "description": "Slow-cooked beef stew with wine and herbs.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 40,
+      "carbs": 16,
+      "fat": 28
+    },
+    "prep_time_min": 180,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom daube with lentils",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_lunch_019",
+    "name_tr": "Lobster Thermidor",
+    "name_en": "Lobster Thermidor",
+    "description": "Lobster in creamy mustard sauce.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 44,
+      "carbs": 12,
+      "fat": 32
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and tofu thermidor",
+    "sifat_appeal": ["sofistike", "centil_kibri", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "fr_lunch_020",
+    "name_tr": "Potato Gratin",
+    "name_en": "Gratin Dauphinois",
+    "description": "Potato and cream gratin with cheese.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 22
+    },
+    "prep_time_min": 75,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Gratin with plant-based cream and cheese",
+    "sifat_appeal": ["sevgi_dolu", "tatli", "rahat"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_001",
+    "name_tr": "Soupe à l'Oignon",
+    "name_en": "Onion Soup",
+    "description": "Caramelized onion soup with bread and cheese.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Onion soup with plant-based cheese",
+    "sifat_appeal": ["sevgi_dolu", "rahat", "zarif"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_002",
+    "name_tr": "Velouté Sebze",
+    "name_en": "Vegetable Soup",
+    "description": "Smooth vegetable velouté with cream.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Velouté with plant-based cream",
+    "sifat_appeal": ["saglikli", "hafif", "zarif"],
+    "season": "winter",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_dinner_003",
+    "name_tr": "Salade Composée",
+    "name_en": "Composed Salad",
+    "description": "Mixed salad with cheese, eggs, and vegetables.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 18,
+      "fat": 20
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Salad with plant-based options",
+    "sifat_appeal": ["saglikli", "zarif", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_004",
+    "name_tr": "Escargots",
+    "name_en": "Snails with Garlic Butter",
+    "description": "Baked snails with herb butter.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom caps with garlic butter",
+    "sifat_appeal": ["sofistike", "macera_seven", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "fr_dinner_005",
+    "name_tr": "Pâté Toast",
+    "name_en": "Pâté and Pickles",
+    "description": "Terrine pâté with pickles and toast.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom pâté with pickles",
+    "sifat_appeal": ["sofistike", "zarif", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "fr_dinner_006",
+    "name_tr": "Cheese Tray",
+    "name_en": "French Cheese Board",
+    "description": "Selection of French cheeses with bread and fruits.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 22
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Plant-based cheese board",
+    "sifat_appeal": ["zarif", "sofistike", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_dinner_007",
+    "name_tr": "Chicken Rillettes",
+    "name_en": "Chicken Rillettes",
+    "description": "Shredded chicken spread with bread.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 22,
+      "carbs": 24,
+      "fat": 18
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom rillettes",
+    "sifat_appeal": ["basit", "tatli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_dinner_008",
+    "name_tr": "Souffle Omelet",
+    "name_en": "Cheese Soufflé Omelette",
+    "description": "Fluffy cheese soufflé omelette.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu soufflé with plant-based cheese",
+    "sifat_appeal": ["zarif", "tatli", "sofistike"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_dinner_009",
+    "name_tr": "Quiche Lorraine",
+    "name_en": "Quiche Lorraine",
+    "description": "Savory custard tart with bacon and cheese.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 16,
+      "carbs": 32,
+      "fat": 26
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Quiche with plant-based bacon and cheese",
+    "sifat_appeal": ["tatli", "sevgi_dolu", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_010",
+    "name_tr": "Leek Soup",
+    "name_en": "Potato Leek Soup",
+    "description": "Creamy potato and leek soup.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 14
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Leek soup with plant-based cream",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_011",
+    "name_tr": "Light Salad",
+    "name_en": "Green Salad with Vinaigrette",
+    "description": "Simple salad with mustard vinaigrette.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 12,
+      "fat": 18
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "hafif"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "fr_dinner_012",
+    "name_tr": "Mushroom Tarte",
+    "name_en": "Mushroom Tart",
+    "description": "Savory mushroom tart with herbs.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 36,
+      "fat": 20
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom tart with plant-based cream",
+    "sifat_appeal": ["zarif", "saglikli", "santiye"],
+    "season": "autumn",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "fr_dinner_013",
+    "name_tr": "Fish Cakes",
+    "name_en": "Croquettes de Poisson",
+    "description": "Fish croquettes with lemon sauce.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 24,
+      "carbs": 28,
+      "fat": 18
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom croquettes with lemon sauce",
+    "sifat_appeal": ["zarif", "macera_seven", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "fr_dinner_014",
+    "name_tr": "Beef Tartare",
+    "name_en": "Beef Tartare",
+    "description": "Raw beef with capers, onions, and egg.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 36,
+      "carbs": 8,
+      "fat": 18
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom tartare with walnuts",
+    "sifat_appeal": ["sofistike", "macera_seven", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "fr_dinner_015",
+    "name_tr": "Roasted Vegetables",
+    "name_en": "Roasted Root Vegetables",
+    "description": "Seasonal roasted vegetables with herbs.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 36,
+      "fat": 10
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "dogu"],
+    "season": "autumn",
+    "frequency_weight": 0.9
+  }
+]

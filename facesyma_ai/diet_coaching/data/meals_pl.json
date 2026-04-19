@@ -1,0 +1,1062 @@
+{
+  "country_name": "Poland",
+  "language_code": "pl",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "pl_breakfast_001",
+        "name_tr": "Çay Seftalı Ekmek",
+        "name_en": "Tea & Rye Bread",
+        "description": "Strong black tea with dense rye bread and butter. Simple, hearty, traditional Polish.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 6,
+          "carbs": 32,
+          "fat": 9
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Rye bread with plant-based butter",
+        "sifat_appeal": ["gelenekci", "praktikci_zaman", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "pl_breakfast_002",
+        "name_tr": "Pastırma Peynir Ekmek",
+        "name_en": "Smoked Meat & Cheese",
+        "description": "Smoked sausage with cheese and bread. Hearty, satisfying, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 16,
+          "carbs": 20,
+          "fat": 22
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based sausage with vegan cheese",
+        "sifat_appeal": ["enerjik", "praktikci_zaman", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "pl_breakfast_003",
+        "name_tr": "Yoğurt Komposto Meyve",
+        "name_en": "Yogurt with Fruit Compote",
+        "description": "Creamy yogurt with homemade fruit compote. Light, sweet, traditional.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based yogurt with fruit compote",
+        "sifat_appeal": ["sevgi_dolu", "doganın_cocugu", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_breakfast_004",
+        "name_tr": "Yumurta Jambon Ekmek",
+        "name_en": "Scrambled Egg with Ham",
+        "description": "Scrambled eggs with ham and bread. Quick, protein-rich, satisfying.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 14,
+          "carbs": 18,
+          "fat": 19
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tofu scramble with plant-based ham",
+        "sifat_appeal": ["enerjik", "praktikci_zaman", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_breakfast_005",
+        "name_tr": "Süt Kaş Peyniri Tatlı",
+        "name_en": "Cottage Cheese with Sugar",
+        "description": "Polish cottage cheese (tvarog) with sugar and bread. Creamy, traditional, filling.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 14,
+          "carbs": 26,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based cottage cheese alternative",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_breakfast_006",
+        "name_tr": "Paczki Tatlı Pastane",
+        "name_en": "Paczki (Fried Pastry)",
+        "description": "Fried dough filled with jam. Indulgent, sweet, traditional carnival treat.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 5,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan paczki with fruit filling",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_breakfast_007",
+        "name_tr": "Kefir Granola Meyve",
+        "name_en": "Kefir with Granola",
+        "description": "Tangy kefir with crunchy granola. Probiotic, healthy, modern.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 34,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Dairy-free kefir with granola",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_breakfast_008",
+        "name_tr": "Kahve Simit Süt",
+        "name_en": "Coffee & Donut",
+        "description": "Strong coffee with Polish donut (pączek without filling). Quick, satisfying.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 28,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based milk coffee with vegan donut",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_breakfast_009",
+        "name_tr": "Obwarzanek Peynir",
+        "name_en": "Obwarzanek (Bagel)",
+        "description": "Polish bagel with cheese. Chewy, satisfying, traditional street food.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Bagel with plant-based cheese",
+        "sifat_appeal": ["pratikci_zaman", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_breakfast_010",
+        "name_tr": "Krupnik Sütlü Kaş",
+        "name_en": "Groats Porridge",
+        "description": "Creamy groats (barley) porridge with milk. Warm, filling, traditional.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 36,
+          "fat": 6
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Groats with plant-based milk",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_breakfast_011",
+        "name_tr": "Çorap Ekmek Zeytin",
+        "name_en": "Rye Bread with Olives",
+        "description": "Dense rye bread with olives and olive oil. Rustic, nutritious, traditional.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 6,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["gelenekci", "ekonomik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_breakfast_012",
+        "name_tr": "Mamlarz Pastırma Yumurta",
+        "name_en": "Fried Sausage & Egg",
+        "description": "Pan-fried sausage with fried egg. Hearty, quick, traditional.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 8,
+          "fat": 28
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based sausage with tofu egg",
+        "sifat_appeal": ["enerjik", "praktikci_zaman", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_breakfast_013",
+        "name_tr": "Mleczko Kakaolu Tatlı",
+        "name_en": "Chocolate Milk with Pastry",
+        "description": "Warm chocolate milk with sweet pastry. Comforting, sweet, childhood favorite.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 40,
+          "fat": 12
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based chocolate milk with vegan pastry",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_breakfast_014",
+        "name_tr": "Żur Telur Roti",
+        "name_en": "Zurek (Rye Soup) Breakfast",
+        "description": "Sour rye soup with eggs and bread. Unique, traditional, Polish specialty.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 10,
+          "carbs": 28,
+          "fat": 9
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Zurek with plant-based sausage",
+        "sifat_appeal": ["gelenekci", "meraklı", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "pl_breakfast_015",
+        "name_tr": "Bisküvi Çay Bal",
+        "name_en": "Tea with Biscuits",
+        "description": "Black tea with butter biscuits. Simple, comforting, traditional.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 28,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tea with vegan biscuits",
+        "sifat_appeal": ["pratikci_zaman", "centil_kibri", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ],
+    "lunch": [
+      {
+        "id": "pl_lunch_001",
+        "name_tr": "Pierogi Peynir Patates",
+        "name_en": "Pierogi (Cheese & Potato Dumplings)",
+        "description": "Boiled dumplings with cheese and potato filling. Iconic Polish, comforting, satisfying.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 14,
+          "carbs": 48,
+          "fat": 14
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pierogi with plant-based cheese",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "pl_lunch_002",
+        "name_tr": "Żurek Çorbası Yumurta",
+        "name_en": "Zurek (Sour Rye Soup)",
+        "description": "Traditional sour rye soup with potato and meat. Tangy, hearty, iconic Polish.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 28,
+          "fat": 12
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Zurek with plant-based sausage",
+        "sifat_appeal": ["gelenekci", "meraklı", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "pl_lunch_003",
+        "name_tr": "Bigos Avçılar",
+        "name_en": "Bigos (Hunter's Stew)",
+        "description": "Complex stew with meat and cabbage. Legendary Polish dish, hearty, warming.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 24,
+          "fat": 22
+        },
+        "prep_time_min": 180,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetarian bigos with mushrooms",
+        "sifat_appeal": ["gelenekci", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_lunch_004",
+        "name_tr": "Kotlet Mielony",
+        "name_en": "Breaded Cutlet",
+        "description": "Breaded and fried ground meat cutlet. Quick, classic, everyday favorite.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 16,
+          "fat": 24
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil and mushroom cutlet",
+        "sifat_appeal": ["praktikci_zaman", "enerjik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_lunch_005",
+        "name_tr": "Flaki Çorbası Patates",
+        "name_en": "Tripe Soup (Flaki)",
+        "description": "Creamy soup with tripe and vegetables. Traditional, unique, acquired taste.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 14,
+          "carbs": 20,
+          "fat": 12
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom soup alternative",
+        "sifat_appeal": ["gelenekci", "cesur_atılgan", "meraklı"],
+        "season": "winter",
+        "frequency_weight": 0.5
+      },
+      {
+        "id": "pl_lunch_006",
+        "name_tr": "Golabki Lahana Sarma",
+        "name_en": "Golabki (Cabbage Rolls)",
+        "description": "Cabbage leaves stuffed with meat and rice. Comforting, traditional family dish.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 16,
+          "carbs": 32,
+          "fat": 16
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cabbage rolls with lentil filling",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_lunch_007",
+        "name_tr": "Placki Kartoflane Sour Cream",
+        "name_en": "Potato Pancakes",
+        "description": "Fried potato pancakes with sour cream. Crispy, savory, traditional.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 8,
+          "carbs": 40,
+          "fat": 18
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Potato pancakes with plant-based cream",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_008",
+        "name_tr": "Kielbasa Kızartma Lahana",
+        "name_en": "Kielbasa with Cabbage",
+        "description": "Polish smoked sausage with braised cabbage. Hearty, flavorful, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 18,
+          "fat": 28
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based sausage with cabbage",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_009",
+        "name_tr": "Pierniki Mezclas",
+        "name_en": "Mushroom Pierogi",
+        "description": "Dumplings with mushroom filling. Vegetarian, earthy, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 10,
+          "carbs": 42,
+          "fat": 12
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use standard recipe",
+        "sifat_appeal": ["gelenekci", "doganın_cocugu", "sevgi_dolu"],
+        "season": "autumn",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_010",
+        "name_tr": "Pierogi Çilekli",
+        "name_en": "Strawberry Pierogi",
+        "description": "Sweet dumplings with fresh strawberry filling. Delicate, sweet, summer specialty.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 8,
+          "carbs": 46,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pierogi with plant-based filling",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "doganın_cocugu"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_lunch_011",
+        "name_tr": "Schabowe Kotlet",
+        "name_en": "Pork Schnitzel",
+        "description": "Breaded and fried thin pork cutlet. Crispy, quick, everyday favorite.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 24,
+          "carbs": 16,
+          "fat": 26
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom schnitzel",
+        "sifat_appeal": ["praktikci_zaman", "enerjik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_012",
+        "name_tr": "Zupa Grochowa Gulaş",
+        "name_en": "Split Pea Soup",
+        "description": "Creamy split pea soup with meat. Hearty, warming, traditional.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 14,
+          "carbs": 36,
+          "fat": 10
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Soup with plant-based broth",
+        "sifat_appeal": ["ekonomik", "sevgi_dolu", "gelenekci"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_013",
+        "name_tr": "Rosół Demiryolu",
+        "name_en": "Rosół (Clear Broth)",
+        "description": "Traditional light broth with noodles and vegetables. Simple, comforting, everyday.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 12,
+          "carbs": 24,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable broth with noodles",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_lunch_014",
+        "name_tr": "Żurek Bigos Karşılaştırma",
+        "name_en": "Bigos Variation",
+        "description": "Variation of hunter's stew with different vegetables. Rustic, hearty, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 18,
+          "carbs": 26,
+          "fat": 20
+        },
+        "prep_time_min": 150,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and vegetable bigos",
+        "sifat_appeal": ["gelenekci", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_015",
+        "name_tr": "Paprykarz Szardinki",
+        "name_en": "Sardine in Tomato",
+        "description": "Canned sardines in spicy tomato sauce. Quick, traditional, economical.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 16,
+          "carbs": 14,
+          "fat": 14
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom alternative in tomato",
+        "sifat_appeal": ["praktikci_zaman", "ekonomik", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_lunch_016",
+        "name_tr": "Mizeria Tatlı Çilek",
+        "name_en": "Mizeria (Cucumber Salad)",
+        "description": "Sour cream cucumber salad. Refreshing, traditional, summer side dish.",
+        "nutrition": {
+          "calories": 160,
+          "protein": 3,
+          "carbs": 12,
+          "fat": 11
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mizeria with plant-based cream",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "sevgi_dolu"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_017",
+        "name_tr": "Sałatka Ziemniaczana",
+        "name_en": "Potato Salad",
+        "description": "Warm potato salad with mayonnaise and vegetables. Festive, traditional, comfort.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 6,
+          "carbs": 40,
+          "fat": 16
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Potato salad with plant-based mayo",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_lunch_018",
+        "name_tr": "Groch Porcja",
+        "name_en": "Pea & Barley",
+        "description": "Split peas with barley. Simple, economical, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 11,
+          "carbs": 42,
+          "fat": 6
+        },
+        "prep_time_min": 80,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["ekonomik", "doganın_cocugu", "gelenekci"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_lunch_019",
+        "name_tr": "Dworek Pierogi Mięs",
+        "name_en": "Meat Pierogi",
+        "description": "Dumplings with meat filling. Hearty, traditional, satisfying.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 16,
+          "carbs": 44,
+          "fat": 18
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pierogi with mushroom filling",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_lunch_020",
+        "name_tr": "Ustronie Chłodnik Betaravy",
+        "name_en": "Cold Beet Soup (Chłodnik)",
+        "description": "Cold soup with beets and vegetables. Refreshing, tangy, summer specialty.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 6,
+          "carbs": 24,
+          "fat": 6
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["doganın_cocugu", "macera_seven", "saglik_bilinc"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      }
+    ],
+    "dinner": [
+      {
+        "id": "pl_dinner_001",
+        "name_tr": "Paprykarz Pierogi",
+        "name_en": "Pierogi with Sour Cream",
+        "description": "Boiled dumplings topped with sour cream and bacon. Comfort dinner, traditional.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 12,
+          "carbs": 48,
+          "fat": 18
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pierogi with plant-based sour cream",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "pl_dinner_002",
+        "name_tr": "Kluski Śląskie Gulaş",
+        "name_en": "Silesian Dumplings",
+        "description": "Bread dumplings served with goulash. Hearty, traditional, comforting.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 16,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Dumplings with vegetable goulash",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_003",
+        "name_tr": "Balık Pilaff",
+        "name_en": "Baked Fish",
+        "description": "Fish baked with vegetables. Light, healthy, elegant.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 12,
+          "fat": 14
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Baked tofu with vegetables",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_004",
+        "name_tr": "Ratatouille Sebze",
+        "name_en": "Vegetable Casserole",
+        "description": "Baked vegetables with tomato. Vegetarian, light, healthy.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 32,
+          "fat": 10
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "gelenekci"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_005",
+        "name_tr": "Kielbasa Gourmet",
+        "name_en": "Kielbasa with Potatoes",
+        "description": "Polish sausage with boiled potatoes. Hearty, simple, traditional.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 18,
+          "carbs": 34,
+          "fat": 24
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based sausage with potatoes",
+        "sifat_appeal": ["praktikci_zaman", "sevgi_dolu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_006",
+        "name_tr": "Placki Mielony Mięso",
+        "name_en": "Meat Pancakes",
+        "description": "Fried meat pancakes. Hearty, satisfying, traditional.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 18,
+          "carbs": 18,
+          "fat": 26
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Lentil pancakes",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_dinner_007",
+        "name_tr": "Zucchini Picard",
+        "name_en": "Zucchini Fritters",
+        "description": "Crispy zucchini pancakes. Vegetarian, seasonal, light.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 24,
+          "fat": 12
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "pratikci_zaman"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_dinner_008",
+        "name_tr": "Ser Żeń Żelj",
+        "name_en": "Cheese Pierogi",
+        "description": "Sweet or savory cheese dumplings. Versatile, traditional, comforting.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 12,
+          "carbs": 44,
+          "fat": 14
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pierogi with plant-based cheese",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_009",
+        "name_tr": "Buraczki Czerwone",
+        "name_en": "Beets with Horseradish",
+        "description": "Roasted beets with spicy horseradish. Simple, vegetarian, traditional.",
+        "nutrition": {
+          "calories": 160,
+          "protein": 4,
+          "carbs": 26,
+          "fat": 5
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["gelenekci", "macera_seven", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "pl_dinner_010",
+        "name_tr": "Gołąbki Lahana Farş",
+        "name_en": "Cabbage Rolls Dinner",
+        "description": "Cabbage rolls with meat, tomato sauce. Comforting, traditional family dinner.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 16,
+          "carbs": 30,
+          "fat": 18
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cabbage rolls with lentils",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_011",
+        "name_tr": "Trout Mantı",
+        "name_en": "Trout Dinner",
+        "description": "Pan-fried trout with herbs. Fresh, elegant, light.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 32,
+          "carbs": 6,
+          "fat": 16
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom schnitzel",
+        "sifat_appeal": ["centil_kibri", "saglik_bilinc", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "pl_dinner_012",
+        "name_tr": "Burak Krem Patates",
+        "name_en": "Creamed Potatoes",
+        "description": "Creamy mashed potatoes with butter. Rich, comforting, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 6,
+          "carbs": 36,
+          "fat": 12
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mashed potatoes with plant-based butter",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_013",
+        "name_tr": "Papryka Mięsa Gulaş",
+        "name_en": "Paprika Beef (Goulash)",
+        "description": "Beef stew with paprika spice. Hearty, warming, classic.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 22,
+          "carbs": 20,
+          "fat": 26
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom goulash",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "luks_seven"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_014",
+        "name_tr": "Serek Zielony Salata",
+        "name_en": "Green Salad with Cheese",
+        "description": "Mixed greens with Polish cheese. Light, fresh, vegetarian.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 9,
+          "carbs": 12,
+          "fat": 15
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Salad with plant-based cheese",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "pl_dinner_015",
+        "name_tr": "Sznycle Wieprzowe",
+        "name_en": "Pork Cutlet Dinner",
+        "description": "Breaded pork cutlet with vegetables. Quick, hearty, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 26,
+          "carbs": 18,
+          "fat": 24
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom cutlet",
+        "sifat_appeal": ["praktikci_zaman", "enerjik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ]
+  }
+}

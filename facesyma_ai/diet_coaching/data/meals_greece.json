@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "gr_breakfast_001",
+    "name_tr": "Feta Yoğurt",
+    "name_en": "Greek Yogurt with Honey",
+    "description": "Creamy Greek yogurt drizzled with honey and topped with walnuts.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Coconut yogurt with maple syrup and walnuts",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "gr_breakfast_002",
+    "name_tr": "Graviera Kaşar",
+    "name_en": "Graviera Cheese and Tomato",
+    "description": "Creamy Graviera cheese with fresh tomato and bread.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 16,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Olive and plant-based cheese with tomato",
+    "sifat_appeal": ["basit", "tatli", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_breakfast_003",
+    "name_tr": "Saganaki Fried Cheese",
+    "name_en": "Fried Cheese Saganaki",
+    "description": "Pan-fried saganaki cheese, crispy outside and melty inside.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 18,
+      "carbs": 14,
+      "fat": 22
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Fried tofu with cornstarch coating",
+    "sifat_appeal": ["guclü", "macera_seven", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_breakfast_004",
+    "name_tr": "Olives Ekmek",
+    "name_en": "Bread with Olives and Oil",
+    "description": "Crusty bread with Kalamata olives and extra virgin olive oil.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["basit", "dogu", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_breakfast_005",
+    "name_tr": "Krem Domates",
+    "name_en": "Whipped Feta Dip",
+    "description": "Whipped feta mixed with olive oil, served with bread.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Whipped cashew cream with lemon",
+    "sifat_appeal": ["zarif", "tatli", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_breakfast_006",
+    "name_tr": "Firin Pasta",
+    "name_en": "Pastry with Honey",
+    "description": "Crispy pastry filled with nuts and honey syrup.",
+    "nutrition": {
+      "calories": 330,
+      "protein": 6,
+      "carbs": 46,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Phyllo with vegan butter and agave nectar",
+    "sifat_appeal": ["tatli", "santiye", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "gr_breakfast_007",
+    "name_tr": "Sesame Halva",
+    "name_en": "Sesame Halva",
+    "description": "Creamy sesame paste halva with honey.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 8,
+      "carbs": 38,
+      "fat": 16
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "geleneksel", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "gr_breakfast_008",
+    "name_tr": "Herbal Çay",
+    "name_en": "Mountain Tea and Bread",
+    "description": "Mountain herbal tea with wholegrain bread and honey.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 6,
+      "carbs": 40,
+      "fat": 3
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["rahat", "saglikli", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_breakfast_009",
+    "name_tr": "Figs Peynir",
+    "name_en": "Fresh Figs with Cheese",
+    "description": "Seasonal fresh figs paired with Feta cheese.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 10,
+      "carbs": 32,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Figs with plant-based cheese",
+    "sifat_appeal": ["tatli", "saglikli", "zarif"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_breakfast_010",
+    "name_tr": "Tahini Ekmek",
+    "name_en": "Tahini Bread",
+    "description": "Whole wheat bread spread with tahini and honey.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 9,
+      "carbs": 38,
+      "fat": 12
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "saglikli", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_breakfast_011",
+    "name_tr": "Dondurma Yoğurt",
+    "name_en": "Yogurt Parfait",
+    "description": "Layered yogurt with granola and fresh berries.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 40,
+      "fat": 6
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Coconut yogurt with granola and berries",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "summer",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_breakfast_012",
+    "name_tr": "Zelnik Börek",
+    "name_en": "Spinach Pie",
+    "description": "Spinach and feta cheese wrapped in crispy phyllo dough.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Spinach pie with plant-based cheese",
+    "sifat_appeal": ["tatli", "sevgi_dolu", "santiye"],
+    "season": "spring",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_breakfast_013",
+    "name_tr": "Miel Keki",
+    "name_en": "Honey Cake",
+    "description": "Light honey cake with crushed walnuts.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 5,
+      "carbs": 44,
+      "fat": 12
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan honey cake with plant-based butter",
+    "sifat_appeal": ["tatli", "hafif", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "gr_breakfast_014",
+    "name_tr": "Krema Yogurt",
+    "name_en": "Cream Cheese Toast",
+    "description": "Toasted bread with whipped cream cheese and jam.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Toast with cashew cream and jam",
+    "sifat_appeal": ["tatli", "zarif", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_breakfast_015",
+    "name_tr": "Korinthiaki Raisins",
+    "name_en": "Raisins and Nuts",
+    "description": "Dried fruits and nuts mixed with whole grain bread.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 8,
+      "carbs": 42,
+      "fat": 10
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "saglikli", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_001",
+    "name_tr": "Greek Salata",
+    "name_en": "Greek Salad",
+    "description": "Tomatoes, cucumbers, olives, onions, feta cheese with olive oil dressing.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 18,
+      "fat": 22
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same salad with plant-based cheese",
+    "sifat_appeal": ["saglikli", "tatli", "zarif"],
+    "season": "summer",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "gr_lunch_002",
+    "name_tr": "Moussaka",
+    "name_en": "Moussaka",
+    "description": "Layered eggplant, meat sauce, and béchamel. Classic Greek comfort food.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 28,
+      "carbs": 36,
+      "fat": 26
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Eggplant moussaka with lentil sauce and cashew béchamel",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_lunch_003",
+    "name_tr": "Souvlaki Chicken",
+    "name_en": "Chicken Souvlaki",
+    "description": "Grilled marinated chicken skewers with fresh herbs and lemon.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 40,
+      "carbs": 12,
+      "fat": 20
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu skewers with same marinade",
+    "sifat_appeal": ["guclü", "macera_seven", "saglikli"],
+    "season": "summer",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "gr_lunch_004",
+    "name_tr": "Pastitsio Pasta",
+    "name_en": "Pastitsio",
+    "description": "Baked pasta with meat sauce and béchamel topping.",
+    "nutrition": {
+      "calories": 500,
+      "protein": 30,
+      "carbs": 46,
+      "fat": 24
+    },
+    "prep_time_min": 75,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil sauce with cashew béchamel",
+    "sifat_appeal": ["sevgi_dolu", "geleneksel", "guclü"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_005",
+    "name_tr": "Gemista Sebze",
+    "name_en": "Stewed Vegetables",
+    "description": "Slow-cooked tomatoes, beans, and seasonal vegetables.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 40,
+      "fat": 8
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_006",
+    "name_tr": "Falafel Pita",
+    "name_en": "Falafel Wrap",
+    "description": "Fried chickpea fritters in pita with tzatziki sauce.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe with vegan tzatziki",
+    "sifat_appeal": ["macera_seven", "satisying", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_007",
+    "name_tr": "Dolma Yaprak",
+    "name_en": "Grape Leaves Dolma",
+    "description": "Grape leaves stuffed with rice, herbs, and spices.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["geleneksel", "zarif", "dogu"],
+    "season": "spring",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_008",
+    "name_tr": "Feta Salatası",
+    "name_en": "Warm Feta Salad",
+    "description": "Baked feta cheese with roasted vegetables and herbs.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 16,
+      "carbs": 24,
+      "fat": 26
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Baked tofu with roasted vegetables",
+    "sifat_appeal": ["zarif", "macera_seven", "saglikli"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_009",
+    "name_tr": "Octopus Grilled",
+    "name_en": "Grilled Octopus",
+    "description": "Tender grilled octopus with lemon and oregano.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 38,
+      "carbs": 8,
+      "fat": 16
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled mushrooms with same aromatics",
+    "sifat_appeal": ["sofistike", "macera_seven", "zarif"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_lunch_010",
+    "name_tr": "Sea Bass Fish",
+    "name_en": "Sea Bass with Herbs",
+    "description": "Whole sea bass grilled with fresh herbs and olive oil.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 42,
+      "carbs": 6,
+      "fat": 20
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu steaks with herbs",
+    "sifat_appeal": ["saglikli", "zarif", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_lunch_011",
+    "name_tr": "Shrimp Saganaki",
+    "name_en": "Shrimp Saganaki",
+    "description": "Sautéed shrimp with feta cheese and tomato sauce.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 36,
+      "carbs": 12,
+      "fat": 24
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu with plant-based cheese and tomato",
+    "sifat_appeal": ["macera_seven", "zarif", "guclü"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_012",
+    "name_tr": "Lamb Kleftiko",
+    "name_en": "Lamb Kleftiko",
+    "description": "Slow-roasted lamb wrapped in paper with vegetables.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 44,
+      "carbs": 14,
+      "fat": 32
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Slow-roasted mushroom steaks with vegetables",
+    "sifat_appeal": ["guclü", "sevgi_dolu", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_013",
+    "name_tr": "Bean Soup Fava",
+    "name_en": "Fava Bean Soup",
+    "description": "Creamy yellow pea soup with olive oil and lemon.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 40,
+      "fat": 6
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_014",
+    "name_tr": "Hilopites Pasta",
+    "name_en": "Handmade Noodles",
+    "description": "Handmade noodle pasta with meat sauce and feta.",
+    "nutrition": {
+      "calories": 460,
+      "protein": 24,
+      "carbs": 50,
+      "fat": 18
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Noodles with mushroom sauce and plant-based cheese",
+    "sifat_appeal": ["geleneksel", "sevgi_dolu", "guclü"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_015",
+    "name_tr": "Horta Boiled",
+    "name_en": "Boiled Greens",
+    "description": "Simple boiled greens with lemon and olive oil.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 8,
+      "carbs": 28,
+      "fat": 8
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "dogu"],
+    "season": "spring",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_016",
+    "name_tr": "Lamb Keftedes",
+    "name_en": "Lamb Meatballs",
+    "description": "Spiced lamb meatballs served with tzatziki sauce.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 20,
+      "fat": 24
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil meatballs with vegan tzatziki",
+    "sifat_appeal": ["macera_seven", "guclü", "sofistike"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_lunch_017",
+    "name_tr": "Tuna Salatası",
+    "name_en": "Tuna Salad",
+    "description": "Fresh tuna with seasonal vegetables and lemon dressing.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 36,
+      "carbs": 12,
+      "fat": 18
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Chickpea salad with same dressing",
+    "sifat_appeal": ["saglikli", "zarif", "basit"],
+    "season": "summer",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_lunch_018",
+    "name_tr": "Vine Leaf Salatası",
+    "name_en": "Vine Leaf Salad",
+    "description": "Young vine leaves salad with olive oil and lemon.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 20,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "zarif", "dogu"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_lunch_019",
+    "name_tr": "Feta Tomato Wrap",
+    "name_en": "Feta Tomato Wrap",
+    "description": "Whole wheat wrap with feta, tomato, cucumber, and herbs.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 14,
+      "carbs": 42,
+      "fat": 14
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Wrap with plant-based cheese",
+    "sifat_appeal": ["saglikli", "basit", "rahat"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_lunch_020",
+    "name_tr": "Kritiko Stew",
+    "name_en": "Cretan Lamb Stew",
+    "description": "Slow-cooked lamb with herbs, tomatoes, and wine.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 40,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil stew with same aromatics",
+    "sifat_appeal": ["sevgi_dolu", "guclü", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_001",
+    "name_tr": "Lentil Soup",
+    "name_en": "Lentil Soup",
+    "description": "Creamy lentil soup with vegetables and olive oil.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 14,
+      "carbs": 36,
+      "fat": 6
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "gr_dinner_002",
+    "name_tr": "Chickpea Salad",
+    "name_en": "Chickpea Salad",
+    "description": "Warm chickpea salad with herbs and lemon dressing.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 38,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_003",
+    "name_tr": "Grilled Zucchini",
+    "name_en": "Grilled Zucchini",
+    "description": "Sliced zucchini grilled with garlic and herbs.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 6,
+      "carbs": 24,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "hafif"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_dinner_004",
+    "name_tr": "Avgolemono Soup",
+    "name_en": "Lemon Chicken Soup",
+    "description": "Creamy soup with chicken, rice, and lemon juice.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 24,
+      "carbs": 28,
+      "fat": 12
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable avgolemono with tofu",
+    "sifat_appeal": ["saglikli", "tatli", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_005",
+    "name_tr": "Imam Baildi",
+    "name_en": "Stuffed Eggplant",
+    "description": "Eggplant stuffed with onions, tomatoes, and herbs.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 32,
+      "fat": 12
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["zarif", "saglikli", "dogu"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_dinner_006",
+    "name_tr": "Salatası Pita",
+    "name_en": "Salad Pita Wrap",
+    "description": "Whole wheat pita filled with fresh salad and tzatziki.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 40,
+      "fat": 10
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pita with vegan tzatziki",
+    "sifat_appeal": ["saglikli", "basit", "rahat"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_007",
+    "name_tr": "Roasted Chicken",
+    "name_en": "Roasted Chicken with Lemon",
+    "description": "Herb-roasted chicken with lemon and potatoes.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 40,
+      "carbs": 18,
+      "fat": 18
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Roasted tofu steaks with lemon potatoes",
+    "sifat_appeal": ["saglikli", "guclü", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_008",
+    "name_tr": "Beet Salata",
+    "name_en": "Beet Salad",
+    "description": "Roasted beets with feta and walnuts.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 10,
+      "carbs": 28,
+      "fat": 12
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Beet salad with plant-based cheese",
+    "sifat_appeal": ["saglikli", "zarif", "macera_seven"],
+    "season": "autumn",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_dinner_009",
+    "name_tr": "White Fish",
+    "name_en": "Baked White Fish",
+    "description": "Whole white fish baked with vegetables and herbs.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 38,
+      "carbs": 12,
+      "fat": 14
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Baked tofu with vegetables",
+    "sifat_appeal": ["saglikli", "zarif", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "gr_dinner_010",
+    "name_tr": "Mushroom Pie",
+    "name_en": "Mushroom Pie",
+    "description": "Mushroom filling in crispy phyllo pastry.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 36,
+      "fat": 14
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom pie with vegan butter",
+    "sifat_appeal": ["zarif", "saglikli", "santiye"],
+    "season": "autumn",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_dinner_011",
+    "name_tr": "Octopus Salad",
+    "name_en": "Octopus Salad",
+    "description": "Tender boiled octopus with olive oil and lemon.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 8,
+      "fat": 12
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom salad with same dressing",
+    "sifat_appeal": ["zarif", "sofistike", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "gr_dinner_012",
+    "name_tr": "Calamari Salatası",
+    "name_en": "Squid Salad",
+    "description": "Tender squid salad with lemon and herbs.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 34,
+      "carbs": 10,
+      "fat": 12
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu salad with same dressing",
+    "sifat_appeal": ["zarif", "macera_seven", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_dinner_013",
+    "name_tr": "Greek Yogurt Dip",
+    "name_en": "Tzatziki and Vegetables",
+    "description": "Creamy tzatziki dip with fresh vegetable sticks.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 14,
+      "carbs": 20,
+      "fat": 10
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Cashew tzatziki with vegetables",
+    "sifat_appeal": ["saglikli", "basit", "rahat"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "gr_dinner_014",
+    "name_tr": "Bean Fava",
+    "name_en": "Yellow Pea Dip",
+    "description": "Creamy yellow pea dip with olive oil and lemon.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "dogu", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "gr_dinner_015",
+    "name_tr": "Mezze Plate",
+    "name_en": "Mezze Platter",
+    "description": "Assorted Greek appetizers: olives, cheese, dips, and bread.",
+    "nutrition": {
+      "calories": 350,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 18
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mezze with plant-based cheese and dips",
+    "sifat_appeal": ["zarif", "sosyal", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  }
+]

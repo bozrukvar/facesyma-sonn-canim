@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "th_breakfast_001",
+    "name_tr": "Jok",
+    "name_en": "Rice Porridge",
+    "description": "Smooth rice porridge with ginger and aromatic spices, topped with pickled mustard greens and crispy shallots. A comforting Thai breakfast staple.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 8,
+      "carbs": 44,
+      "fat": 6
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "th_breakfast_002",
+    "name_tr": "Khao Tom",
+    "name_en": "Rice Soup",
+    "description": "Soft rice in light broth with ginger, fish, and side dishes. A gentle, easily digestible Thai breakfast.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 10,
+      "carbs": 40,
+      "fat": 5
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable rice soup with mushrooms",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_breakfast_003",
+    "name_tr": "Khao Kha Gai",
+    "name_en": "Chicken and Rice",
+    "description": "Poached chicken over rice with turmeric-tinged broth. A classic Thai breakfast bringing comfort and nutrition.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 18,
+      "carbs": 44,
+      "fat": 8
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom version with turmeric broth",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "th_breakfast_004",
+    "name_tr": "Sai Oua",
+    "name_en": "Northern Thai Sausage",
+    "description": "Flavorful northern Thai sausage with herbs and spices, grilled and served with sticky rice. A Northern Thai breakfast specialty.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 38,
+      "fat": 16
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Herbed tofu sausage with sticky rice",
+    "sifat_appeal": ["macera_seven", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_breakfast_005",
+    "name_tr": "Mango Sticky Rice",
+    "name_en": "Mango with Sticky Rice",
+    "description": "Sweet fresh mango with creamy coconut sticky rice. A luscious Thai breakfast dessert.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 4,
+      "carbs": 54,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mango sticky rice with coconut milk",
+    "sifat_appeal": ["tatli_dostum", "saglik_bilinc", "macera_seven"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_breakfast_006",
+    "name_tr": "Kaeng Jeud",
+    "name_en": "Mild Soup",
+    "description": "Mild, clear soup with vegetables and protein. A gentle, healthy Thai breakfast option.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 10,
+      "carbs": 24,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_breakfast_007",
+    "name_tr": "Roti with Condensed Milk",
+    "name_en": "Flatbread with Sweet Milk",
+    "description": "Crispy layered flatbread served with sweetened condensed milk. A beloved Thai street breakfast treat.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 6,
+      "carbs": 48,
+      "fat": 12
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Roti with plant-based condensed milk",
+    "sifat_appeal": ["tatli_dostum", "sosyal_kelebek", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_breakfast_008",
+    "name_tr": "Khao Rad Gra Tiem Moo",
+    "name_en": "Rice with Garlic and Pork",
+    "description": "Rice topped with crispy fried garlic and ground pork. A simple yet flavor-packed Thai breakfast.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Rice with crispy garlic and mushroom-based meat",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "th_breakfast_009",
+    "name_tr": "Khao Pad Morning",
+    "name_en": "Fried Rice Morning",
+    "description": "Fragrant fried rice with egg, garlic, and leftover proteins. A quick Thai breakfast.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 10,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Fried rice with tofu scramble",
+    "sifat_appeal": ["basit_sevici", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_breakfast_010",
+    "name_tr": "Pa Thong Go",
+    "name_en": "Fried Dough",
+    "description": "Crispy fried dough typically dipped in condensed milk or savory curry. A Thai breakfast indulgence.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 5,
+      "carbs": 44,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe with plant-based dipping sauce",
+    "sifat_appeal": ["tatli_dostum", "basit_sevici", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "th_breakfast_011",
+    "name_tr": "Som Tam Light",
+    "name_en": "Green Papaya Salad",
+    "description": "Shredded green papaya with lime juice and fish sauce. A refreshing Thai breakfast salad.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 6,
+      "carbs": 28,
+      "fat": 8
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Green papaya salad with soy sauce instead of fish sauce",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_breakfast_012",
+    "name_tr": "Luk Chin Pla",
+    "name_en": "Fish Balls",
+    "description": "Delicate fish balls in clear broth with soft noodles. A light Thai breakfast.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 14,
+      "carbs": 32,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable balls in clear broth",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_breakfast_013",
+    "name_tr": "Pad Thai Morning",
+    "name_en": "Stir-Fried Noodles",
+    "description": "Chewy rice noodles stir-fried with peanuts and lime. A classic Thai dish as breakfast.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 16
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pad Thai with tofu",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_breakfast_014",
+    "name_tr": "Sauteed Water Spinach",
+    "name_en": "Pad Kangkung",
+    "description": "Tender water spinach stir-fried with garlic and chili. A nutritious Thai breakfast vegetable.",
+    "nutrition": {
+      "calories": 180,
+      "protein": 6,
+      "carbs": 18,
+      "fat": 9
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_breakfast_015",
+    "name_tr": "Sticky Rice with Egg",
+    "name_en": "Khao Pulao Breakfast",
+    "description": "Fragrant sticky rice with egg and side dishes. A simple, filling Thai breakfast.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "carbs": 50,
+      "fat": 9
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Sticky rice with tofu scramble",
+    "sifat_appeal": ["basit_sevici", "sevgi_dolu", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_lunch_001",
+    "name_tr": "Panang Curry",
+    "name_en": "Creamy Curry",
+    "description": "Rich coconut curry with meat and vegetables. A beloved Thai lunch balancing heat and creaminess.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 20,
+      "carbs": 28,
+      "fat": 26
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Panang curry with tofu and mushroom",
+    "sifat_appeal": ["macera_seven", "centil_kibri", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "th_lunch_002",
+    "name_tr": "Tom Yum Goong",
+    "name_en": "Spicy Shrimp Soup",
+    "description": "Tangy, spicy broth with shrimp, lemongrass, and galangal. A legendary Thai lunch soup.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 18,
+      "carbs": 12,
+      "fat": 10
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tom Yum with tofu and mushroom",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.15
+  },
+  {
+    "id": "th_lunch_003",
+    "name_tr": "Green Curry",
+    "name_en": "Thai Green Curry",
+    "description": "Vibrant green coconut curry with Thai basil and chilies. A heat-packed Thai lunch favorite.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 22,
+      "carbs": 24,
+      "fat": 24
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Green curry with vegetables and tofu",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "th_lunch_004",
+    "name_tr": "Larb",
+    "name_en": "Spicy Meat Salad",
+    "description": "Ground meat with herbs, chilies, and lime juice. A Northeastern Thai lunch favorite bursting with bold flavors.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 24,
+      "carbs": 14,
+      "fat": 22
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Lentil larb with herbs and lime",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "th_lunch_005",
+    "name_tr": "Satay Chicken",
+    "name_en": "Grilled Meat Skewers",
+    "description": "Marinated grilled meat served with peanut sauce. A Thai lunch classic.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 18,
+      "fat": 24
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu satay with peanut sauce",
+    "sifat_appeal": ["macera_seven", "sosyal_kelebek", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "th_lunch_006",
+    "name_tr": "Red Curry",
+    "name_en": "Thai Red Curry",
+    "description": "Medium-spiced red coconut curry with bamboo shoots and basil. A balanced Thai lunch.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 20,
+      "carbs": 26,
+      "fat": 26
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Red curry with tofu and vegetables",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "th_lunch_007",
+    "name_tr": "Khao Soi",
+    "name_en": "Northern Thai Noodles",
+    "description": "Creamy curry noodle soup with crispy noodles on top. A Northern Thai lunch specialty.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 16,
+      "carbs": 52,
+      "fat": 16
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Khao soi with tofu and vegetable broth",
+    "sifat_appeal": ["sevgi_dolu", "macera_seven", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_lunch_008",
+    "name_tr": "Som Tam Lunch",
+    "name_en": "Green Papaya Salad",
+    "description": "Spicy and tangy green papaya salad. A refreshing, light Thai lunch.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 12
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Som tam with soy sauce instead of fish sauce",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_lunch_009",
+    "name_tr": "Gaeng Massaman",
+    "name_en": "Massaman Curry",
+    "description": "Rich, mild curry with peanuts and potatoes. A Muslim-influenced Thai lunch favorite.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 20,
+      "carbs": 36,
+      "fat": 24
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Massaman curry with mushroom and tofu",
+    "sifat_appeal": ["sevgi_dolu", "centil_kibri", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_lunch_010",
+    "name_tr": "Yum Nua",
+    "name_en": "Beef Salad",
+    "description": "Spicy beef salad with lime juice and fresh herbs. A bold, flavorful Thai lunch.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 20
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom salad with lime and herbs",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_lunch_011",
+    "name_tr": "Pad Krapao Moo",
+    "name_en": "Pork with Basil",
+    "description": "Ground pork stir-fried with holy basil and chilies. A fragrant Thai lunch street food favorite.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 22,
+      "carbs": 16,
+      "fat": 18
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu with holy basil and chilies",
+    "sifat_appeal": ["macera_seven", "basit_sevici", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "th_lunch_012",
+    "name_tr": "Tom Kha Gai",
+    "name_en": "Chicken Coconut Soup",
+    "description": "Creamy coconut soup with chicken, ginger, and galangal. A aromatic Thai lunch comfort.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 20,
+      "carbs": 22,
+      "fat": 20
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tom kha with mushroom and tofu",
+    "sifat_appeal": ["sevgi_dolu", "macera_seven", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "th_lunch_013",
+    "name_tr": "Pla Rod Kruang",
+    "name_en": "Crispy Fish",
+    "description": "Whole fish deep-fried until golden and crispy. A coastal Thai lunch favorite.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 22
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Fried tofu with same sauce",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_lunch_014",
+    "name_tr": "Pad Bai Mango",
+    "name_en": "Stir-Fried with Mango",
+    "description": "Meat stir-fried with fresh mango and herbs. A fruity, tropical Thai lunch.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 20,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mango stir-fried with mushroom and tofu",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "heyecan_arayan"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_lunch_015",
+    "name_tr": "Kaeng Liang",
+    "name_en": "Clear Curry",
+    "description": "Light, clear vegetable curry with delicate spicing. A subtle Thai lunch.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 12,
+      "carbs": 28,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_lunch_016",
+    "name_tr": "Pad Sataw",
+    "name_en": "Stir-Fried with Chives",
+    "description": "Meat stir-fried with chives and garlic. A simple, aromatic Thai lunch.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 22,
+      "carbs": 14,
+      "fat": 16
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu stir-fried with chives and garlic",
+    "sifat_appeal": ["macera_seven", "basit_sevici", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "th_lunch_017",
+    "name_tr": "Gai Tod",
+    "name_en": "Fried Chicken",
+    "description": "Marinated and deep-fried chicken until golden and crispy. A beloved Thai lunch.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 26
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Fried tofu with same seasoning",
+    "sifat_appeal": ["macera_seven", "basit_sevici", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_lunch_018",
+    "name_tr": "Pad Preaw Wan",
+    "name_en": "Sweet and Sour",
+    "description": "Meat stir-fried with pineapple and vegetables. A balanced Thai lunch.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Sweet and sour tofu and vegetables",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_lunch_019",
+    "name_tr": "Pla Muang",
+    "name_en": "Whole Grilled Fish",
+    "description": "Whole fish grilled with aromatic seasonings. A Thai coastal lunch favorite.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 32,
+      "carbs": 8,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu with same aromatics",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_lunch_020",
+    "name_tr": "Pad See Ew",
+    "name_en": "Soy Sauce Noodles",
+    "description": "Wide noodles stir-fried with soy sauce and meat. A savory Thai lunch favorite.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 16,
+      "carbs": 50,
+      "fat": 14
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Soy sauce noodles with tofu and vegetables",
+    "sifat_appeal": ["basit_sevici", "macera_seven", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_001",
+    "name_tr": "Gaeng Phed",
+    "name_en": "Hot Curry Dinner",
+    "description": "Spicy red curry for evening meal. A warming, heat-packed Thai dinner.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 20,
+      "carbs": 24,
+      "fat": 24
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Hot curry with tofu and mushroom",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_002",
+    "name_tr": "Light Pad Thai Evening",
+    "name_en": "Light Rice Noodles",
+    "description": "Lighter version of pad Thai for evening. Easy on the stomach.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Light pad Thai with tofu",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_003",
+    "name_tr": "Clear Soup Evening",
+    "name_en": "Mild Broth",
+    "description": "Gentle, clear soup for a light dinner. Soothing and digestive.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 10,
+      "carbs": 20,
+      "fat": 6
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_004",
+    "name_tr": "Stir-Fried Greens",
+    "name_en": "Pad Vegetables",
+    "description": "Quickly stir-fried greens with garlic. A light, nutritious Thai dinner.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 6,
+      "carbs": 16,
+      "fat": 8
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_005",
+    "name_tr": "Steamed Fish Evening",
+    "name_en": "Steamed Fish",
+    "description": "Gently steamed fish with ginger and aromatics. A healthy Thai dinner.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 30,
+      "carbs": 8,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Steamed tofu with ginger",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_006",
+    "name_tr": "Light Curry Evening",
+    "name_en": "Mild Curry",
+    "description": "A mild, creamy curry for easy evening digestion. Comforting yet light.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 26,
+      "fat": 18
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mild curry with vegetables and tofu",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_007",
+    "name_tr": "Rice with Light Curry",
+    "name_en": "Rice Bowl Dinner",
+    "description": "Simple rice with light curry sauce. A classic Thai evening meal.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 48,
+      "fat": 9
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Rice with vegan curry",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_008",
+    "name_tr": "Mild Tom Yum",
+    "name_en": "Gentle Soup",
+    "description": "A less spicy Tom Yum for evening. Aromatic without heat.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 14,
+      "carbs": 18,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mild Tom Yum with mushroom and tofu",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_009",
+    "name_tr": "Soft Noodles",
+    "name_en": "Gentle Noodle Soup",
+    "description": "Soft noodles in mild broth. An easy-to-digest Thai dinner.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 9,
+      "carbs": 44,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_010",
+    "name_tr": "Grilled Chicken Light",
+    "name_en": "Grilled Chicken",
+    "description": "Lightly seasoned grilled chicken. A healthy Thai dinner option.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 6,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu with same seasoning",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_011",
+    "name_tr": "Vegetable Medley",
+    "name_en": "Mixed Vegetables",
+    "description": "Lightly seasoned mixed vegetables. A light, nutritious dinner.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 7,
+      "carbs": 24,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_012",
+    "name_tr": "Soft Tofu Dish",
+    "name_en": "Silken Tofu",
+    "description": "Soft tofu in light sauce. An easily digestible Thai dinner.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 14,
+      "carbs": 12,
+      "fat": 12
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "th_dinner_013",
+    "name_tr": "Light Papaya Salad",
+    "name_en": "Mild Green Papaya",
+    "description": "A milder version of Som Tam for dinner. Refreshing yet gentle.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 26,
+      "fat": 10
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Green papaya salad with soy sauce",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_014",
+    "name_tr": "Boiled Rice Simple",
+    "name_en": "Plain Rice Dinner",
+    "description": "Simple steamed rice with light accompaniments. The most gentle Thai dinner.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 4,
+      "carbs": 52,
+      "fat": 2
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "th_dinner_015",
+    "name_tr": "Mild Curry Rice",
+    "name_en": "Gentle Curry with Rice",
+    "description": "Mild curry served over rice for evening comfort. Soothing and complete.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mild curry with vegan components over rice",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  }
+]

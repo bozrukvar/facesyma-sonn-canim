@@ -1,0 +1,428 @@
+{
+  "metadata": {
+    "description": "Celebrity and historical figure profiles for facial similarity comparison and personality analysis",
+    "version": "2.0",
+    "total_profiles": 30,
+    "categories": [
+      "celebrity",
+      "historical_figure"
+    ],
+    "generated_at": "2026-04-18",
+    "language": "en"
+  },
+  "profiles": [
+    {
+      "name": "Audrey Hepburn",
+      "category": "celebrity",
+      "era": "1950s-1960s",
+      "traits": [
+        "elegant",
+        "graceful",
+        "sophisticated",
+        "refined"
+      ],
+      "description": "Audrey Hepburn embodied elegance, grace, and sophistication. Known for her delicate facial features, expressive eyes, and iconic cheekbones, she represented timeless beauty and refined aesthetic. Her style transcended fashion into a philosophy of effortless sophistication.",
+      "descriptions": {
+        "en": "Audrey Hepburn embodied elegance, grace, and sophistication.",
+        "tr": "Audrey Hepburn zarafeti, inceliği ve sofistiked tarzı temsil etti.",
+        "de": "Audrey Hepburn verkörperte Eleganz, Anmut und Raffinesse.",
+        "fr": "Audrey Hepburn incarnait l'élégance, la grâce et la sophistication.",
+        "es": "Audrey Hepburn encarnó la elegancia, la gracia y la sofisticación.",
+        "ja": "オードリー・ヘップバーンは優雅さ、たおやかさ、洗練さを具現化していました。",
+        "zh": "奥黛丽·赫本体现了优雅、优美和精致。"
+      }
+    },
+    {
+      "name": "Marilyn Monroe",
+      "category": "celebrity",
+      "era": "1950s",
+      "traits": [
+        "sensual",
+        "magnetic",
+        "voluptuous",
+        "charismatic"
+      ],
+      "descriptions": {
+        "en": "Marilyn Monroe's allure came from her distinctive facial contours, full lips, and luminous presence. Her beauty was voluptuous yet delicate, combining sensuality with vulnerability. She possessed a magnetic charm that captivated audiences worldwide."
+      }
+    },
+    {
+      "name": "Cleopatra VII",
+      "category": "historical_figure",
+      "era": "69 BCE - 30 BCE",
+      "traits": [
+        "powerful",
+        "intelligent",
+        "authoritative",
+        "striking"
+      ],
+      "descriptions": {
+        "en": "Cleopatra VII was known for her magnetic presence and striking appearance. With sharp facial features, intense eyes, and an air of authority, she embodied power and intelligence. Her distinctive facial geometry conveyed both beauty and dominance."
+      }
+    },
+    {
+      "name": "Leonardo da Vinci",
+      "category": "historical_figure",
+      "era": "Renaissance",
+      "traits": [
+        "intellectual",
+        "curious",
+        "artistic",
+        "observant"
+      ],
+      "descriptions": {
+        "en": "Leonardo da Vinci was a Renaissance master with features reflecting intellectual brilliance. His face showed a balance of artistic sensitivity and scientific precision. His gaze was penetrating, revealing deep observation and curiosity about the world."
+      }
+    },
+    {
+      "name": "Queen Victoria",
+      "category": "historical_figure",
+      "era": "1837-1901",
+      "traits": [
+        "regal",
+        "dignified",
+        "authoritative",
+        "composed"
+      ],
+      "descriptions": {
+        "en": "Queen Victoria's appearance conveyed regal bearing and dignified authority. Her facial structure showed determination and reserve, with features that commanded respect. She possessed a composed expression reflecting her imperial status."
+      }
+    },
+    {
+      "name": "Grace Kelly",
+      "category": "celebrity",
+      "era": "1950s-1960s",
+      "traits": [
+        "elegant",
+        "poised",
+        "serene",
+        "aristocratic"
+      ],
+      "descriptions": {
+        "en": "Grace Kelly possessed an air of aristocratic elegance and serene composure. Her high cheekbones, clear complexion, and measured gaze created an image of timeless refinement. She epitomized understated luxury and dignified beauty."
+      }
+    },
+    {
+      "name": "Cleopatra Selene",
+      "category": "historical_figure",
+      "era": "40 BCE - 5 CE",
+      "traits": [
+        "beautiful",
+        "tragic",
+        "noble",
+        "resilient"
+      ],
+      "descriptions": {
+        "en": "Cleopatra Selene, daughter of Cleopatra VII, combined Mediterranean beauty with Greek heritage. Her coins reveal strong facial features and intelligent eyes. Despite personal tragedy, her face conveyed nobility and dignity."
+      }
+    },
+    {
+      "name": "Nefertiti",
+      "category": "historical_figure",
+      "era": "14th century BCE",
+      "traits": [
+        "radiant",
+        "exotic",
+        "regal",
+        "symmetrical"
+      ],
+      "descriptions": {
+        "en": "Nefertiti's famous bust reveals exceptional facial symmetry and exotic beauty. Her elongated neck, perfect bone structure, and serene expression made her an icon of ancient Egyptian aesthetics. Her proportions have been compared to modern golden ratio principles."
+      }
+    },
+    {
+      "name": "Joan of Arc",
+      "category": "historical_figure",
+      "era": "1412-1431",
+      "traits": [
+        "fierce",
+        "determined",
+        "visionary",
+        "strong-willed"
+      ],
+      "descriptions": {
+        "en": "Joan of Arc's determined facial structure reflected her unwavering conviction. Contemporary accounts describe strong, angular features and penetrating eyes. Her youthful face conveyed both innocence and unshakeable resolve."
+      }
+    },
+    {
+      "name": "Napoleon Bonaparte",
+      "category": "historical_figure",
+      "era": "1769-1821",
+      "traits": [
+        "ambitious",
+        "commanding",
+        "calculating",
+        "intense"
+      ],
+      "descriptions": {
+        "en": "Napoleon's face revealed sharp intelligence and ambitious determination. His penetrating gaze and commanding expression reflected his strategic mind. His features conveyed both charisma and ruthless calculation."
+      }
+    },
+    {
+      "name": "Elizabeth I",
+      "category": "historical_figure",
+      "era": "1533-1603",
+      "traits": [
+        "powerful",
+        "calculated",
+        "commanding",
+        "theatrical"
+      ],
+      "descriptions": {
+        "en": "Elizabeth I's formal portraits reveal a face designed to project power and sovereignty. Her high forehead, small mouth, and painted complexion created an image of mathematical perfection and authority. Her gaze commanded absolute respect."
+      }
+    },
+    {
+      "name": "Vivien Leigh",
+      "category": "celebrity",
+      "era": "1939-1960s",
+      "traits": [
+        "passionate",
+        "dramatic",
+        "vulnerable",
+        "exotic"
+      ],
+      "descriptions": {
+        "en": "Vivien Leigh's striking features combined delicate beauty with dramatic intensity. Her large, expressive eyes and defined cheekbones conveyed both vulnerability and passion. Her face was capable of expressing complex emotions with remarkable clarity."
+      }
+    },
+    {
+      "name": "Sophia Loren",
+      "category": "celebrity",
+      "era": "1950s-1960s",
+      "traits": [
+        "sensual",
+        "confident",
+        "magnetic",
+        "earthy"
+      ],
+      "descriptions": {
+        "en": "Sophia Loren epitomized Mediterranean beauty with her full lips, warm dark eyes, and generous proportions. Her confident expression and natural sensuality made her an icon of classic beauty. Her face conveyed both strength and allure."
+      }
+    },
+    {
+      "name": "James Dean",
+      "category": "celebrity",
+      "era": "1950s",
+      "traits": [
+        "brooding",
+        "sensitive",
+        "rebellious",
+        "angelic"
+      ],
+      "descriptions": {
+        "en": "James Dean possessed androgynous beauty with fine features and vulnerable eyes. His brooding expression and sensitive gaze conveyed inner depth and rebellion. His face was capable of shifting from boyish innocence to dangerous intensity."
+      }
+    },
+    {
+      "name": "Paul Newman",
+      "category": "celebrity",
+      "era": "1950s-1980s",
+      "traits": [
+        "striking",
+        "charismatic",
+        "handsome",
+        "intense"
+      ],
+      "descriptions": {
+        "en": "Paul Newman's piercing blue eyes and chiseled features made him an icon of masculine beauty. His confident expression and natural charisma were evident in his gaze. His face conveyed both approachability and magnetic intensity."
+      }
+    },
+    {
+      "name": "Ingrid Bergman",
+      "category": "celebrity",
+      "era": "1940s-1950s",
+      "traits": [
+        "intelligent",
+        "warm",
+        "noble",
+        "understated"
+      ],
+      "descriptions": {
+        "en": "Ingrid Bergman possessed Swedish classical beauty with strong bone structure and clear skin. Her intelligent eyes and warm expression conveyed both strength and accessibility. Her face reflected her reputation for depth and authenticity."
+      }
+    },
+    {
+      "name": "Rita Hayworth",
+      "category": "celebrity",
+      "era": "1940s",
+      "traits": [
+        "glamorous",
+        "alluring",
+        "dramatic",
+        "confident"
+      ],
+      "descriptions": {
+        "en": "Rita Hayworth's radiant beauty combined perfect proportions with dramatic flair. Her luxurious hair, defined cheekbones, and confident gaze created an image of timeless glamour. Her face exemplified 1940s Hollywood ideals of beauty."
+      }
+    },
+    {
+      "name": "Amelia Earhart",
+      "category": "historical_figure",
+      "era": "1897-1937",
+      "traits": [
+        "courageous",
+        "determined",
+        "visionary",
+        "bold"
+      ],
+      "descriptions": {
+        "en": "Amelia Earhart's determined features reflected her pioneering spirit. Her strong jaw, direct gaze, and confident expression conveyed fearlessness and vision. Her face embodied the spirit of exploration and breaking boundaries."
+      }
+    },
+    {
+      "name": "Marie Curie",
+      "category": "historical_figure",
+      "era": "1867-1934",
+      "traits": [
+        "intellectual",
+        "focused",
+        "determined",
+        "serious"
+      ],
+      "descriptions": {
+        "en": "Marie Curie's serious expression and focused gaze reflected her scientific brilliance. Her austere beauty conveyed dedication to her work and intellectual depth. Her face embodied the intensity of her scientific passion."
+      }
+    },
+    {
+      "name": "Cleopatra's Sister: Arsinoe IV",
+      "category": "historical_figure",
+      "era": "68 BCE - 41 BCE",
+      "traits": [
+        "noble",
+        "tragic",
+        "beautiful",
+        "unfortunate"
+      ],
+      "descriptions": {
+        "en": "Arsinoe IV shared her sister's exotic beauty with Greek and Egyptian features. Historical accounts and coins reveal fine bone structure and intelligent eyes. Her young face conveyed both privilege and vulnerability."
+      }
+    },
+    {
+      "name": "Catherine the Great",
+      "category": "historical_figure",
+      "era": "1729-1796",
+      "traits": [
+        "powerful",
+        "intelligent",
+        "authoritative",
+        "regal"
+      ],
+      "descriptions": {
+        "en": "Catherine the Great's formal portraits reveal a face of authority and intelligence. Her composed expression and direct gaze reflected her absolute power. Her features conveyed both femininity and commanding authority."
+      }
+    },
+    {
+      "name": "Greta Garbo",
+      "category": "celebrity",
+      "era": "1920s-1930s",
+      "traits": [
+        "mysterious",
+        "aloof",
+        "ethereal",
+        "haunting"
+      ],
+      "descriptions": {
+        "en": "Greta Garbo's striking Nordic beauty combined with mysterious allure made her iconic. Her high cheekbones, penetrating eyes, and enigmatic expression conveyed depth and isolation. Her face epitomized the mysterious beauty of silent cinema."
+      }
+    },
+    {
+      "name": "Marlene Dietrich",
+      "category": "celebrity",
+      "era": "1930s-1940s",
+      "traits": [
+        "sophisticated",
+        "androgynous",
+        "sensual",
+        "artistic"
+      ],
+      "descriptions": {
+        "en": "Marlene Dietrich possessed an androgynous, artistic beauty that transcended conventional definitions. Her angular features, smoky eyes, and sophisticated expression created an image of sexual confidence and artistic depth. Her face was a canvas for dramatic transformation."
+      }
+    },
+    {
+      "name": "Michelangelo",
+      "category": "historical_figure",
+      "era": "Renaissance",
+      "traits": [
+        "artistic",
+        "visionary",
+        "intense",
+        "passionate"
+      ],
+      "descriptions": {
+        "en": "Michelangelo's strong features and intense gaze reflected his artistic vision. His broken nose and weathered face conveyed years of passionate work. His expression embodied the intensity of creative genius."
+      }
+    },
+    {
+      "name": "Joan Crawford",
+      "category": "celebrity",
+      "era": "1920s-1940s",
+      "traits": [
+        "ambitious",
+        "strong",
+        "dramatic",
+        "distinctive"
+      ],
+      "descriptions": {
+        "en": "Joan Crawford's distinctive beauty featured strong cheekbones and a characteristic smile. Her determined expression and confident gaze conveyed ambition and strength. Her face reflected her reputation for powerful screen presence."
+      }
+    },
+    {
+      "name": "Eva Perón",
+      "category": "historical_figure",
+      "era": "1919-1952",
+      "traits": [
+        "glamorous",
+        "charismatic",
+        "tragic",
+        "iconic"
+      ],
+      "descriptions": {
+        "en": "Eva Perón combined Hollywood glamour with political passion. Her beautiful features, confident expression, and radiant smile conveyed both accessibility and ambition. Her face became an icon of Latin American femininity and power."
+      }
+    },
+    {
+      "name": "Orson Welles",
+      "category": "celebrity",
+      "era": "1930s-1940s",
+      "traits": [
+        "intelligent",
+        "commanding",
+        "theatrical",
+        "powerful"
+      ],
+      "descriptions": {
+        "en": "Orson Welles possessed a powerful presence with strong features and commanding gaze. His expressive face conveyed intelligence and dramatic intensity. His features reflected his reputation as a visionary filmmaker."
+      }
+    },
+    {
+      "name": "Gora Gai",
+      "category": "historical_figure",
+      "era": "Ancient India",
+      "traits": [
+        "radiant",
+        "spiritual",
+        "serene",
+        "divine"
+      ],
+      "descriptions": {
+        "en": "Ancient Indian texts describe divine beauty with serene composure and spiritual depth. Her proportions and features exemplified classical Indian aesthetic ideals. Her face conveyed both ethereal beauty and inner peace."
+      }
+    },
+    {
+      "name": "Tutankhamun",
+      "category": "historical_figure",
+      "era": "1341 BCE - 1323 BCE",
+      "traits": [
+        "youthful",
+        "noble",
+        "delicate",
+        "mysterious"
+      ],
+      "descriptions": {
+        "en": "Tutankhamun's golden mask reveals a youthful, feminine face of great beauty. His soft features and serene expression conveyed both youth and royal dignity. His face represents the epitome of pharaonic idealization of beauty."
+      }
+    }
+  ]
+}
