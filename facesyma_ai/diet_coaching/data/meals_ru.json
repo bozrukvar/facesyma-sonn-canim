@@ -1,0 +1,1062 @@
+{
+  "country_name": "Russia",
+  "language_code": "ru",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "ru_breakfast_001",
+        "name_tr": "Kaş Çay Beyaz",
+        "name_en": "Tea with Cottage Cheese",
+        "description": "Hot black tea with Russian cottage cheese (tvorog) and bread. Simple, traditional, warming.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 12,
+          "carbs": 28,
+          "fat": 10
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Silken tofu with tea",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "ru_breakfast_002",
+        "name_tr": "Sütlü Pirinç Porridge",
+        "name_en": "Rice Porridge with Milk",
+        "description": "Creamy rice porridge with milk and sugar. Warm, comforting, childhood classic.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 6,
+          "carbs": 38,
+          "fat": 6
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Rice porridge with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ru_breakfast_003",
+        "name_tr": "Yumurta Salatalı Sandviç",
+        "name_en": "Egg & Salad Sandwich",
+        "description": "Boiled egg with fresh vegetables on bread. Simple, fresh, quick Russian breakfast.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 24,
+          "fat": 14
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tofu egg with vegetables",
+        "sifat_appeal": ["praktikci_zaman", "doganın_cocugu", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_breakfast_004",
+        "name_tr": "Tatlı Pişi Kuru Meyve",
+        "name_en": "Sweet Baked Bun with Dried Fruit",
+        "description": "Soft bun with raisins and dried fruit. Sweet, satisfying, Russian bakery classic.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 6,
+          "carbs": 42,
+          "fat": 8
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan sweet bun with dried fruit",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_breakfast_005",
+        "name_tr": "Unlu Omlet Mantar",
+        "name_en": "Mushroom Omelet",
+        "description": "Fluffy omelet with sautéed mushrooms. Hearty, satisfying, Russian favorite.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 12,
+          "carbs": 6,
+          "fat": 24
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom-based omelet with turmeric",
+        "sifat_appeal": ["praktikci_zaman", "doganın_cocugu", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ru_breakfast_006",
+        "name_tr": "Kaş Tatlı Bal Peynir",
+        "name_en": "Cottage Cheese with Honey",
+        "description": "Russian cottage cheese served with honey and berries. Creamy, sweet, nutritious.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 14,
+          "carbs": 28,
+          "fat": 6
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based yogurt with honey",
+        "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ru_breakfast_007",
+        "name_tr": "Pastırma Ekmeği",
+        "name_en": "Sausage & Bread",
+        "description": "Sliced sausage with rye bread and butter. Quick, hearty, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 22,
+          "fat": 20
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based sausage with bread",
+        "sifat_appeal": ["praktikci_zaman", "enerjik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_breakfast_008",
+        "name_tr": "Sütlü Semolina Porridge",
+        "name_en": "Semolina Porridge",
+        "description": "Creamy semolina porridge with milk and sugar. Smooth, creamy, nostalgic.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 5,
+          "carbs": 36,
+          "fat": 5
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Semolina porridge with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_breakfast_009",
+        "name_tr": "Siyah Ekmek Tereyağ",
+        "name_en": "Black Bread with Butter",
+        "description": "Dense Russian black bread with butter. Hearty, nutritious, traditional.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 7,
+          "carbs": 32,
+          "fat": 10
+        },
+        "prep_time_min": 3,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Black bread with plant-based butter",
+        "sifat_appeal": ["gelenekci", "ekonomik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_breakfast_010",
+        "name_tr": "Kaş Peynir Yumurta",
+        "name_en": "Cheese & Egg",
+        "description": "Cottage cheese with boiled egg and bread. Protein-rich, traditional, satisfying.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 16,
+          "carbs": 20,
+          "fat": 14
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tofu with plant-based cheese",
+        "sifat_appeal": ["enerjik", "saglik_bilinc", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_breakfast_011",
+        "name_tr": "Soğuk Çorba Okroshka",
+        "name_en": "Cold Vegetable Soup (Okroshka)",
+        "description": "Cold summer soup with vegetables and kvass. Refreshing, traditional, summer specialty.",
+        "nutrition": {
+          "calories": 140,
+          "protein": 5,
+          "carbs": 18,
+          "fat": 4
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["doganın_cocugu", "makera_seven", "sevgi_dolu"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_breakfast_012",
+        "name_tr": "Kaş Krep Reçel",
+        "name_en": "Cottage Cheese Crepes",
+        "description": "Thin crepes filled with cottage cheese and jam. Sweet, filling, traditional.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 10,
+          "carbs": 40,
+          "fat": 10
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Crepes with plant-based filling",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_breakfast_013",
+        "name_tr": "Tatlı Buğday Ezmesi Tatlı",
+        "name_en": "Sweet Wheat Cereal",
+        "description": "Sweet wheat cereal with milk and sugar. Warm, traditional, filling.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 8,
+          "carbs": 42,
+          "fat": 5
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Wheat cereal with plant-based milk",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_breakfast_014",
+        "name_tr": "Tatlı Turta Elma",
+        "name_en": "Apple Pie (Breakfast Portion)",
+        "description": "Slice of sweet apple pie. Indulgent, traditional, special occasion breakfast.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 4,
+          "carbs": 44,
+          "fat": 14
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan apple pie slice",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_breakfast_015",
+        "name_tr": "Kahve Bisküvi",
+        "name_en": "Coffee & Biscuit",
+        "description": "Strong black coffee with Russian biscuits. Simple, quick, traditional.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 26,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based milk coffee with vegan biscuits",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ],
+    "lunch": [
+      {
+        "id": "ru_lunch_001",
+        "name_tr": "Borscht Sour Cream",
+        "name_en": "Borscht with Sour Cream",
+        "description": "Classic beet soup with sour cream. Iconic Russian, earthy, warming.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Borscht with plant-based cream",
+        "sifat_appeal": ["gelenekci", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "ru_lunch_002",
+        "name_tr": "Şchi Lahana Çorbası",
+        "name_en": "Cabbage Soup (Shchi)",
+        "description": "Traditional Russian cabbage soup. Simple, filling, peasant classic.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 8,
+          "carbs": 26,
+          "fat": 8
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["gelenekci", "ekonomik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ru_lunch_003",
+        "name_tr": "Stroganoff Sığır Etli",
+        "name_en": "Beef Stroganoff",
+        "description": "Beef in sour cream sauce with mushrooms. Rich, luxurious, Russian classic.",
+        "nutrition": {
+          "calories": 440,
+          "protein": 28,
+          "carbs": 20,
+          "fat": 30
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom stroganoff with cashew cream",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ru_lunch_004",
+        "name_tr": "Pelmeni Kuyruklu",
+        "name_en": "Pelmeni (Dumplings)",
+        "description": "Meat-filled dumplings in broth. Iconic Russian, comforting, social meal.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 16,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable pelmeni",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sosyal_comertkane"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "ru_lunch_005",
+        "name_tr": "Tavuk Cutlet Sour Cream",
+        "name_en": "Chicken Cutlet with Sour Cream",
+        "description": "Breaded chicken cutlet with sour cream sauce. Quick, tasty, everyday Russian.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 24,
+          "carbs": 18,
+          "fat": 24
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom cutlet with plant-based cream",
+        "sifat_appeal": ["pratikci_zaman", "sevgi_dolu", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_lunch_006",
+        "name_tr": "Kulebyaka Balık Pie",
+        "name_en": "Kulebyaka (Layered Pie)",
+        "description": "Layered pastry pie with fish and vegetables. Elegant, traditional, festive.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 20,
+          "carbs": 48,
+          "fat": 22
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable and mushroom kulebyaka",
+        "sifat_appeal": ["gelenekci", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_007",
+        "name_tr": "Balık Cotlet Patates",
+        "name_en": "Fish Cutlet with Potatoes",
+        "description": "Fish cutlet served with boiled potatoes. Light, healthy, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 26,
+          "carbs": 30,
+          "fat": 14
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom cutlet with potatoes",
+        "sifat_appeal": ["saglik_bilinc", "praktikci_zaman", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_008",
+        "name_tr": "Olivie Salatası",
+        "name_en": "Olivier Salad",
+        "description": "Russian salad with potatoes, peas, and mayo. Festive, rich, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 8,
+          "carbs": 28,
+          "fat": 20
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Olivier with plant-based mayo",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "sosyal_comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_lunch_009",
+        "name_tr": "Pilaff Sığır Etli",
+        "name_en": "Pilaf",
+        "description": "Rice cooked with meat and spices. Central Asian influence, aromatic, hearty.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 18,
+          "carbs": 48,
+          "fat": 18
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Pilaf with mushrooms and lentils",
+        "sifat_appeal": ["macera_seven", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_lunch_010",
+        "name_tr": "Pelmeni Yoğurt Sos",
+        "name_en": "Pelmeni with Yogurt Sauce",
+        "description": "Dumplings with yogurt sauce variation. Lighter, tangy, refreshing.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 40,
+          "fat": 14
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable pelmeni with yogurt sauce",
+        "sifat_appeal": ["doganın_cocugu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_011",
+        "name_tr": "Tavuk Patates Güveç",
+        "name_en": "Chicken & Potato Casserole",
+        "description": "Baked chicken with potatoes and sour cream. Comforting, family meal.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 22,
+          "carbs": 32,
+          "fat": 22
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable casserole with plant-based cream",
+        "sifat_appeal": ["aile_odakli", "sevgi_dolu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_012",
+        "name_tr": "Kaynana Dili Rulo",
+        "name_en": "Stuffed Cabbage Rolls",
+        "description": "Cabbage leaves stuffed with meat and rice. Traditional, filling, comforting.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 32,
+          "fat": 18
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cabbage rolls with lentil filling",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_lunch_013",
+        "name_tr": "Kropotkini Çorbası",
+        "name_en": "Solyanka (Mixed Soup)",
+        "description": "Complex soup with meat, vegetables, and olives. Rich, tangy, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 28,
+          "fat": 16
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable solyanka",
+        "sifat_appeal": ["gelenekci", "macera_seven", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_014",
+        "name_tr": "Tavuk Kiyma Patates",
+        "name_en": "Minced Chicken with Mashed Potatoes",
+        "description": "Ground chicken served with creamy mashed potatoes. Soft, comforting, healthy.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 22,
+          "carbs": 36,
+          "fat": 12
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Lentil mince with mashed potatoes",
+        "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_015",
+        "name_tr": "Ekmek Yufka Patates",
+        "name_en": "Potato Pancakes",
+        "description": "Fried potato pancakes with sour cream. Crispy, indulgent, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 8,
+          "carbs": 40,
+          "fat": 20
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Potato pancakes with plant-based cream",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_016",
+        "name_tr": "Tavuk Kotlet",
+        "name_en": "Breaded Chicken Cutlet",
+        "description": "Classic breaded and fried chicken cutlet. Crispy, quick, everyday favorite.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 24,
+          "carbs": 16,
+          "fat": 22
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom cutlet breaded",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ru_lunch_017",
+        "name_tr": "Balık Buğulu Dill",
+        "name_en": "Steamed Fish with Dill",
+        "description": "Gently steamed fish with aromatic dill. Light, healthy, Russian flavor.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 12
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Steamed tofu with dill",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_018",
+        "name_tr": "Lahana Salata Turşu",
+        "name_en": "Sauerkraut Salad",
+        "description": "Fermented cabbage salad. Tangy, healthy, traditional Russian.",
+        "nutrition": {
+          "calories": 120,
+          "protein": 3,
+          "carbs": 14,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_019",
+        "name_tr": "Lahana Dolması",
+        "name_en": "Cabbage Rolls (Meat Version)",
+        "description": "Cabbage rolls with meat and rice variation. Hearty, satisfying, comforting.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 34,
+          "fat": 20
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable cabbage rolls",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_lunch_020",
+        "name_tr": "Sığır Etli Pelmeni",
+        "name_en": "Beef Pelmeni",
+        "description": "Meat dumplings in savory broth. Classic preparation, hearty main course.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 18,
+          "carbs": 44,
+          "fat": 18
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable pelmeni",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sosyal_comertkane"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      }
+    ],
+    "dinner": [
+      {
+        "id": "ru_dinner_001",
+        "name_tr": "Tavuk İçli Patates",
+        "name_en": "Chicken-Stuffed Potato",
+        "description": "Baked potato filled with chicken. Hearty, warm, comforting.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 42,
+          "fat": 12
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom-stuffed potato",
+        "sifat_appeal": ["sevgi_dolu", "praktikci_zaman", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_002",
+        "name_tr": "Tavuk Şnitzel",
+        "name_en": "Chicken Schnitzel",
+        "description": "Breaded and fried thin chicken breast. Quick, crispy, satisfying.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 26,
+          "carbs": 14,
+          "fat": 20
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom schnitzel",
+        "sifat_appeal": ["pratikci_zaman", "enerjik", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_003",
+        "name_tr": "Sebze Haşlanmış",
+        "name_en": "Boiled Vegetables",
+        "description": "Simple boiled vegetables with butter. Light, healthy, vegetarian.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 6,
+          "carbs": 22,
+          "fat": 8
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_004",
+        "name_tr": "Balık Fırında Mantar",
+        "name_en": "Baked Fish with Mushrooms",
+        "description": "Fish baked with mushrooms and cream. Elegant, light, restaurant-quality.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 16
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom bake with plant-based cream",
+        "sifat_appeal": ["centil_kibri", "yaratici_sanat", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_dinner_005",
+        "name_tr": "Pilaff Tavuk",
+        "name_en": "Chicken Pilaf",
+        "description": "Rice pilaf with chicken. Aromatic, hearty, traditional.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 20,
+          "carbs": 46,
+          "fat": 16
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Pilaf with mushrooms and lentils",
+        "sifat_appeal": ["gelenekci", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_006",
+        "name_tr": "Sığır Stifado",
+        "name_en": "Beef Stifado",
+        "description": "Braised beef with pearl onions. Rich, tender, traditional.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 28,
+          "carbs": 18,
+          "fat": 28
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom and onion stew",
+        "sifat_appeal": ["luks_seven", "gelenekci", "sevgi_dolu"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_dinner_007",
+        "name_tr": "Peynir Kuyruklu",
+        "name_en": "Cheese Pie",
+        "description": "Baked pastry with cheese filling. Savory, comforting, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 12,
+          "carbs": 40,
+          "fat": 18
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pie with plant-based cheese",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_dinner_008",
+        "name_tr": "Mantar Krem Salsa",
+        "name_en": "Mushroom Stroganoff",
+        "description": "Mushroom version of stroganoff. Vegetarian, creamy, satisfying.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 10,
+          "carbs": 24,
+          "fat": 20
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Stroganoff with plant-based cream",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_009",
+        "name_tr": "Kırmızı Fasülye Sos",
+        "name_en": "Kidney Bean Stew",
+        "description": "Slow-cooked beans in tomato sauce. Hearty, vegetarian, healthy.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 12,
+          "carbs": 36,
+          "fat": 6
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_dinner_010",
+        "name_tr": "Sebze Güveç",
+        "name_en": "Vegetable Casserole",
+        "description": "Baked mixed vegetables. Light, healthy, vegetarian main.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 7,
+          "carbs": 28,
+          "fat": 9
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_011",
+        "name_tr": "Pilaff Sebze",
+        "name_en": "Vegetable Pilaf",
+        "description": "Rice pilaf with vegetables. Vegetarian, aromatic, satisfying.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 8,
+          "carbs": 48,
+          "fat": 12
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_012",
+        "name_tr": "Tavuk Terbiyeli",
+        "name_en": "Chicken with Egg Sauce",
+        "description": "Chicken with creamy egg and lemon sauce. Elegant, light, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 30,
+          "carbs": 10,
+          "fat": 20
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with cashew cream sauce",
+        "sifat_appeal": ["centil_kibri", "yaratici_sanat", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ru_dinner_013",
+        "name_tr": "Sığır Kızartma",
+        "name_en": "Roasted Beef",
+        "description": "Slow-roasted beef with vegetables. Tender, rich, special occasion.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 16,
+          "fat": 28
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom roast",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "ru_dinner_014",
+        "name_tr": "Balık Şnitzel",
+        "name_en": "Fish Schnitzel",
+        "description": "Breaded and fried fish cutlet. Quick, crispy, light.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 28,
+          "carbs": 14,
+          "fat": 16
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom schnitzel",
+        "sifat_appeal": ["praktikci_zaman", "saglik_bilinc", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ru_dinner_015",
+        "name_tr": "Lahana Ketçup Sos",
+        "name_en": "Cabbage in Tomato Sauce",
+        "description": "Braised cabbage in tomato sauce. Simple, vegetarian, comforting.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 5,
+          "carbs": 26,
+          "fat": 6
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["ekonomik", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      }
+    ]
+  }
+}

@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "zh_breakfast_001",
+    "name_tr": "Congee",
+    "name_en": "Rice Porridge",
+    "description": "Smooth rice porridge with century egg and pork. A classic Chinese breakfast bringing comfort and warmth.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 44,
+      "fat": 8
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable congee with mushroom",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "zh_breakfast_002",
+    "name_tr": "Youtiao",
+    "name_en": "Fried Dough Stick",
+    "description": "Crispy fried dough stick typically dipped in soy milk. A beloved Chinese breakfast staple.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 6,
+      "carbs": 38,
+      "fat": 14
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Youtiao with plant-based soy milk",
+    "sifat_appeal": ["basit_sevici", "sosyal_kelebek", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_breakfast_003",
+    "name_tr": "Dim Sum",
+    "name_en": "Small Bite Delicacies",
+    "description": "Assorted small dishes with shrimp dumplings, pork buns, and vegetable spring rolls. A social Chinese breakfast tradition.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetarian dim sum with mushroom and vegetable dumplings",
+    "sifat_appeal": ["sosyal_kelebek", "centil_kibri", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_breakfast_004",
+    "name_tr": "Soy Milk and Youtiao",
+    "name_en": "Soy Milk with Fried Dough",
+    "description": "Warm soy milk served with crispy fried dough and century egg. A nutritious Chinese breakfast combination.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 11
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan with soy milk",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_breakfast_005",
+    "name_tr": "Baozi",
+    "name_en": "Steamed Pork Bun",
+    "description": "Fluffy steamed bun filled with pork and vegetables. A comfort breakfast reflecting Chinese steam-cooking mastery.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 8,
+      "carbs": 48,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Steamed bun with mushroom and vegetable filling",
+    "sifat_appeal": ["sevgi_dolu", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_breakfast_006",
+    "name_tr": "Jianbing",
+    "name_en": "Chinese Crepe",
+    "description": "Savory crepe filled with egg, crispy wonton, and scallions. Street food breakfast celebrated across China.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 14
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crepe with tofu scramble and vegetables",
+    "sifat_appeal": ["basit_sevici", "heyecan_arayan", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_breakfast_007",
+    "name_tr": "Century Egg Congee",
+    "name_en": "Century Egg Porridge",
+    "description": "Silky rice porridge topped with sliced century egg and ginger. A refined Chinese breakfast.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 8,
+      "carbs": 40,
+      "fat": 7
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Congee with marinated mushroom",
+    "sifat_appeal": ["saglik_bilinc", "centil_kibri", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "zh_breakfast_008",
+    "name_tr": "Egg Fried Rice",
+    "name_en": "Egg Rice",
+    "description": "Fragrant fried rice with scrambled egg and vegetables. A quick Chinese breakfast favorite.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "carbs": 46,
+      "fat": 11
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Fried rice with tofu scramble",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_breakfast_009",
+    "name_tr": "Xiao Long Bao",
+    "name_en": "Soup Dumpling",
+    "description": "Delicate dumpling filled with pork and soup. A Shanghai specialty breakfast celebrating precision.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 38,
+      "fat": 10
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Soup dumpling with mushroom and vegetable filling",
+    "sifat_appeal": ["centil_kibri", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_breakfast_010",
+    "name_tr": "Turnip Cake",
+    "name_en": "Radish Cake",
+    "description": "Steamed savory cake with turnip and sausage. A Cantonese breakfast specialty.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 32,
+      "fat": 10
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Turnip cake with mushroom instead of sausage",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "zh_breakfast_011",
+    "name_tr": "Steamed Bao with Char Siu",
+    "name_en": "Barbecue Pork Bun",
+    "description": "Fluffy bun filled with sweet barbecued pork. A beloved Chinese breakfast comfort.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 48,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Steamed bun with marinated mushroom",
+    "sifat_appeal": ["tatli_dostum", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_breakfast_012",
+    "name_tr": "Pork Porridge",
+    "name_en": "Pork Rice Soup",
+    "description": "Creamy rice porridge with ground pork and vegetables. A hearty Chinese breakfast.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 40,
+      "fat": 10
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable porridge with mushroom",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_breakfast_013",
+    "name_tr": "Shaomai",
+    "name_en": "Pork Dumpling",
+    "description": "Open-topped dumpling filled with pork and shrimp. A dim sum breakfast favorite.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Shaomai with mushroom and vegetable filling",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "zh_breakfast_014",
+    "name_tr": "Scallion Pancake",
+    "name_en": "Cong You Bing",
+    "description": "Crispy layered flatbread with scallions. A simple Chinese breakfast staple.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 6,
+      "carbs": 36,
+      "fat": 12
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Scallion pancake with plant-based oil",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_breakfast_015",
+    "name_tr": "Rice Noodle Roll",
+    "name_en": "Cheong Fun",
+    "description": "Soft rice noodle sheet rolled with shrimp and pork. A Cantonese breakfast delicacy.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "carbs": 34,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Rice noodle roll with mushroom and vegetable",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_lunch_001",
+    "name_tr": "Kung Pao Chicken",
+    "name_en": "Spicy Cashew Chicken",
+    "description": "Diced chicken stir-fried with peanuts and chilies. A legendary Sichuan lunch bursting with flavor.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 24,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Kung Pao tofu with peanuts and chilies",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.15
+  },
+  {
+    "id": "zh_lunch_002",
+    "name_tr": "Mapo Tofu",
+    "name_en": "Spicy Tofu",
+    "description": "Silken tofu in numbing and spicy Sichuan sauce. A landmark vegetarian lunch.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 16,
+      "carbs": 14,
+      "fat": 20
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "zh_lunch_003",
+    "name_tr": "Mongolian Beef",
+    "name_en": "Tender Beef Strips",
+    "description": "Thinly sliced beef stir-fried with scallions and chilies. A Sichuan favorite bursting with umami.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 16,
+      "fat": 24
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom strips with same Sichuan flavoring",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_lunch_004",
+    "name_tr": "Orange Chicken",
+    "name_en": "Citrus Chicken",
+    "description": "Crispy chicken in glossy orange sauce. A modern Chinese-American lunch favorite.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 22,
+      "carbs": 32,
+      "fat": 24
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crispy tofu with orange sauce",
+    "sifat_appeal": ["macera_seven", "tatli_dostum", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_005",
+    "name_tr": "General Tso's Chicken",
+    "name_en": "Spicy Sweet Chicken",
+    "description": "Crispy chicken in sweet and spicy sauce. A popular Hunanese-inspired lunch.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 20,
+      "carbs": 36,
+      "fat": 20
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crispy tofu with General Tso's sauce",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "tatli_dostum"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_006",
+    "name_tr": "Chow Mein",
+    "name_en": "Stir-Fried Noodles",
+    "description": "Crispy noodles stir-fried with vegetables and protein. A classic Chinese lunch.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 14,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable chow mein with tofu",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_007",
+    "name_tr": "Sweet and Sour Pork",
+    "name_en": "Tangy Pork",
+    "description": "Pork in sweet and sour sauce with pineapple. A balanced, flavorful lunch.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 20,
+      "carbs": 40,
+      "fat": 18
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Sweet and sour tofu with pineapple",
+    "sifat_appeal": ["macera_seven", "tatli_dostum", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_008",
+    "name_tr": "Chow Fun",
+    "name_en": "Wide Rice Noodles",
+    "description": "Wide silky rice noodles stir-fried with vegetables and meat. A Cantonese classic.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 12
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable chow fun with tofu",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_009",
+    "name_tr": "Chicken with Black Bean Sauce",
+    "name_en": "Fermented Bean Chicken",
+    "description": "Tender chicken in pungent black bean sauce. A flavor-packed Cantonese lunch.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 26,
+      "carbs": 18,
+      "fat": 18
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu with black bean sauce",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_lunch_010",
+    "name_tr": "Hot Pot",
+    "name_en": "Simmering Broth",
+    "description": "Thinly sliced ingredients cooked at table in spicy broth. A social, interactive Chinese lunch.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 22,
+      "carbs": 24,
+      "fat": 22
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable hot pot with tofu and mushroom",
+    "sifat_appeal": ["sosyal_kelebek", "macera_seven", "heyecan_arayan"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_011",
+    "name_tr": "Lo Mein",
+    "name_en": "Soft Fried Noodles",
+    "description": "Soft noodles stir-fried with vegetables and protein. A comforting Chinese lunch.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 12
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable lo mein with tofu",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_012",
+    "name_tr": "Peking Duck",
+    "name_en": "Roasted Duck",
+    "description": "Crispy roasted duck wrapped in thin pancakes with plum sauce. A Beijing luxury lunch.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 28,
+      "fat": 24
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crispy tofu wraps with plum sauce",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "zh_lunch_013",
+    "name_tr": "Fried Rice",
+    "name_en": "Combination Fried Rice",
+    "description": "Fragrant fried rice with assorted vegetables, egg, and meat. A complete Chinese lunch in a bowl.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable fried rice with tofu",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_lunch_014",
+    "name_tr": "Lemon Chicken",
+    "name_en": "Citrus Sauce Chicken",
+    "description": "Crispy chicken in tangy lemon sauce. A refreshing, balanced lunch.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 22,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Crispy tofu with lemon sauce",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_lunch_015",
+    "name_tr": "Shrimp with Lobster Sauce",
+    "name_en": "Seafood in Rich Sauce",
+    "description": "Shrimp in fermented black bean and lobster roe sauce. A luxurious Cantonese lunch.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 24,
+      "carbs": 16,
+      "fat": 18
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom with fermented black bean sauce",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "zh_lunch_016",
+    "name_tr": "Twice-Cooked Pork",
+    "name_en": "Braised then Stir-Fried Pork",
+    "description": "Pork braised then stir-fried with fermented beans and chilies. A Sichuan classic.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 26,
+      "carbs": 12,
+      "fat": 28
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Twice-cooked tofu with fermented beans",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_lunch_017",
+    "name_tr": "Black Pepper Beef",
+    "name_en": "Peppery Beef",
+    "description": "Beef stir-fried with black pepper and onions. A simple yet flavor-packed lunch.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 16,
+      "fat": 20
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Black pepper tofu and mushroom",
+    "sifat_appeal": ["macera_seven", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "zh_lunch_018",
+    "name_tr": "Fish with Ginger and Scallion",
+    "name_en": "Steamed Fish",
+    "description": "Whole fish steamed with ginger and scallion. A simple, elegant Chinese lunch.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 32,
+      "carbs": 8,
+      "fat": 14
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Steamed tofu with ginger and scallion",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_lunch_019",
+    "name_tr": "Cashew Chicken",
+    "name_en": "Nut-Studded Chicken",
+    "description": "Chicken with roasted cashew nuts. A balanced, nutritious lunch.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 24,
+      "carbs": 20,
+      "fat": 26
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Cashew tofu with vegetables",
+    "sifat_appeal": ["saglik_bilinc", "centil_kibri", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_lunch_020",
+    "name_tr": "Mixed Vegetable Stir-Fry",
+    "name_en": "Buddha's Delight",
+    "description": "Mixed vegetables with tofu, mushrooms, and nuts. A vegetarian Chinese lunch classic.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 16
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_dinner_001",
+    "name_tr": "Light Congee Evening",
+    "name_en": "Gentle Rice Porridge",
+    "description": "Simple rice porridge with light vegetable toppings. A restful Chinese dinner.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 6,
+      "carbs": 40,
+      "fat": 4
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "zh_dinner_002",
+    "name_tr": "Steamed Chicken Dinner",
+    "name_en": "Tender Steamed Chicken",
+    "description": "Gently steamed chicken with light sauce. A healthy, protein-rich dinner.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 8,
+      "fat": 12
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Steamed tofu with light sauce",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_003",
+    "name_tr": "Vegetable Stir-Fry Evening",
+    "name_en": "Mixed Vegetables",
+    "description": "Quick stir-fried vegetables with minimal oil. A light dinner option.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 7,
+      "carbs": 22,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_004",
+    "name_tr": "Clear Soup with Noodle",
+    "name_en": "Light Noodle Soup",
+    "description": "Soft noodles in clear broth with vegetables. A gentle, digestible dinner.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 8,
+      "carbs": 42,
+      "fat": 6
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_005",
+    "name_tr": "Fish Soup Evening",
+    "name_en": "Light Fish Broth",
+    "description": "Tender fish in clear broth with vegetables. A nutritious, light dinner.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 26,
+      "carbs": 10,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu broth",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_006",
+    "name_tr": "Simple Fried Rice Evening",
+    "name_en": "Plain Fried Rice",
+    "description": "Light fried rice with egg and simple vegetables. An easy dinner.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 8,
+      "carbs": 44,
+      "fat": 10
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Fried rice with tofu scramble",
+    "sifat_appeal": ["basit_sevici", "ev_hanımı", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_007",
+    "name_tr": "Tofu with Greens",
+    "name_en": "Soft Tofu Dinner",
+    "description": "Silken tofu with sauteed greens. A simple vegetarian dinner.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 16,
+      "carbs": 12,
+      "fat": 12
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_008",
+    "name_tr": "Rice with Side Dishes",
+    "name_en": "Plain Rice Bowl",
+    "description": "Steamed rice with light side dishes. A gentle, traditional Chinese dinner.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 4,
+      "carbs": 52,
+      "fat": 2
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_009",
+    "name_tr": "Egg Noodle Soup",
+    "name_en": "Soft Noodle Broth",
+    "description": "Tender egg noodles in light broth. A comforting dinner option.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 40,
+      "fat": 8
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegetable noodle soup with tofu",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "zh_dinner_010",
+    "name_tr": "Spinach with Garlic",
+    "name_en": "Quick Greens",
+    "description": "Fresh spinach stir-fried with garlic. A quick, nutritious dinner.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 5,
+      "carbs": 14,
+      "fat": 8
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_011",
+    "name_tr": "Mushroom Soup",
+    "name_en": "Earthy Mushroom Broth",
+    "description": "Delicate mushroom soup with vegetables. A light, nutritious dinner.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 7,
+      "carbs": 22,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_012",
+    "name_tr": "Braised Vegetable",
+    "name_en": "Slow-Cooked Greens",
+    "description": "Vegetables braised in light sauce. A gentle, warming dinner.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 6,
+      "carbs": 20,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_013",
+    "name_tr": "Chicken with Vegetables",
+    "name_en": "Simple Chicken Dish",
+    "description": "Tender chicken with mixed vegetables. A balanced dinner option.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom with vegetables",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_014",
+    "name_tr": "Light Bean Sprout",
+    "name_en": "Sprout Stir-Fry",
+    "description": "Fresh bean sprouts quickly stir-fried. A light, crisp dinner.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 6,
+      "carbs": 14,
+      "fat": 8
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "zh_dinner_015",
+    "name_tr": "Light Fish Steak",
+    "name_en": "Pan-Seared Fish",
+    "description": "Fish seared gently with light herbs. A healthy dinner option.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 6,
+      "fat": 14
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Pan-seared tofu with herbs",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  }
+]

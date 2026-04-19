@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "ur_breakfast_001",
+    "name_tr": "Halwa Puri",
+    "name_en": "Sweet Wheat with Fried Bread",
+    "description": "Warm semolina halwa served with golden fried puri bread. A traditional Pakistani breakfast bringing festive morning celebration to tables nationwide.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 8,
+      "carbs": 48,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Halwa with flax milk instead of ghee, vegan puri",
+    "sifat_appeal": ["tatli_dostum", "gelenekci", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_breakfast_002",
+    "name_tr": "Aloo Prantha",
+    "name_en": "Potato Stuffed Flatbread",
+    "description": "Crispy flatbread stuffed with spiced potato mixture, served with yogurt and pickle. A filling morning preparation loved across Pakistani households.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "carbs": 44,
+      "fat": 13
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Parantha with vegan butter and potato stuffing",
+    "sifat_appeal": ["basit_sevici", "ev_hanımı", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_breakfast_003",
+    "name_tr": "Paratha Egg",
+    "name_en": "Layered Flatbread with Egg",
+    "description": "Flaky layered flatbread served with scrambled or fried egg, onions, and tomatoes. A quick yet satisfying Pakistani breakfast staple.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 13
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Paratha with tofu scramble and vegetables",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "ur_breakfast_004",
+    "name_tr": "Khichdi",
+    "name_en": "Rice and Lentil Porridge",
+    "description": "Soft rice and lentil mixture seasoned with ghee and spices. A comforting, easily digestible breakfast reflecting traditional Pakistani home cooking.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 8
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Khichdi made with coconut oil instead of ghee",
+    "sifat_appeal": ["sevgi_dolu", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_breakfast_005",
+    "name_tr": "Chai aur Biscuit",
+    "name_en": "Tea with Biscuits",
+    "description": "Strong spiced tea served with traditional Pakistani biscuits. A beloved light breakfast reflecting the tea culture of South Asia.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 4,
+      "carbs": 38,
+      "fat": 8
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tea with plant-based milk and vegan biscuits",
+    "sifat_appeal": ["basit_sevici", "gelenekci", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ur_breakfast_006",
+    "name_tr": "Dahi Aaloo",
+    "name_en": "Yogurt with Fried Potatoes",
+    "description": "Yogurt mixed with crispy fried potatoes, onions, and spices. A refreshing breakfast combining cooling yogurt with warm fried textures.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 11
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Coconut yogurt with fried potatoes",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ur_breakfast_007",
+    "name_tr": "Nihari Breakfast",
+    "name_en": "Slow-Cooked Meat Stew",
+    "description": "Rich beef stew slow-cooked overnight in aromatic spices. Served early morning with naan. A festive Pakistani breakfast for special occasions.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 24,
+      "fat": 22
+    },
+    "prep_time_min": 180,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Chickpea and vegetable nihari with mushrooms",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "winter",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "ur_breakfast_008",
+    "name_tr": "Anda Fry",
+    "name_en": "Fried Egg with Bread",
+    "description": "Fried eggs with crispy edges served with warm naan and fresh tomato-onion salad. A simple yet deeply satisfying Pakistani breakfast.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 10,
+      "carbs": 34,
+      "fat": 13
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu scramble with naan and fresh salad",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_breakfast_009",
+    "name_tr": "Chanay Bhaturey",
+    "name_en": "Chickpea Curry with Fried Bread",
+    "description": "Spiced chickpea curry served with puffy fried bread. A hearty vegetarian breakfast reflecting Pakistani street food culture.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 12,
+      "carbs": 48,
+      "fat": 11
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_breakfast_010",
+    "name_tr": "Dhal Puri",
+    "name_en": "Lentil Curry with Fried Bread",
+    "description": "Warm lentil curry served with golden fried puri. A protein-rich breakfast celebrating Pakistani lentil cooking traditions.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 11,
+      "carbs": 46,
+      "fat": 10
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "gelenekci", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_breakfast_011",
+    "name_tr": "Sheermaal",
+    "name_en": "Sweet Saffron Bread",
+    "description": "Saffron and cardamom-infused bread served with clotted cream and jam. A festival bread bringing sweetness and aroma to Pakistani mornings.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 6,
+      "carbs": 50,
+      "fat": 8
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Sheermaal with vegan butter and fruit spread",
+    "sifat_appeal": ["tatli_dostum", "centil_kibri", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "ur_breakfast_012",
+    "name_tr": "Besan ka Halwa",
+    "name_en": "Chickpea Flour Sweet",
+    "description": "Roasted chickpea flour halwa with ghee and nuts. An aromatic sweet breakfast reflecting Pakistani festive traditions.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 8,
+      "carbs": 44,
+      "fat": 16
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Halwa made with coconut oil and plant-based milk",
+    "sifat_appeal": ["tatli_dostum", "gelenekci", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ur_breakfast_013",
+    "name_tr": "Mehlri",
+    "name_en": "Whipped Milk Dessert",
+    "description": "Whipped condensed milk with dried fruits and nuts. A light sweet breakfast reflecting Pakistani culinary elegance.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 4,
+      "carbs": 42,
+      "fat": 11
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Coconut cream whipped with plant-based condensed milk",
+    "sifat_appeal": ["tatli_dostum", "centil_kibri", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "ur_breakfast_014",
+    "name_tr": "Tari Wali Puri",
+    "name_en": "Gravy-Soaked Fried Bread",
+    "description": "Soft puri bread dipped in spiced chickpea gravy. A comforting breakfast that brings together bread and curry traditions.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 12
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ur_breakfast_015",
+    "name_tr": "Paya Breakfast",
+    "name_en": "Slow-Cooked Feet Stew",
+    "description": "Tender slow-cooked meat feet in aromatic spiced broth. A protein-rich traditional breakfast served on special mornings.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 32,
+      "carbs": 8,
+      "fat": 22
+    },
+    "prep_time_min": 150,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and root vegetable stew with spices",
+    "sifat_appeal": ["centil_kibri", "macera_seven", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "ur_lunch_001",
+    "name_tr": "Biryani",
+    "name_en": "Fragrant Rice with Meat",
+    "description": "Slow-cooked basmati rice with tender meat, aromatic spices, and fried onions. The royal dish of Pakistan bringing celebration to every lunch table.",
+    "nutrition": {
+      "calories": 440,
+      "protein": 24,
+      "carbs": 56,
+      "fat": 14
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and mushroom biryani with basmati rice",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "ur_lunch_002",
+    "name_tr": "Karahi",
+    "name_en": "Wok-Cooked Meat",
+    "description": "Tender meat cooked in aromatic wok-style sauce with tomatoes, peppers, and ginger. A sizzling lunch favorite reflecting Peshawar's culinary traditions.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 14,
+      "fat": 22
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu karahi with bold spices",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "ur_lunch_003",
+    "name_tr": "Haleem",
+    "name_en": "Slow-Cooked Meat Porridge",
+    "description": "Meat slowly cooked with lentils and wheat until it forms a thick, creamy paste. A festive dish embodying hours of patient cooking and celebration.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 20,
+      "carbs": 42,
+      "fat": 16
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil and vegetable haleem with wheat",
+    "sifat_appeal": ["sevgi_dolu", "gelenekci", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_lunch_004",
+    "name_tr": "Nihari",
+    "name_en": "Slow-Cooked Beef Stew",
+    "description": "Tender beef stewed overnight in complex spice blend. Served with fresh naan and ginger. A legendary Pakistani lunch that defines the art of slow cooking.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 24,
+      "fat": 22
+    },
+    "prep_time_min": 180,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and vegetable nihari with chickpeas",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.15
+  },
+  {
+    "id": "ur_lunch_005",
+    "name_tr": "Peshawari Tikka",
+    "name_en": "Meat Skewers",
+    "description": "Marinated meat cooked on skewers with charred edges. Served with fresh naan, onions, and lime. A street food classic turned lunch favorite.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 30,
+      "carbs": 16,
+      "fat": 18
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu skewers with same marinade",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "sosyal_kelebek"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_lunch_006",
+    "name_tr": "Korma",
+    "name_en": "Mild Meat Curry",
+    "description": "Tender meat in creamy sauce with yogurt and nuts. A refined, elegant lunch reflecting Mughal culinary heritage.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 26,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable korma with coconut cream and nuts",
+    "sifat_appeal": ["centil_kibri", "saglik_bilinc", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_lunch_007",
+    "name_tr": "Seekh Kebab Lunch",
+    "name_en": "Cylindrical Meat Kebab",
+    "description": "Minced meat molded onto skewers and grilled. Served with mint chutney and soft bread. A beloved lunch capturing Pakistani kebab culture.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 28,
+      "carbs": 14,
+      "fat": 18
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Lentil and vegetable seekh kebab with spices",
+    "sifat_appeal": ["macera_seven", "sosyal_kelebek", "heyecan_arayan"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_lunch_008",
+    "name_tr": "Saag Meat",
+    "name_en": "Meat with Spinach",
+    "description": "Tender meat cooked with fresh spinach and aromatics. A wholesome lunch combining protein and greens in Pakistani tradition.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 20
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Paneer and spinach curry with tofu additions",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_lunch_009",
+    "name_tr": "Aloo Gosht",
+    "name_en": "Meat with Potato",
+    "description": "Tender meat with potatoes in aromatic spiced sauce. A rustic lunch favorite reflecting the essence of Pakistani home cooking.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 24,
+      "carbs": 32,
+      "fat": 18
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and mushroom curry with potatoes",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_lunch_010",
+    "name_tr": "Shami Kebab",
+    "name_en": "Spiced Meat Patty",
+    "description": "Ground meat mixed with lentils and spices, formed into patties and fried. Served with mint sauce. A lunch staple showcasing Pakistani spice mastery.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 18,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil and vegetable patties with spice mix",
+    "sifat_appeal": ["macera_seven", "basit_sevici", "gelenekci"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_lunch_011",
+    "name_tr": "Dopiaza",
+    "name_en": "Two-Onion Curry",
+    "description": "Meat in sauce with cooked and fried onions for double onion flavor and texture. A sophisticated lunch dish loved across Pakistan.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 26,
+      "carbs": 20,
+      "fat": 20
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu do piaza with double onions",
+    "sifat_appeal": ["macera_seven", "centil_kibri", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ur_lunch_012",
+    "name_tr": "Kaleji Masala",
+    "name_en": "Spiced Liver",
+    "description": "Tender liver cooked in bold masala with peppers and onions. A daring lunch for adventurous eaters seeking deep savory flavors.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 28,
+      "carbs": 10,
+      "fat": 14
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and vegetable masala with bold spices",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "ur_lunch_013",
+    "name_tr": "Tandoori Chicken",
+    "name_en": "Clay Oven Chicken",
+    "description": "Yogurt-marinated chicken cooked in tandoor oven until charred outside and juicy inside. An iconic lunch reflecting Pakistani grill mastery.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 36,
+      "carbs": 6,
+      "fat": 16
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tandoori tofu and vegetable skewers",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "ur_lunch_014",
+    "name_tr": "Chaat Masala Mix",
+    "name_en": "Spiced Street Food Mix",
+    "description": "Mixed vegetables and crispy elements with tangy spice powder. A light, refreshing lunch option popular at Pakistani food stalls.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 6,
+      "carbs": 32,
+      "fat": 10
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["heyecan_arayan", "macera_seven", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ur_lunch_015",
+    "name_tr": "Dhal Chawal",
+    "name_en": "Lentils with Rice",
+    "description": "Simple yet complete meal of cooked lentils served with plain basmati rice. A humble lunch celebrating the beauty of everyday Pakistani cooking.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 14,
+      "carbs": 54,
+      "fat": 6
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_lunch_016",
+    "name_tr": "Lahori Aloo Paratha",
+    "name_en": "Lahore-Style Potato Flatbread",
+    "description": "Crispy flatbread with spiced potato filling served with yogurt. A Lahore-style lunch reflecting the city's culinary sophistication.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 8,
+      "carbs": 48,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Paratha with vegan butter and spiced potato",
+    "sifat_appeal": ["gelenekci", "centil_kibri", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_lunch_017",
+    "name_tr": "Nehari at Lunch",
+    "name_en": "Slow-Cooked Meat Stew",
+    "description": "Rich beef stew in thick sauce served at lunch. A legendary dish that transcends meal times in Pakistani cuisine.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 32,
+      "carbs": 20,
+      "fat": 24
+    },
+    "prep_time_min": 180,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and vegetable nihari with legumes",
+    "sifat_appeal": ["centil_kibri", "sevgi_dolu", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_lunch_018",
+    "name_tr": "Achari Gosht",
+    "name_en": "Pickled Spice Meat",
+    "description": "Meat cooked with pickling spices creating bold, tangy flavors. An adventurous lunch reflecting Pakistani appetite for complex tastes.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 26,
+      "carbs": 12,
+      "fat": 20
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable achari with mushrooms and tofu",
+    "sifat_appeal": ["macera_seven", "heyecan_arayan", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ur_lunch_019",
+    "name_tr": "Bhuna Gosht",
+    "name_en": "Dry-Fried Meat",
+    "description": "Meat cooked until sauce reduces and coats each piece. A flavorful, concentrated lunch dish showcasing Pakistani sauce mastery.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "carbs": 14,
+      "fat": 24
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable bhuna with concentrated spice sauce",
+    "sifat_appeal": ["macera_seven", "centil_kibri", "saglik_bilinc"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ur_lunch_020",
+    "name_tr": "Paneer Tikka Lunch",
+    "name_en": "Grilled Cheese Curds",
+    "description": "Marinated cheese curd chunks grilled on skewers. A vegetarian lunch favorite among Pakistani food lovers.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 18,
+      "carbs": 8,
+      "fat": 22
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu tikka with same marinade and grilling",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_001",
+    "name_tr": "Dhal Fry",
+    "name_en": "Fried Lentil Curry",
+    "description": "Cooked lentils tempered with oil and spices until edges crisp. A simple dinner showcasing Pakistani lentil cooking mastery.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 38,
+      "fat": 8
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_dinner_002",
+    "name_tr": "Mixed Vegetable Dinner",
+    "name_en": "Mixed Vegetables",
+    "description": "Seasonal vegetables stir-fried with aromatic spices. A light, healthy dinner reflecting Pakistani vegetable traditions.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 8,
+      "carbs": 26,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_dinner_003",
+    "name_tr": "Aloo Keema",
+    "name_en": "Ground Meat with Potato",
+    "description": "Ground meat cooked with potatoes in aromatic spices. A comforting dinner that combines protein and carbs efficiently.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 22,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Lentil keema with potatoes and mushrooms",
+    "sifat_appeal": ["sevgi_dolu", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_dinner_004",
+    "name_tr": "Okra Fry",
+    "name_en": "Crispy Okra",
+    "description": "Fresh okra fried until crispy outside with a tender inside. A popular Pakistani dinner vegetable loved for its unique texture.",
+    "nutrition": {
+      "calories": 160,
+      "protein": 4,
+      "carbs": 16,
+      "fat": 8
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "ev_hanımı"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "ur_dinner_005",
+    "name_tr": "Egg Curry Light",
+    "name_en": "Light Egg Curry",
+    "description": "Eggs in mild, light curry sauce. A gentle evening meal balancing flavor with digestibility.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 10,
+      "carbs": 16,
+      "fat": 17
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu and mushroom in mild curry sauce",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_006",
+    "name_tr": "Spinach and Potato",
+    "name_en": "Saag Aloo",
+    "description": "Spinach cooked with potatoes in aromatic spices. A wholesome dinner combining greens and carbs.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 9
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_dinner_007",
+    "name_tr": "Tomato Lentil Soup",
+    "name_en": "Tomato Dal",
+    "description": "Red lentils cooked with tomatoes and aromatics into a comforting soup. A light, nutritious dinner staple.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 10,
+      "carbs": 36,
+      "fat": 4
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "ur_dinner_008",
+    "name_tr": "Cauliflower Fry",
+    "name_en": "Fried Cauliflower",
+    "description": "Cauliflower florets fried until golden and crispy. A simple vegetable dinner loved across Pakistani families.",
+    "nutrition": {
+      "calories": 180,
+      "protein": 6,
+      "carbs": 18,
+      "fat": 9
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "vejetaryen"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_009",
+    "name_tr": "Chicken Curry Light",
+    "name_en": "Light Chicken Curry",
+    "description": "Tender chicken in light sauce with minimal oil. A health-conscious dinner option for Pakistani families.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 28,
+      "carbs": 12,
+      "fat": 12
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Vegetable and tofu curry with same light approach",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "ur_dinner_010",
+    "name_tr": "Chikhalwali",
+    "name_en": "Chickpea Vegetable Stew",
+    "description": "Chickpeas cooked with seasonal vegetables and spices. A protein-rich vegetarian dinner staple.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 11,
+      "carbs": 40,
+      "fat": 6
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_011",
+    "name_tr": "Fish Fry Evening",
+    "name_en": "Simple Fried Fish",
+    "description": "Fresh fish marinated and fried until golden. Served with lemon and fresh herbs. A light dinner option.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 6,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu cutlet with same coating and frying method",
+    "sifat_appeal": ["saglik_bilinc", "basit_sevici", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_012",
+    "name_tr": "Bean Curry",
+    "name_en": "Kidney Bean Curry",
+    "description": "Kidney beans in aromatic curry sauce. A hearty vegetarian dinner providing sustained energy.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 8
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "ur_dinner_013",
+    "name_tr": "Moong Sprout",
+    "name_en": "Mung Sprout Curry",
+    "description": "Fresh mung sprouts in light curry. A nutritious, living-food dinner option celebrated in Pakistani health cuisine.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 10,
+      "carbs": 24,
+      "fat": 6
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "vejetaryen", "basit_sevici"],
+    "season": "spring",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "ur_dinner_014",
+    "name_tr": "Bitter Gourd Fry",
+    "name_en": "Fried Bitter Gourd",
+    "description": "Bitter gourd fried until crispy with minimal oil. A health-conscious dinner for those seeking medicinal properties in food.",
+    "nutrition": {
+      "calories": 140,
+      "protein": 4,
+      "carbs": 12,
+      "fat": 7
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe - naturally vegan",
+    "sifat_appeal": ["saglik_bilinc", "macera_seven", "vejetaryen"],
+    "season": "summer",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "ur_dinner_015",
+    "name_tr": "White Rice Plain",
+    "name_en": "Plain Basmati Rice",
+    "description": "Simple steamed basmati rice served with yogurt and light curry. A gentle, digestible dinner option.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 4,
+      "carbs": 54,
+      "fat": 2
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe with vegan yogurt",
+    "sifat_appeal": ["basit_sevici", "saglik_bilinc", "ev_hanımı"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  }
+]

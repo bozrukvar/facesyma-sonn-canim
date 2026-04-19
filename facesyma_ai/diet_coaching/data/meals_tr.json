@@ -1,0 +1,1162 @@
+{
+  "country": "Turkey",
+  "language_code": "tr",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "tr_breakfast_001",
+        "name_tr": "Sahanda Yumurta",
+        "name_en": "Fried Eggs",
+        "description": "Tavada pişirilmiş, taze yumurta",
+        "nutrition": {
+          "calories": 250,
+          "protein_g": 12,
+          "carbs_g": 2,
+          "fat_g": 20
+        },
+        "prep_time_min": 5,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["disiplinli", "saglik_bilinc", "pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_breakfast_002",
+        "name_tr": "Omlet",
+        "name_en": "Omelet",
+        "description": "Peynir ve sebzeli omlet",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 14,
+          "carbs_g": 3,
+          "fat_g": 23
+        },
+        "prep_time_min": 8,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Sebzeli Tofu Omlet",
+        "sifat_appeal": ["disiplinli", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "tr_breakfast_003",
+        "name_tr": "Menemen",
+        "name_en": "Turkish Scrambled Eggs",
+        "description": "Yumurta, domates, biber karışımı",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 11,
+          "carbs_g": 8,
+          "fat_g": 15
+        },
+        "prep_time_min": 10,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Sebzeli Menemen (Yumurtasız)",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_breakfast_004",
+        "name_tr": "Çılbır",
+        "name_en": "Poached Eggs with Yogurt",
+        "description": "Yoğurt üzeri poşe yumurta ve sos",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 13,
+          "carbs_g": 10,
+          "fat_g": 15
+        },
+        "prep_time_min": 12,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_breakfast_005",
+        "name_tr": "Sucuklu Yumurta",
+        "name_en": "Eggs with Sausage",
+        "description": "Sucuk ve yumurta karışımı",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 18,
+          "carbs_g": 2,
+          "fat_g": 26
+        },
+        "prep_time_min": 8,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["disiplinli", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_breakfast_006",
+        "name_tr": "Simit & Peynir",
+        "name_en": "Sesame Bagel & Cheese",
+        "description": "Simit, beyaz peynir, zeytin",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 10,
+          "carbs_g": 32,
+          "fat_g": 12
+        },
+        "prep_time_min": 2,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Peynir ile",
+        "sifat_appeal": ["pratikci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "tr_breakfast_007",
+        "name_tr": "Açma & Kaymak & Reçel",
+        "name_en": "Turkish Pastry with Cream & Jam",
+        "description": "Taze açma, kaymak, çeşitli reçeller",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 7,
+          "carbs_g": 45,
+          "fat_g": 14
+        },
+        "prep_time_min": 3,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Agave Reçeli ile",
+        "sifat_appeal": ["sosyal", "yaratici", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_breakfast_008",
+        "name_tr": "Poğaça",
+        "name_en": "Savory Pastry",
+        "description": "Peynir veya et dolulu poğaça",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 8,
+          "carbs_g": 28,
+          "fat_g": 15
+        },
+        "prep_time_min": 5,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["pratikci", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_breakfast_009",
+        "name_tr": "Tost",
+        "name_en": "Toast",
+        "description": "Peynir ve jambonlu tost",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 9,
+          "carbs_g": 24,
+          "fat_g": 11
+        },
+        "prep_time_min": 4,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Peynir ile",
+        "sifat_appeal": ["pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_breakfast_010",
+        "name_tr": "Muesli & Yogurt",
+        "name_en": "Muesli with Yogurt",
+        "description": "Müsli, Greek yogurt, meyve",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 12,
+          "carbs_g": 32,
+          "fat_g": 4
+        },
+        "prep_time_min": 2,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Yogurt ile",
+        "sifat_appeal": ["saglik_bilinc", "pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.05
+      },
+      {
+        "id": "tr_breakfast_011",
+        "name_tr": "Gözleme",
+        "name_en": "Turkish Crepes",
+        "description": "Peynir veya ıspanak dolulu ince pide",
+        "nutrition": {
+          "calories": 260,
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 12
+        },
+        "prep_time_min": 15,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Sebzeli Gözleme",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_breakfast_012",
+        "name_tr": "Balık Ekmek",
+        "name_en": "Fish Sandwich",
+        "description": "Izgarada pişirilmiş balık sandviç",
+        "nutrition": {
+          "calories": 300,
+          "protein_g": 20,
+          "carbs_g": 28,
+          "fat_g": 10
+        },
+        "prep_time_min": 10,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_breakfast_013",
+        "name_tr": "Börek",
+        "name_en": "Phyllo Pastry",
+        "description": "Peynir veya sebze dolulu börek",
+        "nutrition": {
+          "calories": 300,
+          "protein_g": 11,
+          "carbs_g": 26,
+          "fat_g": 17
+        },
+        "prep_time_min": 8,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Sebzeli Börek",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_breakfast_014",
+        "name_tr": "Keftali & Ekmek",
+        "name_en": "Meatball & Bread",
+        "description": "Ev yapımı köfteli sandviç",
+        "nutrition": {
+          "calories": 380,
+          "protein_g": 22,
+          "carbs_g": 32,
+          "fat_g": 18
+        },
+        "prep_time_min": 12,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["sosyal", "comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_breakfast_015",
+        "name_tr": "Midye Dolma",
+        "name_en": "Stuffed Mussels",
+        "description": "Pirinç ve baharat dolulu midye",
+        "nutrition": {
+          "calories": 150,
+          "protein_g": 18,
+          "carbs_g": 12,
+          "fat_g": 2
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["yaratici", "luks_seven"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      }
+    ],
+    "lunch": [
+      {
+        "id": "tr_lunch_001",
+        "name_tr": "Mercimek Çorbası",
+        "name_en": "Red Lentil Soup",
+        "description": "Kırmızı mercimek çorbası, sos ile",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 4
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "aile_odakli", "ekonomik", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "tr_lunch_002",
+        "name_tr": "Nohut Çorbası",
+        "name_en": "Chickpea Soup",
+        "description": "Nohut çorbası, kuru soğan, sos",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 12,
+          "carbs_g": 32,
+          "fat_g": 3
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci", "saglik_bilinc"],
+        "season": "winter",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "tr_lunch_003",
+        "name_tr": "İşkembe Çorbası",
+        "name_en": "Tripe Soup",
+        "description": "Işkembe, limon, sos",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 22,
+          "carbs_g": 6,
+          "fat_g": 8
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci"],
+        "season": "winter",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "tr_lunch_004",
+        "name_tr": "Tavuk Şnitzel",
+        "name_en": "Chicken Schnitzel",
+        "description": "Kızarmış tavuk şnitzel, limon",
+        "nutrition": {
+          "calories": 380,
+          "protein_g": 35,
+          "carbs_g": 20,
+          "fat_g": 16
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Çiftlik Peyniri Şnitzel",
+        "sifat_appeal": ["disiplinli", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_lunch_005",
+        "name_tr": "Köfte",
+        "name_en": "Meatballs",
+        "description": "Ev yapımı köfte, pilavla servis",
+        "nutrition": {
+          "calories": 420,
+          "protein_g": 28,
+          "carbs_g": 32,
+          "fat_g": 18
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Sebze Köfte",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 1.05
+      },
+      {
+        "id": "tr_lunch_006",
+        "name_tr": "Kemiç Kebap",
+        "name_en": "Lamb Shish Kebab",
+        "description": "Kuzu şişle ızgarada pişmiş",
+        "nutrition": {
+          "calories": 450,
+          "protein_g": 40,
+          "carbs_g": 0,
+          "fat_g": 32
+        },
+        "prep_time_min": 30,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["sosyal", "luks_seven"],
+        "season": "summer",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_lunch_007",
+        "name_tr": "Adana Kebap",
+        "name_en": "Adana Kebab",
+        "description": "Baharat malzemeleri ile yapılmış kebap",
+        "nutrition": {
+          "calories": 480,
+          "protein_g": 35,
+          "carbs_g": 20,
+          "fat_g": 28
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["sosyal", "comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_lunch_008",
+        "name_tr": "Urfa Kebap",
+        "name_en": "Urfa Kebab",
+        "description": "Hafif baharat malzemeleri ile yapılmış kebap",
+        "nutrition": {
+          "calories": 470,
+          "protein_g": 34,
+          "carbs_g": 18,
+          "fat_g": 27
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_lunch_009",
+        "name_tr": "Döner",
+        "name_en": "Doner Kebab",
+        "description": "Döner et, lavash, salatala",
+        "nutrition": {
+          "calories": 380,
+          "protein_g": 28,
+          "carbs_g": 28,
+          "fat_g": 18
+        },
+        "prep_time_min": 8,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Sebzeli Döner",
+        "sifat_appeal": ["pratikci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_lunch_010",
+        "name_tr": "İskender Kebap",
+        "name_en": "Iskender Kebab",
+        "description": "Döner et, ekmek, yoğurt, sos",
+        "nutrition": {
+          "calories": 520,
+          "protein_g": 32,
+          "carbs_g": 38,
+          "fat_g": 24
+        },
+        "prep_time_min": 15,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["luks_seven", "comertkane"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_lunch_011",
+        "name_tr": "Sarma/Yaprak Sarması",
+        "name_en": "Stuffed Grape Leaves",
+        "description": "Asma yaprağı, pirinç, fesleğen",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 8,
+          "carbs_g": 24,
+          "fat_g": 8
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["aile_odakli", "gelenekci", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_lunch_012",
+        "name_tr": "Dolma",
+        "name_en": "Stuffed Vegetables",
+        "description": "Biber/domates, pirinç ve tahıl dolgusu",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 8
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "summer",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_lunch_013",
+        "name_tr": "Pide",
+        "name_en": "Turkish Flatbread",
+        "description": "Kıyma, kaşar, ıspanak pidesi",
+        "nutrition": {
+          "calories": 380,
+          "protein_g": 14,
+          "carbs_g": 42,
+          "fat_g": 16
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Sebzeli Pide",
+        "sifat_appeal": ["aile_odakli", "sosyal"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "tr_lunch_014",
+        "name_tr": "Pizza",
+        "name_en": "Pizza",
+        "description": "Türk ustasının yapısı, çeşitli malzemeler",
+        "nutrition": {
+          "calories": 340,
+          "protein_g": 12,
+          "carbs_g": 42,
+          "fat_g": 14
+        },
+        "prep_time_min": 18,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": "Vegan Pizza",
+        "sifat_appeal": ["pratikci", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.95
+      },
+      {
+        "id": "tr_lunch_015",
+        "name_tr": "Balık Pilaki",
+        "name_en": "Fish with Vegetables",
+        "description": "Izgarada pişmiş balık, sebzeler",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 32,
+          "carbs_g": 18,
+          "fat_g": 8
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_lunch_016",
+        "name_tr": "Taze Balık (Izgara)",
+        "name_en": "Grilled Fresh Fish",
+        "description": "Mevsimsel balık, taze limon",
+        "nutrition": {
+          "calories": 250,
+          "protein_g": 35,
+          "carbs_g": 0,
+          "fat_g": 12
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_lunch_017",
+        "name_tr": "Tabbouleh (Bulgur Salatası)",
+        "name_en": "Bulgur Salad",
+        "description": "Bulgur, domates, maydanoz",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 8,
+          "carbs_g": 28,
+          "fat_g": 5
+        },
+        "prep_time_min": 15,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "summer",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_lunch_018",
+        "name_tr": "Çoban Salatası",
+        "name_en": "Turkish Chopped Salad",
+        "description": "Domates, salatalık, soğan, limon",
+        "nutrition": {
+          "calories": 120,
+          "protein_g": 4,
+          "carbs_g": 18,
+          "fat_g": 4
+        },
+        "prep_time_min": 8,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "pratikci"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_lunch_019",
+        "name_tr": "Humus & Falafel",
+        "name_en": "Hummus & Falafel",
+        "description": "Nohuttan yapılmış, tahini soslu",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 12,
+          "carbs_g": 28,
+          "fat_g": 10
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_lunch_020",
+        "name_tr": "Kısır",
+        "name_en": "Red Lentil Bulgur",
+        "description": "Bulgur, bulgur, domates, limon",
+        "nutrition": {
+          "calories": 160,
+          "protein_g": 7,
+          "carbs_g": 24,
+          "fat_g": 4
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      }
+    ],
+    "dinner": [
+      {
+        "id": "tr_dinner_001",
+        "name_tr": "Sebze Yemeği",
+        "name_en": "Vegetable Stew",
+        "description": "Karışık sebzeler, domates, tahıl",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 10,
+          "carbs_g": 34,
+          "fat_g": 6
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "tr_dinner_002",
+        "name_tr": "Etli Pilav",
+        "name_en": "Meat Pilaf",
+        "description": "Kuzu eti, pirinç, baharat",
+        "nutrition": {
+          "calories": 480,
+          "protein_g": 28,
+          "carbs_g": 48,
+          "fat_g": 18
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Tahıllı Sebze Pilav",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "tr_dinner_003",
+        "name_tr": "Kuru Fasülye",
+        "name_en": "Dry Beans Stew",
+        "description": "Haricot fasulyesi, soğan, domates",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 14,
+          "carbs_g": 38,
+          "fat_g": 6
+        },
+        "prep_time_min": 90,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "winter",
+        "frequency_weight": 1.05
+      },
+      {
+        "id": "tr_dinner_004",
+        "name_tr": "Balık (Izgara veya Fırında)",
+        "name_en": "Grilled or Baked Fish",
+        "description": "Taze balık, limon, zeytinyağı",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 35,
+          "carbs_g": 0,
+          "fat_g": 14
+        },
+        "prep_time_min": 25,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_dinner_005",
+        "name_tr": "Mücver",
+        "name_en": "Zucchini Fritters",
+        "description": "Kabak, yumurta, dill, kızarmış",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 9,
+          "carbs_g": 16,
+          "fat_g": 13
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Mücver",
+        "sifat_appeal": ["saglik_bilinc", "yaratici"],
+        "season": "summer",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_dinner_006",
+        "name_tr": "İmam Baildi",
+        "name_en": "Stuffed Eggplant",
+        "description": "Patlıcan, soğan, domates, zeytinyağı",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 6,
+          "carbs_g": 22,
+          "fat_g": 8
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["aile_odakli", "yaratici"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_dinner_007",
+        "name_tr": "Biber Dolması",
+        "name_en": "Stuffed Peppers",
+        "description": "Kırmızı biber, pirinç, dill",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 8,
+          "carbs_g": 26,
+          "fat_g": 7
+        },
+        "prep_time_min": 40,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Biber Dolması",
+        "sifat_appeal": ["yaratici"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "tr_dinner_008",
+        "name_tr": "Patates Graten",
+        "name_en": "Potato Gratin",
+        "description": "Patates, süt, peynir, fırında pişirilmiş",
+        "nutrition": {
+          "calories": 320,
+          "protein_g": 12,
+          "carbs_g": 36,
+          "fat_g": 14
+        },
+        "prep_time_min": 50,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Vegan Patates Graten",
+        "sifat_appeal": ["aile_odakli", "luks_seven"],
+        "season": "winter",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_dinner_009",
+        "name_tr": "Çökelek Ezme",
+        "name_en": "Mashed Cheese & Herbs",
+        "description": "Taze peynir, dill, maydanoz",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 14,
+          "carbs_g": 6,
+          "fat_g": 12
+        },
+        "prep_time_min": 10,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.75
+      },
+      {
+        "id": "tr_dinner_010",
+        "name_tr": "Mercimek Köftesi",
+        "name_en": "Lentil Meatballs",
+        "description": "Kırmızı mercimek, bulgur, baharat",
+        "nutrition": {
+          "calories": 220,
+          "protein_g": 12,
+          "carbs_g": 28,
+          "fat_g": 6
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "tr_dinner_011",
+        "name_tr": "Ayran Çorbası",
+        "name_en": "Yogurt Soup",
+        "description": "Ayran, bulgur, nane",
+        "nutrition": {
+          "calories": 160,
+          "protein_g": 8,
+          "carbs_g": 20,
+          "fat_g": 4
+        },
+        "prep_time_min": 20,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": false,
+          "gluten_free": false
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "tr_dinner_012",
+        "name_tr": "Paça Çorbası",
+        "name_en": "Trotter Soup",
+        "description": "Hayvan ayağı, limon, nohut",
+        "nutrition": {
+          "calories": 280,
+          "protein_g": 32,
+          "carbs_g": 8,
+          "fat_g": 12
+        },
+        "prep_time_min": 120,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["gelenekci"],
+        "season": "winter",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "tr_dinner_013",
+        "name_tr": "Fasülye Püresi",
+        "name_en": "Bean Puree",
+        "description": "Haricot fasulyesi, zeytinyağı",
+        "nutrition": {
+          "calories": 200,
+          "protein_g": 11,
+          "carbs_g": 28,
+          "fat_g": 5
+        },
+        "prep_time_min": 60,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.75
+      },
+      {
+        "id": "tr_dinner_014",
+        "name_tr": "Taze Yaprak Sarması (Sıcak)",
+        "name_en": "Hot Grape Leaves",
+        "description": "Asma yaprağı, pirinç, et",
+        "nutrition": {
+          "calories": 240,
+          "protein_g": 12,
+          "carbs_g": 26,
+          "fat_g": 10
+        },
+        "prep_time_min": 45,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": false,
+          "vegan": false,
+          "gluten_free": true
+        },
+        "vegan_substitute": "Sebzeli Yaprak Sarması",
+        "sifat_appeal": ["aile_odakli", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      },
+      {
+        "id": "tr_dinner_015",
+        "name_tr": "Hayır Çorbası",
+        "name_en": "Mixed Vegetable Soup",
+        "description": "Karışık sebzeler, nohut, pirinç",
+        "nutrition": {
+          "calories": 180,
+          "protein_g": 9,
+          "carbs_g": 26,
+          "fat_g": 4
+        },
+        "prep_time_min": 35,
+        "dietary": {
+          "omnivore": true,
+          "vegetarian": true,
+          "vegan": true,
+          "gluten_free": true
+        },
+        "vegan_substitute": null,
+        "sifat_appeal": ["saglik_bilinc", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.85
+      }
+    ]
+  }
+}

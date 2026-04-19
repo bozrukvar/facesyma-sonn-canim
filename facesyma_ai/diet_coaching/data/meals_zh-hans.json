@@ -1,0 +1,1312 @@
+{
+  "country_name": "中国",
+  "language_code": "zh-hans",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "en_breakfast_001",
+        "name_he": "ארוחת בוקר אנגלית מלאה",
+        "name_en": "Full English Breakfast",
+        "description": "Bacon, sausages, eggs, baked beans, mushrooms, tomatoes, toast. Classic hearty English breakfast.",
+        "nutrition": {
+          "calories": 520,
+          "protein": 24,
+          "carbs": 32,
+          "fat": 36
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Full vegan English with plant-based meats",
+        "sifat_appeal": [
+          "enerjik",
+          "luks_seven",
+          "aile_odakli"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.2,
+        "name_zh_hans": "英式全套早餐"
+      },
+      {
+        "id": "en_breakfast_002",
+        "name_he": "תה וטוסט עם מרמלדה",
+        "name_en": "Tea & Toast with Marmalade",
+        "description": "Strong English breakfast tea with buttered toast and orange marmalade. Simple, classic.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 5,
+          "carbs": 34,
+          "fat": 8
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan butter with fruit spread",
+        "sifat_appeal": [
+          "gelenekci",
+          "pratikci_zaman",
+          "centil_kibri"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.1,
+        "name_zh_hans": "茶和果酱吐司"
+      },
+      {
+        "id": "en_breakfast_003",
+        "name_he": "בייקון וביצים",
+        "name_en": "Bacon & Eggs",
+        "description": "Crispy bacon with fried or scrambled eggs. Quick, satisfying, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 2,
+          "fat": 31
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tempeh bacon with tofu scramble",
+        "sifat_appeal": [
+          "enerjik",
+          "pratikci_zaman",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "培根和鸡蛋"
+      },
+      {
+        "id": "en_breakfast_004",
+        "name_he": "טוסט עם חמאה ודבש",
+        "name_en": "Toast with Butter & Honey",
+        "description": "Toasted bread with butter and honey. Simple, sweet, comfort breakfast.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 30,
+          "fat": 9
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Toast with plant-based butter and honey",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "pratikci_zaman",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "黄油和蜂蜜吐司"
+      },
+      {
+        "id": "en_breakfast_005",
+        "name_he": "קפה וביסקוויטים",
+        "name_en": "Coffee & Biscuits",
+        "description": "Strong English coffee with digestive biscuits. Afternoon tea or light breakfast.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 3,
+          "carbs": 24,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based milk coffee with vegan biscuits",
+        "sifat_appeal": [
+          "pratikci_zaman",
+          "centil_kibri",
+          "sosyal_comertkane"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "咖啡和饼干"
+      },
+      {
+        "id": "en_breakfast_006",
+        "name_he": "Crepes with Jam & Cream",
+        "name_en": "Crepes with Jam & Cream",
+        "description": "Thin crepes with jam and whipped cream. Elegant, sweet, French-influenced British.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 36,
+          "fat": 14
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Crepes with vegan cream and fruit",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "luks_seven",
+          "yaratici_sanat"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Crepes with Jam & Cream"
+      },
+      {
+        "id": "en_breakfast_007",
+        "name_he": "Yogurt with Granola & Fruit",
+        "name_en": "Yogurt with Granola & Fruit",
+        "description": "Creamy yogurt with crunchy granola and fresh berries. Light, healthy, modern.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 36,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based yogurt with vegan granola",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "doganın_cocugu",
+          "pratikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Yogurt with Granola & Fruit"
+      },
+      {
+        "id": "en_breakfast_008",
+        "name_he": "Porridge with Sugar & Cinnamon",
+        "name_en": "Porridge with Sugar & Cinnamon",
+        "description": "Warm oatmeal with sugar and cinnamon. Comforting, warm, Scottish influence.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 38,
+          "fat": 6
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use plant-based milk",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "gelenekci",
+          "aile_odakli"
+        ],
+        "season": "winter",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Porridge with Sugar & Cinnamon"
+      },
+      {
+        "id": "en_breakfast_009",
+        "name_he": "Pastry & Tea",
+        "name_en": "Pastry & Tea",
+        "description": "Butter pastry with English breakfast tea. Morning treat, sweet, indulgent.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 5,
+          "carbs": 34,
+          "fat": 14
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan pastry with plant-based milk tea",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "luks_seven",
+          "centil_kibri"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Pastry & Tea"
+      },
+      {
+        "id": "en_breakfast_010",
+        "name_he": "Cheese & Tomato Toast",
+        "name_en": "Cheese & Tomato Toast",
+        "description": "Toasted bread with melted cheese and sliced tomato. Quick, satisfying, vegetarian.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 11,
+          "carbs": 24,
+          "fat": 13
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Toast with vegan cheese and tomato",
+        "sifat_appeal": [
+          "pratikci_zaman",
+          "doganın_cocugu",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Cheese & Tomato Toast"
+      },
+      {
+        "id": "en_breakfast_011",
+        "name_he": "Cereal & Milk",
+        "name_en": "Cereal & Milk",
+        "description": "Classic British cereal with cold milk. Quick, easy, casual breakfast.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 6,
+          "carbs": 32,
+          "fat": 4
+        },
+        "prep_time_min": 3,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Use plant-based milk",
+        "sifat_appeal": [
+          "pratikci_zaman",
+          "ekonomik",
+          "enerjik"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Cereal & Milk"
+      },
+      {
+        "id": "en_breakfast_012",
+        "name_he": "Sausage & Boiled Egg",
+        "name_en": "Sausage & Boiled Egg",
+        "description": "Pork sausage with boiled egg and toast. Hearty, traditional English.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 18,
+          "fat": 25
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based sausage with boiled egg",
+        "sifat_appeal": [
+          "enerjik",
+          "praktikci_zaman",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Sausage & Boiled Egg"
+      },
+      {
+        "id": "en_breakfast_013",
+        "name_he": "Baked Beans on Toast",
+        "name_en": "Baked Beans on Toast",
+        "description": "Canned beans in tomato sauce on buttered toast. Quick, cheap, classic British.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 40,
+          "fat": 8
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use vegan butter",
+        "sifat_appeal": [
+          "ekonomik",
+          "pratikci_zaman",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Baked Beans on Toast"
+      },
+      {
+        "id": "en_breakfast_014",
+        "name_he": "Fruit Salad with Cream",
+        "name_en": "Fruit Salad with Cream",
+        "description": "Mixed fresh fruit with whipped cream. Light, fresh, healthy summer breakfast.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 28,
+          "fat": 11
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Fruit salad with coconut cream",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "doganın_cocugu",
+          "sevgi_dolu"
+        ],
+        "season": "summer",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Fruit Salad with Cream"
+      },
+      {
+        "id": "en_breakfast_015",
+        "name_he": "Scone with Butter & Jam",
+        "name_en": "Scone with Butter & Jam",
+        "description": "Fresh scone with butter and jam. Quintessentially British, afternoon tea style.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 5,
+          "carbs": 38,
+          "fat": 14
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan scone with plant-based butter",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "centil_kibri",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Scone with Butter & Jam"
+      }
+    ],
+    "lunch": [
+      {
+        "id": "en_lunch_001",
+        "name_he": "דג וצ'יפס",
+        "name_en": "Fish & Chips",
+        "description": "Battered white fish with thick-cut chips and malt vinegar. Iconic British, crispy, satisfying.",
+        "nutrition": {
+          "calories": 520,
+          "protein": 22,
+          "carbs": 48,
+          "fat": 26
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Battered mushroom with chips",
+        "sifat_appeal": [
+          "luks_seven",
+          "macera_seven",
+          "pratikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.2,
+        "name_zh_hans": "炸鱼和薯条"
+      },
+      {
+        "id": "en_lunch_002",
+        "name_he": "Beef with Yorkshire Pudding",
+        "name_en": "Beef with Yorkshire Pudding",
+        "description": "Roasted beef with Yorkshire pudding, gravy, vegetables. Classic Sunday roast.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 28,
+          "carbs": 36,
+          "fat": 28
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Nut roast with vegan pudding",
+        "sifat_appeal": [
+          "aile_odakli",
+          "gelenekci",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Beef with Yorkshire Pudding"
+      },
+      {
+        "id": "en_lunch_003",
+        "name_he": "Steak & Kidney Pie",
+        "name_en": "Steak & Kidney Pie",
+        "description": "Beef steak and kidney in pastry. Rich, traditional, hearty British dish.",
+        "nutrition": {
+          "calories": 520,
+          "protein": 24,
+          "carbs": 42,
+          "fat": 28
+        },
+        "prep_time_min": 150,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom and lentil pie",
+        "sifat_appeal": [
+          "gelenekci",
+          "macera_seven",
+          "sevgi_dolu"
+        ],
+        "season": "winter",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Steak & Kidney Pie"
+      },
+      {
+        "id": "en_lunch_004",
+        "name_he": "Chicken in Champagne Sauce",
+        "name_en": "Chicken in Champagne Sauce",
+        "description": "Chicken breast in elegant champagne sauce. Luxurious, light, restaurant-quality.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 28,
+          "carbs": 8,
+          "fat": 30
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in champagne mushroom sauce",
+        "sifat_appeal": [
+          "luks_seven",
+          "centil_kibri",
+          "yaratici_sanat"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Chicken in Champagne Sauce"
+      },
+      {
+        "id": "en_lunch_005",
+        "name_he": "Shepherd's Pie",
+        "name_en": "Shepherd's Pie",
+        "description": "Ground lamb with vegetables topped with mashed potato. Comforting, rustic, hearty.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 20,
+          "carbs": 40,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Lentil shepherd's pie",
+        "sifat_appeal": [
+          "aile_odakli",
+          "gelenekci",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Shepherd's Pie"
+      },
+      {
+        "id": "en_lunch_006",
+        "name_he": "Pork Chop with Apple Sauce",
+        "name_en": "Pork Chop with Apple Sauce",
+        "description": "Grilled pork chop with apple sauce. Classic British pairing, sweet and savory.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 26,
+          "carbs": 14,
+          "fat": 28
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu chop with apple sauce",
+        "sifat_appeal": [
+          "gelenekci",
+          "sevgi_dolu",
+          "pratikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Pork Chop with Apple Sauce"
+      },
+      {
+        "id": "en_lunch_007",
+        "name_he": "Cornish Pasty",
+        "name_en": "Cornish Pasty",
+        "description": "Pastry filled with beef, potato, and vegetables. Portable, hearty, regional specialty.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 18,
+          "carbs": 44,
+          "fat": 26
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable pasty",
+        "sifat_appeal": [
+          "gelenekci",
+          "macera_seven",
+          "pratikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Cornish Pasty"
+      },
+      {
+        "id": "en_lunch_008",
+        "name_he": "Steamed Fish",
+        "name_en": "Steamed Fish",
+        "description": "White fish steamed with herbs and vegetables. Light, healthy, elegant.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 32,
+          "carbs": 10,
+          "fat": 12
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Steamed vegetables with herb butter",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "centil_kibri",
+          "doganın_cocugu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Steamed Fish"
+      },
+      {
+        "id": "en_lunch_009",
+        "name_he": "Toad in the Hole",
+        "name_en": "Toad in the Hole",
+        "description": "Sausages in batter, baked. Whimsical name, traditional British comfort food.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 16,
+          "carbs": 38,
+          "fat": 24
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable sausage in batter",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "gelenekci",
+          "aile_odakli"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Toad in the Hole"
+      },
+      {
+        "id": "en_lunch_010",
+        "name_he": "Cheddar Mac & Cheese",
+        "name_en": "Cheddar Mac & Cheese",
+        "description": "Macaroni in creamy cheddar cheese sauce. Indulgent, creamy, comfort classic.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 16,
+          "carbs": 48,
+          "fat": 24
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mac & cheese with plant-based cheddar",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "luks_seven",
+          "aile_odakli"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Cheddar Mac & Cheese"
+      },
+      {
+        "id": "en_lunch_011",
+        "name_he": "Chicken Tikka Masala",
+        "name_en": "Chicken Tikka Masala",
+        "description": "British-Indian fusion curry with cream sauce. Popular British takeaway favorite.",
+        "nutrition": {
+          "calories": 440,
+          "protein": 26,
+          "carbs": 24,
+          "fat": 28
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu tikka masala",
+        "sifat_appeal": [
+          "macera_seven",
+          "luks_seven",
+          "sosyal_comertkane"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Chicken Tikka Masala"
+      },
+      {
+        "id": "en_lunch_012",
+        "name_he": "Chicken Pot Pie",
+        "name_en": "Chicken Pot Pie",
+        "description": "Chicken and vegetables in creamy sauce under pastry. Hearty, warming, comforting.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 22,
+          "carbs": 42,
+          "fat": 26
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Mushroom pot pie with plant-based cream",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "aile_odakli",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Chicken Pot Pie"
+      },
+      {
+        "id": "en_lunch_013",
+        "name_he": "Tomato Soup & Bread Roll",
+        "name_en": "Tomato Soup & Bread Roll",
+        "description": "Creamy tomato soup with crusty bread roll. Light, simple, classic British lunch.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 10
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tomato soup with plant-based cream",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "pratikci_zaman",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Tomato Soup & Bread Roll"
+      },
+      {
+        "id": "en_lunch_014",
+        "name_he": "Baked Fish with Lemon",
+        "name_en": "Baked Fish with Lemon",
+        "description": "Baked white fish with lemon and herbs. Elegant, light, healthy.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 34,
+          "carbs": 6,
+          "fat": 16
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Baked tofu with lemon herb",
+        "sifat_appeal": [
+          "centil_kibri",
+          "saglik_bilinc",
+          "doganın_cocugu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Baked Fish with Lemon"
+      },
+      {
+        "id": "en_lunch_015",
+        "name_he": "Steak with Pepper Sauce",
+        "name_en": "Steak with Pepper Sauce",
+        "description": "Premium steak with peppercorn sauce. Luxurious, tender, restaurant-quality.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 36,
+          "carbs": 4,
+          "fat": 38
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom steak with pepper sauce",
+        "sifat_appeal": [
+          "luks_seven",
+          "centil_kibri",
+          "macera_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.7,
+        "name_zh_hans": "Steak with Pepper Sauce"
+      },
+      {
+        "id": "en_lunch_016",
+        "name_he": "Cobb Salad",
+        "name_en": "Cobb Salad",
+        "description": "Mixed greens with bacon, egg, avocado, cheddar. Substantial, satisfying salad.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 18,
+          "carbs": 12,
+          "fat": 28
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cobb salad with plant-based bacon",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "luks_seven",
+          "praktikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Cobb Salad"
+      },
+      {
+        "id": "en_lunch_017",
+        "name_he": "Liver & Fava Beans",
+        "name_en": "Liver & Fava Beans",
+        "description": "Pan-fried liver with stewed beans. Traditional, nutrient-rich, acquired taste.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 32,
+          "carbs": 20,
+          "fat": 16
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom liver with fava beans",
+        "sifat_appeal": [
+          "gelenekci",
+          "cesur_atılgan",
+          "macera_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.5,
+        "name_zh_hans": "Liver & Fava Beans"
+      },
+      {
+        "id": "en_lunch_018",
+        "name_he": "Sausage Roll",
+        "name_en": "Sausage Roll",
+        "description": "Sausage wrapped in flaky pastry. Quick, portable, classic British snack.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 12,
+          "carbs": 26,
+          "fat": 22
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable sausage roll",
+        "sifat_appeal": [
+          "pratikci_zaman",
+          "gelenekci",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Sausage Roll"
+      },
+      {
+        "id": "en_lunch_019",
+        "name_he": "Bacon-Wrapped Beef",
+        "name_en": "Bacon-Wrapped Beef",
+        "description": "Beef wrapped in bacon, pan-fried. Rich, savory, hearty.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 32,
+          "carbs": 2,
+          "fat": 36
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom with tempeh bacon",
+        "sifat_appeal": [
+          "luks_seven",
+          "enerjik",
+          "macera_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.7,
+        "name_zh_hans": "Bacon-Wrapped Beef"
+      },
+      {
+        "id": "en_lunch_020",
+        "name_he": "Lentil Soup",
+        "name_en": "Lentil Soup",
+        "description": "Thick lentil soup with vegetables. Hearty, healthy, warming vegetarian option.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 12,
+          "carbs": 36,
+          "fat": 4
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "ekonomik",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Lentil Soup"
+      }
+    ],
+    "dinner": [
+      {
+        "id": "en_dinner_001",
+        "name_he": "Fish Pie",
+        "name_en": "Fish Pie",
+        "description": "White fish with creamy sauce under pastry crust. Elegant, comforting, traditional.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 24,
+          "carbs": 38,
+          "fat": 20
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Fish pie with plant-based cream",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "centil_kibri",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Fish Pie"
+      },
+      {
+        "id": "en_dinner_002",
+        "name_he": "Chicken with Balsamic Glaze",
+        "name_en": "Chicken with Balsamic Glaze",
+        "description": "Chicken breast with balsamic reduction. Light, elegant, modern British.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 18
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with balsamic glaze",
+        "sifat_appeal": [
+          "centil_kibri",
+          "yaratici_sanat",
+          "saglik_bilinc"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Chicken with Balsamic Glaze"
+      },
+      {
+        "id": "en_dinner_003",
+        "name_he": "Roasted Brussels Sprouts",
+        "name_en": "Roasted Brussels Sprouts",
+        "description": "Roasted Brussels sprouts with bacon and hazelnuts. Vegetarian, seasonal, trendy.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 10,
+          "carbs": 20,
+          "fat": 16
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Roasted with plant-based bacon",
+        "sifat_appeal": [
+          "doganın_cocugu",
+          "saglik_bilinc",
+          "yaratici_sanat"
+        ],
+        "season": "autumn",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Roasted Brussels Sprouts"
+      },
+      {
+        "id": "en_dinner_004",
+        "name_he": "עוף עם אורז",
+        "name_en": "Chicken with Rice",
+        "description": "Simple roasted chicken with rice. Home-cooked, comforting, family meal.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 28,
+          "carbs": 40,
+          "fat": 12
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Roasted vegetables with rice",
+        "sifat_appeal": [
+          "aile_odakli",
+          "sevgi_dolu",
+          "praktikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "鸡肉配米饭"
+      },
+      {
+        "id": "en_dinner_005",
+        "name_he": "Vegetable Tart with Pesto",
+        "name_en": "Vegetable Tart with Pesto",
+        "description": "Flaky pastry with seasonal vegetables and pesto. Vegetarian, elegant, modern.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 11,
+          "carbs": 32,
+          "fat": 19
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tart with plant-based pesto",
+        "sifat_appeal": [
+          "yaratici_sanat",
+          "saglik_bilinc",
+          "centil_kibri"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Vegetable Tart with Pesto"
+      },
+      {
+        "id": "en_dinner_006",
+        "name_he": "Lamb with Mint Sauce",
+        "name_en": "Lamb with Mint Sauce",
+        "description": "Roasted lamb with traditional mint sauce. Classic British, tender, aromatic.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 32
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom with mint sauce",
+        "sifat_appeal": [
+          "gelenekci",
+          "centil_kibri",
+          "sevgi_dolu"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Lamb with Mint Sauce"
+      },
+      {
+        "id": "en_dinner_007",
+        "name_he": "Broccoli & Cheese",
+        "name_en": "Broccoli & Cheese",
+        "description": "Roasted broccoli with cheddar cheese. Simple, healthy, vegetarian side or main.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 13,
+          "carbs": 18,
+          "fat": 18
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Broccoli with plant-based cheddar",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "doganın_cocugu",
+          "pratikci_zaman"
+        ],
+        "season": "year_round",
+        "frequency_weight": 1.0,
+        "name_zh_hans": "Broccoli & Cheese"
+      },
+      {
+        "id": "en_dinner_008",
+        "name_he": "Creamy Mushroom Pasta",
+        "name_en": "Creamy Mushroom Pasta",
+        "description": "Pasta with mushroom cream sauce. Vegetarian, luxurious, simple elegance.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 14,
+          "carbs": 44,
+          "fat": 20
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pasta with plant-based cream",
+        "sifat_appeal": [
+          "sevgi_dolu",
+          "centil_kibri",
+          "yaratici_sanat"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Creamy Mushroom Pasta"
+      },
+      {
+        "id": "en_dinner_009",
+        "name_he": "Salmon with Teriyaki Sauce",
+        "name_en": "Salmon with Teriyaki Sauce",
+        "description": "Salmon fillet with Asian-inspired teriyaki glaze. Modern, healthy, quick.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 34,
+          "carbs": 12,
+          "fat": 20
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with teriyaki glaze",
+        "sifat_appeal": [
+          "centil_kibri",
+          "macera_seven",
+          "saglik_bilinc"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Salmon with Teriyaki Sauce"
+      },
+      {
+        "id": "en_dinner_010",
+        "name_he": "Steak with Mushroom Sauce",
+        "name_en": "Steak with Mushroom Sauce",
+        "description": "Tender steak topped with rich mushroom sauce. Luxurious, classic, satisfying.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 38,
+          "carbs": 6,
+          "fat": 36
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom steak with sauce",
+        "sifat_appeal": [
+          "luks_seven",
+          "centil_kibri",
+          "macera_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.8,
+        "name_zh_hans": "Steak with Mushroom Sauce"
+      },
+      {
+        "id": "en_dinner_011",
+        "name_he": "Salt-Crusted Fish",
+        "name_en": "Salt-Crusted Fish",
+        "description": "Whole fish baked in salt crust. Dramatic presentation, tender, elegant.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 36,
+          "carbs": 4,
+          "fat": 18
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in herb crust",
+        "sifat_appeal": [
+          "centil_kibri",
+          "yaratici_sanat",
+          "luks_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.7,
+        "name_zh_hans": "Salt-Crusted Fish"
+      },
+      {
+        "id": "en_dinner_012",
+        "name_he": "Lamb Roast with Potatoes",
+        "name_en": "Lamb Roast with Potatoes",
+        "description": "Slow-roasted lamb with root vegetables. Sunday roast classic, comforting.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 32,
+          "carbs": 32,
+          "fat": 28
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom roast with vegetables",
+        "sifat_appeal": [
+          "aile_odakli",
+          "sevgi_dolu",
+          "gelenekci"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Lamb Roast with Potatoes"
+      },
+      {
+        "id": "en_dinner_013",
+        "name_he": "Baked Chicken with Tomatoes",
+        "name_en": "Baked Chicken with Tomatoes",
+        "description": "Chicken baked with tomatoes and herbs. Simple, healthy, homestyle.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 32,
+          "carbs": 12,
+          "fat": 16
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Roasted vegetables with herbs",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "praktikci_zaman",
+          "gelenekci"
+        ],
+        "season": "summer",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Baked Chicken with Tomatoes"
+      },
+      {
+        "id": "en_dinner_014",
+        "name_he": "Lentil Stew",
+        "name_en": "Lentil Stew",
+        "description": "Slow-cooked lentils with vegetables. Vegetarian, hearty, healthy.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 14,
+          "carbs": 40,
+          "fat": 6
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": [
+          "saglik_bilinc",
+          "doganın_cocugu",
+          "ekonomik"
+        ],
+        "season": "winter",
+        "frequency_weight": 0.9,
+        "name_zh_hans": "Lentil Stew"
+      },
+      {
+        "id": "en_dinner_015",
+        "name_he": "Duck with Raspberry Sauce",
+        "name_en": "Duck with Raspberry Sauce",
+        "description": "Duck breast with tart raspberry sauce. Luxurious, elegant, restaurant-quality.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 10,
+          "fat": 30
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom duck with sauce",
+        "sifat_appeal": [
+          "luks_seven",
+          "centil_kibri",
+          "macera_seven"
+        ],
+        "season": "year_round",
+        "frequency_weight": 0.6,
+        "name_zh_hans": "Duck with Raspberry Sauce"
+      }
+    ]
+  }
+}

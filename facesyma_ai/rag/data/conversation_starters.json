@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "description": "Deep psychological and philosophical conversation starters for personality discovery (Turkish & English)",
+    "version": "2.0",
+    "total_questions_per_language": 108,
+    "languages": ["tr", "en"],
+    "categories": [
+      "self_discovery",
+      "hidden_traits",
+      "relationships",
+      "purpose",
+      "authenticity",
+      "shadows",
+      "potential",
+      "connections",
+      "transformation",
+      "legacy"
+    ],
+    "generated_at": "2026-04-18"
+  },
+  "questions_by_category": {
+    "self_discovery": {
+      "description": "Kendini bulma, tanıma, keşfetme | Finding yourself, getting to know yourself",
+      "questions_tr": [
+        "Gel, kendini bul.",
+        "Sandığın kadar mısın, başka mı?",
+        "Anlattığın mısın, anlatamadığın mı?",
+        "Hangi sen hâlâ seni bekliyor?",
+        "Şimdiki seni tanımak ister misin?",
+        "Sandığın gibi misin, yoksa sandığından başka mı?",
+        "Hiç kendinden kaçtığını fark ettin mi?",
+        "Gerçek senin kim olduğunu biliyor musun?",
+        "Hangi senin en samimi hali?",
+        "Kendine hangi soruyu asla soramazsın?",
+        "Kimsin aslında, kendine göre?",
+        "Hangi sen senin en gerçek sen?"
+      ],
+      "questions_en": [
+        "Come, find yourself.",
+        "Are you as you think you are, or something else?",
+        "Are you who you appear to be?",
+        "Which you is still waiting for you?",
+        "Do you want to get to know the you of today?",
+        "Are you who you believe yourself to be?",
+        "Have you ever noticed yourself escaping from yourself?",
+        "Do you truly know who you really are?",
+        "What is your most authentic self?",
+        "What question do you never ask yourself?",
+        "Who are you really, in your own eyes?",
+        "Which self of yours is the most genuine?"
+      ]
+    },
+    "hidden_traits": {
+      "description": "Gizli yönler, saklı güçler, fark edilmeyen özellikler | Hidden sides, buried strengths",
+      "questions_tr": [
+        "Fark etmediğin nefesini duymak ister misin?",
+        "Fark etmediğin gücün ne?",
+        "Sakladığın şeyi bulmak ister misin?",
+        "Bilmediğin kendinle tanışmak ister misin?",
+        "Görmediğin yüzünü görmek ister misin?",
+        "Hangi suskunluğun aslında çığlık?",
+        "Kimlere karşı kendini saklamışsın?",
+        "Hangi korkun aslında gücünün işareti?",
+        "Neyin altında hangi başka şey saklanıyor?",
+        "Kendinde hangi çelişkiyi hep gizledin?",
+        "Kimler seni eksik biliyor?",
+        "Hangi yetenekini asla duydukları yok?",
+        "Ne kadarın görünür, ne kadarın gizli?",
+        "En çok neyi sakladığını bilmek ister misin?"
+      ],
+      "questions_en": [
+        "Do you want to hear the breath you don't notice?",
+        "What is the power you don't realize?",
+        "Do you want to find what you're hiding?",
+        "Do you want to meet the self you don't know?",
+        "Do you want to see the face you haven't seen?",
+        "Which silence is actually a scream?",
+        "Who have you hidden yourself from?",
+        "Is your fear actually a sign of your strength?",
+        "What is concealed beneath what you show?",
+        "What contradiction have you always kept secret?",
+        "Who knows an incomplete version of you?",
+        "What talent do people never hear about?",
+        "How much of you is visible, how much is hidden?",
+        "Do you want to know what you hide the most?"
+      ]
+    },
+    "relationships": {
+      "description": "İlişkiler, bağlantılar, kişiler arası dinamikler | Connections, relationships, interpersonal dynamics",
+      "questions_tr": [
+        "Sana en çok benzeyen yabancıyı tanımak ister misin?",
+        "En iyi anlaştığın insan tipini bilmek ister misin?",
+        "Kimlerde kendini kaybettiğini öğrenmek ister misin?",
+        "Sana en çok dokunan kim en çok uzak?",
+        "Seni anlayan kimse var mı gerçekten?",
+        "Hangi insanlarla gelişiyorsun, hangileriyle küçülüyorsun?",
+        "Kim seni en iyi haliyle görmüştür?",
+        "Hangi ilişki seni en çok değiştirdi?",
+        "Kimin yanında en çok kendini hissedersin?",
+        "Hangi kişi sende hangi yönü açığa çıkardı?",
+        "Kim sana en çok benziyor karakter olarak?",
+        "Hangi ilişkinin kaybı seni en çok etkiledi?",
+        "Kimin yanında en çok sessiz kalsın?",
+        "Hangi insana en çok ihtiyaç duyarsın?"
+      ],
+      "questions_en": [
+        "Do you want to get to know the stranger who resembles you the most?",
+        "Do you want to know the type of person you get along with best?",
+        "Do you want to learn in whom you lose yourself?",
+        "Who touches you the most? Who is the furthest away?",
+        "Is there truly anyone who understands you?",
+        "Which people help you grow, and which ones diminish you?",
+        "Who has seen you at your best?",
+        "Which relationship changed you the most?",
+        "In whose presence do you feel most like yourself?",
+        "Which person brought out a different side of you?",
+        "Who do you resemble most in character?",
+        "The loss of which relationship affected you most?",
+        "In whose presence are you most silent?",
+        "Which person do you need the most?"
+      ]
+    },
+    "purpose": {
+      "description": "Amaç, anlam, yaşam yönü | Life purpose, meaning, direction",
+      "questions_tr": [
+        "Seni senle buluşturmak ister misin?",
+        "Sana seni anlatmam nasıl olur?",
+        "Kendini benden öğrenmek ister misin?",
+        "Hayatın asıl anlamı ne olabilir?",
+        "Hangi amaç seni gerçekten çekiyor?",
+        "Neyin için uğraştığını bilmek ister misin?",
+        "Hangi başarı seni mutlu eder?",
+        "Neye dokundum, neyi değiştirebilirim?",
+        "Hangi mirası bırakmak istersen?",
+        "Neden bu hayatı yaşıyorsun?",
+        "Hangi hayali gerçekten senin?",
+        "Hangi başarıda kalpten mutlu olursan?"
+      ],
+      "questions_en": [
+        "Do you want to bring you together with yourself?",
+        "How would it be if I described you to yourself?",
+        "Do you want to learn about yourself from me?",
+        "What could be the true meaning of your life?",
+        "What purpose truly draws you?",
+        "Do you know what you're really striving for?",
+        "What kind of success would make you truly happy?",
+        "What have you touched, and what can you change?",
+        "What legacy do you want to leave?",
+        "Why are you living this life?",
+        "Which dream is truly yours?",
+        "What achievement would fill your heart with joy?"
+      ]
+    },
+    "authenticity": {
+      "description": "Gerçeklik, dürüstlük, kimlik | Truthfulness, honesty, identity",
+      "questions_tr": [
+        "Ne kadarın oyuncu, ne kadarın gerçek?",
+        "Kimler seni eksik tanıyor?",
+        "Hangi cümleler yalanın parçası?",
+        "Hangi gülüş sahte, hangi ciddiyetse öyle?",
+        "Kendini hangi durumlarda bulmuyorsun?",
+        "Hangi ortamda en çok yalan söylersen?",
+        "Gerçek duygularını kimden saklamışsın?",
+        "Hangi veriye görenerek değiştin?",
+        "Toplum seni neye zorlıyor da kabul ettin?",
+        "Kendine hangi şeyde ihanet ettin?",
+        "Hangi yalanı en çok inanmışsın?",
+        "Gerçek seni kim görmek istemez?"
+      ],
+      "questions_en": [
+        "How much of you is an actor, how much is real?",
+        "Who knows an incomplete version of you?",
+        "Which words are part of a lie?",
+        "Which smile is fake, which seriousness is real?",
+        "In what situations do you not find yourself?",
+        "In which settings do you lie the most?",
+        "From whom have you hidden your true feelings?",
+        "What did you learn that changed you?",
+        "What is society forcing you to accept?",
+        "In what way have you betrayed yourself?",
+        "Which lie have you believed the most?",
+        "Who doesn't want to see the real you?"
+      ]
+    },
+    "shadows": {
+      "description": "Gölgeler, çelişkiler, karanlık taraflar | Shadow self, contradictions, dark sides",
+      "questions_tr": [
+        "Kendi içinde ne kadar karanlık var?",
+        "Hangi kötülüğü kendinde hissettin?",
+        "Neyin verilen haline kızdın en çok?",
+        "Hangi duygunda kendini tanımıyorsun?",
+        "Hangi harika insanı kinayeyle görürsün?",
+        "Neden çoğu zaman mutsuz olur gibisin?",
+        "Hangi öfkenin altında ne yatıyor?",
+        "Kimleri önemsememekten sen rahat mısın?",
+        "Hangi durumda en kötü versiyonun ortaya çıkıyor?",
+        "Hangi canavarını hâlâ besliyor musun?",
+        "Hangi vicdan azabı hep peşinde dolaşıyor?",
+        "Hangi ayıbını kimse bilmeyeceğini düşünürsün?"
+      ],
+      "questions_en": [
+        "How much darkness exists within you?",
+        "What evil have you felt inside yourself?",
+        "What has made you angriest about how things are?",
+        "What emotion don't you recognize in yourself?",
+        "Which wonderful person do you secretly resent?",
+        "Why do you often seem unhappy?",
+        "What lies beneath your anger?",
+        "Are you at peace with not caring about some people?",
+        "In what situation does your worst version emerge?",
+        "What monster inside you are you still feeding?",
+        "What guilt follows you everywhere?",
+        "What shame do you think no one knows about?"
+      ]
+    },
+    "potential": {
+      "description": "Potansiyel, büyüme, gelişim | Potential, growth, development",
+      "questions_tr": [
+        "Hangi versiyonun olabilirdin?",
+        "Neleri hâlâ başarabileceğini inanıyor musun?",
+        "Hangi alana sadeceli ilgi duysan neler olur?",
+        "Hangisine inansan hayatın değişir?",
+        "Hangi korkudan kurtulsam kim olurum?",
+        "Neyde başarılı olmaya çalışmadın?",
+        "Hangisinde disiplin uygulsam?",
+        "Hangi yeteneğin uyuyor hâlâ?",
+        "Neyin uzmanı olabilirdin?",
+        "Hangi özel bir şey sende özel?",
+        "Hangisinin en iyi hali sensinde yatıyor?",
+        "Ne değişirse tamamlanmış hissedeceksin?"
+      ],
+      "questions_en": [
+        "Which version of yourself could you have been?",
+        "Do you still believe you can achieve great things?",
+        "What if you dedicated yourself fully to one thing?",
+        "What if you truly believed in yourself?",
+        "Who would you be if you weren't afraid?",
+        "What have you never seriously tried to excel at?",
+        "What would change if you had discipline?",
+        "What talent is still sleeping inside you?",
+        "What field could you have mastered?",
+        "What makes you uniquely special?",
+        "Where is your greatest potential hiding?",
+        "What change would make you feel complete?"
+      ]
+    },
+    "connections": {
+      "description": "Bağlantılar, karşılıklılık, empati | Bonds, reciprocity, empathy",
+      "questions_tr": [
+        "Hangi insandan en çok öğrendin?",
+        "Kim seni en çok etkileyen insan?",
+        "Hangi aile dinamiği seni yüce yaptı?",
+        "Hangi kuşağın mirası taşıyorsun?",
+        "Kimin yanında en çok tamamlanmış hissedersin?",
+        "Hangi akraba seni anlaşılırsın?",
+        "Ailenin hangi konusu hep gizli kaldı?",
+        "Hangi ebeveyn seni kim yaptı?",
+        "Hangi kardeş dinamiği seni değiştirdi?",
+        "Kimin yanında çocuk kalır gibi olursun?",
+        "Hangi aile sırı hep sende kaldı?",
+        "Hangi neslin özelliği sende de var?",
+        "Kim seni en iyi anlaşılır?",
+        "Hangi köken seni şekillendirdi?"
+      ],
+      "questions_en": [
+        "From which person have you learned the most?",
+        "Who is the most influential person in your life?",
+        "What family dynamic elevated you?",
+        "What generational inheritance do you carry?",
+        "In whose presence do you feel most complete?",
+        "Which family member truly understands you?",
+        "What family secret has always remained hidden?",
+        "Which parent made you who you are?",
+        "What sibling dynamic changed you?",
+        "In whose presence do you become childlike?",
+        "What family secret have you kept?",
+        "Which generation's traits do you carry?",
+        "Who understands you the best?",
+        "Which roots shaped who you are?"
+      ]
+    },
+    "transformation": {
+      "description": "Değişim, dönüşüm, evrim | Change, transformation, evolution",
+      "questions_tr": [
+        "Hangi olaydan sonra harita değişti?",
+        "Hangi çatlak seni güzelleştirdi?",
+        "Hangi acı seni büyüttü?",
+        "Hangi başarısızlık seni düzeltindi?",
+        "Hangi kaybıyla öğrendin?",
+        "Hangi yıkılış yeniden bitti?",
+        "Hangi ıstırap seni iyileştirdi?",
+        "Hangi terslik en iyi kararını yaptırdı?",
+        "Hangi kırılış seni güçlendirdi?",
+        "Hangisini bırakınca özgür oldum?",
+        "Hangi değişim seni şaşırttı?",
+        "Hangi an tamamen farklılaştın?"
+      ],
+      "questions_en": [
+        "After which event did your map change?",
+        "Which wound made you more beautiful?",
+        "What pain made you grow?",
+        "Which failure corrected you?",
+        "What loss taught you something?",
+        "Which collapse ended and rebuilt you?",
+        "What suffering healed you?",
+        "Which setback led to your best decision?",
+        "Which breaking made you stronger?",
+        "What did you have to let go of to be free?",
+        "Which change surprised you?",
+        "In which moment did you become completely different?"
+      ]
+    },
+    "legacy": {
+      "description": "Miras, kalıcılık, etki | Legacy, permanence, impact",
+      "questions_tr": [
+        "Hangisini geride bırakmak istersen?",
+        "Neyin mirasını taşıyıp istersen?",
+        "Kimler senden ne öğrenecek?",
+        "Hangi söz sende yaşayacak?",
+        "Hangi dileklerin gerçek olması en çok istersen?",
+        "Neyi değiştiremezse çok ıslaklarsın?",
+        "Hangi medeniyete katkı etmeyi hayal ettin?",
+        "Hangi duşağında kimler değişsin?",
+        "Hangi iyiliğin özeği seninle kalıyor?",
+        "Kimin yaşadığını sen mi değiştirdin?",
+        "Hangi iyileşmeye sen aracı oldun?",
+        "Kimler sayende daha özgür?"
+      ],
+      "questions_en": [
+        "What do you want to leave behind?",
+        "What inheritance do you want to pass on?",
+        "What will people learn from you?",
+        "What words will live on in you?",
+        "What wish do you most want to come true?",
+        "What would you deeply regret not changing?",
+        "What contribution to the world have you dreamed of?",
+        "Whose life have you influenced?",
+        "What good action lives on through you?",
+        "Have you changed someone's life?",
+        "What healing have you been part of?",
+        "Who is freer because of you?"
+      ]
+    }
+  },
+  "usage": {
+    "description": "Bu soruları RAG sistemi ile kullanma",
+    "languages_supported": ["tr", "en"],
+    "methods": [
+      "1. Chat endpoint: /chat/message'e soru gönder (lang: 'tr' or 'en')",
+      "2. Suggestion API: GET /chat/suggestions?category=self_discovery&lang=en (gelecek versiyon)",
+      "3. Batch test: test_rag_simple.py ile CHROMA_PATH env var set et"
+    ],
+    "expected_behavior": "RAG retriever, sorudan ilgili sıfat karakteristikleri bulup LLM'e context olarak injekte eder. Cevap daha derinlemesine ve ilişkili olur."
+  }
+}

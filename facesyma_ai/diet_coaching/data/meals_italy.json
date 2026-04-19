@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "it_breakfast_001",
+    "name_tr": "Cappuccino ve Cornetto",
+    "name_en": "Cappuccino and Cornetto",
+    "description": "Creamy cappuccino with a buttery, flaky cornetto pastry. Classic Italian breakfast combination.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 35,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Oat milk cappuccino with vegan cornetto made from coconut oil",
+    "sifat_appeal": ["zarif", "santiye", "ozguvenlı"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "it_breakfast_002",
+    "name_tr": "Frittata Italiana",
+    "name_en": "Italian Frittata",
+    "description": "Baked egg dish with zucchini, bell peppers, and fresh herbs. Fluffy and savory.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 18,
+      "carbs": 12,
+      "fat": 22
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu-based frittata with turmeric and nutritional yeast",
+    "sifat_appeal": ["saglikli", "guclu", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_breakfast_003",
+    "name_tr": "Grano Turco Polenta",
+    "name_en": "Polenta with Ricotta",
+    "description": "Creamy polenta topped with sweet ricotta cheese and fresh berries.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 8
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Almond milk polenta with cashew cream and berries",
+    "sifat_appeal": ["rahat", "tatli", "sevgi_dolu"],
+    "season": "year_round",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_breakfast_004",
+    "name_tr": "Pane e Peperone",
+    "name_en": "Roasted Pepper Bread",
+    "description": "Toasted bread with roasted red peppers, garlic, olive oil, and oregano.",
+    "nutrition": {
+      "calories": 250,
+      "protein": 8,
+      "carbs": 38,
+      "fat": 7
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["basit", "saglikli", "dogu"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_breakfast_005",
+    "name_tr": "Yogurt Muesli",
+    "name_en": "Greek Yogurt Muesli",
+    "description": "Creamy Greek yogurt with muesli, honey, and fresh figs.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 15,
+      "carbs": 45,
+      "fat": 6
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Coconut yogurt with granola and dates",
+    "sifat_appeal": ["saglikli", "akilli", "tatli"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_breakfast_006",
+    "name_tr": "Focaccia Italiana",
+    "name_en": "Italian Focaccia",
+    "description": "Olive oil-infused flatbread with sea salt and rosemary sprigs.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "carbs": 40,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["tatli", "santiye", "basit"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_breakfast_007",
+    "name_tr": "Uova Strapazzate",
+    "name_en": "Scrambled Eggs Italian Style",
+    "description": "Soft scrambled eggs with fresh tomatoes, basil, and mozzarella.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 16,
+      "carbs": 8,
+      "fat": 20
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Crumbled tofu with fresh tomatoes, basil, and nutritional yeast",
+    "sifat_appeal": ["basit", "guclu", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_breakfast_008",
+    "name_tr": "Panettone Dilimi",
+    "name_en": "Panettone Slice",
+    "description": "Traditional Italian Christmas cake with candied fruit and raisins.",
+    "nutrition": {
+      "calories": 350,
+      "protein": 6,
+      "carbs": 48,
+      "fat": 16
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan panettone made with plant-based butter and egg replacer",
+    "sifat_appeal": ["tatli", "sevgi_dolu", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 0.7
+  },
+  {
+    "id": "it_breakfast_009",
+    "name_tr": "Crostata Murebba",
+    "name_en": "Berry Tart",
+    "description": "Sweet pastry tart with jam and fresh berries.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 5,
+      "carbs": 46,
+      "fat": 13
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan pastry with coconut cream and fresh berries",
+    "sifat_appeal": ["tatli", "kadin", "zarif"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_breakfast_010",
+    "name_tr": "Prosciutto Melone",
+    "name_en": "Prosciutto and Melon",
+    "description": "Thinly sliced prosciutto wrapped around sweet cantaloupe melon.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "carbs": 22,
+      "fat": 14
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Coconut bacon with melon and fresh mint",
+    "sifat_appeal": ["sofistike", "tatli", "santiye"],
+    "season": "summer",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "it_breakfast_011",
+    "name_tr": "Ricotta Taze Meyve",
+    "name_en": "Ricotta with Fresh Fruit",
+    "description": "Creamy ricotta cheese with strawberries, peaches, and honey drizzle.",
+    "nutrition": {
+      "calories": 250,
+      "protein": 14,
+      "carbs": 28,
+      "fat": 9
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Cashew cream with fresh fruit and maple syrup",
+    "sifat_appeal": ["tatli", "saglikli", "zarif"],
+    "season": "summer",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_breakfast_012",
+    "name_tr": "Pandoro Keki",
+    "name_en": "Pandoro Cake",
+    "description": "Light, fluffy Italian cake dusted with powdered sugar.",
+    "nutrition": {
+      "calories": 330,
+      "protein": 5,
+      "carbs": 50,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan pandoro with plant-based butter and almond milk",
+    "sifat_appeal": ["tatli", "hafif", "santiye"],
+    "season": "winter",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "it_breakfast_013",
+    "name_tr": "Kaşar Domatesi Tost",
+    "name_en": "Cheese and Tomato Toast",
+    "description": "Toasted bread with fresh mozzarella, tomato, and basil.",
+    "nutrition": {
+      "calories": 270,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 11
+    },
+    "prep_time_min": 8,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Tofu-based cheese alternative with fresh tomato and basil",
+    "sifat_appeal": ["basit", "tatli", "saglikli"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_breakfast_014",
+    "name_tr": "Kahve Cappuccino",
+    "name_en": "Strong Italian Coffee",
+    "description": "Thick, rich Italian espresso with hot milk. Morning essential.",
+    "nutrition": {
+      "calories": 90,
+      "protein": 3,
+      "carbs": 8,
+      "fat": 3
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Oat milk cappuccino",
+    "sifat_appeal": ["guclu", "basit", "ozguvenlı"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "it_breakfast_015",
+    "name_tr": "Bisküvi Şerbet",
+    "name_en": "Biscotti with Gelato",
+    "description": "Twice-baked almond biscotti dunked in gelato.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 6,
+      "carbs": 44,
+      "fat": 12
+    },
+    "prep_time_min": 5,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Vegan biscotti with dairy-free gelato",
+    "sifat_appeal": ["tatli", "geleneksel", "zarif"],
+    "season": "year_round",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "it_lunch_001",
+    "name_tr": "Spaghetti Carbonara",
+    "name_en": "Spaghetti Carbonara",
+    "description": "Creamy pasta with guanciale, eggs, Parmesan, and black pepper. Roman classic.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 22,
+      "carbs": 52,
+      "fat": 20
+    },
+    "prep_time_min": 18,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pasta with cashew cream, coconut bacon, and nutritional yeast",
+    "sifat_appeal": ["tatli", "klasik", "santiye"],
+    "season": "year_round",
+    "frequency_weight": 1.2
+  },
+  {
+    "id": "it_lunch_002",
+    "name_tr": "Lasagna Bolognese",
+    "name_en": "Lasagna Bolognese",
+    "description": "Layered pasta with rich meat sauce, béchamel, and melted cheese.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 24
+    },
+    "prep_time_min": 60,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil bolognese with cashew béchamel and nutritional yeast",
+    "sifat_appeal": ["sevgi_dolu", "samimi", "guclü"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_lunch_003",
+    "name_tr": "Risotto Milanese",
+    "name_en": "Risotto Milanese",
+    "description": "Creamy saffron risotto with butter, stock, and Parmesan.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 14,
+      "carbs": 54,
+      "fat": 16
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Risotto with vegetable stock, nutritional yeast, and plant-based butter",
+    "sifat_appeal": ["zarif", "sofistike", "centil_kibri"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_lunch_004",
+    "name_tr": "Pappardelle Boar",
+    "name_en": "Pappardelle with Wild Boar",
+    "description": "Wide ribbons of pasta with slow-cooked wild boar ragù sauce.",
+    "nutrition": {
+      "calories": 510,
+      "protein": 30,
+      "carbs": 48,
+      "fat": 22
+    },
+    "prep_time_min": 90,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom ragù with walnuts for texture",
+    "sifat_appeal": ["guclü", "ilkeli", "sofistike"],
+    "season": "winter",
+    "frequency_weight": 0.8
+  },
+  {
+    "id": "it_lunch_005",
+    "name_tr": "Ragu di Carne",
+    "name_en": "Meat Ragù with Pasta",
+    "description": "Rich, slow-cooked meat sauce served over fresh egg pasta.",
+    "nutrition": {
+      "calories": 490,
+      "protein": 26,
+      "carbs": 50,
+      "fat": 20
+    },
+    "prep_time_min": 120,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil and mushroom ragù",
+    "sifat_appeal": ["tatli", "sevgi_dolu", "geleneksel"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_lunch_006",
+    "name_tr": "Osso Buco",
+    "name_en": "Osso Buco",
+    "description": "Braised veal shanks in white wine, tomatoes, and aromatic vegetables.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 36,
+      "carbs": 18,
+      "fat": 28
+    },
+    "prep_time_min": 150,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and lentil stew with same aromatics",
+    "sifat_appeal": ["sofistike", "guclu", "centil_kibri"],
+    "season": "winter",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_lunch_007",
+    "name_tr": "Risotto Fungi",
+    "name_en": "Mushroom Risotto",
+    "description": "Creamy risotto with wild mushrooms, garlic, and Parmesan.",
+    "nutrition": {
+      "calories": 400,
+      "protein": 13,
+      "carbs": 52,
+      "fat": 15
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe with vegetable stock and nutritional yeast",
+    "sifat_appeal": ["saglikli", "zarif", "dogu"],
+    "season": "autumn",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_lunch_008",
+    "name_tr": "Pesto Basilico Pasta",
+    "name_en": "Pesto Basil Pasta",
+    "description": "Linguine tossed in fresh basil pesto with pine nuts and Parmesan.",
+    "nutrition": {
+      "calories": 450,
+      "protein": 16,
+      "carbs": 48,
+      "fat": 22
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pesto with cashews and nutritional yeast",
+    "sifat_appeal": ["tatli", "saglikli", "rahat"],
+    "season": "summer",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "it_lunch_009",
+    "name_tr": "Cacio e Pepe",
+    "name_en": "Cacio e Pepe",
+    "description": "Simple yet elegant pasta with Pecorino Romano and cracked black pepper.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 50,
+      "fat": 16
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pasta with nutritional yeast and black pepper",
+    "sifat_appeal": ["basit", "zarif", "klassik"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "it_lunch_010",
+    "name_tr": "Amatriciana Pasta",
+    "name_en": "Amatriciana",
+    "description": "Pasta with guanciale, tomato, and Pecorino Romano. Roman tradition.",
+    "nutrition": {
+      "calories": 460,
+      "protein": 20,
+      "carbs": 50,
+      "fat": 20
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Pasta with coconut bacon and fresh tomato sauce",
+    "sifat_appeal": ["guclü", "zarif", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_lunch_011",
+    "name_tr": "Saltimbocca Veal",
+    "name_en": "Veal Saltimbocca",
+    "description": "Veal cutlets wrapped with prosciutto and sage, pan-seared.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 40,
+      "carbs": 12,
+      "fat": 28
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Tofu cutlets with sage and nutritional yeast",
+    "sifat_appeal": ["sofistike", "guclü", "centil_kibri"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_lunch_012",
+    "name_tr": "Eggplant Parmigiana",
+    "name_en": "Eggplant Parmigiana",
+    "description": "Layered eggplant with tomato sauce, mozzarella, and basil.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 26
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe with vegan mozzarella",
+    "sifat_appeal": ["saglikli", "sevgi_dolu", "zarif"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_lunch_013",
+    "name_tr": "Branzino Grilled",
+    "name_en": "Grilled Sea Bass",
+    "description": "Whole sea bass grilled with lemon, rosemary, and olive oil.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 42,
+      "carbs": 8,
+      "fat": 20
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Grilled tofu steaks with same aromatics",
+    "sifat_appeal": ["saglikli", "zarif", "macera_seven"],
+    "season": "summer",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_lunch_014",
+    "name_tr": "Spaghetti Vongole",
+    "name_en": "Spaghetti Vongole",
+    "description": "Pasta with fresh littleneck clams in white wine and garlic sauce.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 14
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Mushroom and artichoke spaghetti with white wine sauce",
+    "sifat_appeal": ["zarif", "sofistike", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_lunch_015",
+    "name_tr": "Gnocchi al Pesto",
+    "name_en": "Gnocchi al Pesto",
+    "description": "Soft potato dumplings tossed in fresh basil pesto.",
+    "nutrition": {
+      "calories": 440,
+      "protein": 14,
+      "carbs": 56,
+      "fat": 18
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Gnocchi with vegan pesto and nutritional yeast",
+    "sifat_appeal": ["tatli", "rahat", "saglikli"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_lunch_016",
+    "name_tr": "Polpette Sugo",
+    "name_en": "Italian Meatballs",
+    "description": "Tender meatballs in rich tomato sauce with fresh basil.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 30,
+      "carbs": 28,
+      "fat": 26
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Lentil and mushroom meatballs",
+    "sifat_appeal": ["sevgi_dolu", "samimi", "guclü"],
+    "season": "year_round",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_lunch_017",
+    "name_tr": "Calamari Fritti",
+    "name_en": "Fried Squid",
+    "description": "Crispy fried calamari served with lemon and fresh herbs.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 24,
+      "fat": 22
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Fried tofu rings with lemon and herbs",
+    "sifat_appeal": ["macera_seven", "zarif", "basit"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_lunch_018",
+    "name_tr": "Polenta Tartufo",
+    "name_en": "Polenta with Truffle",
+    "description": "Creamy polenta topped with black truffle shavings and butter.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 12,
+      "carbs": 42,
+      "fat": 18
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Polenta with mushroom-truffle oil and nutritional yeast",
+    "sifat_appeal": ["sofistike", "centil_kibri", "zarif"],
+    "season": "autumn",
+    "frequency_weight": 0.75
+  },
+  {
+    "id": "it_lunch_019",
+    "name_tr": "Cotoletta Milanese",
+    "name_en": "Milanese Cutlet",
+    "description": "Breaded and fried veal cutlet, crispy outside and tender inside.",
+    "nutrition": {
+      "calories": 450,
+      "protein": 36,
+      "carbs": 20,
+      "fat": 24
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Breaded tofu cutlet with same cooking method",
+    "sifat_appeal": ["guclü", "tatli", "geleneksel"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_lunch_020",
+    "name_tr": "Tagliatelle Fungi",
+    "name_en": "Tagliatelle with Mushrooms",
+    "description": "Ribbon pasta with porcini, cremini, and shiitake mushrooms.",
+    "nutrition": {
+      "calories": 430,
+      "protein": 16,
+      "carbs": 52,
+      "fat": 18
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe with nutritional yeast instead of Parmesan",
+    "sifat_appeal": ["zarif", "saglikli", "dogu"],
+    "season": "autumn",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_001",
+    "name_tr": "Minestrone Soup",
+    "name_en": "Minestrone Soup",
+    "description": "Hearty vegetable soup with pasta and beans. Light yet satisfying.",
+    "nutrition": {
+      "calories": 260,
+      "protein": 12,
+      "carbs": 38,
+      "fat": 6
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 1.0
+  },
+  {
+    "id": "it_dinner_002",
+    "name_tr": "Pasta Aglio Olio",
+    "name_en": "Pasta with Garlic and Oil",
+    "description": "Simple pasta tossed in garlic-infused olive oil and red pepper flakes.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 10,
+      "carbs": 48,
+      "fat": 10
+    },
+    "prep_time_min": 12,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["basit", "saglikli", "dogu"],
+    "season": "year_round",
+    "frequency_weight": 1.1
+  },
+  {
+    "id": "it_dinner_003",
+    "name_tr": "Pomodoro Salad",
+    "name_en": "Tomato and Basil Salad",
+    "description": "Fresh tomatoes, mozzarella, basil, and olive oil. Caprese style.",
+    "nutrition": {
+      "calories": 220,
+      "protein": 10,
+      "carbs": 12,
+      "fat": 14
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same salad with cashew mozzarella",
+    "sifat_appeal": ["saglikli", "zarif", "tatli"],
+    "season": "summer",
+    "frequency_weight": 1.05
+  },
+  {
+    "id": "it_dinner_004",
+    "name_tr": "Arugula Salata",
+    "name_en": "Arugula Salad",
+    "description": "Peppery arugula with shaved Parmesan, lemon dressing, and pine nuts.",
+    "nutrition": {
+      "calories": 240,
+      "protein": 11,
+      "carbs": 10,
+      "fat": 16
+    },
+    "prep_time_min": 10,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same salad with nutritional yeast",
+    "sifat_appeal": ["saglikli", "akilli", "zarif"],
+    "season": "spring",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_005",
+    "name_tr": "Bruschetta Domates",
+    "name_en": "Tomato Bruschetta",
+    "description": "Toasted bread topped with fresh tomato, garlic, and basil.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 8,
+      "carbs": 38,
+      "fat": 10
+    },
+    "prep_time_min": 15,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["basit", "tatli", "macera_seven"],
+    "season": "summer",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_006",
+    "name_tr": "Pasta Primavera",
+    "name_en": "Pasta Primavera",
+    "description": "Pasta with seasonal spring vegetables in light olive oil.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 12,
+      "carbs": 50,
+      "fat": 10
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "hafif", "rahat"],
+    "season": "spring",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_007",
+    "name_tr": "Risi e Bisi",
+    "name_en": "Rice and Peas",
+    "description": "Creamy rice with fresh peas and Parmesan. Venetian specialty.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 14,
+      "carbs": 42,
+      "fat": 10
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Rice and peas with vegetable stock and nutritional yeast",
+    "sifat_appeal": ["saglikli", "rahat", "geleneksel"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_dinner_008",
+    "name_tr": "Zucchini Fritters",
+    "name_en": "Zucchini Fritters",
+    "description": "Crispy pan-fried zucchini cakes with fresh herbs.",
+    "nutrition": {
+      "calories": 280,
+      "protein": 10,
+      "carbs": 28,
+      "fat": 14
+    },
+    "prep_time_min": 20,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Zucchini fritters with aquafaba binder",
+    "sifat_appeal": ["saglikli", "hafif", "basit"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_dinner_009",
+    "name_tr": "White Bean Soup",
+    "name_en": "White Bean Soup",
+    "description": "Creamy white bean soup with garlic, herbs, and olive oil.",
+    "nutrition": {
+      "calories": 250,
+      "protein": 14,
+      "carbs": 36,
+      "fat": 4
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "rahat", "sevgi_dolu"],
+    "season": "winter",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_010",
+    "name_tr": "Spinach Crepes",
+    "name_en": "Spinach Crepes",
+    "description": "Delicate crepes filled with spinach and ricotta cheese.",
+    "nutrition": {
+      "calories": 300,
+      "protein": 16,
+      "carbs": 32,
+      "fat": 12
+    },
+    "prep_time_min": 35,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Spinach crepes with cashew cream",
+    "sifat_appeal": ["zarif", "saglikli", "centil_kibri"],
+    "season": "spring",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_dinner_011",
+    "name_tr": "Risotto Seafood",
+    "name_en": "Seafood Risotto",
+    "description": "Creamy risotto with shrimp, mussels, and clams.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 12
+    },
+    "prep_time_min": 40,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Mushroom and artichoke risotto",
+    "sifat_appeal": ["zarif", "sofistike", "macera_seven"],
+    "season": "year_round",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_dinner_012",
+    "name_tr": "Eggplant Involtini",
+    "name_en": "Eggplant Involtini",
+    "description": "Eggplant rolls filled with ricotta and herbs, baked with sauce.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 16,
+      "carbs": 28,
+      "fat": 20
+    },
+    "prep_time_min": 50,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Eggplant rolls with cashew ricotta",
+    "sifat_appeal": ["zarif", "saglikli", "sevgi_dolu"],
+    "season": "summer",
+    "frequency_weight": 0.85
+  },
+  {
+    "id": "it_dinner_013",
+    "name_tr": "Lentil Pasta",
+    "name_en": "Lentil Pasta with Tomato",
+    "description": "Hearty pasta with red lentils and fresh tomato sauce.",
+    "nutrition": {
+      "calories": 360,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 6
+    },
+    "prep_time_min": 30,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": false
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "guclü", "rahat"],
+    "season": "year_round",
+    "frequency_weight": 0.95
+  },
+  {
+    "id": "it_dinner_014",
+    "name_tr": "Grilled Vegetables",
+    "name_en": "Grilled Vegetables",
+    "description": "Seasonal vegetables grilled with garlic, herbs, and olive oil.",
+    "nutrition": {
+      "calories": 200,
+      "protein": 8,
+      "carbs": 24,
+      "fat": 8
+    },
+    "prep_time_min": 25,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": true,
+      "vegan": true,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Same recipe, already vegan-friendly",
+    "sifat_appeal": ["saglikli", "basit", "dogu"],
+    "season": "summer",
+    "frequency_weight": 0.9
+  },
+  {
+    "id": "it_dinner_015",
+    "name_tr": "Roasted Chicken Breast",
+    "name_en": "Roasted Chicken Breast",
+    "description": "Herb-roasted chicken with roasted root vegetables.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 44,
+      "carbs": 16,
+      "fat": 14
+    },
+    "prep_time_min": 45,
+    "dietary": {
+      "omnivore": true,
+      "vegetarian": false,
+      "vegan": false,
+      "gluten_free": true
+    },
+    "vegan_substitute": "Roasted tofu steaks with same seasonings",
+    "sifat_appeal": ["saglikli", "guclü", "basit"],
+    "season": "autumn",
+    "frequency_weight": 0.95
+  }
+]

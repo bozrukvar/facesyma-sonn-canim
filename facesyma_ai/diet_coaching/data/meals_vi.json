@@ -1,0 +1,1062 @@
+{
+  "country_name": "Vietnam",
+  "language_code": "vi",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "vi_breakfast_001",
+        "name_tr": "Pho Sabah Çorbası",
+        "name_en": "Pho (Rice Noodle Soup)",
+        "description": "Aromatic beef broth with rice noodles and fresh herbs. Iconic Vietnamese, warming, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 18,
+          "carbs": 42,
+          "fat": 10
+        },
+        "prep_time_min": 120,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable pho with tofu",
+        "sifat_appeal": ["gelenekci", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "vi_breakfast_002",
+        "name_tr": "Bánh Mì Sandwich",
+        "name_en": "Bánh Mì (Vietnamese Sandwich)",
+        "description": "Crispy baguette with pâté, ham, and fresh vegetables. Quick, flavorful, iconic street food.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 12,
+          "carbs": 38,
+          "fat": 18
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Bánh mì with plant-based pâté",
+        "sifat_appeal": ["macera_seven", "praktikci_zaman", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "vi_breakfast_003",
+        "name_tr": "Nước Mía Nhân Sâm",
+        "name_en": "Sugarcane Juice with Ginger",
+        "description": "Fresh squeezed sugarcane juice with ginger. Refreshing, energizing, traditional.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 1,
+          "carbs": 42,
+          "fat": 0
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["enerjik", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_004",
+        "name_tr": "Xôi Dâu Pirinç Yapışkan",
+        "name_en": "Sticky Rice with Mango",
+        "description": "Sweet sticky rice with fresh mango. Dessert-like, light, tropical.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 4,
+          "carbs": 56,
+          "fat": 3
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["sevgi_dolu", "doganın_cocugu", "luks_seven"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_005",
+        "name_tr": "Bánh Chưng Kare",
+        "name_en": "Bánh Chưng (Sticky Rice Cake)",
+        "description": "Sticky rice and mung bean cake. Traditional, festive, Tet celebration classic.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 8,
+          "carbs": 48,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Bánh chưng with plant-based filling",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_breakfast_006",
+        "name_tr": "Cơm Tấm Trứng",
+        "name_en": "Broken Rice with Egg",
+        "description": "Broken rice with fried egg and vegetables. Humble, satisfying, everyday Vietnamese.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 10,
+          "carbs": 44,
+          "fat": 15
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Broken rice with tofu egg",
+        "sifat_appeal": ["gelenekci", "ekonomik", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "vi_breakfast_007",
+        "name_tr": "Bánh Cuốn Tôm",
+        "name_en": "Steamed Rice Crepes",
+        "description": "Delicate rolled crepes with shrimp filling. Light, elegant, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 36,
+          "fat": 8
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Crepes with vegetable filling",
+        "sifat_appeal": ["centil_kibri", "yaratici_sanat", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_008",
+        "name_tr": "Canh Chua Tôm",
+        "name_en": "Sour Soup",
+        "description": "Light sour soup with shrimp and pineapple. Tangy, refreshing, traditional.",
+        "nutrition": {
+          "calories": 140,
+          "protein": 12,
+          "carbs": 12,
+          "fat": 4
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Sour soup with vegetables and tofu",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_breakfast_009",
+        "name_tr": "Bánh Khot Şarlot",
+        "name_en": "Mini Savory Pancakes",
+        "description": "Golden mini pancakes with shrimp. Crispy, savory, traditional street food.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 14
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pancakes with vegetable filling",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_010",
+        "name_tr": "Cà Phê Siyah",
+        "name_en": "Vietnamese Coffee",
+        "description": "Strong drip coffee with sweetened condensed milk. Bold, creamy, iconic.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 3,
+          "carbs": 24,
+          "fat": 7
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Coffee with plant-based condensed milk",
+        "sifat_appeal": ["centil_kibri", "enerjik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "vi_breakfast_011",
+        "name_tr": "Bánh Bao Tatlı",
+        "name_en": "Steamed Buns",
+        "description": "Fluffy steamed buns with sweet or savory filling. Soft, comforting, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 44,
+          "fat": 8
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Bao with plant-based filling",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_012",
+        "name_tr": "Bánh Rán Tatlı Mung",
+        "name_en": "Fried Sesame Balls",
+        "description": "Golden fried balls with mung bean paste. Sweet, indulgent, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 6,
+          "carbs": 40,
+          "fat": 16
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Sesame balls with vegan filling",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_breakfast_013",
+        "name_tr": "Hủ Tíu Noodle",
+        "name_en": "Hủ Tiếu (Tapioca Soup)",
+        "description": "Light tapioca noodle soup with pork. Delicate, traditional, Southern Vietnamese.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 38,
+          "fat": 8
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tapioca soup with vegetables",
+        "sifat_appeal": ["gelenekci", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_014",
+        "name_tr": "Cơm Chiều Sồi",
+        "name_en": "Savory Rice Porridge",
+        "description": "Rice porridge with pork and seasonings. Warm, comforting, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 11,
+          "carbs": 42,
+          "fat": 10
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Rice porridge with vegetables",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "winter",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_breakfast_015",
+        "name_tr": "Bánh Mỳ Đắng Cà Chua",
+        "name_en": "Toast with Pâté",
+        "description": "Crispy toast with liver pâté and fresh vegetables. Quick, satisfying, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 32,
+          "fat": 16
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Toast with plant-based pâté",
+        "sifat_appeal": ["praktikci_zaman", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ],
+    "lunch": [
+      {
+        "id": "vi_lunch_001",
+        "name_tr": "Bun Cha Pork Tavuk",
+        "name_en": "Bun Cha (Grilled Pork with Noodles)",
+        "description": "Chargrilled pork with rice noodles and fresh herbs. Iconic Vietnamese, aromatic, satisfying.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 22,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled vegetables with noodles",
+        "sifat_appeal": ["macera_seven", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "vi_lunch_002",
+        "name_tr": "Nem Rulo Kızartma",
+        "name_en": "Spring Rolls (Fried)",
+        "description": "Crispy fried rolls with pork and vegetables. Golden, savory, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 36,
+          "fat": 16
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Spring rolls with vegetable filling",
+        "sifat_appeal": ["macera_seven", "luks_seven", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "vi_lunch_003",
+        "name_tr": "Gỏi Cuốn Tôm",
+        "name_en": "Summer Rolls",
+        "description": "Fresh rice paper rolls with shrimp and herbs. Light, healthy, refreshing.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 10,
+          "carbs": 24,
+          "fat": 6
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Summer rolls with vegetables",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "sevgi_dolu"],
+        "season": "summer",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "vi_lunch_004",
+        "name_tr": "Cơm Tấm Sườn",
+        "name_en": "Broken Rice with Grilled Pork",
+        "description": "Broken rice with chargrilled pork chop. Hearty, flavorful, traditional.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 20,
+          "carbs": 44,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Broken rice with grilled vegetables",
+        "sifat_appeal": ["macera_seven", "gelenekci", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "vi_lunch_005",
+        "name_tr": "Bánh Canh Tôm",
+        "name_en": "Tapioca Noodle Soup",
+        "description": "Thick tapioca noodle soup with shrimp. Comforting, filling, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 40,
+          "fat": 10
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Soup with vegetable filling",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_006",
+        "name_tr": "Mì Xào Thăn",
+        "name_en": "Stir-Fried Noodles",
+        "description": "Crispy fried noodles with vegetables and protein. Quick, satisfying, casual.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 14,
+          "carbs": 42,
+          "fat": 18
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Noodles with vegetables and tofu",
+        "sifat_appeal": ["praktikci_zaman", "macera_seven", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "vi_lunch_007",
+        "name_tr": "Lẩu Thái Tom",
+        "name_en": "Thai Hot Pot",
+        "description": "Spicy broth with seafood and vegetables. Social, interactive, warming.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 18,
+          "carbs": 28,
+          "fat": 18
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Hot pot with vegetables and tofu",
+        "sifat_appeal": ["macera_seven", "sosyal_comertkane", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_008",
+        "name_tr": "Cá Nướng Mơ Hương",
+        "name_en": "Grilled Fish",
+        "description": "Whole grilled fish with aromatic spices. Fresh, elegant, coastal specialty.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 18
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled tofu steaks",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_009",
+        "name_tr": "Gỏi Nha Trang Salata",
+        "name_en": "Mixed Salad",
+        "description": "Fresh vegetables with herbs and fish sauce dressing. Light, healthy, refreshing.",
+        "nutrition": {
+          "calories": 180,
+          "protein": 8,
+          "carbs": 16,
+          "fat": 8
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Salad with soy dressing",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_010",
+        "name_tr": "Bún Thang Tavuk",
+        "name_en": "Chicken Vermicelli Soup",
+        "description": "Light chicken broth with rice vermicelli. Delicate, traditional, healing.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 16,
+          "carbs": 36,
+          "fat": 6
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Soup with vegetables and tofu",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_011",
+        "name_tr": "Thịt Kho Tơ Kare",
+        "name_en": "Braised Pork in Caramel",
+        "description": "Pork braised in sweet and savory caramel sauce. Rich, tender, traditional.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 26,
+          "carbs": 12,
+          "fat": 28
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu braised in caramel sauce",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_012",
+        "name_tr": "Mực Nướng Baharat",
+        "name_en": "Grilled Squid",
+        "description": "Grilled squid with herbs and lime. Tender, flavorful, coastal favorite.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 28,
+          "carbs": 6,
+          "fat": 12
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled mushroom steaks",
+        "sifat_appeal": ["centil_kibri", "macera_seven", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_lunch_013",
+        "name_tr": "Rau Xào Garlic",
+        "name_en": "Sautéed Vegetables",
+        "description": "Fresh vegetables sautéed with garlic. Light, healthy, vegetarian.",
+        "nutrition": {
+          "calories": 160,
+          "protein": 6,
+          "carbs": 18,
+          "fat": 7
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_014",
+        "name_tr": "Canh Chua Balık",
+        "name_en": "Sour Fish Soup",
+        "description": "Tangy soup with fish and pineapple. Aromatic, traditional, South Vietnamese.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 20,
+          "carbs": 16,
+          "fat": 10
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Sour soup with vegetables",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_015",
+        "name_tr": "Bún Riêu Cua",
+        "name_en": "Crab Tomato Vermicelli",
+        "description": "Crab broth with tomato and vermicelli. Aromatic, hearty, iconic Northern Vietnamese.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 14,
+          "carbs": 38,
+          "fat": 10
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tomato vermicelli with vegetables",
+        "sifat_appeal": ["gelenekci", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_016",
+        "name_tr": "Chả Cá Hà Nội",
+        "name_en": "Hanoi Fish Cake",
+        "description": "Turmeric fish cake with herbs. Aromatic, traditional, Northern specialty.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 24,
+          "carbs": 16,
+          "fat": 18
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tofu cake with turmeric",
+        "sifat_appeal": ["gelenekci", "centil_kibri", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_lunch_017",
+        "name_tr": "Tôm Sốt Me Tamarind",
+        "name_en": "Tamarind Shrimp",
+        "description": "Shrimp in tangy tamarind sauce. Sour, sweet, aromatic.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 20,
+          "carbs": 12,
+          "fat": 12
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in tamarind sauce",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_lunch_018",
+        "name_tr": "Gà Nướng Mỳ Sesamı",
+        "name_en": "Grilled Chicken",
+        "description": "Chargrilled chicken with sesame seeds. Aromatic, flavorful, casual.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 28,
+          "carbs": 8,
+          "fat": 24
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled vegetables with sesame",
+        "sifat_appeal": ["macera_seven", "enerjik", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_019",
+        "name_tr": "Bánh Xèo Tavuk",
+        "name_en": "Sizzling Crepes",
+        "description": "Crispy crepes with shrimp and pork. Golden, savory, traditional.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 14,
+          "carbs": 38,
+          "fat": 16
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Crepes with vegetable filling",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_lunch_020",
+        "name_tr": "Khoai Nướng Yumurta",
+        "name_en": "Grilled Sweet Potato",
+        "description": "Chargrilled sweet potato with egg. Simple, sweet, satisfying.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 40,
+          "fat": 10
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled sweet potato with tofu",
+        "sifat_appeal": ["doganın_cocugu", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      }
+    ],
+    "dinner": [
+      {
+        "id": "vi_dinner_001",
+        "name_tr": "Cơm Chiều Tavuk",
+        "name_en": "Rice Porridge Dinner",
+        "description": "Savory rice porridge with chicken. Warm, comforting, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 42,
+          "fat": 10
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Rice porridge with vegetables",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_002",
+        "name_tr": "Lẩu Riau Sebze",
+        "name_en": "Hot Pot Dinner",
+        "description": "Interactive hot pot with mixed vegetables and protein. Social, fun, warming.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 16,
+          "carbs": 30,
+          "fat": 16
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable hot pot with tofu",
+        "sifat_appeal": ["macera_seven", "sosyal_comertkane", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_003",
+        "name_tr": "Bún Chả Tối",
+        "name_en": "Evening Grilled Pork",
+        "description": "Chargrilled pork with rice noodles for dinner. Hearty, flavorful, casual.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 20,
+          "carbs": 40,
+          "fat": 16
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled vegetables with noodles",
+        "sifat_appeal": ["macera_seven", "enerjik", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_004",
+        "name_tr": "Cá Kho Tơ Balık",
+        "name_en": "Fish in Caramel",
+        "description": "Fish braised in sweet caramel sauce. Rich, tender, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 28,
+          "carbs": 14,
+          "fat": 20
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in caramel sauce",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_005",
+        "name_tr": "Mì Xào Giòn Tối",
+        "name_en": "Crispy Noodles",
+        "description": "Crispy fried noodles with vegetables. Quick, satisfying, casual.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 12,
+          "carbs": 40,
+          "fat": 18
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Noodles with vegetables and tofu",
+        "sifat_appeal": ["praktikci_zaman", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_006",
+        "name_tr": "Gà Luộc Dill",
+        "name_en": "Boiled Chicken",
+        "description": "Tender boiled chicken with ginger sauce. Light, healthy, simple.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 14
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in ginger sauce",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_007",
+        "name_tr": "Thịt Rang Me Tamarind",
+        "name_en": "Meat in Tamarind",
+        "description": "Meat in tangy tamarind sauce. Sour, sweet, aromatic.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 24,
+          "carbs": 14,
+          "fat": 24
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu in tamarind sauce",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_008",
+        "name_tr": "Canh Chua Tối",
+        "name_en": "Sour Soup Dinner",
+        "description": "Light sour soup with vegetables. Tangy, refreshing, traditional.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 10,
+          "carbs": 20,
+          "fat": 8
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_009",
+        "name_tr": "Rau Xào Tôm",
+        "name_en": "Vegetables with Shrimp",
+        "description": "Sautéed vegetables with shrimp. Light, quick, healthy.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 18,
+          "carbs": 16,
+          "fat": 10
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetables with tofu",
+        "sifat_appeal": ["saglik_bilinc", "praktikci_zaman", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_010",
+        "name_tr": "Gỏi Cuốn Tối Tôm",
+        "name_en": "Summer Rolls Dinner",
+        "description": "Fresh rice paper rolls with herbs. Light, refreshing, healthy.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 12,
+          "carbs": 26,
+          "fat": 8
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Rolls with vegetables",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_011",
+        "name_tr": "Mực Xào Me",
+        "name_en": "Squid in Tamarind",
+        "description": "Squid in tangy tamarind sauce. Tender, flavorful, coastal.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 24,
+          "carbs": 12,
+          "fat": 12
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom in tamarind sauce",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_012",
+        "name_tr": "Bún Bò Huế",
+        "name_en": "Spicy Beef Vermicelli",
+        "description": "Spicy beef broth with vermicelli. Rich, warming, Central Vietnamese.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 18,
+          "carbs": 36,
+          "fat": 16
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Spicy vegetable vermicelli",
+        "sifat_appeal": ["macera_seven", "cesur_atılgan", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_013",
+        "name_tr": "Dưa Leo Tôm",
+        "name_en": "Shrimp & Cucumber",
+        "description": "Shrimp with fresh cucumber salad. Light, refreshing, simple.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 18,
+          "carbs": 12,
+          "fat": 8
+        },
+        "prep_time_min": 15,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cucumber with tofu",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "pratikci_zaman"],
+        "season": "summer",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "vi_dinner_014",
+        "name_tr": "Rau Muống Xào Tỏi",
+        "name_en": "Water Spinach with Garlic",
+        "description": "Sautéed water spinach with garlic. Simple, healthy, vegetarian.",
+        "nutrition": {
+          "calories": 140,
+          "protein": 5,
+          "carbs": 12,
+          "fat": 7
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "vi_dinner_015",
+        "name_tr": "Cơm Tấm Tối Sườn",
+        "name_en": "Broken Rice Dinner",
+        "description": "Broken rice with pork chop and vegetables. Casual, satisfying, traditional.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 18,
+          "carbs": 42,
+          "fat": 16
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Broken rice with grilled vegetables",
+        "sifat_appeal": ["gelenekci", "macera_seven", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ]
+  }
+}

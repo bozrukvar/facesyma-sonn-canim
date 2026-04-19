@@ -1,0 +1,1062 @@
+{
+  "country_name": "Saudi Arabia",
+  "language_code": "ar",
+  "meals": {
+    "breakfast": [
+      {
+        "id": "ar_breakfast_001",
+        "name_tr": "Fül Medames Humus",
+        "name_en": "Fava Beans (Fül)",
+        "description": "Mashed fava beans with olive oil and spices. Traditional Arab breakfast, nutritious, satisfying.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 12,
+          "carbs": 30,
+          "fat": 10
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "ar_breakfast_002",
+        "name_tr": "Haloumi Peyniri Tavalanmış",
+        "name_en": "Fried Halloumi Cheese",
+        "description": "Crispy fried cheese with bread. Rich, salty, traditional Arab breakfast.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 18,
+          "fat": 22
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Fried tofu cheese",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_breakfast_003",
+        "name_tr": "Manakeesh Kat'aif",
+        "name_en": "Cheese-Filled Bread",
+        "description": "Flatbread with cheese and herbs filling. Warm, savory, traditional.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 11,
+          "carbs": 32,
+          "fat": 14
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Manakeesh with plant-based cheese",
+        "sifat_appeal": ["gelenekci", "praktikci_zaman", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ar_breakfast_004",
+        "name_tr": "Çörek Zeytin",
+        "name_en": "Olive & Cheese Pastry",
+        "description": "Flaky pastry with olives and cheese. Savory, indulgent, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 18
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan pastry with olives",
+        "sifat_appeal": ["luks_seven", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_breakfast_005",
+        "name_tr": "Açma Yoğurt Meyve",
+        "name_en": "Yogurt & Fruit",
+        "description": "Plain yogurt with fresh dates and berries. Light, healthy, traditional.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 5
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Plant-based yogurt with fruit",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ar_breakfast_006",
+        "name_tr": "Humus Ekmek",
+        "name_en": "Hummus & Bread",
+        "description": "Chickpea puree with olive oil and bread. Nutritious, filling, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 10,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use standard hummus",
+        "sifat_appeal": ["saglik_bilinc", "ekonomik", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ar_breakfast_007",
+        "name_tr": "Çay Tatlı Hamuri",
+        "name_en": "Tea & Sweet Pastry",
+        "description": "Black tea with honey pastry. Simple, sweet, comforting traditional.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 34,
+          "fat": 9
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegan pastry with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "pratikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_breakfast_008",
+        "name_tr": "Tagen Yumurta Sebze",
+        "name_en": "Shakshuka (Eggs in Sauce)",
+        "description": "Eggs poached in tomato sauce with peppers. Hearty, flavorful, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 11,
+          "carbs": 14,
+          "fat": 20
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu shakshuka",
+        "sifat_appeal": ["sevgi_dolu", "macera_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_breakfast_009",
+        "name_tr": "Hurma Ceviz Kahvesi",
+        "name_en": "Dates & Coffee",
+        "description": "Fresh dates with strong Arabic coffee. Traditional, energizing, symbolic.",
+        "nutrition": {
+          "calories": 200,
+          "protein": 3,
+          "carbs": 42,
+          "fat": 2
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegan coffee preparation",
+        "sifat_appeal": ["gelenekci", "centil_kibri", "enerjik"],
+        "season": "year_round",
+        "frequency_weight": 1.1
+      },
+      {
+        "id": "ar_breakfast_010",
+        "name_tr": "Tabule Ekmek",
+        "name_en": "Tabbouleh & Bread",
+        "description": "Parsley salad with bulgur wheat and bread. Fresh, healthy, light.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 32,
+          "fat": 10
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_breakfast_011",
+        "name_tr": "Samsa Pastırma",
+        "name_en": "Meat Samosa",
+        "description": "Crispy pastry with spiced meat filling. Indulgent, flavorful, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 28,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Samosa with vegetable filling",
+        "sifat_appeal": ["macera_seven", "luks_seven", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_breakfast_012",
+        "name_tr": "Harinah Bal Tereyağ",
+        "name_en": "Savory Semolina Porridge",
+        "description": "Salted semolina porridge with ghee. Rich, savory, traditional Saudi breakfast.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 36,
+          "fat": 14
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Semolina with plant-based ghee",
+        "sifat_appeal": ["gelenekci", "luks_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_breakfast_013",
+        "name_tr": "Aşure Tatlı",
+        "name_en": "Sweet Milk Pudding",
+        "description": "Creamy milk pudding with nuts and dried fruit. Sweet, rich, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 38,
+          "fat": 11
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Pudding with plant-based milk",
+        "sifat_appeal": ["sevgi_dolu", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_breakfast_014",
+        "name_tr": "Peynir Hurma Ekmek",
+        "name_en": "Cheese, Dates & Bread",
+        "description": "White cheese with dates and bread. Traditional combination, satisfying.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 11,
+          "carbs": 36,
+          "fat": 12
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Plant-based cheese with dates",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_breakfast_015",
+        "name_tr": "Çay Bisküvi Baharat",
+        "name_en": "Tea & Spiced Cookies",
+        "description": "Black tea with spiced biscuits. Aromatic, traditional, comforting.",
+        "nutrition": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 28,
+          "fat": 10
+        },
+        "prep_time_min": 5,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Tea with vegan spiced cookies",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      }
+    ],
+    "lunch": [
+      {
+        "id": "ar_lunch_001",
+        "name_tr": "Kebab Riş",
+        "name_en": "Kebab",
+        "description": "Grilled meat skewers with vegetables and rice. Iconic Arab dish, aromatic, festive.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 28,
+          "carbs": 40,
+          "fat": 22
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable kebab with tofu",
+        "sifat_appeal": ["luks_seven", "macera_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 1.2
+      },
+      {
+        "id": "ar_lunch_002",
+        "name_tr": "Shawarma Tavuk",
+        "name_en": "Chicken Shawarma",
+        "description": "Marinated chicken with spices in pita. Quick, flavorful, popular Arab street food.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 26,
+          "carbs": 32,
+          "fat": 20
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Shawarma with seitan",
+        "sifat_appeal": ["macera_seven", "pratikci_zaman", "luks_seven"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ar_lunch_003",
+        "name_tr": "Falafel Humus Tahini",
+        "name_en": "Falafel Platter",
+        "description": "Fried chickpea balls with hummus and tahini sauce. Vegetarian, satisfying, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 13,
+          "carbs": 42,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard falafel",
+        "sifat_appeal": ["ekonomik", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 1.0
+      },
+      {
+        "id": "ar_lunch_004",
+        "name_tr": "Kuru Fasulye Kurubağlama",
+        "name_en": "Beans & Rice",
+        "description": "Slow-cooked beans with rice. Hearty, nutritious, economical.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 12,
+          "carbs": 48,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil version",
+        "sifat_appeal": ["ekonomik", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_lunch_005",
+        "name_tr": "Mansaf Kuzu",
+        "name_en": "Mansaf (Lamb in Yogurt Sauce)",
+        "description": "Lamb with yogurt-based sauce and rice. Festive, traditional, Jordanian-Palestinian dish.",
+        "nutrition": {
+          "calories": 480,
+          "protein": 32,
+          "carbs": 36,
+          "fat": 26
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom mansaf with plant-based yogurt",
+        "sifat_appeal": ["gelenekci", "luks_seven", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_lunch_006",
+        "name_tr": "Köfte Baharat Sos",
+        "name_en": "Spiced Meatballs",
+        "description": "Ground meat meatballs with spices and sauce. Flavorful, traditional, satisfying.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 20,
+          "carbs": 18,
+          "fat": 28
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil meatballs",
+        "sifat_appeal": ["macera_seven", "sevgi_dolu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_007",
+        "name_tr": "Maklouba Pirinç",
+        "name_en": "Maklouba (Upside-Down Rice)",
+        "description": "Layered rice and meat, flipped to present. Impressive presentation, traditional, festive.",
+        "nutrition": {
+          "calories": 440,
+          "protein": 18,
+          "carbs": 50,
+          "fat": 20
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Maklouba with vegetables and tofu",
+        "sifat_appeal": ["yaratici_sanat", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_008",
+        "name_tr": "Balık Izgara Limon",
+        "name_en": "Grilled Fish with Lemon",
+        "description": "Fresh grilled fish with lemon and herbs. Light, healthy, coastal specialty.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 34,
+          "carbs": 6,
+          "fat": 16
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled tofu with lemon",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_009",
+        "name_tr": "Muhamarra Peynir",
+        "name_en": "Red Pepper & Walnut Dip",
+        "description": "Roasted red pepper paste with walnuts, served with bread. Tangy, rich, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 28,
+          "fat": 16
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["macera_seven", "doganın_cocugu", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_010",
+        "name_tr": "Tabuleh Bulgur",
+        "name_en": "Tabbouleh (Bulgur Salad)",
+        "description": "Bulgur salad with parsley, tomato, and olive oil. Fresh, light, vegetarian.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 12
+        },
+        "prep_time_min": 25,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "yaratici_sanat"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_lunch_011",
+        "name_tr": "Mujadara Mercimek Bulgur",
+        "name_en": "Mujadara (Lentil & Bulgur)",
+        "description": "Lentils and bulgur with caramelized onions. Vegetarian, nutritious, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 12,
+          "carbs": 46,
+          "fat": 10
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "ekonomik", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_012",
+        "name_tr": "Manakesh Za'atar",
+        "name_en": "Zaatar Flatbread",
+        "description": "Flatbread with za'atar spice blend and olive oil. Aromatic, simple, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 36,
+          "fat": 12
+        },
+        "prep_time_min": 20,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["gelenekci", "pratikci_zaman", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_lunch_013",
+        "name_tr": "Çiğ Köfte Salata",
+        "name_en": "Raw Meatball (Çiğ Köfte)",
+        "description": "Raw or cooked spiced meatball. Tangy, flavorful, traditional specialty.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 14,
+          "carbs": 24,
+          "fat": 14
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil-based çiğ köfte",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "meraklı"],
+        "season": "year_round",
+        "frequency_weight": 0.6
+      },
+      {
+        "id": "ar_lunch_014",
+        "name_tr": "Dum Biryani Tavuk",
+        "name_en": "Biryani (Spiced Rice)",
+        "description": "Aromatic rice with meat and spices. Flavorful, festive, South Asian influence.",
+        "nutrition": {
+          "calories": 460,
+          "protein": 20,
+          "carbs": 52,
+          "fat": 18
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Biryani with vegetables and tofu",
+        "sifat_appeal": ["macera_seven", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_015",
+        "name_tr": "Falafel Tarator",
+        "name_en": "Falafel with Tahini",
+        "description": "Fried chickpea balls with tahini sesame sauce. Creamy, traditional, vegetarian.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 12,
+          "carbs": 44,
+          "fat": 20
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_016",
+        "name_tr": "Pide Peynir Et",
+        "name_en": "Turkish Pide",
+        "description": "Boat-shaped pastry with cheese and meat. Warm, satisfying, Turkish-Arab fusion.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 16,
+          "carbs": 40,
+          "fat": 20
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Pide with plant-based filling",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_017",
+        "name_tr": "Kofte Sebze",
+        "name_en": "Vegetable Meatballs",
+        "description": "Herbed meatballs with vegetables. Lighter, fresher variation.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 18,
+          "carbs": 22,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Vegetable and lentil balls",
+        "sifat_appeal": ["saglik_bilinc", "sevgi_dolu", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_018",
+        "name_tr": "Kapuska Lahana",
+        "name_en": "Cabbage & Meat",
+        "description": "Cabbage leaves with meat filling and tomato sauce. Hearty, traditional, comforting.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 28,
+          "fat": 22
+        },
+        "prep_time_min": 70,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Cabbage with lentil filling",
+        "sifat_appeal": ["aile_odakli", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_lunch_019",
+        "name_tr": "Lahana Acılı Harissa",
+        "name_en": "Harissa (Spice Paste) Lamb",
+        "description": "Lamb with hot harissa paste. Spicy, intense, North African influence.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 28,
+          "carbs": 12,
+          "fat": 30
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Mushroom with harissa",
+        "sifat_appeal": ["cesur_atılgan", "macera_seven", "centil_kibri"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_lunch_020",
+        "name_tr": "Sebze Mercimek Çorbası",
+        "name_en": "Lentil Vegetable Soup",
+        "description": "Red lentil soup with vegetables. Light, healthy, warming.",
+        "nutrition": {
+          "calories": 240,
+          "protein": 10,
+          "carbs": 36,
+          "fat": 5
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use vegetable broth",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      }
+    ],
+    "dinner": [
+      {
+        "id": "ar_dinner_001",
+        "name_tr": "Tat Tavuk Pirinç",
+        "name_en": "Chicken with Rice",
+        "description": "Roasted chicken with fragrant rice. Simple, comforting, family meal.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 26,
+          "carbs": 42,
+          "fat": 12
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Roasted vegetables with rice",
+        "sifat_appeal": ["aile_odakli", "sevgi_dolu", "praktikci_zaman"],
+        "season": "year_round",
+        "frequency_weight": 0.9
+      },
+      {
+        "id": "ar_dinner_002",
+        "name_tr": "Kuzu Izgara Nane",
+        "name_en": "Grilled Lamb with Mint",
+        "description": "Grilled lamb chops with fresh mint sauce. Elegant, aromatic, traditional.",
+        "nutrition": {
+          "calories": 420,
+          "protein": 32,
+          "carbs": 6,
+          "fat": 32
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Grilled mushroom with mint",
+        "sifat_appeal": ["centil_kibri", "luks_seven", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_003",
+        "name_tr": "Tat Balık Baharat",
+        "name_en": "Spiced Baked Fish",
+        "description": "Baked fish with warm spices. Healthy, aromatic, satisfying.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 34,
+          "carbs": 10,
+          "fat": 17
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Spiced tofu bake",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "macera_seven"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_004",
+        "name_tr": "Tat Sebze Güveç",
+        "name_en": "Vegetable Casserole",
+        "description": "Baked vegetables with tomato sauce. Light, vegetarian, comforting.",
+        "nutrition": {
+          "calories": 260,
+          "protein": 8,
+          "carbs": 32,
+          "fat": 11
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_005",
+        "name_tr": "Tat Tavuk Ayran",
+        "name_en": "Chicken with Yogurt",
+        "description": "Chicken in creamy yogurt sauce. Tangy, light, traditional.",
+        "nutrition": {
+          "calories": 340,
+          "protein": 28,
+          "carbs": 12,
+          "fat": 20
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Chicken with plant-based yogurt",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "saglik_bilinc"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_dinner_006",
+        "name_tr": "Gözleme Spinat Peynir",
+        "name_en": "Spinach & Cheese Flatbread",
+        "description": "Thin pastry filled with spinach and cheese. Vegetarian, savory, traditional.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 11,
+          "carbs": 32,
+          "fat": 16
+        },
+        "prep_time_min": 30,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Gözleme with plant-based cheese",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_007",
+        "name_tr": "Tat Kuzu Pilaff",
+        "name_en": "Lamb Pilaf",
+        "description": "Lamb with fragrant rice pilaf. Rich, aromatic, festive.",
+        "nutrition": {
+          "calories": 440,
+          "protein": 26,
+          "carbs": 46,
+          "fat": 18
+        },
+        "prep_time_min": 75,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Vegetable pilaf with mushrooms",
+        "sifat_appeal": ["luks_seven", "gelenekci", "sevgi_dolu"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_008",
+        "name_tr": "Tat Sebze Merci",
+        "name_en": "Lentil & Vegetable",
+        "description": "Lentils with seasonal vegetables. Nutritious, vegetarian, hearty.",
+        "nutrition": {
+          "calories": 300,
+          "protein": 13,
+          "carbs": 42,
+          "fat": 7
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["saglik_bilinc", "doganın_cocugu", "ekonomik"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_009",
+        "name_tr": "Tat Tavuk Sumak",
+        "name_en": "Chicken with Sumac",
+        "description": "Chicken with tangy sumac spice. Bright, flavorful, traditional.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 30,
+          "carbs": 8,
+          "fat": 24
+        },
+        "prep_time_min": 35,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu with sumac",
+        "sifat_appeal": ["macera_seven", "centil_kibri", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_dinner_010",
+        "name_tr": "Tat Kuru Fasulye",
+        "name_en": "White Beans in Tomato",
+        "description": "Slow-cooked beans in tomato sauce. Vegetarian, economical, traditional.",
+        "nutrition": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 38,
+          "fat": 8
+        },
+        "prep_time_min": 90,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": true,
+        "vegan_substitute": "Use olive oil",
+        "sifat_appeal": ["ekonomik", "saglik_bilinc", "gelenekci"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_dinner_011",
+        "name_tr": "Tat Balık Baharat Koç",
+        "name_en": "Baked Fish with Vegetables",
+        "description": "Fish baked with fresh vegetables. Healthy, light, elegant.",
+        "nutrition": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 12,
+          "fat": 14
+        },
+        "prep_time_min": 45,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Tofu bake with vegetables",
+        "sifat_appeal": ["saglik_bilinc", "centil_kibri", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      },
+      {
+        "id": "ar_dinner_012",
+        "name_tr": "Tat Muhamarra İmam",
+        "name_en": "Stuffed Eggplant",
+        "description": "Eggplant stuffed with meat and spices. Flavorful, traditional, satisfying.",
+        "nutrition": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 24,
+          "fat": 24
+        },
+        "prep_time_min": 60,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Stuffed eggplant with lentils",
+        "sifat_appeal": ["yaratici_sanat", "gelenekci", "sevgi_dolu"],
+        "season": "summer",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_013",
+        "name_tr": "Tat Tavuk Baharat Fırında",
+        "name_en": "Roasted Spiced Chicken",
+        "description": "Roasted chicken with warm spices. Aromatic, comforting, family meal.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 26
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": true,
+        "vegan_substitute": "Roasted mushroom with spices",
+        "sifat_appeal": ["gelenekci", "sevgi_dolu", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_014",
+        "name_tr": "Tat Köfte Paradoks",
+        "name_en": "Kofta (Meatball) Dinner",
+        "description": "Spiced meatballs with rice or bread. Traditional, satisfying, family favorite.",
+        "nutrition": {
+          "calories": 400,
+          "protein": 22,
+          "carbs": 32,
+          "fat": 22
+        },
+        "prep_time_min": 50,
+        "omnivore": true,
+        "vegetarian": false,
+        "vegan": false,
+        "gluten_free": false,
+        "vegan_substitute": "Lentil kofta",
+        "sifat_appeal": ["sevgi_dolu", "gelenekci", "aile_odakli"],
+        "season": "year_round",
+        "frequency_weight": 0.8
+      },
+      {
+        "id": "ar_dinner_015",
+        "name_tr": "Tat Falafel Tahini Pide",
+        "name_en": "Falafel with Tahini Sauce",
+        "description": "Falafel served with creamy tahini sauce. Vegetarian, filling, traditional.",
+        "nutrition": {
+          "calories": 380,
+          "protein": 13,
+          "carbs": 42,
+          "fat": 18
+        },
+        "prep_time_min": 40,
+        "omnivore": true,
+        "vegetarian": true,
+        "vegan": true,
+        "gluten_free": false,
+        "vegan_substitute": "Standard recipe",
+        "sifat_appeal": ["saglik_bilinc", "gelenekci", "doganın_cocugu"],
+        "season": "year_round",
+        "frequency_weight": 0.7
+      }
+    ]
+  }
+}
