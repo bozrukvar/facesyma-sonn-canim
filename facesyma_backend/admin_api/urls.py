@@ -42,6 +42,10 @@ from admin_api.views.subscription_views import (
     VerifySubscriptionView, SubscriptionStatusView, FeatureAccessView,
     CancelSubscriptionView
 )
+from admin_api.views.subscription_dashboard_views import (
+    SubscriptionMetricsView, UserSubscriptionDetailView, SubscriptionSearchView,
+    ChurnAnalysisView
+)
 from admin_api.views.monitoring_views import (
     HealthCheckView, UptimeMetricsView, ErrorRateView, ResponseTimeView,
     AlertManagementView, LogsView
@@ -191,6 +195,12 @@ api_patterns = [
     path('subscription/status/<int:user_id>/', SubscriptionStatusView.as_view(), name='subscription-status'),
     path('subscription/feature/<int:user_id>/', FeatureAccessView.as_view(), name='feature-access'),
     path('subscription/cancel/<int:user_id>/', CancelSubscriptionView.as_view(), name='subscription-cancel'),
+
+    # Subscription Dashboard (Admin Metrics & Management)
+    path('monitoring/subscriptions/', SubscriptionMetricsView.as_view(), name='subscription-metrics'),
+    path('subscriptions/search/', SubscriptionSearchView.as_view(), name='subscription-search'),
+    path('subscriptions/churn/', ChurnAnalysisView.as_view(), name='subscription-churn'),
+    path('subscriptions/<int:user_id>/', UserSubscriptionDetailView.as_view(), name='subscription-detail'),
 
     # Monitoring & Health (PHASE 1)
     path('monitoring/health/', HealthCheckView.as_view(), name='health-check'),

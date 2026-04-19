@@ -10,10 +10,6 @@ from admin_api.views.html_views import (
     AdminDatabaseView, AdminReviewsView, AdminCoachView,
     SubscriptionDashboardHTMLView, AdminLogoutView
 )
-from admin_api.views.subscription_dashboard_views import (
-    SubscriptionMetricsView, UserSubscriptionDetailView, SubscriptionSearchView,
-    ChurnAnalysisView
-)
 
 urlpatterns = [
     path('login/', AdminLoginHTMLView.as_view(), name='admin-html-login'),
@@ -23,6 +19,5 @@ urlpatterns = [
     path('reviews/', AdminReviewsView.as_view(), name='admin-html-reviews'),
     path('coach/', AdminCoachView.as_view(), name='admin-html-coach'),
     path('subscriptions/', SubscriptionDashboardHTMLView.as_view(), name='admin-html-subscriptions'),
-
     path('logout/', AdminLogoutView.as_view(), name='admin-html-logout'),
 ]
