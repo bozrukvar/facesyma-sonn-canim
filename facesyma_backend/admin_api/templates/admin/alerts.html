@@ -1,0 +1,247 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Uyarılar{% endblock %}
+
+{% block nav-alerts %}active{% endblock %}
+
+{% block content %}
+<div class="alerts-container">
+    <!-- Stats Cards -->
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Aktif Kurallar</div>
+            <div class="stat-value" id="stat-enabled">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Bu Hafta Tetiklenen</div>
+            <div class="stat-value" id="stat-triggered">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">E-posta Gönderilen</div>
+            <div class="stat-value" id="stat-emails">-</div>
+        </div>
+    </div>
+
+    <!-- Alert Rules Table -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">Uyarı Kuralları</div>
+        <button onclick="showNewRuleForm()" style="margin-bottom: 15px; padding: 8px 16px; background: #d4af37; color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">+ Yeni Kural</button>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #3a3632;">
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Ad</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Metrik</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Koşul</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Eşik</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Durum</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="rules-table-body">
+                <tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">Yükleniyor...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Alert History -->
+    <div class="card">
+        <div class="card-title">Tetiklenme Geçmişi (Son 20)</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #3a3632;">
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Saat</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Kural</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Değer</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">E-posta</th>
+                </tr>
+            </thead>
+            <tbody id="history-table-body">
+                <tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Yükleniyor...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .alerts-container {
+        padding: 20px 0;
+    }
+
+    table tbody tr {
+        border-bottom: 1px solid #3a3632;
+    }
+
+    table tbody tr:hover {
+        background: #2a2928;
+    }
+
+    table td {
+        padding: 15px;
+        color: #999;
+        font-size: 13px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-enabled {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .status-disabled {
+        background: #999;
+        color: white;
+    }
+
+    .email-sent {
+        color: #4CAF50;
+    }
+
+    .email-not-sent {
+        color: #F44336;
+    }
+</style>
+
+<script>
+    let token = localStorage.getItem('admin_token');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!token) {
+            window.location.href = '/admin/login/';
+            return;
+        }
+
+        loadStats();
+        loadRules();
+        loadHistory();
+    });
+
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/v1/admin/alerts/stats/', {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            document.getElementById('stat-enabled').textContent = data.enabled_rules;
+            document.getElementById('stat-triggered').textContent = data.triggered_this_week;
+            document.getElementById('stat-emails').textContent = data.emails_sent;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    async function loadRules() {
+        try {
+            const response = await fetch('/api/v1/admin/alerts/rules/', {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const tbody = document.getElementById('rules-table-body');
+
+            if (!data.rules || data.rules.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">Kural yok</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.rules.map(rule => `
+                <tr>
+                    <td>${rule.name}</td>
+                    <td>${rule.metric}</td>
+                    <td>${rule.condition}</td>
+                    <td>${rule.threshold}</td>
+                    <td><span class="status-badge ${rule.enabled ? 'status-enabled' : 'status-disabled'}">${rule.enabled ? 'AÇIK' : 'KAPALI'}</span></td>
+                    <td>
+                        <button onclick="toggleRule(${rule.id}, ${!rule.enabled})" style="margin-right: 5px; padding: 4px 8px; background: #666; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Aç/Kapat</button>
+                        <button onclick="deleteRule(${rule.id})" style="padding: 4px 8px; background: #F44336; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Sil</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading rules:', error);
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const response = await fetch('/api/v1/admin/alerts/history/', {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const tbody = document.getElementById('history-table-body');
+
+            if (!data.items || data.items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Tetiklenme yok</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.items.map(item => `
+                <tr>
+                    <td>${new Date(item.triggered_at).toLocaleString('tr-TR')}</td>
+                    <td>${item.rule_name}</td>
+                    <td>${item.metric_value} / ${item.threshold}</td>
+                    <td><span class="${item.email_sent ? 'email-sent' : 'email-not-sent'}">${item.email_sent ? '✓ Gönderildi' : '✗ Gönderilmedi'}</span></td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading history:', error);
+        }
+    }
+
+    async function toggleRule(ruleId, newState) {
+        try {
+            const response = await fetch(`/api/v1/admin/alerts/rules/${ruleId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({enabled: newState})
+            });
+
+            if (response.ok) {
+                loadRules();
+                loadStats();
+            }
+        } catch (error) {
+            console.error('Error toggling rule:', error);
+        }
+    }
+
+    async function deleteRule(ruleId) {
+        if (!confirm('Kuralı silmek istediğinizden emin misiniz?')) return;
+
+        try {
+            const response = await fetch(`/api/v1/admin/alerts/rules/${ruleId}/`, {
+                method: 'DELETE',
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (response.ok) {
+                loadRules();
+                loadStats();
+            }
+        } catch (error) {
+            console.error('Error deleting rule:', error);
+        }
+    }
+
+    function showNewRuleForm() {
+        alert('Yeni kural eklemek için API kullanın: POST /api/v1/admin/alerts/rules/');
+    }
+</script>
+{% endblock %}

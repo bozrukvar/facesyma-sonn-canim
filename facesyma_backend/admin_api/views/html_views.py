@@ -100,6 +100,46 @@ class AdminDatabaseView(View):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Renewals (Abonelik Yenileme Otomasyonu) ──────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AdminRenewalsView(View):
+    """
+    HTML Abonelik yenileme otomasyonu yönetimi sayfası.
+
+    GET /admin/renewals/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/renewals.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Payments ──────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AdminPaymentsView(View):
+    """
+    HTML Ödeme yönetimi sayfası.
+
+    GET /admin/payments/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/payments.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # ── HTML Panel - Reviews ───────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -157,6 +197,126 @@ class SubscriptionDashboardHTMLView(View):
             return redirect('/admin/login/')
 
         return render(request, 'admin/subscriptions.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Reports ────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AdminReportsView(View):
+    """
+    HTML Raporlar sayfası (İstatistikler ve rapor oluşturma).
+
+    GET /admin/reports/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/reports.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Analytics Dashboard ────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AdminAnalyticsView(View):
+    """
+    HTML Analytics sayfası (kullanıcı analitikleri).
+
+    GET /admin/analytics/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/analytics.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - User Insights (Date/Time/Module Analysis) ──────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AdminInsightsView(View):
+    """
+    HTML İçgörüler sayfası (Kullanıcı kayıt analizi, zaman örüntüleri, modül kullanımı).
+
+    GET /admin/insights/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/insights.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Live Dashboard ────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════════
+
+class AdminLiveDashboardView(View):
+    """
+    Live Analytics Dashboard — 30-second polling.
+
+    GET /admin/live/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/live_dashboard.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Audit Log ─────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════════
+
+class AdminAuditLogView(View):
+    """
+    Audit Log — Admin activity trail.
+
+    GET /admin/audit/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/audit_log.html')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ── HTML Panel - Alerts ────────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════════
+
+class AdminAlertsView(View):
+    """
+    Alerts — Automated alert rules.
+
+    GET /admin/alerts/
+    """
+
+    def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError):
+            return redirect('/admin/login/')
+
+        return render(request, 'admin/alerts.html')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
