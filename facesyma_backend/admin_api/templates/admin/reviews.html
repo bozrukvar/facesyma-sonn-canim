@@ -1,0 +1,434 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-reviews %}active{% endblock %}
+
+{% block title %}Yorum Yönetimi{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Yorum İstatistikleri</div>
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Yorum</div>
+            <div class="stat-value" id="totalReviewsCount">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pozitif</div>
+            <div class="stat-value" id="positiveCount" style="color: #4CAF50;">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Negatif</div>
+            <div class="stat-value" id="negativeCount" style="color: #F44336;">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Nötr</div>
+            <div class="stat-value" id="neutralCount" style="color: #FF9800;">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Yorum Listesi</div>
+
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px;">Sentiment</label>
+            <select id="filterSentiment" style="width: 100%; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="">Tümü</option>
+                <option value="positive">Pozitif</option>
+                <option value="negative">Negatif</option>
+                <option value="neutral">Nötr</option>
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px;">Platform</label>
+            <select id="filterPlatform" style="width: 100%; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="">Tümü</option>
+                <option value="mobile">Mobil</option>
+                <option value="web">Web</option>
+                <option value="api">API</option>
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px;">Görünürlük</label>
+            <select id="filterVisible" style="width: 100%; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="">Tümü</option>
+                <option value="true">Görünür</option>
+                <option value="false">Gizli</option>
+            </select>
+        </div>
+        <button onclick="loadReviews()" class="btn btn-primary">Filtrele</button>
+        <button onclick="exportReviews()" class="btn btn-secondary" style="background: #2a7f62; border-color: #2a7f62;">CSV İndir</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Kullanıcı</th>
+                <th>Yorum</th>
+                <th>Rating</th>
+                <th>Sentiment</th>
+                <th>Platform</th>
+                <th>Tarih</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="reviewsTable">
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- ANALYTICS SECTION -->
+<div class="card">
+    <div class="card-title">📊 Yorum Analitikleri</div>
+
+    <!-- Rating Distribution -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #d4af37; margin-bottom: 15px;">Puan Dağılımı</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+            <div id="ratingDist1" style="text-align: center; padding: 15px; background: #2a2928; border-radius: 4px;">
+                <div style="font-size: 24px; color: #4CAF50;">-</div>
+                <div style="font-size: 12px; color: #999;">⭐ 1</div>
+            </div>
+            <div id="ratingDist2" style="text-align: center; padding: 15px; background: #2a2928; border-radius: 4px;">
+                <div style="font-size: 24px; color: #4CAF50;">-</div>
+                <div style="font-size: 12px; color: #999;">⭐ 2</div>
+            </div>
+            <div id="ratingDist3" style="text-align: center; padding: 15px; background: #2a2928; border-radius: 4px;">
+                <div style="font-size: 24px; color: #FFC107;">-</div>
+                <div style="font-size: 12px; color: #999;">⭐ 3</div>
+            </div>
+            <div id="ratingDist4" style="text-align: center; padding: 15px; background: #2a2928; border-radius: 4px;">
+                <div style="font-size: 24px; color: #4CAF50;">-</div>
+                <div style="font-size: 12px; color: #999;">⭐ 4</div>
+            </div>
+            <div id="ratingDist5" style="text-align: center; padding: 15px; background: #2a2928; border-radius: 4px;">
+                <div style="font-size: 24px; color: #4CAF50;">-</div>
+                <div style="font-size: 12px; color: #999;">⭐ 5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zaman Serisi -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #d4af37; margin-bottom: 15px;">Son 7 Günün Trendi</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+            <label style="margin: 0; color: #999; font-size: 12px;">Dönem:</label>
+            <select id="trendPeriod" style="padding: 6px; background: #2a2928; border: 1px solid #444; color: #fff; border-radius: 4px;">
+                <option value="daily">Günlük</option>
+                <option value="weekly">Haftalık</option>
+            </select>
+            <button onclick="loadTrend()" style="padding: 6px 12px; background: #d4af37; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Yükle</button>
+        </div>
+        <div id="trendContainer" style="display: flex; gap: 8px; align-items: flex-end; min-height: 150px; padding: 15px; background: #2a2928; border-radius: 4px; overflow-x: auto;">
+            <div style="text-align: center; color: #999; margin: auto;">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Trending Tags -->
+    <div>
+        <h3 style="color: #d4af37; margin-bottom: 15px;">En Çok Kullanılan Etiketler</h3>
+        <div id="tagsContainer" style="display: flex; gap: 8px; flex-wrap: wrap; padding: 15px; background: #2a2928; border-radius: 4px; min-height: 40px;">
+            <div style="color: #999;">Yükleniyor...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Yorum Detay Modal -->
+<div id="reviewDetailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #1a1918; border: 1px solid #2a2928; border-radius: 8px; max-width: 700px; margin: 30px auto; padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #d4af37; margin: 0;">Yorum Detayları</h2>
+            <button onclick="closeReviewModal()" style="background: none; border: none; color: #d4af37; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+
+        <div id="reviewDetailContent"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="closeReviewModal()" class="btn btn-secondary">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let currentReviewId = null;
+
+    async function loadStats() {
+        try {
+            const data = await apiCall('/reviews/stats/');
+            document.getElementById('totalReviewsCount').textContent = data.total_reviews || 0;
+            document.getElementById('positiveCount').textContent = data.by_sentiment?.positive || 0;
+            document.getElementById('negativeCount').textContent = data.by_sentiment?.negative || 0;
+            document.getElementById('neutralCount').textContent = data.by_sentiment?.neutral || 0;
+        } catch (error) {
+            console.error('İstatistik yükleme hatası:', error);
+        }
+    }
+
+    async function loadReviews(page = 1) {
+        try {
+            currentPage = page;
+            const sentiment = document.getElementById('filterSentiment').value;
+            const platform = document.getElementById('filterPlatform').value;
+            const visible = document.getElementById('filterVisible').value;
+
+            let endpoint = `/reviews/?page=${page}&limit=20`;
+            if (sentiment) endpoint += `&sentiment=${sentiment}`;
+            if (platform) endpoint += `&platform=${platform}`;
+            if (visible) endpoint += `&visible=${visible}`;
+
+            const data = await apiCall(endpoint);
+            const tbody = document.getElementById('reviewsTable');
+            tbody.innerHTML = '';
+
+            if (data.reviews && data.reviews.length > 0) {
+                data.reviews.forEach(review => {
+                    const row = document.createElement('tr');
+                    const sentimentColor = {
+                        'positive': '#4CAF50',
+                        'negative': '#F44336',
+                        'neutral': '#FF9800'
+                    }[review.sentiment] || '#707070';
+
+                    const visibilityBadge = review.is_visible ?
+                        '<span style="background: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Görünür</span>' :
+                        '<span style="background: #707070; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Gizli</span>';
+
+                    const shortText = (review.text || '').substring(0, 50) + (review.text?.length > 50 ? '...' : '');
+
+                    row.innerHTML = `
+                        <td>${review.id}</td>
+                        <td>${review.user_email || 'Anonim'}</td>
+                        <td title="${review.text}">${shortText}</td>
+                        <td>${review.rating ? '⭐' + review.rating : '-'}</td>
+                        <td><span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${review.sentiment}</span></td>
+                        <td>${review.platform}</td>
+                        <td>${new Date(review.created_at).toLocaleDateString('tr-TR')}</td>
+                        <td>
+                            <button onclick="viewReview(${review.id})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Yorum bulunamadı.</td></tr>';
+            }
+
+            // Pagination
+            if (data.pagination) {
+                const paginationDiv = document.getElementById('pagination');
+                paginationDiv.innerHTML = '';
+
+                for (let i = 1; i <= data.pagination.pages; i++) {
+                    const link = document.createElement('a');
+                    if (i === currentPage) {
+                        link.innerHTML = `<span class="active">${i}</span>`;
+                    } else {
+                        link.textContent = i;
+                        link.href = '#';
+                        link.onclick = (e) => { e.preventDefault(); loadReviews(i); };
+                    }
+                    paginationDiv.appendChild(link);
+                }
+            }
+        } catch (error) {
+            console.error('Yorum yükleme hatası:', error);
+            document.getElementById('reviewsTable').innerHTML = `
+                <tr><td colspan="8" style="text-align: center; padding: 20px; color: #F44336;">
+                    Hata: ${error.message}
+                </td></tr>
+            `;
+        }
+    }
+
+    async function viewReview(reviewId) {
+        try {
+            currentReviewId = reviewId;
+            const data = await apiCall(`/reviews/?page=1&limit=1000`);
+            const review = data.reviews.find(r => r.id === reviewId);
+
+            if (!review) {
+                alert('Yorum bulunamadı.');
+                return;
+            }
+
+            const sentimentColor = {
+                'positive': '#4CAF50',
+                'negative': '#F44336',
+                'neutral': '#FF9800'
+            }[review.sentiment] || '#707070';
+
+            const tagsHtml = review.tags && review.tags.length > 0 ?
+                `<p style="margin: 10px 0;"><strong>Etiketler:</strong> ${review.tags.join(', ')}</p>` :
+                '';
+
+            const contentDiv = document.getElementById('reviewDetailContent');
+            contentDiv.innerHTML = `
+                <div style="background: #2a2928; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <p style="margin: 5px 0;"><strong>Kullanıcı:</strong> ${review.user_email || 'Anonim'}</p>
+                    <p style="margin: 5px 0;"><strong>Rating:</strong> ${review.rating ? '⭐' + review.rating : '-'}</p>
+                    <p style="margin: 5px 0;"><strong>Platform:</strong> ${review.platform}</p>
+                    <p style="margin: 5px 0;"><strong>Tarih:</strong> ${new Date(review.created_at).toLocaleString('tr-TR')}</p>
+                    <p style="margin: 5px 0;"><strong>Sentiment:</strong> <span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${review.sentiment} (${review.sentiment_score?.toFixed(2) || '-'})</span></p>
+                    <p style="margin: 5px 0;"><strong>Görünürlük:</strong> ${review.is_visible ? 'Görünür' : 'Gizli'}</p>
+                    ${tagsHtml}
+                </div>
+
+                <div style="background: #2a2928; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <p style="margin: 5px 0 10px 0;"><strong>Yorum Metni:</strong></p>
+                    <p style="color: #b0b0b0; line-height: 1.6; margin: 0;">${review.text}</p>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="toggleReviewVisibility(${reviewId}, ${!review.is_visible})" class="btn btn-primary" style="flex: 1;">
+                        ${review.is_visible ? '🙈 Gizle' : '👁️ Göster'}
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('reviewDetailModal').style.display = 'block';
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function toggleReviewVisibility(reviewId, newVisible) {
+        try {
+            await apiCall(`/reviews/${reviewId}/update/`, 'PATCH', {
+                is_visible: newVisible
+            });
+            viewReview(reviewId);
+            loadReviews(currentPage);
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewDetailModal').style.display = 'none';
+        currentReviewId = null;
+    }
+
+    async function exportReviews() {
+        try {
+            const sentiment = document.getElementById('filterSentiment').value;
+            let url = '/api/v1/admin/reviews/export/?format=csv&limit=10000';
+            if (sentiment) url += `&sentiment=${sentiment}`;
+
+            window.location.href = url;
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function loadRatingDistribution() {
+        try {
+            // Simplified: count ratings from all loaded reviews
+            // In production, use a dedicated API endpoint
+            const data = await apiCall('/reviews/?page=1&limit=1000');
+            const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+            (data.reviews || []).forEach(review => {
+                if (review.rating && review.rating >= 1 && review.rating <= 5) {
+                    distribution[review.rating]++;
+                }
+            });
+
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`ratingDist${i}`).innerHTML = `
+                    <div style="font-size: 24px; color: #4CAF50;">${distribution[i]}</div>
+                    <div style="font-size: 12px; color: #999;">⭐ ${i}</div>
+                `;
+            }
+        } catch (error) {
+            console.error('Rating distribution error:', error);
+        }
+    }
+
+    async function loadTrend() {
+        try {
+            const period = document.getElementById('trendPeriod').value;
+            const days = period === 'daily' ? 7 : 30;
+            const data = await apiCall(`/reviews/trend/?period=${period}&days=${days}`);
+
+            if (!data.trend || data.trend.length === 0) {
+                document.getElementById('trendContainer').innerHTML = '<div style="color: #999; margin: auto;">Veri yok</div>';
+                return;
+            }
+
+            // Find max count for scaling
+            const maxCount = Math.max(...data.trend.map(d => d.count), 1);
+            const maxRating = Math.max(...data.trend.map(d => d.avg_rating || 0), 1);
+
+            const html = data.trend.map(item => `
+                <div style="display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 40px;">
+                    <div style="width: 30px; height: ${(item.count / maxCount) * 100}px; background: linear-gradient(180deg, #d4af37 0%, #8b7500 100%); border-radius: 3px 3px 0 0; position: relative;" title="${item.count} yorum, ⭐${item.avg_rating}">
+                        <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #d4af37; white-space: nowrap;">${item.count}</span>
+                    </div>
+                    <div style="font-size: 10px; color: #999; margin-top: 8px; text-align: center; width: 100%; word-break: break-word;">${item.date}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('trendContainer').innerHTML = html;
+        } catch (error) {
+            console.error('Trend error:', error);
+            document.getElementById('trendContainer').innerHTML = `<div style="color: #f44336; margin: auto;">Hata: ${error.message}</div>`;
+        }
+    }
+
+    async function loadTags() {
+        try {
+            const data = await apiCall('/reviews/tags/?limit=15');
+
+            if (!data.tags || data.tags.length === 0) {
+                document.getElementById('tagsContainer').innerHTML = '<div style="color: #999;">Etiket yok</div>';
+                return;
+            }
+
+            // Find max count for sizing
+            const maxCount = Math.max(...data.tags.map(t => t.count), 1);
+
+            const html = data.tags.map(tag => {
+                const size = Math.max(12, Math.min(24, (tag.count / maxCount) * 24));
+                return `
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0.1) 100%);
+                        border: 1px solid #d4af37;
+                        border-radius: 20px;
+                        color: #d4af37;
+                        font-size: ${size}px;
+                        font-weight: bold;
+                        cursor: default;
+                        transition: all 0.2s;
+                    " title="${tag.count} kez kullanılmış">
+                        ${tag.tag} (${tag.count})
+                    </span>
+                `;
+            }).join('');
+
+            document.getElementById('tagsContainer').innerHTML = html;
+        } catch (error) {
+            console.error('Tags error:', error);
+            document.getElementById('tagsContainer').innerHTML = `<div style="color: #f44336;">Hata: ${error.message}</div>`;
+        }
+    }
+
+    window.addEventListener('load', () => {
+        loadStats();
+        loadReviews();
+        loadRatingDistribution();
+        loadTrend();
+        loadTags();
+    });
+</script>
+{% endblock %}

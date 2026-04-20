@@ -1,0 +1,302 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facesyma Admin Girişi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0e0e 0%, #1a1918 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: #1a1918;
+            border: 1px solid #2a2928;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .logo-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+            letter-spacing: 2px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: #707070;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #2a2928;
+            border: 1px solid #3a3632;
+            color: #ffffff;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        input::placeholder {
+            color: #707070;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #d4af37;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background: #c19a2d;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-danger {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+            color: #F44336;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-top: 2px solid #d4af37;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .help-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #707070;
+        }
+
+        .help-text strong {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">👁️</div>
+            <div class="logo-title">FACESYMA</div>
+            <div class="logo-subtitle">Admin Panel</div>
+        </div>
+
+        <div id="alert" class="alert alert-danger"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">E-Posta</label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="admin@facesyma.com"
+                    required
+                    autocomplete="email"
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Şifrenizi girin"
+                    required
+                    autocomplete="current-password"
+                />
+            </div>
+
+            <button type="submit" class="login-btn" id="submitBtn">
+                Giriş Yap
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <div class="help-text">
+            Test Hesabı:<br>
+            <strong>admin@facesyma.com</strong> / <strong>admin123</strong>
+        </div>
+    </div>
+
+    <script>
+        // Sayfayı kontrol et
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('admin_token');
+            if (token) {
+                // Token varsa, onun geçerli olup olmadığını kontrol et
+                validateTokenAndRedirect(token);
+            }
+        });
+
+        async function validateTokenAndRedirect(token) {
+            try {
+                const response = await fetch('/api/v1/admin/auth/me/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Token geçerli, dashboard'a yönlendir
+                    window.location.href = '/admin/';
+                } else {
+                    // Token geçersiz, sil
+                    localStorage.removeItem('admin_token');
+                }
+            } catch (error) {
+                // Token geçersiz, sil
+                localStorage.removeItem('admin_token');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const alert = document.getElementById('alert');
+
+            // State
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            alert.classList.remove('show');
+
+            try {
+                console.log('🔐 Logging in with:', email);
+                const response = await fetch('/api/v1/admin/auth/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                console.log('📡 Response status:', response.status);
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+
+                if (!response.ok) {
+                    const errorMsg = data.detail || 'Giriş başarısız';
+                    console.error('❌ Login failed:', errorMsg);
+                    throw new Error(errorMsg);
+                }
+
+                // Token kaydet
+                console.log('💾 Saving token...');
+                localStorage.setItem('admin_token', data.access);
+                console.log('✅ Token saved, redirecting to /admin/');
+
+                // Biraz bekle ve yönlendir
+                setTimeout(() => {
+                    window.location.href = '/admin/';
+                }, 500);
+
+            } catch (error) {
+                console.error('🚨 Login error:', error.message);
+                alert.textContent = error.message;
+                alert.classList.add('show');
+                // Hata mesajını uzun tutanız göster
+                alert.style.display = 'block';
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
