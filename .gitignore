@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development databases
+db.sqlite3
+chroma_db/
+
+# Dependencies (regenerate on deploy)
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Build artifacts
+*.o
+*.a
+*.dylib
+
+# Test files (generated)
+test_face.jpg
+*.tmp
+
+# Logs
+*.log
+logs/
