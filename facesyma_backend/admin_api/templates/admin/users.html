@@ -17,6 +17,11 @@
             <option value="free">Ücretsiz</option>
             <option value="premium">Premium</option>
         </select>
+        <select id="appSourceFilter" style="padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+            <option value="">Tüm Kaynaklar</option>
+            <option value="mobile">📱 Mobil</option>
+            <option value="web">🌐 Web</option>
+        </select>
         <button onclick="loadUsers()" class="btn btn-primary">Ara</button>
     </div>
 
@@ -44,6 +49,7 @@
                 <th>Kullanıcı Adı</th>
                 <th>Plan</th>
                 <th>Durum</th>
+                <th>Kaynak</th>
                 <th>Katılma</th>
                 <th>Aksiyon</th>
             </tr>
@@ -100,10 +106,12 @@
             currentPage = page;
             const search = document.getElementById('searchInput').value.trim();
             const planFilter = document.getElementById('planFilter').value;
+            const appSourceFilter = document.getElementById('appSourceFilter').value;
 
             let endpoint = `/users/?page=${page}&limit=20`;
             if (search) endpoint += `&search=${encodeURIComponent(search)}`;
             if (planFilter) endpoint += `&plan=${planFilter}`;
+            if (appSourceFilter) endpoint += `&app_source=${appSourceFilter}`;
 
             const data = await apiCall(endpoint);
             const tbody = document.getElementById('usersTable');
@@ -114,6 +122,7 @@
                     const row = document.createElement('tr');
                     const statusBadge = user.is_active ? '<span style="background: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Aktif</span>' : '<span style="background: #F44336; padding: 4px 8px; border-radius: 4px; font-size: 12px;">İnaktif</span>';
                     const planBadge = `<span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${user.plan || 'free'}</span>`;
+                    const appSourceBadge = user.app_source === 'web' ? '<span style="background: #2196F3; padding: 4px 8px; border-radius: 4px; font-size: 12px;">🌐 Web</span>' : '<span style="background: #FF9800; padding: 4px 8px; border-radius: 4px; font-size: 12px;">📱 Mobil</span>';
 
                     row.innerHTML = `
                         <td><input type="checkbox" class="userCheckbox" value="${user.id}" onchange="updateSelectedCount()"></td>
@@ -122,6 +131,7 @@
                         <td>${user.username || '-'}</td>
                         <td>${planBadge}</td>
                         <td>${statusBadge}</td>
+                        <td>${appSourceBadge}</td>
                         <td>${new Date(user.date_joined).toLocaleDateString('tr-TR')}</td>
                         <td>
                             <button onclick="editUser(${user.id}, '${user.email}', '${user.plan}', ${user.is_active})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Düzenle</button> |
@@ -131,7 +141,7 @@
                     tbody.appendChild(row);
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Kullanıcı bulunamadı.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Kullanıcı bulunamadı.</td></tr>';
             }
 
             // Pagination
