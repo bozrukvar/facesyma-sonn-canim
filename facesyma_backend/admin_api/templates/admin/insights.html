@@ -1,0 +1,497 @@
+{% extends "admin/base.html" %}
+
+{% block title %}👁 İçgörüler{% endblock %}
+
+{% block nav-insights %}active{% endblock %}
+
+{% block content %}
+<style>
+    .section-header {
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #d4af37;
+    }
+
+    .section-header h2 {
+        font-size: 20px;
+        color: #d4af37;
+        margin: 0;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin-top: 15px;
+    }
+
+    .filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .inline-group {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    .inline-group label {
+        flex: 1;
+    }
+
+    .inline-group input {
+        flex: 1;
+    }
+
+    .mode-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .mode-label {
+        width: 150px;
+        color: #b0b0b0;
+        font-size: 12px;
+    }
+
+    .mode-bar-bg {
+        flex: 1;
+        height: 25px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0 10px;
+    }
+
+    .mode-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #d4af37, #a0a020);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 8px;
+        color: #000;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .mode-count {
+        width: 50px;
+        text-align: right;
+        color: #d4af37;
+        font-weight: 600;
+    }
+</style>
+
+<!-- Bölüm 1: Kayıt Zaman Çizelgesi -->
+<div class="section-header">
+    <h2>Kayıt Zaman Çizelgesi</h2>
+</div>
+<div class="card">
+    <div class="filters">
+        <div class="form-group">
+            <label>Gün Sayısı</label>
+            <select id="timelinedays" onchange="loadTimeline()">
+                <option value="30">Son 30 Gün</option>
+                <option value="60">Son 60 Gün</option>
+                <option value="90">Son 90 Gün</option>
+                <option value="180">Son 180 Gün</option>
+                <option value="365">Son 365 Gün</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Grupla</label>
+            <select id="timelineperiod" onchange="loadTimeline()">
+                <option value="day">Günlük</option>
+                <option value="week">Haftalık</option>
+                <option value="month">Aylık</option>
+            </select>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="timelineChart"></canvas>
+    </div>
+</div>
+
+<!-- Bölüm 2: Zaman Örüntüleri -->
+<div class="section-header">
+    <h2>Zaman Örüntüleri</h2>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <strong style="color: #d4af37; display: block; margin-bottom: 10px;">Saate Göre Kayıtlar (UTC)</strong>
+        <div class="chart-container">
+            <canvas id="hourChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <strong style="color: #d4af37; display: block; margin-bottom: 10px;">Haftanın Gününe Göre Kayıtlar</strong>
+        <div class="chart-container">
+            <canvas id="dayOfWeekChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 20px;">
+        <strong style="color: #d4af37; display: block; margin-bottom: 10px;">Aya Göre Kayıtlar</strong>
+        <div class="chart-container">
+            <canvas id="monthChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Bölüm 3: Modül Kullanım Analizi -->
+<div class="section-header">
+    <h2>Modül Kullanım Analizi</h2>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 30px;">
+        <strong style="color: #d4af37; display: block; margin-bottom: 15px;">Moda Göre Analiz Dağılımı</strong>
+        <div id="modeBreakdownContainer"></div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 10px;">
+        <strong style="color: #d4af37; display: block; margin-bottom: 15px;">En Aktif 10 Kullanıcı</strong>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Kullanıcı ID</th>
+                <th>Analiz Sayısı</th>
+            </tr>
+        </thead>
+        <tbody id="topUsersTable">
+            <tr><td colspan="2">Yükleniyor...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Bölüm 4: Tarih Aralığına Göre Kullanıcılar -->
+<div class="section-header">
+    <h2>Kullanıcı Filtresi (Tarih Aralığı)</h2>
+</div>
+
+<div class="card">
+    <div class="filters">
+        <div class="form-group">
+            <label>Başlangıç Tarihi</label>
+            <input type="date" id="fromDate">
+        </div>
+        <div class="form-group">
+            <label>Bitiş Tarihi</label>
+            <input type="date" id="toDate">
+        </div>
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary" onclick="filterUsersByDate()" style="width: 100%;">Filtrele</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Kullanıcı Adı</th>
+                    <th>Plan</th>
+                    <th>Kayıt Tarihi</th>
+                </tr>
+            </thead>
+            <tbody id="filteredUsersTable">
+                <tr><td colspan="5">Filtrele butonuna tıklayarak başlayın</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+    let timelineChart = null;
+    let hourChart = null;
+    let dayOfWeekChart = null;
+    let monthChart = null;
+
+    async function loadTimeline() {
+        const period = document.getElementById('timelineperiod').value;
+        const days = document.getElementById('timelinedays').value;
+
+        try {
+            const data = await apiCall(`/users/timeline/?period=${period}&days=${days}`);
+
+            const labels = data.data.timeline.map(d => d.date);
+            const newUsers = data.data.timeline.map(d => d.new_users);
+            const cumulative = data.data.timeline.map(d => d.cumulative_total);
+
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+
+            if (timelineChart) {
+                timelineChart.destroy();
+            }
+
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Yeni Kullanıcılar',
+                            data: newUsers,
+                            borderColor: '#d4af37',
+                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                            fill: true,
+                            yAxisID: 'y',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Toplam (Kümülatif)',
+                            data: cumulative,
+                            borderColor: '#a0a020',
+                            borderDash: [5, 5],
+                            yAxisID: 'y1',
+                            tension: 0.4,
+                            pointRadius: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#b0b0b0',
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(212, 175, 55, 0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#a0a020' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: {
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(212, 175, 55, 0.1)' }
+                        }
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Timeline yükleme hatası:', e);
+        }
+    }
+
+    async function loadPatterns() {
+        try {
+            const data = await apiCall('/users/patterns/');
+
+            // Saat grafiği
+            const hourCtx = document.getElementById('hourChart').getContext('2d');
+            if (hourChart) hourChart.destroy();
+            hourChart = new Chart(hourCtx, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => `${String(i).padStart(2, '0')}:00`),
+                    datasets: [{
+                        label: 'Kayıt Sayısı',
+                        data: Object.values(data.data.by_hour),
+                        backgroundColor: '#d4af37',
+                        borderColor: '#a0a020',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#b0b0b0' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } },
+                        y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } }
+                    }
+                }
+            });
+
+            // Haftanın günü grafiği
+            const dayCtx = document.getElementById('dayOfWeekChart').getContext('2d');
+            if (dayOfWeekChart) dayOfWeekChart.destroy();
+            dayOfWeekChart = new Chart(dayCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.data.day_names,
+                    datasets: [{
+                        label: 'Kayıt Sayısı',
+                        data: Object.values(data.data.by_day_of_week),
+                        backgroundColor: '#d4af37',
+                        borderColor: '#a0a020',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#b0b0b0' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } },
+                        y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } }
+                    }
+                }
+            });
+
+            // Ay grafiği
+            const monthCtx = document.getElementById('monthChart').getContext('2d');
+            if (monthChart) monthChart.destroy();
+            monthChart = new Chart(monthCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.data.month_names.slice(1),
+                    datasets: [{
+                        label: 'Kayıt Sayısı',
+                        data: Object.values(data.data.by_month),
+                        backgroundColor: '#d4af37',
+                        borderColor: '#a0a020',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#b0b0b0' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } },
+                        y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(212, 175, 55, 0.1)' } }
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Patterns yükleme hatası:', e);
+        }
+    }
+
+    async function loadModuleUsage() {
+        try {
+            const data = await apiCall('/users/module-usage/');
+
+            // Mode breakdown horizontal bar
+            const modeData = data.data.by_mode;
+            const maxCount = Math.max(...Object.values(modeData));
+            let html = '';
+
+            for (const [mode, count] of Object.entries(modeData).sort((a, b) => b[1] - a[1])) {
+                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                html += `
+                    <div class="mode-bar">
+                        <div class="mode-label">${mode}</div>
+                        <div class="mode-bar-bg">
+                            <div class="mode-bar-fill" style="width: ${percentage}%;">
+                                ${count > 0 ? count : ''}
+                            </div>
+                        </div>
+                        <div class="mode-count">${count}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modeBreakdownContainer').innerHTML = html;
+
+            // Top users table
+            let tableHtml = '';
+            for (const user of data.data.top_users) {
+                tableHtml += `
+                    <tr>
+                        <td>${user.user_id}</td>
+                        <td>${user.analysis_count}</td>
+                    </tr>
+                `;
+            }
+
+            if (tableHtml === '') {
+                tableHtml = '<tr><td colspan="2">Veri yok</td></tr>';
+            }
+
+            document.getElementById('topUsersTable').innerHTML = tableHtml;
+        } catch (e) {
+            console.error('Module usage yükleme hatası:', e);
+        }
+    }
+
+    async function filterUsersByDate() {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+
+        if (!fromDate || !toDate) {
+            alert('Lütfen her iki tarihi de seçin');
+            return;
+        }
+
+        try {
+            let url = `/users/?from_date=${fromDate}&to_date=${toDate}`;
+            const data = await apiCall(url);
+
+            let tableHtml = '';
+            for (const user of data.users) {
+                tableHtml += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.username || '-'}</td>
+                        <td>${user.plan}</td>
+                        <td>${user.created_at}</td>
+                    </tr>
+                `;
+            }
+
+            if (tableHtml === '') {
+                tableHtml = '<tr><td colspan="5">Seçilen tarih aralığında kullanıcı yok</td></tr>';
+            }
+
+            document.getElementById('filteredUsersTable').innerHTML = tableHtml;
+        } catch (e) {
+            console.error('Kullanıcı filtresi hatası:', e);
+            alert('Filtreleme sırasında hata: ' + e.message);
+        }
+    }
+
+    // Sayfa yüklendiğinde tüm verileri yükle
+    window.addEventListener('load', function() {
+        loadTimeline();
+        loadPatterns();
+        loadModuleUsage();
+    });
+</script>
+
+{% endblock %}

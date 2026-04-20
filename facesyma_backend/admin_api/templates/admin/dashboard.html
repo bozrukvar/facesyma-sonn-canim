@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-dashboard %}active{% endblock %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stat-cards">
+    <div class="stat-card">
+        <div class="stat-label">Toplam Kullanıcı</div>
+        <div class="stat-value" id="totalUsers">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Premium Kullanıcı</div>
+        <div class="stat-value" id="premiumCount">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Toplam Yorum</div>
+        <div class="stat-value" id="totalReviews">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Tahmini Aylık Gelir</div>
+        <div class="stat-value" id="monthlyRevenue" style="font-size: 24px;">-</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Son 10 Kullanıcı</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>E-Posta</th>
+                <th>Kullanıcı Adı</th>
+                <th>Plan</th>
+                <th>Katılma Tarihi</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="recentUsersTable">
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function loadDashboard() {
+        try {
+            // İstatistikleri yükle
+            const statsData = await apiCall('/users/stats/');
+            document.getElementById('totalUsers').textContent = statsData.total_users || 0;
+            document.getElementById('premiumCount').textContent = statsData.premium_count || 0;
+
+            const reviewStatsData = await apiCall('/reviews/stats/');
+            document.getElementById('totalReviews').textContent = reviewStatsData.total_reviews || 0;
+
+            const purchaseStatsData = await apiCall('/purchases/stats/');
+            const revenue = purchaseStatsData.estimated_monthly_revenue || 0;
+            document.getElementById('monthlyRevenue').textContent = '$' + revenue.toFixed(2);
+
+            // Son kullanıcıları yükle
+            const usersData = await apiCall('/users/?page=1&limit=10');
+            const tbody = document.getElementById('recentUsersTable');
+            tbody.innerHTML = '';
+
+            if (usersData.users && usersData.users.length > 0) {
+                usersData.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.username || '-'}</td>
+                        <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${user.plan || 'free'}</span></td>
+                        <td>${new Date(user.date_joined).toLocaleDateString('tr-TR')}</td>
+                        <td><a href="/admin/users/#${user.id}" style="color: #d4af37; text-decoration: none;">Detay</a></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Kullanıcı bulunamadı.</td></tr>';
+            }
+        } catch (error) {
+            console.error('Dashboard yükleme hatası:', error);
+            document.getElementById('recentUsersTable').innerHTML = `
+                <tr><td colspan="6" style="text-align: center; padding: 20px; color: #F44336;">
+                    Hata: ${error.message}
+                </td></tr>
+            `;
+        }
+    }
+
+    window.addEventListener('load', loadDashboard);
+</script>
+{% endblock %}

@@ -1,0 +1,673 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-coach %}active{% endblock %}
+
+{% block title %}Coach DB Yönetimi{% endblock %}
+
+{% block content %}
+<div class="stat-cards" id="statsContainer">
+    <div class="stat-card">
+        <div class="stat-label">Toplam Kullanıcı</div>
+        <div class="stat-value" id="statTotalUsers">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Toplam Hedef</div>
+        <div class="stat-value" id="statTotalGoals">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Toplam Seans</div>
+        <div class="stat-value" id="statTotalSessions">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Aktif Diller</div>
+        <div class="stat-value" id="statActiveLangs">-</div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <button class="tab" onclick="showCoachTab('users')" id="tab-users" style="background: #1c1c26; color: #f0ede6; border-color: #5c5c72;">👥 Kullanıcılar</button>
+    <button class="tab" onclick="showCoachTab('goals')" id="tab-goals">🎯 Hedefler</button>
+    <button class="tab" onclick="showCoachTab('attributes')" id="tab-attributes">🗄️ Sıfat Veritabanı</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: KULLANICILAR -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="panel-users" class="card">
+    <div class="card-title">Coach Kullanıcıları</div>
+
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #d4af37;">Dil</label>
+            <select id="filterUserLang" style="width: 100%; padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="">Tümü</option>
+                <option value="tr">Türkçe</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="ru">Русский</option>
+                <option value="ar">العربية</option>
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #d4af37;">Burç (Sun Sign)</label>
+            <input type="text" id="filterUserSunSign" placeholder="ör: Aries" style="width: 100%; padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+        </div>
+        <button onclick="loadCoachUsers(1)" class="btn btn-primary">Filtrele</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Dil</th>
+                <th>Burç</th>
+                <th>Seanslar</th>
+                <th>Aktif Hedef</th>
+                <th>Katılma Tarihi</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="coachUsersTable">
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="coachUsersPagination"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: HEDEFLER -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="panel-goals" class="card" style="display: none;">
+    <div class="card-title">Coach Hedefleri</div>
+
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #d4af37;">Durum</label>
+            <select id="filterGoalStatus" style="width: 100%; padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+                <option value="">Tümü</option>
+                <option value="aktif">Aktif</option>
+                <option value="tamamlandı">Tamamlandı</option>
+                <option value="iptal">İptal</option>
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #d4af37;">Modül</label>
+            <input type="text" id="filterGoalModule" placeholder="ör: kariyer" style="width: 100%; padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #d4af37;">User ID</label>
+            <input type="number" id="filterGoalUser" placeholder="123" style="width: 100%; padding: 8px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+        </div>
+        <button onclick="loadCoachGoals(1)" class="btn btn-primary">Filtrele</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Başlık</th>
+                <th>User ID</th>
+                <th>Modül</th>
+                <th>Öncelik</th>
+                <th>Durum</th>
+                <th>Tarih</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="coachGoalsTable">
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="coachGoalsPagination"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: SIFAT VERİTABANI -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="panel-attributes" class="card" style="display: none;">
+    <div class="card-title">Coach Sıfat Veritabanı (27 Modül)</div>
+
+    <!-- Dil Seçici -->
+    <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 10px; font-size: 12px; color: #d4af37; font-weight: 600;">Dil Seçiniz</label>
+        <div id="langButtons" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+    </div>
+
+    <!-- Sıfat Listesi -->
+    <div style="margin-bottom: 15px;">
+        <input type="text" id="searchSifat" placeholder="Sıfat adına göre ara..." style="width: 100%; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px; margin-bottom: 10px;">
+        <button onclick="loadCoachAttributes(1)" class="btn btn-primary">Ara</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sıfat Adı</th>
+                <th>Versiyon</th>
+                <th>Modül Sayısı</th>
+                <th>Güncellenme Tarihi</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="coachAttributesTable">
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">Dil seçiniz</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="coachAttributesPagination"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- USER DETAIL MODAL -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="userDetailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #1a1918; border: 1px solid #2a2928; border-radius: 8px; max-width: 700px; margin: 50px auto; padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #d4af37; margin: 0;">Kullanıcı Detayları</h2>
+            <button onclick="closeUserDetailModal()" style="background: none; border: none; color: #d4af37; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+
+        <div id="userDetailContent"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="deleteCoachUser(currentCoachUserId)" class="btn btn-secondary" style="background: #F44336; border-color: #F44336; color: #fff;">Kullanıcıyı Sil</button>
+            <button onclick="closeUserDetailModal()" class="btn btn-secondary">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- SIFAT DETAIL MODAL -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="sifatDetailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #1a1918; border: 1px solid #2a2928; border-radius: 8px; max-width: 800px; margin: 30px auto; padding: 30px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #d4af37; margin: 0;" id="sifatDetailTitle">Sıfat Detayları</h2>
+            <button onclick="closeSifatDetailModal()" style="background: none; border: none; color: #d4af37; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+
+        <div id="sifatModulesContainer" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="saveSifatChanges()" class="btn btn-primary">Değişiklikleri Kaydet</button>
+            <button onclick="closeSifatDetailModal()" class="btn btn-secondary">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global state
+let currentCoachUsersPage = 1;
+let currentCoachGoalsPage = 1;
+let currentCoachAttributesPage = 1;
+let currentCoachAttributesLang = '';
+let currentCoachUserId = null;
+let currentCoachSifatLang = '';
+let currentCoachSifatName = '';
+
+// Tab switching
+function showCoachTab(tabName) {
+    // Hide all tabs
+    document.getElementById('panel-users').style.display = 'none';
+    document.getElementById('panel-goals').style.display = 'none';
+    document.getElementById('panel-attributes').style.display = 'none';
+
+    // Deactivate all buttons
+    document.getElementById('tab-users').style.background = 'transparent';
+    document.getElementById('tab-users').style.color = '#9b9aad';
+    document.getElementById('tab-goals').style.background = 'transparent';
+    document.getElementById('tab-goals').style.color = '#9b9aad';
+    document.getElementById('tab-attributes').style.background = 'transparent';
+    document.getElementById('tab-attributes').style.color = '#9b9aad';
+
+    // Show selected tab
+    document.getElementById('panel-' + tabName).style.display = 'block';
+
+    // Activate button
+    document.getElementById('tab-' + tabName).style.background = '#1c1c26';
+    document.getElementById('tab-' + tabName).style.color = '#f0ede6';
+
+    if (tabName === 'attributes' && currentCoachAttributesLang === '') {
+        loadAttrLangOverview();
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STATS
+// ─────────────────────────────────────────────────────────────────────────
+
+async function loadCoachStats() {
+    try {
+        const data = await apiCall('/coach/stats/');
+        document.getElementById('statTotalUsers').textContent = data.total_users || 0;
+        document.getElementById('statTotalGoals').textContent = data.total_goals || 0;
+        document.getElementById('statTotalSessions').textContent = data.total_sessions || 0;
+        const activeLangs = Object.keys(data.attributes_by_lang || {}).filter(k => data.attributes_by_lang[k] > 0).length;
+        document.getElementById('statActiveLangs').textContent = activeLangs;
+    } catch (error) {
+        console.error('Stats yükleme hatası:', error);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// USERS TAB
+// ─────────────────────────────────────────────────────────────────────────
+
+async function loadCoachUsers(page = 1) {
+    try {
+        currentCoachUsersPage = page;
+        const lang = document.getElementById('filterUserLang').value;
+        const sunSign = document.getElementById('filterUserSunSign').value;
+
+        let ep = `/coach/users/?page=${page}&limit=20`;
+        if (lang) ep += `&lang=${lang}`;
+        if (sunSign) ep += `&sun_sign=${encodeURIComponent(sunSign)}`;
+
+        const data = await apiCall(ep);
+        const tbody = document.getElementById('coachUsersTable');
+        tbody.innerHTML = '';
+
+        if (data.data && data.data.length > 0) {
+            data.data.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.user_id}</td>
+                    <td>${user.lang}</td>
+                    <td>${user.sun_sign || '-'}</td>
+                    <td>${user.coach_session_count || 0}</td>
+                    <td>${(user.aktif_hedefler || []).length}</td>
+                    <td>${new Date(user.created_at).toLocaleDateString('tr-TR')}</td>
+                    <td>
+                        <button onclick="viewCoachUser(${user.user_id})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button> |
+                        <button onclick="if(confirm('Kullanıcıyı silmek istediğinize emin misiniz?')) deleteCoachUser(${user.user_id})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Kullanıcı bulunamadı.</td></tr>';
+        }
+
+        // Pagination
+        if (data.pagination) {
+            const paginationDiv = document.getElementById('coachUsersPagination');
+            paginationDiv.innerHTML = '';
+            for (let i = 1; i <= data.pagination.pages; i++) {
+                const link = document.createElement('a');
+                if (i === currentCoachUsersPage) {
+                    link.innerHTML = `<span class="active">${i}</span>`;
+                } else {
+                    link.textContent = i;
+                    link.href = '#';
+                    link.onclick = (e) => { e.preventDefault(); loadCoachUsers(i); };
+                }
+                paginationDiv.appendChild(link);
+            }
+        }
+    } catch (error) {
+        console.error('Kullanıcı yükleme hatası:', error);
+        document.getElementById('coachUsersTable').innerHTML = `
+            <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
+                Hata: ${error.message}
+            </td></tr>
+        `;
+    }
+}
+
+async function viewCoachUser(userId) {
+    try {
+        currentCoachUserId = userId;
+        const data = await apiCall(`/coach/users/${userId}/`);
+
+        const contentDiv = document.getElementById('userDetailContent');
+        const user = data.user;
+        const birthData = data.birth_data || {};
+        const goals = data.recent_goals || [];
+
+        let goalsHtml = '<h4 style="color: #d4af37; margin-bottom: 10px;">Son 10 Hedef</h4>';
+        if (goals.length > 0) {
+            goalsHtml += '<ul style="margin: 0; padding-left: 20px;">';
+            goals.forEach(g => {
+                const statusColor = g.status === 'aktif' ? '#4CAF50' : g.status === 'tamamlandı' ? '#2196F3' : '#707070';
+                goalsHtml += `<li style="margin-bottom: 8px;">
+                    <strong>${g.title}</strong> (${g.module})
+                    <span style="background: ${statusColor}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">
+                        ${g.status}
+                    </span>
+                </li>`;
+            });
+            goalsHtml += '</ul>';
+        } else {
+            goalsHtml += '<p style="color: #707070;">Hedef bulunmadı.</p>';
+        }
+
+        contentDiv.innerHTML = `
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" value="${user.user_id}" readonly style="background: #3a3632; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>Dil</label>
+                <input type="text" value="${user.lang || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>Burç (Sun Sign)</label>
+                <input type="text" value="${user.sun_sign || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>Doğum Tarihi</label>
+                <input type="text" value="${birthData.birth_date || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>Seanslar</label>
+                <input type="text" value="${user.coach_session_count || 0}" readonly style="background: #3a3632; cursor: not-allowed;">
+            </div>
+            ${goalsHtml}
+        `;
+
+        document.getElementById('userDetailModal').style.display = 'block';
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+function closeUserDetailModal() {
+    document.getElementById('userDetailModal').style.display = 'none';
+    currentCoachUserId = null;
+}
+
+async function deleteCoachUser(userId) {
+    try {
+        await apiCall(`/coach/users/${userId}/`, 'DELETE');
+        closeUserDetailModal();
+        loadCoachUsers(currentCoachUsersPage);
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// GOALS TAB
+// ─────────────────────────────────────────────────────────────────────────
+
+async function loadCoachGoals(page = 1) {
+    try {
+        currentCoachGoalsPage = page;
+        const status = document.getElementById('filterGoalStatus').value;
+        const module = document.getElementById('filterGoalModule').value;
+        const userId = document.getElementById('filterGoalUser').value;
+
+        let ep = `/coach/goals/?page=${page}&limit=20`;
+        if (status) ep += `&status=${status}`;
+        if (module) ep += `&module=${module}`;
+        if (userId) ep += `&user_id=${userId}`;
+
+        const data = await apiCall(ep);
+        const tbody = document.getElementById('coachGoalsTable');
+        tbody.innerHTML = '';
+
+        if (data.data && data.data.length > 0) {
+            data.data.forEach(goal => {
+                const row = document.createElement('tr');
+                const priorityColor = goal.priority === 'yüksek' ? '#F44336' : goal.priority === 'orta' ? '#FF9800' : '#9E9E9E';
+                const statusColor = goal.status === 'aktif' ? '#4CAF50' : goal.status === 'tamamlandı' ? '#2196F3' : '#707070';
+
+                row.innerHTML = `
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${goal.title}">${goal.title}</td>
+                    <td>${goal.user_id}</td>
+                    <td>${goal.module}</td>
+                    <td><span style="background: ${priorityColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${goal.priority || '-'}</span></td>
+                    <td><span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${goal.status}</span></td>
+                    <td>${goal.target_date ? new Date(goal.target_date).toLocaleDateString('tr-TR') : '-'}</td>
+                    <td>
+                        <button onclick="updateGoalStatus('${goal._id}', '${goal.status === 'aktif' ? 'tamamlandı' : 'aktif'}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Değiştir</button> |
+                        <button onclick="deleteCoachGoal('${goal._id}')" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Sil</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Hedef bulunamadı.</td></tr>';
+        }
+
+        // Pagination
+        if (data.pagination) {
+            const paginationDiv = document.getElementById('coachGoalsPagination');
+            paginationDiv.innerHTML = '';
+            for (let i = 1; i <= data.pagination.pages; i++) {
+                const link = document.createElement('a');
+                if (i === currentCoachGoalsPage) {
+                    link.innerHTML = `<span class="active">${i}</span>`;
+                } else {
+                    link.textContent = i;
+                    link.href = '#';
+                    link.onclick = (e) => { e.preventDefault(); loadCoachGoals(i); };
+                }
+                paginationDiv.appendChild(link);
+            }
+        }
+    } catch (error) {
+        console.error('Hedef yükleme hatası:', error);
+        document.getElementById('coachGoalsTable').innerHTML = `
+            <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
+                Hata: ${error.message}
+            </td></tr>
+        `;
+    }
+}
+
+async function updateGoalStatus(goalId, newStatus) {
+    try {
+        await apiCall(`/coach/goals/${goalId}/`, 'PATCH', { status: newStatus });
+        loadCoachGoals(currentCoachGoalsPage);
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+async function deleteCoachGoal(goalId) {
+    if (!confirm('Hedefi silmek istediğinize emin misiniz?')) return;
+    try {
+        await apiCall(`/coach/goals/${goalId}/`, 'DELETE');
+        loadCoachGoals(currentCoachGoalsPage);
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// ATTRIBUTES TAB
+// ─────────────────────────────────────────────────────────────────────────
+
+async function loadAttrLangOverview() {
+    try {
+        const data = await apiCall('/coach/attributes/');
+        const container = document.getElementById('langButtons');
+        container.innerHTML = '';
+
+        const allLangs = ["tr","en","de","ru","ar","es","ko","ja","zh","hi","fr","pt","bn","id","ur","it","vi","pl"];
+        allLangs.forEach(lang => {
+            const count = data.data.find(d => d.lang === lang)?.sifat_count || 0;
+            const btn = document.createElement('button');
+            btn.onclick = () => { currentCoachAttributesLang = lang; loadCoachAttributes(1); };
+            btn.style.cssText = `
+                padding: 10px 15px;
+                background: #2a2928;
+                border: 1px solid #3a3632;
+                color: #b0b0b0;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.2s;
+            `;
+            btn.textContent = `${lang.toUpperCase()} (${count})`;
+            btn.onmouseover = () => { btn.style.borderColor = '#5c5c72'; btn.style.color = '#d4af37'; };
+            btn.onmouseout = () => { btn.style.borderColor = '#3a3632'; btn.style.color = '#b0b0b0'; };
+            container.appendChild(btn);
+        });
+    } catch (error) {
+        console.error('Dil yükleme hatası:', error);
+    }
+}
+
+async function loadCoachAttributes(page = 1) {
+    try {
+        if (!currentCoachAttributesLang) {
+            document.getElementById('coachAttributesTable').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Dil seçiniz</td></tr>';
+            return;
+        }
+
+        currentCoachAttributesPage = page;
+        const search = document.getElementById('searchSifat').value.trim();
+
+        let ep = `/coach/attributes/${currentCoachAttributesLang}/?page=${page}&limit=20`;
+        if (search) ep += `&search=${encodeURIComponent(search)}`;
+
+        const data = await apiCall(ep);
+        const tbody = document.getElementById('coachAttributesTable');
+        tbody.innerHTML = '';
+
+        if (data.data && data.data.length > 0) {
+            data.data.forEach(sifat => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${sifat._id}</strong></td>
+                    <td>${sifat.version || 1}</td>
+                    <td>${sifat.module_count || 27}</td>
+                    <td>${new Date(sifat.updated_at).toLocaleDateString('tr-TR')}</td>
+                    <td>
+                        <button onclick="viewCoachSifat('${currentCoachAttributesLang}', '${sifat._id}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Sıfat bulunamadı.</td></tr>';
+        }
+
+        // Pagination
+        if (data.pagination) {
+            const paginationDiv = document.getElementById('coachAttributesPagination');
+            paginationDiv.innerHTML = '';
+            for (let i = 1; i <= data.pagination.pages; i++) {
+                const link = document.createElement('a');
+                if (i === currentCoachAttributesPage) {
+                    link.innerHTML = `<span class="active">${i}</span>`;
+                } else {
+                    link.textContent = i;
+                    link.href = '#';
+                    link.onclick = (e) => { e.preventDefault(); loadCoachAttributes(i); };
+                }
+                paginationDiv.appendChild(link);
+            }
+        }
+    } catch (error) {
+        console.error('Sıfat yükleme hatası:', error);
+        document.getElementById('coachAttributesTable').innerHTML = `
+            <tr><td colspan="5" style="text-align: center; padding: 20px; color: #F44336;">
+                Hata: ${error.message}
+            </td></tr>
+        `;
+    }
+}
+
+async function viewCoachSifat(lang, sifatName) {
+    try {
+        currentCoachSifatLang = lang;
+        currentCoachSifatName = sifatName;
+
+        const data = await apiCall(`/coach/attributes/${lang}/${encodeURIComponent(sifatName)}/`);
+        document.getElementById('sifatDetailTitle').textContent = `Sıfat: ${sifatName} (${lang.toUpperCase()})`;
+
+        const allModules = [
+            "kariyer","giyim","liderlik","duygusal","uyum","beceri","ik","tavsiye",
+            "motivasyon","astroloji","etkinlik","muzik","film_dizi","saglik_esenwlik",
+            "dogruluk_sadakat","guvenlik","suc_egilim","iliski_yonetimi","iletisim_becerileri",
+            "stres_yonetimi","ozguven","zaman_yonetimi","kisisel_hedefler",
+            "astroloji_harita","dogum_analizi","yas_koc_ozet","vucut_dil"
+        ];
+
+        const container = document.getElementById('sifatModulesContainer');
+        container.innerHTML = '';
+
+        allModules.forEach(module => {
+            const moduleValue = data[module] || {};
+            const jsonStr = JSON.stringify(moduleValue, null, 2);
+
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+            fieldDiv.innerHTML = `
+                <label>${module}</label>
+                <textarea id="mod-${module}" rows="3" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px; font-family: monospace; font-size: 11px;">
+${jsonStr}
+                </textarea>
+            `;
+            container.appendChild(fieldDiv);
+        });
+
+        document.getElementById('sifatDetailModal').style.display = 'block';
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+function closeSifatDetailModal() {
+    document.getElementById('sifatDetailModal').style.display = 'none';
+}
+
+async function saveSifatChanges() {
+    try {
+        const allModules = [
+            "kariyer","giyim","liderlik","duygusal","uyum","beceri","ik","tavsiye",
+            "motivasyon","astroloji","etkinlik","muzik","film_dizi","saglik_esenwlik",
+            "dogruluk_sadakat","guvenlik","suc_egilim","iliski_yonetimi","iletisim_becerileri",
+            "stres_yonetimi","ozguven","zaman_yonetimi","kisisel_hedefler",
+            "astroloji_harita","dogum_analizi","yas_koc_ozet","vucut_dil"
+        ];
+
+        const body = {};
+        allModules.forEach(mod => {
+            const el = document.getElementById(`mod-${mod}`);
+            if (el) {
+                try {
+                    body[mod] = JSON.parse(el.value);
+                } catch {
+                    body[mod] = el.value;
+                }
+            }
+        });
+
+        await apiCall(`/coach/attributes/${currentCoachSifatLang}/${encodeURIComponent(currentCoachSifatName)}/`, 'PATCH', body);
+        alert('Kaydedildi!');
+        closeSifatDetailModal();
+        loadCoachAttributes(currentCoachAttributesPage);
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// INITIALIZATION
+// ─────────────────────────────────────────────────────────────────────────
+
+window.addEventListener('load', () => {
+    loadCoachStats();
+    loadCoachUsers(1);
+    loadCoachGoals(1);
+});
+</script>
+{% endblock %}

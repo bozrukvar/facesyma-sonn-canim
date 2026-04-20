@@ -1,0 +1,413 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-database %}active{% endblock %}
+
+{% block title %}Veritabanı Yönetimi{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Yeni Sıfat Ekle</div>
+    <form id="newSifatForm" style="max-width: 600px;">
+        <div class="form-group">
+            <label>Sıfat Adı (Türkçe)</label>
+            <input type="text" id="newSifatAd" placeholder="örn: acele karar vermeyen" required>
+        </div>
+        <div class="form-group">
+            <label>Tür</label>
+            <select id="newSifatTur" required>
+                <option value="">Seçiniz</option>
+                <option value="kişilik">Kişilik Özelliği</option>
+                <option value="davranış">Davranış</option>
+                <option value="yetenek">Yetenek</option>
+                <option value="diğer">Diğer</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Açıklama</label>
+            <textarea id="newSifatAciklama" placeholder="Sıfat hakkında açıklama (opsiyonel)" rows="3"></textarea>
+        </div>
+        <button type="button" onclick="createNewSifat()" class="btn btn-primary">Sıfat Ekle</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-title">Sıfat Listesi</div>
+
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <input type="text" id="searchSifat" placeholder="Sıfat adına göre ara..."
+               style="flex: 1; min-width: 200px; padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+        <select id="filterTur" style="padding: 10px; background: #2a2928; border: 1px solid #3a3632; color: #ffffff; border-radius: 4px;">
+            <option value="">Tüm Türler</option>
+            <option value="kişilik">Kişilik Özelliği</option>
+            <option value="davranış">Davranış</option>
+            <option value="yetenek">Yetenek</option>
+            <option value="diğer">Diğer</option>
+        </select>
+        <button onclick="loadSifatlar()" class="btn btn-primary">Ara</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Adı</th>
+                <th>Tür</th>
+                <th>Cümle Sayısı</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody id="sifatlarTable">
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">Yükleniyor...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Sıfat Detay Modal -->
+<div id="sifatDetailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #1a1918; border: 1px solid #2a2928; border-radius: 8px; max-width: 700px; margin: 30px auto; padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #d4af37; margin: 0;">Sıfat Detayları</h2>
+            <button onclick="closeSifatModal()" style="background: none; border: none; color: #d4af37; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+
+        <div id="sifatDetailContent"></div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #2a2928;">
+            <h3 style="color: #d4af37; margin-bottom: 15px;">Cümle Ekle</h3>
+            <div class="form-group">
+                <label>Dil</label>
+                <select id="cumleLanguage">
+                    <option value="tr">Türkçe</option>
+                    <option value="en">İngilizce</option>
+                    <option value="de">Almanca</option>
+                    <option value="fr">Fransızca</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cümle Metni</label>
+                <textarea id="cumleText" placeholder="Yeni cümleyi girin..." rows="3"></textarea>
+            </div>
+            <button type="button" onclick="addCumleToCurrent()" class="btn btn-primary">Cümle Ekle</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button onclick="deleteSifatCurrent()" class="btn btn-secondary" style="background: #F44336; border-color: #F44336; color: #fff;">Sıfatı Sil</button>
+            <button onclick="closeSifatModal()" class="btn btn-secondary">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Dil Senkronizasyonu -->
+<div class="card">
+    <div class="card-title">Dil Senkronizasyonu</div>
+
+    <div style="margin-bottom: 20px;">
+        <button onclick="loadSyncStatus()" class="btn btn-primary">Senkronizasyon Durumunu Getir</button>
+    </div>
+
+    <table style="width: 100%; margin-bottom: 20px;">
+        <thead>
+            <tr>
+                <th>Dil</th>
+                <th>Çevrildi</th>
+                <th>Toplam</th>
+                <th>Yüzde</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="syncStatusTable">
+            <tr><td colspan="5" style="text-align: center; padding: 15px;">Başlangıç için "Durumu Getir" butonuna tıklayın</td></tr>
+        </tbody>
+    </table>
+
+    <div style="border-top: 1px solid #2a2928; padding-top: 15px;">
+        <div class="form-group" style="max-width: 300px;">
+            <label>Toplu Çevir - Dil Seç</label>
+            <select id="batchSyncLanguage">
+                <option value="">Seçiniz</option>
+                <option value="en">İngilizce (English)</option>
+                <option value="de">Almanca (Deutsch)</option>
+                <option value="fr">Fransızca (Français)</option>
+                <option value="es">İspanyolca (Español)</option>
+                <option value="it">İtalyanca (Italiano)</option>
+                <option value="pt">Portekizce (Português)</option>
+                <option value="ru">Rusça (Русский)</option>
+                <option value="ar">Arapça (العربية)</option>
+                <option value="zh">Çince (中文)</option>
+                <option value="ja">Japonca (日本語)</option>
+                <option value="ko">Korece (한국어)</option>
+                <option value="hi">Hintçe (हिन्दी)</option>
+                <option value="bn">Bengalce (বাঙালি)</option>
+                <option value="id">Endonezce (Bahasa Indonesia)</option>
+                <option value="vi">Vietnamca (Tiếng Việt)</option>
+                <option value="pl">Lehçe (Polski)</option>
+                <option value="ur">Urduca (اردو)</option>
+            </select>
+        </div>
+        <button onclick="triggerBatchSync()" class="btn btn-primary" style="margin-top: 15px;">Toplu Çevir Başlat</button>
+        <div id="syncStatus" style="margin-top: 15px; padding: 12px; border-radius: 4px; display: none;"></div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let currentSifatNo = null;
+
+    async function loadSifatlar(page = 1) {
+        try {
+            currentPage = page;
+            const search = document.getElementById('searchSifat').value.trim();
+            const tur = document.getElementById('filterTur').value;
+
+            let endpoint = `/database/sifatlar/?page=${page}&limit=20`;
+            if (search) endpoint += `&search=${encodeURIComponent(search)}`;
+            if (tur) endpoint += `&tur=${tur}`;
+
+            const data = await apiCall(endpoint);
+            const tbody = document.getElementById('sifatlarTable');
+            tbody.innerHTML = '';
+
+            if (data.sifatlar && data.sifatlar.length > 0) {
+                data.sifatlar.forEach(sifat => {
+                    const row = document.createElement('tr');
+                    const cumleCount = (sifat.cumleler || []).length;
+                    row.innerHTML = `
+                        <td>${sifat.no}</td>
+                        <td>${sifat.ad}</td>
+                        <td>${sifat.tur || '-'}</td>
+                        <td>${cumleCount}</td>
+                        <td>
+                            <button onclick="viewSifatDetail(${sifat.no})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button> |
+                            <button onclick="deleteSifat(${sifat.no})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Sıfat bulunamadı.</td></tr>';
+            }
+
+            // Pagination
+            if (data.pagination) {
+                const paginationDiv = document.getElementById('pagination');
+                paginationDiv.innerHTML = '';
+
+                for (let i = 1; i <= data.pagination.pages; i++) {
+                    const link = document.createElement('a');
+                    if (i === currentPage) {
+                        link.innerHTML = `<span class="active">${i}</span>`;
+                    } else {
+                        link.textContent = i;
+                        link.href = '#';
+                        link.onclick = (e) => { e.preventDefault(); loadSifatlar(i); };
+                    }
+                    paginationDiv.appendChild(link);
+                }
+            }
+        } catch (error) {
+            console.error('Sıfat yükleme hatası:', error);
+            document.getElementById('sifatlarTable').innerHTML = `
+                <tr><td colspan="5" style="text-align: center; padding: 20px; color: #F44336;">
+                    Hata: ${error.message}
+                </td></tr>
+            `;
+        }
+    }
+
+    async function viewSifatDetail(no) {
+        try {
+            currentSifatNo = no;
+            const data = await apiCall(`/database/sifatlar/${no}/`);
+            const contentDiv = document.getElementById('sifatDetailContent');
+
+            let cumleHtml = '<h4 style="color: #d4af37; margin-bottom: 10px;">Cümleler</h4>';
+            if (data.cumleler && data.cumleler.length > 0) {
+                cumleHtml += '<ul style="margin: 0; padding-left: 20px;">';
+                data.cumleler.forEach(c => {
+                    cumleHtml += `<li style="margin-bottom: 8px;">${c.metin}</li>`;
+                });
+                cumleHtml += '</ul>';
+            } else {
+                cumleHtml += '<p style="color: #707070;">Henüz cümle eklenmedi.</p>';
+            }
+
+            contentDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Sıfat Adı</label>
+                    <input type="text" value="${data.ad}" readonly style="background: #3a3632; cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>Tür</label>
+                    <input type="text" value="${data.tur || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea readonly style="background: #3a3632; cursor: not-allowed;" rows="2">${data.aciklama || ''}</textarea>
+                </div>
+                ${cumleHtml}
+            `;
+
+            document.getElementById('sifatDetailModal').style.display = 'block';
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    function closeSifatModal() {
+        document.getElementById('sifatDetailModal').style.display = 'none';
+        currentSifatNo = null;
+        document.getElementById('cumleText').value = '';
+    }
+
+    async function addCumleToCurrent() {
+        try {
+            const metin = document.getElementById('cumleText').value.trim();
+            const lang = document.getElementById('cumleLanguage').value;
+
+            if (!metin) {
+                alert('Cümle metni boş olamaz.');
+                return;
+            }
+
+            const langMap = { tr: 'cumleler', en: 'cumleler_en', de: 'cumleler_de', fr: 'cumleler_fr' };
+            const field = langMap[lang];
+
+            await apiCall(`/database/sifatlar/${currentSifatNo}/cumle/`, 'POST', {
+                lang,
+                [field]: [{ metin }]
+            });
+
+            document.getElementById('cumleText').value = '';
+            viewSifatDetail(currentSifatNo);
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function createNewSifat() {
+        try {
+            const ad = document.getElementById('newSifatAd').value.trim();
+            const tur = document.getElementById('newSifatTur').value;
+            const aciklama = document.getElementById('newSifatAciklama').value.trim();
+
+            if (!ad || !tur) {
+                alert('Sıfat adı ve tür zorunludur.');
+                return;
+            }
+
+            await apiCall('/database/sifatlar/', 'POST', {
+                ad,
+                tur,
+                aciklama
+            });
+
+            document.getElementById('newSifatForm').reset();
+            loadSifatlar();
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function deleteSifat(no) {
+        if (confirm('Bu sıfatı silmek istediğinize emin misiniz?')) {
+            try {
+                await apiCall(`/database/sifatlar/${no}/`, 'DELETE');
+                loadSifatlar(currentPage);
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+    }
+
+    async function deleteSifatCurrent() {
+        if (confirm('Bu sıfatı silmek istediğinize emin misiniz?')) {
+            try {
+                await apiCall(`/database/sifatlar/${currentSifatNo}/`, 'DELETE');
+                closeSifatModal();
+                loadSifatlar(currentPage);
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+    }
+
+    window.addEventListener('load', () => loadSifatlar());
+
+    // Dil Senkronizasyonu Fonksiyonları
+    async function loadSyncStatus() {
+        try {
+            const data = await apiCall('/database/sync/status/');
+
+            if (data.languages) {
+                let html = '';
+                for (const [lang, status] of Object.entries(data.languages)) {
+                    const percent = status.percentage || 0;
+                    html += `
+                        <tr>
+                            <td style="text-transform: uppercase;">${lang}</td>
+                            <td>${status.translated}</td>
+                            <td>${status.total}</td>
+                            <td>
+                                <div style="background: #2a2928; height: 20px; border-radius: 3px; overflow: hidden;">
+                                    <div style="background: ${percent > 50 ? '#4CAF50' : percent > 20 ? '#FFC107' : '#F44336'}; height: 100%; width: ${percent}%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white;">
+                                        ${percent.toFixed(0)}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <button onclick="triggerBatchSync('${lang}')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Çevir</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                document.getElementById('syncStatusTable').innerHTML = html;
+            }
+        } catch (error) {
+            alert('Hata: ' + error.message);
+        }
+    }
+
+    async function triggerBatchSync(lang = null) {
+        try {
+            if (!lang) {
+                lang = document.getElementById('batchSyncLanguage').value;
+                if (!lang) {
+                    alert('Lütfen bir dil seçiniz');
+                    return;
+                }
+            }
+
+            const statusDiv = document.getElementById('syncStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(76, 175, 80, 0.2)';
+            statusDiv.style.border = '1px solid #4CAF50';
+            statusDiv.style.color = '#4CAF50';
+            statusDiv.textContent = `${lang.toUpperCase()} dilinde çeviri işlemi başlatılıyor...`;
+
+            const data = await apiCall('/database/sync/trigger/', 'POST', { lang });
+
+            if (data.success) {
+                statusDiv.style.background = 'rgba(76, 175, 80, 0.2)';
+                statusDiv.style.border = '1px solid #4CAF50';
+                statusDiv.style.color = '#4CAF50';
+                statusDiv.textContent = `✓ İşlem tamamlandı! ${data.translated_count} sıfat çevrildi, ${data.skipped_count} atlandı, ${data.error_count} hata.`;
+
+                // Refresh status
+                setTimeout(() => loadSyncStatus(), 2000);
+            }
+        } catch (error) {
+            const statusDiv = document.getElementById('syncStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(244, 67, 54, 0.2)';
+            statusDiv.style.border = '1px solid #F44336';
+            statusDiv.style.color = '#F44336';
+            statusDiv.textContent = 'Hata: ' + error.message;
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Denetim Logu{% endblock %}
+
+{% block nav-audit %}active{% endblock %}
+
+{% block content %}
+<div class="audit-log-container">
+    <!-- Stats Cards -->
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-label">Toplam İşlem</div>
+            <div class="stat-value" id="stat-total">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Bugün</div>
+            <div class="stat-value" id="stat-today">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Bu Hafta</div>
+            <div class="stat-value" id="stat-week">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Benzersiz Admin</div>
+            <div class="stat-value" id="stat-admins">-</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">Filtrele</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 15px 0;">
+            <div>
+                <label style="color: #d4af37; font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px;">Admin Email</label>
+                <input type="email" id="filter-email" placeholder="admin@example.com" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #fff; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="color: #d4af37; font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px;">İşlem Tipi</label>
+                <select id="filter-action" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #fff; border-radius: 4px;">
+                    <option value="">Tümü</option>
+                    <option value="update_user">Kullanıcı Güncelle</option>
+                    <option value="delete_user">Kullanıcı Sil</option>
+                    <option value="bulk_update_users">Toplu Güncelle</option>
+                    <option value="bulk_delete_users">Toplu Sil</option>
+                    <option value="update_app_config">Uygulama Config</option>
+                    <option value="update_sifat">Sıfat Güncelle</option>
+                    <option value="delete_sifat">Sıfat Sil</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: #d4af37; font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px;">Target Tipi</label>
+                <select id="filter-target" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #fff; border-radius: 4px;">
+                    <option value="">Tümü</option>
+                    <option value="user">Kullanıcı</option>
+                    <option value="app_config">Uygulama Konfigürasyonu</option>
+                    <option value="sifat">Sıfat</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: #d4af37; font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px;">Başlangıç Tarihi</label>
+                <input type="date" id="filter-from" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #fff; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="color: #d4af37; font-size: 12px; font-weight: 600; display: block; margin-bottom: 5px;">Bitiş Tarihi</label>
+                <input type="date" id="filter-to" style="width: 100%; padding: 8px 12px; background: #2a2928; border: 1px solid #3a3632; color: #fff; border-radius: 4px;">
+            </div>
+            <div>
+                <button onclick="applyFilters()" style="width: 100%; padding: 8px 12px; background: #d4af37; color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; margin-top: 23px;">
+                    Filtrele
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Log Table -->
+    <div class="card">
+        <div class="card-title">İşlem Geçmişi</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #3a3632;">
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Saat</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Admin</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">İşlem</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Target</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Detay</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">IP</th>
+                </tr>
+            </thead>
+            <tbody id="audit-table-body">
+                <tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">Yükleniyor...</td></tr>
+            </tbody>
+        </table>
+        <div id="pagination" style="padding: 20px; text-align: center; color: #999;"></div>
+    </div>
+</div>
+
+<style>
+    .audit-log-container {
+        padding: 20px 0;
+    }
+
+    table tbody tr {
+        border-bottom: 1px solid #3a3632;
+    }
+
+    table tbody tr:hover {
+        background: #2a2928;
+    }
+
+    table td {
+        padding: 15px;
+        color: #999;
+        font-size: 13px;
+    }
+
+    .action-update {
+        background: #4CAF50;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .action-delete {
+        background: #F44336;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .action-bulk {
+        background: #FF9800;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 11px;
+    }
+</style>
+
+<script>
+    let token = localStorage.getItem('admin_token');
+    let currentPage = 1;
+    let currentLimit = 20;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!token) {
+            window.location.href = '/admin/login/';
+            return;
+        }
+
+        loadStats();
+        loadLogs();
+    });
+
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/v1/admin/audit/stats/', {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            document.getElementById('stat-total').textContent = data.total_actions;
+            document.getElementById('stat-today').textContent = data.today_actions;
+            document.getElementById('stat-week').textContent = data.this_week_actions;
+            document.getElementById('stat-admins').textContent = data.unique_admins;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    async function loadLogs(page = 1) {
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                limit: currentLimit
+            });
+
+            const email = document.getElementById('filter-email').value;
+            if (email) params.append('admin_email', email);
+
+            const action = document.getElementById('filter-action').value;
+            if (action) params.append('action', action);
+
+            const target = document.getElementById('filter-target').value;
+            if (target) params.append('target_type', target);
+
+            const fromDate = document.getElementById('filter-from').value;
+            if (fromDate) params.append('from_date', fromDate);
+
+            const toDate = document.getElementById('filter-to').value;
+            if (toDate) params.append('to_date', toDate);
+
+            const response = await fetch(`/api/v1/admin/audit/logs/?${params}`, {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            currentPage = page;
+
+            // Render table
+            const tbody = document.getElementById('audit-table-body');
+            if (data.logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">Kayıt bulunamadı</td></tr>';
+            } else {
+                tbody.innerHTML = data.logs.map(log => {
+                    const actionClass = log.action.includes('delete') ? 'action-delete' :
+                                       log.action.includes('bulk') ? 'action-bulk' : 'action-update';
+                    const time = new Date(log.timestamp).toLocaleString('tr-TR');
+
+                    return `
+                        <tr>
+                            <td>${time}</td>
+                            <td>${log.admin_email || '-'}</td>
+                            <td><span class="${actionClass}">${log.action}</span></td>
+                            <td>${log.target_type || '-'}</td>
+                            <td>${log.detail || (log.target_id ? `ID: ${log.target_id}` : '-')}</td>
+                            <td>${log.ip_address || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Pagination
+            const totalPages = Math.ceil(data.total / currentLimit);
+            let paginationHtml = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    paginationHtml += `<span style="margin: 0 5px; color: #d4af37; font-weight: 600;">${i}</span>`;
+                } else {
+                    paginationHtml += `<a href="#" onclick="loadLogs(${i}); return false;" style="margin: 0 5px; color: #d4af37; text-decoration: none;">${i}</a>`;
+                }
+            }
+            document.getElementById('pagination').innerHTML = paginationHtml;
+        } catch (error) {
+            console.error('Error loading logs:', error);
+        }
+    }
+
+    function applyFilters() {
+        loadLogs(1);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+# ── Eğitim (GPU sunucuda) ──────────────────────────────────────────────────────
+# unsloth — Llama 3.1 için optimize (CUDA 12.1 + PyTorch 2.3.0)
+unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git
+transformers==4.46.0
+datasets==3.0.1
+trl==0.11.4
+peft==0.13.2
+accelerate==1.0.1
+bitsandbytes==0.44.1
+
+# Alternatif: PyPI'dan (daha yavaş kurulum)
+# unsloth==2024.11.7
+
+# ── Serving ───────────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn==0.30.6
+httpx==0.27.2
+PyJWT==2.9.0
+pymongo==4.7.2
+python-multipart==0.0.12
+
+# vLLM (ayrı kurulum — büyük paket)
+# pip install vllm==0.6.3
+
+# ── Veri üretimi ─────────────────────────────────────────────────────────────
+pymongo==4.7.2
