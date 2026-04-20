@@ -22,11 +22,17 @@
             <div class="kpi-icon">📝</div>
             <div class="kpi-label">Bugün Kayıt</div>
             <div class="kpi-value" id="kpi-registrations">-</div>
+            <div style="font-size: 11px; color: #999; margin-top: 8px; border-top: 1px solid #3a3632; padding-top: 8px;">
+                <div>📱 <span id="app-mobile-reg">-</span> | 🌐 <span id="app-web-reg">-</span></div>
+            </div>
         </div>
         <div class="kpi-card">
             <div class="kpi-icon">📊</div>
             <div class="kpi-label">Bugün Analiz</div>
             <div class="kpi-value" id="kpi-analyses">-</div>
+            <div style="font-size: 11px; color: #999; margin-top: 8px; border-top: 1px solid #3a3632; padding-top: 8px;">
+                <div>📱 <span id="app-mobile-ana">-</span> | 🌐 <span id="app-web-ana">-</span></div>
+            </div>
         </div>
         <div class="kpi-card">
             <div class="kpi-icon">💰</div>
@@ -341,7 +347,7 @@
 
             const data = await response.json();
 
-            updateKPIs(data.kpis, data.error_rate_1h);
+            updateKPIs(data.kpis, data.error_rate_1h, data.app_sources);
             updateChart(data.hourly_chart);
             updateActivityFeed(data.activity_feed);
             updateSystemHealth(data.system_health);
@@ -350,12 +356,20 @@
         }
     }
 
-    function updateKPIs(kpis, errorRate) {
+    function updateKPIs(kpis, errorRate, appSources) {
         document.getElementById('kpi-active-users').textContent = kpis.active_users_5min;
         document.getElementById('kpi-registrations').textContent = kpis.new_registrations_today;
         document.getElementById('kpi-analyses').textContent = kpis.analyses_today;
         document.getElementById('kpi-mrr').textContent = '$' + kpis.mrr.toFixed(2);
         document.getElementById('kpi-error-rate').textContent = errorRate.rate_pct + '%';
+
+        // Update app source breakdown
+        if (appSources) {
+            document.getElementById('app-mobile-reg').textContent = appSources.mobile_users_today || 0;
+            document.getElementById('app-web-reg').textContent = appSources.web_users_today || 0;
+            document.getElementById('app-mobile-ana').textContent = appSources.mobile_analyses_today || 0;
+            document.getElementById('app-web-ana').textContent = appSources.web_analyses_today || 0;
+        }
     }
 
     function updateChart(hourlyData) {

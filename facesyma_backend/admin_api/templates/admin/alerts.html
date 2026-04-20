@@ -53,6 +53,7 @@
                     <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Kural</th>
                     <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Değer</th>
                     <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">E-posta</th>
+                    <th style="padding: 15px; text-align: left; color: #d4af37; font-weight: 600;">Slack</th>
                 </tr>
             </thead>
             <tbody id="history-table-body">
@@ -106,7 +107,157 @@
     .email-not-sent {
         color: #F44336;
     }
+
+    .rule-form-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 1000;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .rule-form-content {
+        background: #1a1918;
+        border: 1px solid #2a2928;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #d4af37;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        background: #2a2928;
+        border: 1px solid #3a3632;
+        color: #ffffff;
+        border-radius: 4px;
+        font-family: inherit;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 25px;
+    }
+
+    .form-buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .form-buttons .btn-primary {
+        background: #d4af37;
+        color: #000;
+    }
+
+    .form-buttons .btn-secondary {
+        background: #666;
+        color: #fff;
+    }
 </style>
+
+<!-- Alert Rule Form Modal -->
+<div id="ruleFormModal" class="rule-form-modal">
+    <div class="rule-form-content">
+        <h2 style="color: #d4af37; margin-bottom: 20px;">Uyarı Kuralı</h2>
+
+        <div class="form-group">
+            <label>Kural Adı</label>
+            <input type="text" id="ruleName" placeholder="Örn: Premium kullanıcı düşüşü">
+        </div>
+
+        <div class="form-group">
+            <label>Metrik</label>
+            <select id="ruleMetric">
+                <option value="premium_users">Premium kullanıcılar</option>
+                <option value="total_users">Toplam kullanıcılar</option>
+                <option value="daily_analyses">Günlük analizler</option>
+                <option value="error_rate">Hata oranı</option>
+            </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>Koşul</label>
+                <select id="ruleCondition">
+                    <option value="greater_than">Büyüktür (&gt;)</option>
+                    <option value="less_than">Küçüktür (&lt;)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Eşik Değeri</label>
+                <input type="number" id="ruleThreshold" placeholder="100">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Açıklama</label>
+            <textarea id="ruleDescription" placeholder="Bu uyarı ne zaman tetiklenir?"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="ruleNotifyEmail" style="width: auto; margin-right: 8px;">
+                    E-posta Bildirim
+                </label>
+            </div>
+            <div class="form-group">
+                <label>E-posta Adresi</label>
+                <input type="email" id="ruleNotifyEmailAddr" placeholder="admin@example.com">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Slack Webhook URL (Opsiyonel)</label>
+            <input type="text" id="ruleSlackWebhook" placeholder="https://hooks.slack.com/services/YOUR/WEBHOOK/URL">
+            <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                Slack webhook URL'sini <a href="https://api.slack.com/messaging/webhooks" target="_blank" style="color: #d4af37;">buradan</a> alabilirsiniz
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Cooldown (dakika)</label>
+            <input type="number" id="ruleCooldown" value="60" min="5" max="1440">
+        </div>
+
+        <div style="display: flex; align-items: center; padding: 10px; background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 4px; margin-bottom: 20px;">
+            <input type="checkbox" id="ruleEnabled" style="width: auto; margin-right: 10px;">
+            <label for="ruleEnabled" style="margin: 0; color: #d4af37;">Aktif</label>
+        </div>
+
+        <div class="form-buttons">
+            <button onclick="closeRuleForm()" class="btn-secondary">İptal</button>
+            <button onclick="saveRule()" class="btn-primary">Kaydet</button>
+        </div>
+    </div>
+</div>
 
 <script>
     let token = localStorage.getItem('admin_token');
@@ -195,6 +346,7 @@
                     <td>${item.rule_name}</td>
                     <td>${item.metric_value} / ${item.threshold}</td>
                     <td><span class="${item.email_sent ? 'email-sent' : 'email-not-sent'}">${item.email_sent ? '✓ Gönderildi' : '✗ Gönderilmedi'}</span></td>
+                    <td><span class="${item.slack_sent ? 'email-sent' : 'email-not-sent'}">${item.slack_sent ? '🔔 Gönderildi' : '—'}</span></td>
                 </tr>
             `).join('');
         } catch (error) {
@@ -241,7 +393,88 @@
     }
 
     function showNewRuleForm() {
-        alert('Yeni kural eklemek için API kullanın: POST /api/v1/admin/alerts/rules/');
+        document.getElementById('ruleName').value = '';
+        document.getElementById('ruleMetric').value = 'premium_users';
+        document.getElementById('ruleCondition').value = 'less_than';
+        document.getElementById('ruleThreshold').value = '';
+        document.getElementById('ruleDescription').value = '';
+        document.getElementById('ruleNotifyEmail').checked = false;
+        document.getElementById('ruleNotifyEmailAddr').value = '';
+        document.getElementById('ruleSlackWebhook').value = '';
+        document.getElementById('ruleCooldown').value = 60;
+        document.getElementById('ruleEnabled').checked = true;
+        document.getElementById('ruleFormModal').style.display = 'block';
     }
+
+    function closeRuleForm() {
+        document.getElementById('ruleFormModal').style.display = 'none';
+    }
+
+    async function saveRule() {
+        const name = document.getElementById('ruleName').value.trim();
+        const metric = document.getElementById('ruleMetric').value;
+        const condition = document.getElementById('ruleCondition').value;
+        const threshold = parseFloat(document.getElementById('ruleThreshold').value);
+        const description = document.getElementById('ruleDescription').value.trim();
+        const notifyEmail = document.getElementById('ruleNotifyEmail').checked;
+        const notifyEmailAddr = document.getElementById('ruleNotifyEmailAddr').value.trim();
+        const slackWebhook = document.getElementById('ruleSlackWebhook').value.trim();
+        const cooldown = parseInt(document.getElementById('ruleCooldown').value);
+        const enabled = document.getElementById('ruleEnabled').checked;
+
+        if (!name || !threshold) {
+            alert('Kural adı ve eşik değeri gereklidir!');
+            return;
+        }
+
+        if (notifyEmail && !notifyEmailAddr) {
+            alert('E-posta bildirim seçildiyse e-posta adresi gereklidir!');
+            return;
+        }
+
+        try {
+            const payload = {
+                name,
+                metric,
+                condition,
+                threshold,
+                description,
+                notify_email: notifyEmailAddr || null,
+                slack_webhook_url: slackWebhook || null,
+                cooldown_minutes: cooldown,
+                enabled
+            };
+
+            const response = await fetch('/api/v1/admin/alerts/rules/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                closeRuleForm();
+                loadRules();
+                loadStats();
+                alert('Kural başarıyla oluşturuldu!');
+            } else {
+                const error = await response.json();
+                alert('Hata: ' + (error.detail || 'Kural oluşturulamadı'));
+            }
+        } catch (error) {
+            console.error('Error saving rule:', error);
+            alert('Kural kaydedilirken hata oluştu!');
+        }
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('ruleFormModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 </script>
 {% endblock %}
