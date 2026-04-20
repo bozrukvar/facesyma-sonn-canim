@@ -45,3 +45,7 @@ test_face.jpg
 # Logs
 *.log
 logs/
+
+# Local development
+START_PHASE_2B.sh
+quick_setup.md
