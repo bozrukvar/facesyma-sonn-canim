@@ -1,17 +1,81 @@
+import os
 import random
-import pymongo
+from functools import lru_cache
 import numpy as np
 from twins_calculator import *
-import pandas as pd
-from pandas import DataFrame
 from pymongo import MongoClient
 from calculator import *
 from contrast import *
 from itertools import chain
 
-def twins(img1,img2,lang):
+# ── Module-level cache ────────────────────────────────────────────────────────
+_mongo_client = None
+_static_data_cache = {}
+_pos_neg_cache = None
+
+_LANG_DB_MAP = {
+    "tr": "database_attribute_tr", "tr-TR": "database_attribute_tr",
+    "de": "database_attribute_de", "de-DE": "database_attribute_de",
+    "ru": "database_attribute_ru", "ru-RU": "database_attribute_ru",
+    "ar": "database_attribute_ar", "ar-AR": "database_attribute_ar",
+    "en": "database_attribute_en", "en-US": "database_attribute_en",
+}
+
+_STATIC_DOCS = [
+    ("eye",      "eyes_distance"),
+    ("eye",      "eyes_size"),
+    ("eye",      "eyes_compare"),
+    ("eyebrow",  "eyebrows_eyes_distance"),
+    ("lip",      "lips_width"),
+    ("lip",      "lips_thickness"),
+    ("lip",      "lips_height_compare"),
+    ("nose",     "nose_size"),
+    ("nose",     "nose_length"),
+    ("nose",     "nose_width"),
+    ("forehead", "forehead_distance"),
+]
+
+
+def _get_client():
+    global _mongo_client
+    if _mongo_client is None:
+        _mongo_client = MongoClient(os.environ.get('MONGO_URI', ""))
+    return _mongo_client
+
+
+def _load_static_data(db_name: str) -> dict:
+    global _static_data_cache
+    if db_name in _static_data_cache:
+        return _static_data_cache[db_name]
+    dbref = _get_client()[db_name]
+    cache = {}
+    for col_name, doc_id in _STATIC_DOCS:
+        doc = dbref[col_name].find_one({"_id": doc_id})
+        cache[doc_id] = dict(doc) if doc else {}
+    _static_data_cache[db_name] = cache
+    return cache
+
+
+def _get_pos_neg() -> dict:
+    global _pos_neg_cache
+    if _pos_neg_cache is not None:
+        return _pos_neg_cache
+    doc = _get_client()['pos_neg']['attribute'].find_one(
+        {"_id": "values"}, {"_id": 0, "positive": 1, "negative": 1, "unbiased": 1}
+    )
+    _pos_neg_cache = doc if doc else {'positive': [], 'negative': [], 'unbiased': []}
+    return _pos_neg_cache
+
+
+@lru_cache(maxsize=32)
+def _lang_to_db(lang: str) -> str:
+    _lmget = _LANG_DB_MAP.get
+    return _lmget(lang, _lmget(lang.split('-')[0] if lang else '', "database_attribute_en"))
+
+
+def twins(img1, img2, lang):
     total_att = {}
-    result = Match(img1,img2)
+    result = Match(img1, img2)
 
     att = []
     att2 = []
@@ -19,153 +83,62 @@ def twins(img1,img2,lang):
     x = result[5]
     y = result[6]
 
-    CONNECTION_STRING = "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-    client = MongoClient(CONNECTION_STRING)
-    
-    if lang == "tr-TR" or lang == "tr" : 
-        dbname = client['database_attribute_tr']
-    elif lang == "de-DE" or lang == "de" : 
-        dbname = client['database_attribute_de']
-    elif lang == "ru-RU" or lang == "ru" : 
-        dbname = client['database_attribute_ru']
-    elif lang == "ar-AR" or lang == "ar" : 
-        dbname = client['database_attribute_ar']
-    elif lang == "en-US" or lang == "en" :
-        dbname = client['database_attribute_en']
-    else : 
-        dbname = client['database_attribute_en']
+    db_name = _lang_to_db(lang)
+    static = _load_static_data(db_name)
+    _sget = static.get
+    get_values = _get_pos_neg()
 
-    eye = dbname["eye"]
-    eyebrow = dbname["eyebrow"]
-    lip = dbname["lip"]
-    nose = dbname["nose"]
-    forehead = dbname["forehead"]
+    _r0 = _r0; _r1 = _r1; _r2 = _r2; _r3 = _r3; _r4 = _r4
+    _MEASURE_KEYS = [
+        ("eyes_distance",          _r0["eyes_distance"]),
+        ("eyes_size",              _r0["eyes_size"]),
+        ("eyes_compare",           _r0["eyes_compare"]),
+        ("eyebrows_eyes_distance", _r1["eyebrows_eyes_distance"]),
+        ("lips_width",             _r2["lips_width"]),
+        ("lips_thickness",         _r2["lips_thickness"]),
+        ("lips_height_compare",    _r2["lips_height_compare"]),
+        ("nose_size",              _r3["nose_size"]),
+        ("nose_length",            _r3["nose_length"]),
+        ("nose_width",             _r3["nose_width"]),
+        ("forehead_distance",      _r4["forehead_distance"]),
+    ]
+    _named_texts = {}
+    for doc_id, category in _MEASURE_KEYS:
+        series = _sget(doc_id, {})
+        for sifat, sentences in series.get(category, {}).items():
+            if sentences:
+                _named_texts[sifat] = random.choice(sentences)
 
-    ################################################pos_and_neg############################################################
+    _ntg = _named_texts.get
+    eye_distance_text     = {k: v for k in _sget("eyes_distance",          {}).get(_r0["eyes_distance"],          {}) if (v := _ntg(k)) is not None}
+    eye_size_text         = {k: v for k in _sget("eyes_size",               {}).get(_r0["eyes_size"],               {}) if (v := _ntg(k)) is not None}
+    eye_compare_text      = {k: v for k in _sget("eyes_compare",            {}).get(_r0["eyes_compare"],            {}) if (v := _ntg(k)) is not None}
+    eyebrow_distance_text = {k: v for k in _sget("eyebrows_eyes_distance",  {}).get(_r1["eyebrows_eyes_distance"],  {}) if (v := _ntg(k)) is not None}
+    lip_width_text        = {k: v for k in _sget("lips_width",              {}).get(_r2["lips_width"],              {}) if (v := _ntg(k)) is not None}
+    lip_thickness_text    = {k: v for k in _sget("lips_thickness",          {}).get(_r2["lips_thickness"],          {}) if (v := _ntg(k)) is not None}
+    lip_compare_text      = {k: v for k in _sget("lips_height_compare",     {}).get(_r2["lips_height_compare"],     {}) if (v := _ntg(k)) is not None}
+    size_nose_text        = {k: v for k in _sget("nose_size",               {}).get(_r3["nose_size"],               {}) if (v := _ntg(k)) is not None}
+    length_nose_text      = {k: v for k in _sget("nose_length",             {}).get(_r3["nose_length"],             {}) if (v := _ntg(k)) is not None}
+    width_nose_text       = {k: v for k in _sget("nose_width",              {}).get(_r3["nose_width"],              {}) if (v := _ntg(k)) is not None}
+    forehead_distance_text= {k: v for k in _sget("forehead_distance",       {}).get(_r4["forehead_distance"],       {}) if (v := _ntg(k)) is not None}
 
-    pos_neg = client['pos_neg']['attribute']
-    get_values = pos_neg.find_one({"_id": "values"})
+    _update = total_att.update
+    _update(eye_distance_text)
+    _update(eye_size_text)
+    _update(eye_compare_text)
+    _update(eyebrow_distance_text)
+    _update(lip_width_text)
+    _update(lip_thickness_text)
+    _update(lip_compare_text)
+    _update(size_nose_text)
+    _update(length_nose_text)
+    _update(width_nose_text)
+    _update(forehead_distance_text)
 
-    #######################################################################################################################
+    _tak = total_att.keys
+    new_att = Param(list(_tak()))
 
-
-    ############################# eyes_distance ###########################################################################
-    eye_series0 = dict(eye.find_one({"_id": "eyes_distance"}))
-    eye_dict0 = eye_series0[result[0]["eyes_distance"]]
-    eye_list0 = list(eye_dict0.keys())
-    eye_distance_text = {}
-
-    for a in range(0, len(eye_list0)):
-        distance_eye = len(eye_dict0[eye_list0[a]])
-        random_eye_distance = random.randint(0, (distance_eye - 1))
-        eye_distance_text[eye_list0[a]] = (eye_dict0[eye_list0[a]][random_eye_distance])
-    ############################# eyes_size ###########################################################################
-    eye_series1 = dict(eye.find_one({"_id": "eyes_size"}))
-    eye_dict1 = eye_series1[result[0]["eyes_size"]]
-    eye_list1 = list(eye_dict1.keys())
-    eye_size_text = {}
-    for b in range(0, len(eye_list1)):
-        size_eye = len(eye_dict1[eye_list1[b]])
-        random_eye_size = random.randint(0, (size_eye - 1))
-        eye_size_text[eye_list1[b]] = (eye_dict1[eye_list1[b]][random_eye_size])
-    ############################# eyes_compare ###########################################################################
-    eye_series2 = dict(eye.find_one({"_id": "eyes_compare"}))
-    eye_dict2 = eye_series2[result[0]["eyes_compare"]]
-    eye_list2 = list(eye_dict2.keys())
-    eye_compare_text = {}
-    for c in range(0, len(eye_list2)):
-        compare_eye = len(eye_dict2[eye_list2[c]])
-        random_eye_compare = random.randint(0, (compare_eye - 1))
-        eye_compare_text[eye_list2[c]] = (eye_dict2[eye_list2[c]][random_eye_compare])
-    ############################# eyebrows_eyes_distance ###########################################################################
-    eyebrow_series = dict(eyebrow.find_one({"_id": "eyebrows_eyes_distance"}))
-    eyebrow_dict = eyebrow_series[result[1]["eyebrows_eyes_distance"]]
-    eyebrow_list = list(eyebrow_dict.keys())
-    eyebrow_distance_text = {}
-    for d in range(0, len(eyebrow_list)):
-        distance_eyebrow = len(eyebrow_dict[eyebrow_list[d]])
-        random_eyebrow = random.randint(0, (distance_eyebrow - 1))
-        eyebrow_distance_text[eyebrow_list[d]] = (eyebrow_dict[eyebrow_list[d]][random_eyebrow])
-    ############################### lips_width ################################################################################
-    lip_series = dict(lip.find_one({"_id": "lips_width"}))
-    lip_dict0 = lip_series[result[2]["lips_width"]]
-    lip_list0 = list(lip_dict0.keys())
-    lip_width_text = {}
-    for e in range(0, len(lip_list0)):
-        width_lip = len(lip_dict0[lip_list0[e]])
-        random_lips_width = random.randint(0, (width_lip - 1))
-        lip_width_text[lip_list0[e]] = (lip_dict0[lip_list0[e]][random_lips_width])
-    ############################### lips_thickness ################################################################################
-    lip_series1 = dict(lip.find_one({"_id": "lips_thickness"}))
-    lip_dict1 = lip_series1[result[2]["lips_thickness"]]
-    lip_list1 = list(lip_dict1.keys())
-    lip_thickness_text = {}
-    for f in range(0, len(lip_list1)):
-        thickness_lip = len(lip_dict1[lip_list1[f]])
-        random_lips_thickness = random.randint(0, (thickness_lip - 1))
-        lip_thickness_text[lip_list1[f]] = (lip_dict1[lip_list1[f]][random_lips_thickness])
-    ############################### lips_height_compare ################################################################################
-    lip_series2 = dict(lip.find_one({"_id": "lips_height_compare"}))
-    lip_dict2 = lip_series2[result[2]["lips_height_compare"]]
-    lip_list2 = list(lip_dict2.keys())
-    lip_compare_text = {}
-    for g in range(0, len(lip_list2)):
-        compare_lip = len(lip_dict2[lip_list2[g]])
-        random_lips_compare = random.randint(0, (compare_lip - 1))
-        lip_compare_text[lip_list2[g]] = (lip_dict2[lip_list2[g]][random_lips_compare])
-    ############################### nose_size ################################################################################
-    nose_series = dict(nose.find_one({"_id": "nose_size"}))
-    nose_dict0 = nose_series[result[3]["nose_size"]]
-    nose_list0 = list(nose_dict0.keys())
-    size_nose_text = {}
-    for h in range(0, len(nose_list0)):
-        size_nose = len(nose_dict0[nose_list0[h]])
-        random_size_nose = random.randint(0, (size_nose - 1))
-        size_nose_text[nose_list0[h]] = (nose_dict0[nose_list0[h]][random_size_nose])
-    ############################### nose_length ################################################################################
-    nose_series1 = dict(nose.find_one({"_id": "nose_length"}))
-    nose_dict1 = nose_series1[result[3]["nose_length"]]
-    nose_list1 = list(nose_dict1.keys())
-    length_nose_text = {}
-    for j in range(0, len(nose_list1)):
-        length_nose = len(nose_dict1[nose_list1[j]])
-        random_length_nose = random.randint(0, (length_nose - 1))
-        length_nose_text[nose_list1[j]] = (nose_dict1[nose_list1[j]][random_length_nose])
-    ############################### nose_width ################################################################################
-    nose_series2 = dict(nose.find_one({"_id": "nose_width"}))
-    # print(nose_series2)
-    nose_dict2 = nose_series2[result[3]["nose_width"]]
-    nose_list2 = list(nose_dict2.keys())
-    width_nose_text = {}
-    for k in range(0, len(nose_list2)):
-        width_nose = len(nose_dict2[nose_list2[k]])
-        random_width_nose = random.randint(0, (width_nose - 1))
-        width_nose_text[nose_list2[k]] = (nose_dict2[nose_list2[k]][random_width_nose])
-    ############################### forehead_distance ###########################################################################
-    forehead_series = dict(forehead.find_one({"_id": "forehead_distance"}))
-    forehead_dict = forehead_series[result[4]["forehead_distance"]]
-    forehead_list = list(forehead_dict.keys())
-    forehead_distance_text = {}
-    for d in range(0, len(forehead_list)):
-        distance_forehead = len(forehead_dict[forehead_list[d]])
-        random_forehead = random.randint(0, (distance_forehead - 1))
-        forehead_distance_text[forehead_list[d]] = (forehead_dict[forehead_list[d]][random_forehead])
-
-    total_att.update(eye_distance_text)
-    total_att.update(eye_size_text)
-    total_att.update(eye_compare_text)
-    total_att.update(eyebrow_distance_text)
-    total_att.update(lip_width_text)
-    total_att.update(lip_thickness_text)
-    total_att.update(lip_compare_text)
-    total_att.update(size_nose_text)
-    total_att.update(length_nose_text)
-    total_att.update(width_nose_text)
-    total_att.update(forehead_distance_text)
-
-    new_att = Param(list(total_att.keys()))
-
-    set_difference = set(list(total_att.keys())).symmetric_difference(set(new_att))
+    set_difference = _tak() ^ set(new_att)
     list_difference = list(set_difference)
 
     for m in list_difference:
@@ -182,22 +155,24 @@ def twins(img1,img2,lang):
     total_att = dict(chain.from_iterable(t.items() for t in (p, n, un)))
 
     for e in range(0, 5):
-        for d in range(0, len(att[e])):
-            if x[e][f'{att[e][d]}'] == y[e][f'{att2[e][d]}']:
-                result_att.append(x[e][f'{att[e][d]}'])
+        _ate = att[e]
+        _xe = x[e]
+        for d in range(0, len(_ate)):
+            _ad = _ate[d]
+            _xed = _xe[f'{_ad}']
+            if _xed == y[e][f'{att2[e][d]}']:
+                result_att.append(_xed)
 
     result_att = round(((len(result_att) * 100) / 12), 2)
 
     if result_att == 100.00:
-        result_att = result_att - round(random.uniform(1,7), 2)
+        result_att = result_att - round(random.uniform(1, 7), 2)
     elif result_att < 50.00:
         result_att = result_att + round(random.uniform(5, 10), 2)
-    else:
-        result_att
 
-    total_text = random.sample(list(total_att.values()),len(total_att.values()))
+    _vals = list(total_att.values())
+    total_text = random.sample(_vals, len(_vals))
     total_text = ''.join(map(str, total_text))
-    # result_text = {"ratio": round(((len(result_att) * 100) / 12), 2), "text": total_text}
-    result_text = " " +  str(result_att)+ "#text" + total_text
+    result_text = " " + str(result_att) + "#text" + total_text
 
     return result_text

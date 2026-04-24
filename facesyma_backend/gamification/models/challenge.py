@@ -1,5 +1,5 @@
 """Challenge models"""
-from typing import Optional, List
+from typing import Optional
 
 CHALLENGE_TYPES = [
     'weekly_ranking',

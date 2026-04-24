@@ -53,11 +53,14 @@ EPOCHS = 1  # Test için sadece 1 epoch
 
 
 def main():
+    _exit = sys.exit
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", required=True, help="Path to JSONL dataset")
-    parser.add_argument("--epochs", type=int, default=EPOCHS, help="Number of epochs")
-    parser.add_argument("--output", default=OUTPUT_DIR, help="Output directory")
+    _addarg = parser.add_argument
+    _addarg("--dataset", required=True, help="Path to JSONL dataset")
+    _addarg("--epochs", type=int, default=EPOCHS, help="Number of epochs")
+    _addarg("--output", default=OUTPUT_DIR, help="Output directory")
     args = parser.parse_args()
+    _dataset = args.dataset
 
     # ── Step 1: Load Model & Tokenizer ────────────────────────────────────
     print(f"[1/5] Loading model & tokenizer...")
@@ -102,13 +105,14 @@ def main():
 
         if not model_loaded:
             print("ERROR: Could not load any model")
-            sys.exit(1)
+            _exit(1)
 
     # ── Step 2: Add LoRA ──────────────────────────────────────────────────
     print(f"\n[2/5] Adding LoRA adapters...")
 
     # Determine target modules based on model architecture
-    if "llama" in model_name.lower() or "mistral" in model_name.lower() or "tinyllama" in model_name.lower():
+    _mlow = model_name.lower()
+    if "llama" in _mlow or "mistral" in _mlow or "tinyllama" in _mlow:
         target_mods = ["q_proj", "v_proj"]
     else:
         target_mods = ["c_attn"]
@@ -133,26 +137,27 @@ def main():
         print(f"ERROR in LoRA: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        _exit(1)
 
     # ── Step 3: Load Dataset ──────────────────────────────────────────────
     print(f"\n[3/5] Loading dataset...")
 
-    if not Path(args.dataset).exists():
-        print(f"ERROR: {args.dataset} not found")
-        sys.exit(1)
+    if not Path(_dataset).exists():
+        print(f"ERROR: {_dataset} not found")
+        _exit(1)
 
     try:
-        print(f"  Loading from {args.dataset}...", flush=True)
-        dataset = load_dataset("json", data_files=args.dataset, split="train")
+        print(f"  Loading from {_dataset}...", flush=True)
+        dataset = load_dataset("json", data_files=_dataset, split="train")
 
         # Convert messages to text format for SFTTrainer
         def format_messages_to_text(example):
             messages = example.get('messages', [])
             text = ""
             for msg in messages:
-                role = msg.get('role', 'user')
-                content = msg.get('content', '')
+                _mget = msg.get
+                role = _mget('role', 'user')
+                content = _mget('content', '')
                 text += f"{role}: {content}\n"
             return {"text": text}
 
@@ -163,7 +168,7 @@ def main():
         print(f"ERROR loading dataset: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        _exit(1)
 
     # ── Step 4: Setup Training ────────────────────────────────────────────
     print(f"\n[4/5] Setting up training...")
@@ -203,7 +208,7 @@ def main():
         print(f"ERROR in training setup: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        _exit(1)
 
     # ── Step 5: Train ─────────────────────────────────────────────────────
     print(f"\n[5/5] Starting training...")
@@ -227,12 +232,12 @@ def main():
 
     except KeyboardInterrupt:
         print("\n⚠ Training interrupted")
-        sys.exit(0)
+        _exit(0)
     except RuntimeError as e:
         if "out of memory" in str(e).lower():
             print(f"\n❌ Out of memory: {e}")
             print("Try reducing MAX_SEQ_LEN or BATCH_SIZE")
-            sys.exit(1)
+            _exit(1)
         else:
             raise
 

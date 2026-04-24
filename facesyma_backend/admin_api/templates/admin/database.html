@@ -177,10 +177,10 @@
                     const row = document.createElement('tr');
                     const cumleCount = (sifat.cumleler || []).length;
                     row.innerHTML = `
-                        <td>${sifat.no}</td>
-                        <td>${sifat.ad}</td>
-                        <td>${sifat.tur || '-'}</td>
-                        <td>${cumleCount}</td>
+                        <td>${escapeHtml(String(sifat.no))}</td>
+                        <td>${escapeHtml(sifat.ad)}</td>
+                        <td>${escapeHtml(sifat.tur || '-')}</td>
+                        <td>${escapeHtml(String(cumleCount))}</td>
                         <td>
                             <button onclick="viewSifatDetail(${sifat.no})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button> |
                             <button onclick="deleteSifat(${sifat.no})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
@@ -213,7 +213,7 @@
             console.error('Sıfat yükleme hatası:', error);
             document.getElementById('sifatlarTable').innerHTML = `
                 <tr><td colspan="5" style="text-align: center; padding: 20px; color: #F44336;">
-                    Hata: ${error.message}
+                    Hata: ${escapeHtml(error.message)}
                 </td></tr>
             `;
         }
@@ -229,7 +229,7 @@
             if (data.cumleler && data.cumleler.length > 0) {
                 cumleHtml += '<ul style="margin: 0; padding-left: 20px;">';
                 data.cumleler.forEach(c => {
-                    cumleHtml += `<li style="margin-bottom: 8px;">${c.metin}</li>`;
+                    cumleHtml += `<li style="margin-bottom: 8px;">${escapeHtml(c.metin)}</li>`;
                 });
                 cumleHtml += '</ul>';
             } else {
@@ -239,15 +239,15 @@
             contentDiv.innerHTML = `
                 <div class="form-group">
                     <label>Sıfat Adı</label>
-                    <input type="text" value="${data.ad}" readonly style="background: #3a3632; cursor: not-allowed;">
+                    <input type="text" value="${escapeHtml(data.ad)}" readonly style="background: #3a3632; cursor: not-allowed;">
                 </div>
                 <div class="form-group">
                     <label>Tür</label>
-                    <input type="text" value="${data.tur || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+                    <input type="text" value="${escapeHtml(data.tur || '-')}" readonly style="background: #3a3632; cursor: not-allowed;">
                 </div>
                 <div class="form-group">
                     <label>Açıklama</label>
-                    <textarea readonly style="background: #3a3632; cursor: not-allowed;" rows="2">${data.aciklama || ''}</textarea>
+                    <textarea readonly style="background: #3a3632; cursor: not-allowed;" rows="2">${escapeHtml(data.aciklama || '')}</textarea>
                 </div>
                 ${cumleHtml}
             `;
@@ -344,28 +344,38 @@
             const data = await apiCall('/database/sync/status/');
 
             if (data.languages) {
-                let html = '';
+                const tbody = document.getElementById('syncStatusTable');
+                tbody.innerHTML = '';
                 for (const [lang, status] of Object.entries(data.languages)) {
                     const percent = status.percentage || 0;
-                    html += `
-                        <tr>
-                            <td style="text-transform: uppercase;">${lang}</td>
-                            <td>${status.translated}</td>
-                            <td>${status.total}</td>
-                            <td>
-                                <div style="background: #2a2928; height: 20px; border-radius: 3px; overflow: hidden;">
-                                    <div style="background: ${percent > 50 ? '#4CAF50' : percent > 20 ? '#FFC107' : '#F44336'}; height: 100%; width: ${percent}%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white;">
-                                        ${percent.toFixed(0)}%
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <button onclick="triggerBatchSync('${lang}')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Çevir</button>
-                            </td>
-                        </tr>
-                    `;
+                    const bgColor = percent > 50 ? '#4CAF50' : percent > 20 ? '#FFC107' : '#F44336';
+
+                    const tr = document.createElement('tr');
+
+                    const td1 = document.createElement('td');
+                    td1.style.textTransform = 'uppercase';
+                    td1.textContent = lang;
+
+                    const td2 = document.createElement('td');
+                    td2.textContent = String(status.translated);
+
+                    const td3 = document.createElement('td');
+                    td3.textContent = String(status.total);
+
+                    const td4 = document.createElement('td');
+                    td4.innerHTML = `<div style="background:#2a2928;height:20px;border-radius:3px;overflow:hidden;"><div style="background:${bgColor};height:100%;width:${percent}%;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;">${escapeHtml(percent.toFixed(0))}%</div></div>`;
+
+                    const td5 = document.createElement('td');
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-secondary';
+                    btn.style.cssText = 'padding: 5px 10px; font-size: 12px;';
+                    btn.textContent = 'Çevir';
+                    btn.addEventListener('click', () => triggerBatchSync(lang));
+                    td5.appendChild(btn);
+
+                    tr.append(td1, td2, td3, td4, td5);
+                    tbody.appendChild(tr);
                 }
-                document.getElementById('syncStatusTable').innerHTML = html;
             }
         } catch (error) {
             alert('Hata: ' + error.message);

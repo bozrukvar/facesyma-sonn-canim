@@ -27,7 +27,6 @@ KULLANIM:
 import os, sys, json, time, re, argparse, logging
 from pathlib  import Path
 from datetime import datetime
-from copy     import deepcopy
 
 logging.basicConfig(
     level=logging.INFO,
@@ -145,23 +144,25 @@ def translate_batch(texts: list, target: str) -> list:
     """Batch çeviri — rate limit korumalı."""
     from deep_translator import GoogleTranslator
     results = []
+    _rext = results.extend
+    _sleep = time.sleep
 
     for i in range(0, len(texts), BATCH_SIZE):
         chunk = texts[i:i + BATCH_SIZE]
         for attempt in range(1, MAX_RETRY + 1):
             try:
                 translated = GoogleTranslator(source='tr', target=target).translate_batch(chunk)
-                results.extend(t if t else chunk[j] for j, t in enumerate(translated))
+                _rext(t if t else chunk[j] for j, t in enumerate(translated))
                 break
             except Exception as e:
                 wait = attempt * 2
                 log.warning(f"  Çeviri hatası (deneme {attempt}/{MAX_RETRY}): {e}")
                 if attempt < MAX_RETRY:
-                    time.sleep(wait)
+                    _sleep(wait)
                 else:
                     log.error("  Başarısız — orijinal kullanılıyor")
-                    results.extend(chunk)
-        time.sleep(DELAY_SEC)
+                    _rext(chunk)
+        _sleep(DELAY_SEC)
 
     return results
 
@@ -207,7 +208,8 @@ def migrate_lang(data: dict, lang_code: str, gt_code: str,
     ]
 
     total     = len(data)
-    done_keys = set(progress.get(lang_code, {}).keys())
+    _plc      = progress.get(lang_code, {})
+    done_keys = set(_plc.keys())
 
     for idx, (sifat, fields) in enumerate(data.items(), 1):
         translated_fields = {}
@@ -221,21 +223,22 @@ def migrate_lang(data: dict, lang_code: str, gt_code: str,
             prog_key = f"{sifat}:{mod}"
             if prog_key in done_keys:
                 # Önceden çevrilmiş — progress'ten yükle
-                cached = progress.get(lang_code, {}).get(prog_key)
+                cached = _plc.get(prog_key)
                 translated_fields[mod] = cached if cached else val
                 continue
 
-            log.info(f"  [{idx:3d}/{total}] {sifat[:35]:<35} [{mod}]")
+            _info(f"  [{idx:3d}/{total}] {sifat[:35]:<35} [{mod}]")
 
             if dry_run:
-                translated_fields[mod] = f"[{gt_code.upper()}: {str(val)[:40]}...]"
+                _tf_mod = f"[{gt_code.upper()}: {str(val)[:40]}...]"
             else:
-                translated_fields[mod] = translate_field(str(val), gt_code)
+                _tf_mod = translate_field(str(val), gt_code)
+            translated_fields[mod] = _tf_mod
 
             # İlerlemeyi kaydet
             if lang_code not in progress:
                 progress[lang_code] = {}
-            progress[lang_code][prog_key] = translated_fields[mod]
+            progress[lang_code][prog_key] = _tf_mod
             save_progress(progress)
 
         translated_data[sifat] = translated_fields
@@ -244,6 +247,7 @@ def migrate_lang(data: dict, lang_code: str, gt_code: str,
 
 
 def migrate(langs: list, dry_run: bool, resume: bool):
+    _info = log.info
     t0 = datetime.now()
 
     # JSON yükle
@@ -254,28 +258,29 @@ def migrate(langs: list, dry_run: bool, resume: bool):
     with open(SRC_JSON, encoding='utf-8') as f:
         data = json.load(f)
 
-    log.info(f"Kaynak JSON: {len(data)} sıfat, {len(list(data.values())[0])} modül")
+    _info(f"Kaynak JSON: {len(data)} sıfat, {len(list(data.values())[0])} modül")
 
     # İlerleme yükle
     progress = load_progress() if resume else {}
     if resume and progress:
         done_count = sum(len(v) for v in progress.values())
-        log.info(f"Devam ediliyor — {done_count} alan tamamlanmış")
+        _info(f"Devam ediliyor — {done_count} alan tamamlanmış")
 
     for lang_code in langs:
         gt_code = LANG_MAP[lang_code]
         out_path = OUT_DIR / f"sifat_veritabani_{lang_code}.json"
+        _oname = out_path.name
 
-        log.info(f"\n{'='*55}")
-        log.info(f"DİL: {lang_code.upper()} ({gt_code})  →  {out_path.name}")
-        log.info(f"{'='*55}")
+        _info(f"\n{'='*55}")
+        _info(f"DİL: {lang_code.upper()} ({gt_code})  →  {_oname}")
+        _info(f"{'='*55}")
 
         # Mevcut dosya varsa ve resume ise yükle
         existing = {}
         if resume and out_path.exists():
             with open(out_path, encoding='utf-8') as f:
                 existing = json.load(f)
-            log.info(f"  Mevcut dosya yüklendi: {len(existing)} sıfat")
+            _info(f"  Mevcut dosya yüklendi: {len(existing)} sıfat")
 
         translated = migrate_lang(data, lang_code, gt_code, progress, dry_run)
 
@@ -287,25 +292,25 @@ def migrate(langs: list, dry_run: bool, resume: bool):
         if not dry_run:
             with open(out_path, 'w', encoding='utf-8') as f:
                 json.dump(translated, f, ensure_ascii=False, indent=2)
-            log.info(f"  Kaydedildi: {out_path}")
+            _info(f"  Kaydedildi: {out_path}")
         else:
-            log.info(f"  DRY RUN — {out_path.name} yazılmadı")
+            _info(f"  DRY RUN — {_oname} yazılmadı")
 
         # Facesyma revize klasörüne kopyala
         if not dry_run:
-            dest = Path(__file__).parent.parent / "facesyma_revize" / out_path.name
+            dest = Path(__file__).parent.parent / "facesyma_revize" / _oname
             if dest.parent.exists():
                 import shutil
                 shutil.copy2(out_path, dest)
-                log.info(f"  Kopyalandı: {dest}")
+                _info(f"  Kopyalandı: {dest}")
 
     elapsed = (datetime.now() - t0).total_seconds()
-    log.info(f"\n{'='*55}")
-    log.info(f"TAMAMLANDI: {elapsed:.0f}s ({elapsed/60:.1f} dk)")
-    log.info(f"Diller: {', '.join(langs)}")
+    _info(f"\n{'='*55}")
+    _info(f"TAMAMLANDI: {elapsed:.0f}s ({elapsed/60:.1f} dk)")
+    _info(f"Diller: {', '.join(langs)}")
     if dry_run:
-        log.info("NOT: Dry run — dosyalar yazılmadı.")
-    log.info(f"{'='*55}")
+        _info("NOT: Dry run — dosyalar yazılmadı.")
+    _info(f"{'='*55}")
 
     if not dry_run and PROGRESS_FILE.exists():
         PROGRESS_FILE.unlink()
@@ -314,6 +319,7 @@ def migrate(langs: list, dry_run: bool, resume: bool):
 # ── CLI ───────────────────────────────────────────────────────────
 
 def main():
+    _exit = sys.exit
     p = argparse.ArgumentParser(
         description="sifat_veritabani.json → 17 dil JSON",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -326,22 +332,24 @@ def main():
   python migrate_json.py --dry-run --langs en  # Test
         """
     )
-    p.add_argument("--langs",   default=",".join(LANG_MAP))
-    p.add_argument("--dry-run", action="store_true")
-    p.add_argument("--resume",  action="store_true")
-    p.add_argument("--delay",   type=float, default=DELAY_SEC)
-    p.add_argument("--src",     default=str(SRC_JSON))
+    _addarg = p.add_argument
+    _addarg("--langs",   default=",".join(LANG_MAP))
+    _addarg("--dry-run", action="store_true")
+    _addarg("--resume",  action="store_true")
+    _addarg("--delay",   type=float, default=DELAY_SEC)
+    _addarg("--src",     default=str(SRC_JSON))
     args = p.parse_args()
 
     global DELAY_SEC, SRC_JSON
     DELAY_SEC = args.delay
     SRC_JSON  = Path(args.src)
 
-    langs   = [l.strip() for l in args.langs.split(",") if l.strip() in LANG_MAP]
-    unknown = [l.strip() for l in args.langs.split(",") if l.strip() not in LANG_MAP]
+    _als    = args.langs.split(",")
+    langs   = [s for l in _als if (s := l.strip()) in LANG_MAP]
+    unknown = [s for l in _als if (s := l.strip()) not in LANG_MAP]
     if unknown:
         print(f"HATA: Bilinmeyen dil → {unknown}")
-        sys.exit(1)
+        _exit(1)
 
     with open(SRC_JSON, encoding='utf-8') as f:
         data = json.load(f)
@@ -376,13 +384,14 @@ def main():
     cevap = input("Başlansın mı? (e/h): ").strip().lower()
     if cevap not in ("e", "evet", "y", "yes"):
         print("İptal.")
-        sys.exit(0)
+        _exit(0)
 
+    _dry_run = args.dry_run; _resume = args.resume
     try:
-        migrate(langs=langs, dry_run=args.dry_run, resume=args.resume)
+        migrate(langs=langs, dry_run=_dry_run, resume=_resume)
     except KeyboardInterrupt:
         log.warning("\nDurduruldu. --resume ile devam edebilirsiniz.")
-        sys.exit(0)
+        _exit(0)
 
 
 if __name__ == "__main__":

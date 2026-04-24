@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { Card } from './ui';
 import theme from '../utils/theme';
+const { colors, spacing, radius, shadow } = theme;
 import {
   FaceValidationResult,
   getQualityEmoji,
@@ -65,13 +66,14 @@ export const PhotoQualityCheck: React.FC<Props> = ({
 
   // Kalite seviyesi açıklaması
   const getQualityLevel = () => {
-    if (score >= 85) return { level: 'Mükemmel', color: theme.colors.warmGreen };
-    if (score >= 70) return { level: 'İyi', color: theme.colors.warmAmber };
-    if (score >= 50) return { level: 'Kabul Edilebilir', color: theme.colors.warmOrange || '#FF9800' };
-    return { level: 'Düşük', color: theme.colors.warmRed };
+    if (score >= 85) return { level: 'Mükemmel', color: colors.warmGreen };
+    if (score >= 70) return { level: 'İyi', color: colors.warmAmber };
+    if (score >= 50) return { level: 'Kabul Edilebilir', color: colors.warmOrange || '#FF9800' };
+    return { level: 'Düşük', color: colors.warmRed };
   };
 
   const qualityLevel = getQualityLevel();
+  const qlColor = qualityLevel.color;
 
   return (
     <View style={styles.container}>
@@ -94,8 +96,8 @@ export const PhotoQualityCheck: React.FC<Props> = ({
             style={[
               styles.scoreCircle,
               {
-                backgroundColor: qualityLevel.color + '20',
-                borderColor: qualityLevel.color,
+                backgroundColor: qlColor + '20',
+                borderColor: qlColor,
               },
             ]}
           >
@@ -104,10 +106,10 @@ export const PhotoQualityCheck: React.FC<Props> = ({
           <View style={styles.scoreInfo}>
             <Text style={styles.scoreTitle}>Fotoğraf Kalitesi</Text>
             <View style={styles.scoreRow}>
-              <Text style={[styles.scoreNumber, { color: qualityLevel.color }]}>
+              <Text style={[styles.scoreNumber, { color: qlColor }]}>
                 {Math.round(score)}%
               </Text>
-              <Text style={[styles.scoreLevel, { color: qualityLevel.color }]}>
+              <Text style={[styles.scoreLevel, { color: qlColor }]}>
                 {qualityLevel.level}
               </Text>
             </View>
@@ -163,11 +165,11 @@ export const PhotoQualityCheck: React.FC<Props> = ({
             styles.statusCard,
             {
               backgroundColor: isValid
-                ? theme.colors.warmGreen + '15'
-                : theme.colors.warmRed + '15',
+                ? colors.warmGreen + '15'
+                : colors.warmRed + '15',
               borderColor: isValid
-                ? theme.colors.warmGreen
-                : theme.colors.warmRed,
+                ? colors.warmGreen
+                : colors.warmRed,
             },
           ]}
         >
@@ -175,7 +177,7 @@ export const PhotoQualityCheck: React.FC<Props> = ({
             style={[
               styles.statusMessage,
               {
-                color: isValid ? theme.colors.warmGreen : theme.colors.warmRed,
+                color: isValid ? colors.warmGreen : colors.warmRed,
               },
             ]}
           >
@@ -238,17 +240,17 @@ export const PhotoQualityCheck: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: colors.bg,
   },
   scroll: {
-    padding: theme.spacing.lg,
-    paddingBottom: theme.spacing.xl + 100, // Space for buttons
+    padding: spacing.lg,
+    paddingBottom: spacing.xl + 100, // Space for buttons
   },
   scoreHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-    gap: theme.spacing.lg,
+    marginBottom: spacing.xl,
+    gap: spacing.lg,
   },
   scoreCircle: {
     width: 100,
@@ -266,13 +268,13 @@ const styles = StyleSheet.create({
   },
   scoreTitle: {
     fontSize: 14,
-    color: theme.colors.textWarm + '80',
+    color: colors.textWarm + '80',
     marginBottom: 4,
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.md,
+    gap: spacing.md,
   },
   scoreNumber: {
     fontSize: 28,
@@ -283,130 +285,130 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   previewCard: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
     alignItems: 'center',
   },
   issuesCard: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
     borderLeftWidth: 3,
-    borderLeftColor: theme.colors.warmRed,
+    borderLeftColor: colors.warmRed,
   },
   issuesTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.warmRed,
-    marginBottom: theme.spacing.md,
+    color: colors.warmRed,
+    marginBottom: spacing.md,
   },
   issuesList: {
-    gap: theme.spacing.sm,
+    gap: spacing.sm,
   },
   issueItem: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: spacing.md,
   },
   issueBullet: {
     fontSize: 14,
-    color: theme.colors.warmRed,
+    color: colors.warmRed,
     fontWeight: '600',
   },
   issueText: {
     flex: 1,
     fontSize: 13,
-    color: theme.colors.textWarm,
+    color: colors.textWarm,
   },
   recommendationsCard: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
     borderLeftWidth: 3,
-    borderLeftColor: theme.colors.warmAmber,
+    borderLeftColor: colors.warmAmber,
   },
   recommendationsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.warmAmber,
-    marginBottom: theme.spacing.md,
+    color: colors.warmAmber,
+    marginBottom: spacing.md,
   },
   recommendationsList: {
-    gap: theme.spacing.sm,
+    gap: spacing.sm,
   },
   recommendationItem: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: spacing.md,
   },
   recommendationBullet: {
     fontSize: 14,
-    color: theme.colors.warmAmber,
+    color: colors.warmAmber,
     fontWeight: '600',
   },
   recommendationText: {
     flex: 1,
     fontSize: 13,
-    color: theme.colors.textWarm,
+    color: colors.textWarm,
   },
   statusCard: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
     borderWidth: 1,
   },
   statusMessage: {
     fontSize: 15,
     fontWeight: '600',
-    marginBottom: theme.spacing.sm,
+    marginBottom: spacing.sm,
   },
   statusSubtext: {
     fontSize: 12,
-    color: theme.colors.textWarm,
+    color: colors.textWarm,
     lineHeight: 16,
   },
   tipsCard: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
   },
   tipsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.textWarm,
-    marginBottom: theme.spacing.md,
+    color: colors.textWarm,
+    marginBottom: spacing.md,
   },
   tipsList: {
-    gap: theme.spacing.sm,
+    gap: spacing.sm,
   },
   tipsItem: {
     fontSize: 12,
-    color: theme.colors.textWarm,
+    color: colors.textWarm,
     lineHeight: 16,
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: theme.spacing.lg,
-    left: theme.spacing.lg,
-    right: theme.spacing.lg,
+    bottom: spacing.lg,
+    left: spacing.lg,
+    right: spacing.lg,
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: spacing.md,
   },
   button: {
     flex: 1,
     height: 56,
-    borderRadius: theme.radius.lg,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   retakeButton: {
-    backgroundColor: theme.colors.bg + '60',
+    backgroundColor: colors.bg + '60',
     borderWidth: 1.5,
-    borderColor: theme.colors.warmAmber,
+    borderColor: colors.warmAmber,
   },
   retakeButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: theme.colors.warmAmber,
+    color: colors.warmAmber,
     letterSpacing: 0.5,
   },
   proceedButton: {
-    backgroundColor: theme.colors.warmAmber,
-    ...theme.shadow.warm,
+    backgroundColor: colors.warmAmber,
+    ...shadow.warm,
   },
   proceedButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: theme.colors.bg,
+    color: colors.bg,
     letterSpacing: 0.5,
   },
   proceedButtonDisabled: {

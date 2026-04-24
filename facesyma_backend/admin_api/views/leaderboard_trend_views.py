@@ -9,18 +9,21 @@ Endpoints:
   GET  /api/v1/leaderboards/stats - Overall leaderboard statistics
 """
 
+import json
 import logging
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from admin_api.utils.auth import _require_auth
+from admin_api.utils.auth import _require_auth, _require_admin
 from gamification.services.leaderboard_trend_service import (
     LeaderboardTrendService, TrendError, TrendNotFoundError
 )
 
 log = logging.getLogger(__name__)
+
+_VALID_TREND_METRICS = frozenset({'rank_improvement', 'coins_gained', 'badges_unlocked', 'momentum'})
 
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
@@ -43,16 +46,19 @@ class UserTrendView(View):
 
     def get(self, request, user_id: int):
         try:
-            # Require authentication
-            _require_auth(request)
+            token_user_id = _require_auth(request)
+            if token_user_id != user_id:
+                return _json_error("Access denied.", status=403)
 
             # Parse parameters
-            leaderboard_type = request.GET.get("leaderboard_type", "global").strip()
-            trait_id = request.GET.get("trait_id", "").strip() or None
-            community_id_str = request.GET.get("community_id", "").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            leaderboard_type = _qpget("leaderboard_type", "global").strip()
+            trait_id = _qpget("trait_id", "").strip() or None
+            community_id_str = _qpget("community_id", "").strip()
 
             try:
-                days = int(request.GET.get("days", 30))
+                days = int(_qpget("days", 30))
                 days = min(max(days, 1), 90)  # Clamp 1-90 days
             except ValueError:
                 days = 30
@@ -105,13 +111,15 @@ class UserTrendView(View):
                 "trend_data": trend_data,
             })
 
-        except TrendNotFoundError as e:
-            return _json_error(f"No trend data: {str(e)}", status=404)
-        except TrendError as e:
-            return _json_error(f"Trend error: {str(e)}", status=400)
+        except TrendNotFoundError:
+            return _json_error("No trend data found.", status=404)
+        except TrendError:
+            return _json_error("Trend processing error.", status=400)
+        except PermissionError as e:
+            return _json_error(str(e), status=403)
         except Exception as e:
             log.error(f"UserTrendView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -138,31 +146,27 @@ class TrendingUsersView(View):
             _require_auth(request)
 
             # Parse parameters
-            leaderboard_type = request.GET.get("leaderboard_type", "global").strip()
-            metric = request.GET.get("metric", "rank_improvement").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            leaderboard_type = _qpget("leaderboard_type", "global").strip()
+            metric = _qpget("metric", "rank_improvement").strip()
 
             try:
-                days = int(request.GET.get("days", 7))
+                days = int(_qpget("days", 7))
                 days = min(max(days, 1), 90)
             except ValueError:
                 days = 7
 
             try:
-                limit = int(request.GET.get("limit", 10))
+                limit = int(_qpget("limit", 10))
                 limit = min(max(limit, 1), 100)
             except ValueError:
                 limit = 10
 
             # Validate metric
-            valid_metrics = [
-                "rank_improvement",
-                "coins_gained",
-                "badges_unlocked",
-                "momentum",
-            ]
-            if metric not in valid_metrics:
+            if metric not in _VALID_TREND_METRICS:
                 return _json_error(
-                    f"Invalid metric. Must be one of: {', '.join(valid_metrics)}",
+                    f"Invalid metric. Must be one of: {', '.join(sorted(_VALID_TREND_METRICS))}",
                     status=400
                 )
 
@@ -184,11 +188,11 @@ class TrendingUsersView(View):
                 "trending_users": trending,
             })
 
-        except TrendError as e:
-            return _json_error(f"Trend error: {str(e)}", status=400)
+        except TrendError:
+            return _json_error("Trend processing error.", status=400)
         except Exception as e:
             log.error(f"TrendingUsersView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -214,10 +218,12 @@ class LeaderboardStatsView(View):
             _require_auth(request)
 
             # Parse parameters
-            leaderboard_type = request.GET.get("leaderboard_type", "global").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            leaderboard_type = _qpget("leaderboard_type", "global").strip()
 
             try:
-                days = int(request.GET.get("days", 7))
+                days = int(_qpget("days", 7))
                 days = min(max(days, 1), 90)
             except ValueError:
                 days = 7
@@ -237,11 +243,11 @@ class LeaderboardStatsView(View):
                 "most_active": stats.most_active,
             })
 
-        except TrendError as e:
-            return _json_error(f"Trend error: {str(e)}", status=400)
+        except TrendError:
+            return _json_error("Trend processing error.", status=400)
         except Exception as e:
             log.error(f"LeaderboardStatsView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -269,25 +275,20 @@ class TakeSnapshotView(View):
 
     def post(self, request):
         try:
-            # Require auth (admin check should be added)
-            user_id = _require_auth(request)
+            _require_admin(request)
 
-            # TODO: Add admin permission check
-            # if not _is_admin(request):
-            #     return _json_error("Admin access required", status=403)
-
-            import json
             body = json.loads(request.body.decode())
+            _bget = body.get
 
-            leaderboard_type = body.get("leaderboard_type", "global")
-            trait_id = body.get("trait_id", None)
-            community_id = body.get("community_id", None)
-            time_period = body.get("time_period", "all_time")
-            sort_by = body.get("sort_by", "coins")
-            top_n = body.get("top_n", 100)
-
-            # Validate top_n
-            top_n = min(max(top_n, 10), 500)
+            leaderboard_type = _bget("leaderboard_type", "global")
+            trait_id = _bget("trait_id", None)
+            community_id = _bget("community_id", None)
+            time_period = _bget("time_period", "all_time")
+            sort_by = _bget("sort_by", "coins")
+            try:
+                top_n = min(max(int(_bget("top_n", 100)), 10), 500)
+            except (ValueError, TypeError):
+                top_n = 100
 
             # Take snapshot
             snapshot_id = LeaderboardTrendService.take_snapshot(
@@ -305,8 +306,12 @@ class TakeSnapshotView(View):
                 "message": f"Snapshot taken for {leaderboard_type} leaderboard",
             })
 
-        except TrendError as e:
-            return _json_error(f"Trend error: {str(e)}", status=400)
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
+        except TrendError:
+            return _json_error("Trend processing error.", status=400)
         except json.JSONDecodeError:
             return _json_error("Invalid JSON body", status=400)
         except Exception as e:
@@ -329,12 +334,7 @@ class CleanupSnapshotsView(View):
 
     def post(self, request):
         try:
-            # Require auth (admin check should be added)
-            user_id = _require_auth(request)
-
-            # TODO: Add admin permission check
-            # if not _is_admin(request):
-            #     return _json_error("Admin access required", status=403)
+            _require_admin(request)
 
             # Cleanup
             deleted_count = LeaderboardTrendService.cleanup_old_snapshots()
@@ -345,8 +345,12 @@ class CleanupSnapshotsView(View):
                 "message": f"Deleted {deleted_count} old snapshots",
             })
 
-        except TrendError as e:
-            return _json_error(f"Trend error: {str(e)}", status=400)
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
+        except TrendError:
+            return _json_error("Trend processing error.", status=400)
         except Exception as e:
             log.error(f"CleanupSnapshotsView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)

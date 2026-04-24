@@ -4,10 +4,53 @@ Handles multi-language support for 10 languages
 """
 import json
 import os
+from operator import itemgetter
 from typing import Dict, Optional
 import logging
 
 log = logging.getLogger(__name__)
+
+_DATE_FORMATS = {
+    "tr": "dd.MM.yyyy", "en": "MM/dd/yyyy", "ar": "dd/MM/yyyy",
+    "pt": "dd/MM/yyyy", "it": "dd/MM/yyyy", "de": "dd.MM.yyyy",
+    "es": "dd/MM/yyyy", "ja": "yyyy/MM/dd", "ko": "yyyy.MM.dd",
+    "ru": "dd.MM.yyyy", "fr": "dd/MM/yyyy", "zh": "yyyy/MM/dd",
+    "hi": "dd/MM/yyyy", "bn": "dd/MM/yyyy", "id": "dd/MM/yyyy",
+    "ur": "dd/MM/yyyy", "vi": "dd/MM/yyyy", "pl": "dd.MM.yyyy",
+}
+_TIME_FORMATS = {
+    "tr": "HH:mm", "en": "hh:mm a", "ar": "HH:mm", "pt": "HH:mm",
+    "it": "HH:mm", "de": "HH:mm", "es": "HH:mm", "ja": "HH:mm",
+    "ko": "HH:mm", "ru": "HH:mm", "fr": "HH:mm", "zh": "HH:mm",
+    "hi": "HH:mm", "bn": "HH:mm", "id": "HH:mm", "ur": "HH:mm",
+    "vi": "HH:mm", "pl": "HH:mm",
+}
+_CURRENCY_SYMBOLS = {
+    "tr": "₺", "en": "$",  "ar": "ر.س", "pt": "R$", "it": "€",
+    "de": "€", "es": "€",  "ja": "¥",   "ko": "₩",  "ru": "₽",
+    "fr": "€", "zh": "¥",  "hi": "₹",   "bn": "৳",  "id": "Rp",
+    "ur": "₨", "vi": "₫",  "pl": "zł",
+}
+_NUMBER_FORMATS = {
+    "tr": {"decimal": ",", "thousands": "."},
+    "en": {"decimal": ".", "thousands": ","},
+    "ar": {"decimal": "،", "thousands": "."},
+    "pt": {"decimal": ",", "thousands": "."},
+    "it": {"decimal": ",", "thousands": "."},
+    "de": {"decimal": ",", "thousands": "."},
+    "es": {"decimal": ",", "thousands": "."},
+    "ja": {"decimal": ".", "thousands": ","},
+    "ko": {"decimal": ".", "thousands": ","},
+    "ru": {"decimal": ",", "thousands": " "},
+    "fr": {"decimal": ",", "thousands": " "},
+    "zh": {"decimal": ".", "thousands": ","},
+    "hi": {"decimal": ".", "thousands": ","},
+    "bn": {"decimal": ".", "thousands": ","},
+    "id": {"decimal": ",", "thousands": "."},
+    "ur": {"decimal": ".", "thousands": ","},
+    "vi": {"decimal": ",", "thousands": "."},
+    "pl": {"decimal": ",", "thousands": " "},
+}
 
 class LocalizationManager:
     """Manages localization for 18 languages"""
@@ -35,10 +78,11 @@ class LocalizationManager:
 
     def __init__(self, localization_path: str = None):
         # Try to load 18-language version first, then fallback to 10-language
+        _ospe = os.path.exists
         if localization_path is None:
-            if os.path.exists("./localization_18languages.json"):
+            if _ospe("./localization_18languages.json"):
                 localization_path = "./localization_18languages.json"
-            elif os.path.exists("./localization.json"):
+            elif _ospe("./localization.json"):
                 localization_path = "./localization.json"
             else:
                 localization_path = "./localization.json"
@@ -56,13 +100,14 @@ class LocalizationManager:
                 with open(self.localization_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     # Load UI strings (works for both old and new format)
+                    _dget = data.get
                     if "strings" in data:
-                        self.strings = data.get("strings", {})
+                        self.strings = _dget("strings", {})
                     elif "ui_strings" in data:
-                        self.strings = data.get("ui_strings", {})
+                        self.strings = _dget("ui_strings", {})
                     # Load language metadata if available (18-language format)
                     if "language_metadata" in data:
-                        self.language_metadata = data.get("language_metadata", {})
+                        self.language_metadata = _dget("language_metadata", {})
                 log.info(f"Loaded localization for {len(self.strings)} keys, {len(self.language_metadata) or len(self.SUPPORTED_LANGUAGES)} languages")
             except Exception as e:
                 log.error(f"Error loading localization: {e}")
@@ -123,7 +168,7 @@ class LocalizationManager:
                 if len(q_parts) > 1:
                     try:
                         quality = float(q_parts[1])
-                    except:
+                    except Exception:
                         quality = 0.0
 
             # Extract primary language code
@@ -131,7 +176,7 @@ class LocalizationManager:
             languages.append((primary, quality))
 
         # Sort by quality
-        languages.sort(key=lambda x: x[1], reverse=True)
+        languages.sort(key=itemgetter(1), reverse=True)
 
         # Return first supported language
         for lang, _ in languages:
@@ -142,68 +187,29 @@ class LocalizationManager:
 
     def get_language_direction(self, lang: str) -> str:
         """Get text direction for language (LTR or RTL)"""
+        _lm = self.language_metadata
         # Check metadata first (18-language format)
-        if self.language_metadata and lang in self.language_metadata:
-            return self.language_metadata[lang].get("direction", "ltr")
+        if _lm and lang in _lm:
+            return _lm[lang].get("direction", "ltr")
         # Fallback to hardcoded list
         rtl_languages = ["ar", "ur"]
         return "rtl" if lang in rtl_languages else "ltr"
 
     def get_date_format(self, lang: str) -> str:
         """Get date format for language"""
+        _lm = self.language_metadata
         # Check metadata first (18-language format)
-        if self.language_metadata and lang in self.language_metadata:
-            return self.language_metadata[lang].get("date_format", "MM/dd/yyyy")
-        # Fallback to hardcoded list
-        formats = {
-            "tr": "dd.MM.yyyy",
-            "en": "MM/dd/yyyy",
-            "ar": "dd/MM/yyyy",
-            "pt": "dd/MM/yyyy",
-            "it": "dd/MM/yyyy",
-            "de": "dd.MM.yyyy",
-            "es": "dd/MM/yyyy",
-            "ja": "yyyy/MM/dd",
-            "ko": "yyyy.MM.dd",
-            "ru": "dd.MM.yyyy",
-            "fr": "dd/MM/yyyy",
-            "zh": "yyyy/MM/dd",
-            "hi": "dd/MM/yyyy",
-            "bn": "dd/MM/yyyy",
-            "id": "dd/MM/yyyy",
-            "ur": "dd/MM/yyyy",
-            "vi": "dd/MM/yyyy",
-            "pl": "dd.MM.yyyy"
-        }
-        return formats.get(lang, "MM/dd/yyyy")
+        if _lm and lang in _lm:
+            return _lm[lang].get("date_format", "MM/dd/yyyy")
+        return _DATE_FORMATS.get(lang, "MM/dd/yyyy")
 
     def get_time_format(self, lang: str) -> str:
         """Get time format for language"""
+        _lm = self.language_metadata
         # Check metadata first (18-language format)
-        if self.language_metadata and lang in self.language_metadata:
-            return self.language_metadata[lang].get("time_format", "HH:mm")
-        # Fallback to hardcoded list
-        formats = {
-            "tr": "HH:mm",
-            "en": "hh:mm a",
-            "ar": "HH:mm",
-            "pt": "HH:mm",
-            "it": "HH:mm",
-            "de": "HH:mm",
-            "es": "HH:mm",
-            "ja": "HH:mm",
-            "ko": "HH:mm",
-            "ru": "HH:mm",
-            "fr": "HH:mm",
-            "zh": "HH:mm",
-            "hi": "HH:mm",
-            "bn": "HH:mm",
-            "id": "HH:mm",
-            "ur": "HH:mm",
-            "vi": "HH:mm",
-            "pl": "HH:mm"
-        }
-        return formats.get(lang, "HH:mm")
+        if _lm and lang in _lm:
+            return _lm[lang].get("time_format", "HH:mm")
+        return _TIME_FORMATS.get(lang, "HH:mm")
 
     def pluralize(self, key: str, count: int, lang: str = "en") -> str:
         """Handle pluralization (simple implementation)"""
@@ -214,63 +220,24 @@ class LocalizationManager:
 
     def get_number_format(self, lang: str) -> Dict[str, str]:
         """Get number formatting for language"""
+        _lm = self.language_metadata
         # Check metadata first (18-language format)
-        if self.language_metadata and lang in self.language_metadata:
-            meta = self.language_metadata[lang]
+        if _lm and lang in _lm:
+            meta = _lm[lang]
+            _mget = meta.get
             return {
-                "decimal": meta.get("decimal_separator", "."),
-                "thousands": meta.get("thousands_separator", ",")
+                "decimal": _mget("decimal_separator", "."),
+                "thousands": _mget("thousands_separator", ",")
             }
-        # Fallback to hardcoded list
-        formats = {
-            "tr": {"decimal": ",", "thousands": "."},
-            "en": {"decimal": ".", "thousands": ","},
-            "ar": {"decimal": "،", "thousands": "."},
-            "pt": {"decimal": ",", "thousands": "."},
-            "it": {"decimal": ",", "thousands": "."},
-            "de": {"decimal": ",", "thousands": "."},
-            "es": {"decimal": ",", "thousands": "."},
-            "ja": {"decimal": ".", "thousands": ","},
-            "ko": {"decimal": ".", "thousands": ","},
-            "ru": {"decimal": ",", "thousands": " "},
-            "fr": {"decimal": ",", "thousands": " "},
-            "zh": {"decimal": ".", "thousands": ","},
-            "hi": {"decimal": ".", "thousands": ","},
-            "bn": {"decimal": ".", "thousands": ","},
-            "id": {"decimal": ",", "thousands": "."},
-            "ur": {"decimal": ".", "thousands": ","},
-            "vi": {"decimal": ",", "thousands": "."},
-            "pl": {"decimal": ",", "thousands": " "}
-        }
-        return formats.get(lang, {"decimal": ".", "thousands": ","})
+        return _NUMBER_FORMATS.get(lang, {"decimal": ".", "thousands": ","})
 
     def get_currency_symbol(self, lang: str) -> str:
         """Get currency symbol for language/locale"""
+        _lm = self.language_metadata
         # Check metadata first (18-language format)
-        if self.language_metadata and lang in self.language_metadata:
-            return self.language_metadata[lang].get("currency", "$")
-        # Fallback to hardcoded list
-        symbols = {
-            "tr": "₺",
-            "en": "$",
-            "ar": "ر.س",
-            "pt": "R$",
-            "it": "€",
-            "de": "€",
-            "es": "€",
-            "ja": "¥",
-            "ko": "₩",
-            "ru": "₽",
-            "fr": "€",
-            "zh": "¥",
-            "hi": "₹",
-            "bn": "৳",
-            "id": "Rp",
-            "ur": "₨",
-            "vi": "₫",
-            "pl": "zł"
-        }
-        return symbols.get(lang, "$")
+        if _lm and lang in _lm:
+            return _lm[lang].get("currency", "$")
+        return _CURRENCY_SYMBOLS.get(lang, "$")
 
     # Module-specific localizations
     def get_module_name(self, module: str, lang: str = "en") -> str:

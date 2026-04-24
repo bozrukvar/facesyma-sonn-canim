@@ -140,9 +140,10 @@ class DiscoveryGameStartView(View):
 
             # Parse request
             body = _json(request)
-            game_type = body.get("game_type", "").strip()
-            difficulty = body.get("difficulty", "normal")
-            language = body.get("language", "en")
+            _bget = body.get
+            game_type = _bget("game_type", "").strip()
+            difficulty = _bget("difficulty", "normal")
+            language = _bget("language", "en")
 
             if not game_type:
                 return _json_error("Missing game_type", status=400)
@@ -162,9 +163,9 @@ class DiscoveryGameStartView(View):
             })
 
         except GameTypeNotFoundError as e:
-            return _json_error(f"Game type not found: {str(e)}", status=404)
+            return _json_error("Game type not found.", status=404)
         except DiscoveryGameError as e:
-            return _json_error(f"Game error: {str(e)}", status=400)
+            return _json_error("Game error.", status=400)
         except Exception as e:
             log.error(f"DiscoveryGameStartView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -221,9 +222,10 @@ class DiscoveryGameAnswerView(View):
 
             # Parse request
             body = _json(request)
-            session_id = body.get("session_id", "").strip()
-            question_id = body.get("question_id", "").strip()
-            answer = body.get("answer")
+            _bget = body.get
+            session_id = _bget("session_id", "").strip()
+            question_id = _bget("question_id", "").strip()
+            answer = _bget("answer")
 
             if not session_id or not question_id or answer is None:
                 return _json_error("Missing session_id, question_id, or answer", status=400)
@@ -239,14 +241,15 @@ class DiscoveryGameAnswerView(View):
             # Check if game complete
             if isinstance(result, dict) and "insights" in result:
                 # Game complete
+                _resget = result.get
                 return JsonResponse({
                     "is_correct": is_correct,
                     "game_complete": True,
-                    "accuracy_percent": result.get("accuracy_percent"),
-                    "coins_earned": result.get("coins_earned"),
-                    "xp_earned": result.get("xp_earned"),
-                    "traits_discovered": result.get("traits_discovered"),
-                    "insights": result.get("insights"),
+                    "accuracy_percent": _resget("accuracy_percent"),
+                    "coins_earned": _resget("coins_earned"),
+                    "xp_earned": _resget("xp_earned"),
+                    "traits_discovered": _resget("traits_discovered"),
+                    "insights": _resget("insights"),
                 })
             else:
                 # Next question
@@ -257,9 +260,9 @@ class DiscoveryGameAnswerView(View):
                 })
 
         except SessionNotFoundError as e:
-            return _json_error(f"Session not found: {str(e)}", status=404)
+            return _json_error("Session not found.", status=404)
         except DiscoveryGameError as e:
-            return _json_error(f"Game error: {str(e)}", status=400)
+            return _json_error("Game error.", status=400)
         except Exception as e:
             log.error(f"DiscoveryGameAnswerView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -318,9 +321,9 @@ class DiscoveryGameSessionView(View):
             })
 
         except SessionNotFoundError as e:
-            return _json_error(f"Session not found: {str(e)}", status=404)
+            return _json_error("Session not found.", status=404)
         except DiscoveryGameError as e:
-            return _json_error(f"Game error: {str(e)}", status=400)
+            return _json_error("Game error.", status=400)
         except Exception as e:
             log.error(f"DiscoveryGameSessionView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -377,9 +380,9 @@ class DiscoveryGameAbandonView(View):
             })
 
         except SessionNotFoundError as e:
-            return _json_error(f"Session not found: {str(e)}", status=404)
+            return _json_error("Session not found.", status=404)
         except DiscoveryGameError as e:
-            return _json_error(f"Game error: {str(e)}", status=400)
+            return _json_error("Game error.", status=400)
         except Exception as e:
             log.error(f"DiscoveryGameAbandonView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)

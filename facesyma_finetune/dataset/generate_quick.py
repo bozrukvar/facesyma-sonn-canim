@@ -57,26 +57,28 @@ sifatlar_list = list(sifatlar_db.items())
 
 print(f"\nGenerating 8000 training examples...")
 
+_rc = random.choice
 for i in range(8000):
-    sifat_id, sifat_data = random.choice(sifatlar_list)
+    sifat_id, sifat_data = _rc(sifatlar_list)
 
     # Extract data from sifatlar structure
-    sifat_name = sifat_data.get("ad", f"Sifat {sifat_id}")  # 'ad' is the name
-    cumleler = sifat_data.get("cumleler", [])  # 'cumleler' is the sentences list
+    _sdget = sifat_data.get
+    sifat_name = _sdget("ad", f"Sifat {sifat_id}")  # 'ad' is the name
+    cumleler = _sdget("cumleler", [])  # 'cumleler' is the sentences list
 
     if not cumleler:
         continue
 
     # Get a random sentence from the sifat
-    sentence_obj = random.choice(cumleler)
+    sentence_obj = _rc(cumleler)
     sentence_text = sentence_obj.get("metin", "") if isinstance(sentence_obj, dict) else str(sentence_obj)
 
     if not sentence_text:
         continue
 
     # Simple example
-    user_msg = f"[ANALİZ SONUCU]\nÖzellik: {sifat_name}\n\n{random.choice(QUESTIONS['initial'])}"
-    assistant_msg = f"{random.choice(INTROS)}{sentence_text[:200]}{random.choice(CLOSES)}"
+    user_msg = f"[ANALİZ SONUCU]\nÖzellik: {sifat_name}\n\n{_rc(QUESTIONS['initial'])}"
+    assistant_msg = f"{_rc(INTROS)}{sentence_text[:200]}{_rc(CLOSES)}"
 
     example = {
         "messages": [

@@ -281,10 +281,10 @@ async function loadMetrics() {
         const percentage = totalCount > 0 ? ((tier.count / totalCount) * 100).toFixed(1) : 0;
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td style="font-weight: bold; color: #d4af37;">${tier.tier}</td>
-            <td>${tier.count}</td>
-            <td>$${tier.estimated_mrr.toFixed(2)}</td>
-            <td>${percentage}%</td>
+            <td style="font-weight: bold; color: #d4af37;">${escapeHtml(tier.tier)}</td>
+            <td>${escapeHtml(String(tier.count))}</td>
+            <td>$${escapeHtml(tier.estimated_mrr.toFixed(2))}</td>
+            <td>${escapeHtml(String(percentage))}%</td>
         `;
         tierTable.appendChild(row);
     });
@@ -301,12 +301,12 @@ async function loadMetrics() {
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><strong>${user.user_id}</strong></td>
-                <td>${user.tier}</td>
-                <td>${expiresDate.toLocaleDateString()}</td>
-                <td style="color: ${daysLeft <= 3 ? '#ff6b6b' : '#ffa500'}; font-weight: bold;">${daysLeft} days</td>
+                <td><strong>${escapeHtml(String(user.user_id))}</strong></td>
+                <td>${escapeHtml(user.tier)}</td>
+                <td>${escapeHtml(expiresDate.toLocaleDateString())}</td>
+                <td style="color: ${daysLeft <= 3 ? '#ff6b6b' : '#ffa500'}; font-weight: bold;">${escapeHtml(String(daysLeft))} days</td>
                 <td>
-                    <button class="btn-small" onclick="grantExtension(${user.user_id})">Extend 30d</button>
+                    <button class="btn-small" onclick="grantExtension(${parseInt(user.user_id, 10)})">Extend 30d</button>
                 </td>
             `;
             atRiskTable.appendChild(row);
@@ -339,14 +339,14 @@ async function searchSubscriptions() {
             const row = document.createElement('tr');
             const expiresDate = user.expires_date ? new Date(user.expires_date).toLocaleDateString() : '-';
             row.innerHTML = `
-                <td>${user.user_id}</td>
-                <td>${user.email}</td>
-                <td>${user.username || '-'}</td>
-                <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#666'}; padding: 4px 8px; border-radius: 4px;">${user.plan}</span></td>
-                <td>${user.tier || '-'}</td>
-                <td>${expiresDate}</td>
+                <td>${escapeHtml(user.user_id)}</td>
+                <td>${escapeHtml(user.email)}</td>
+                <td>${escapeHtml(user.username || '-')}</td>
+                <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#666'}; padding: 4px 8px; border-radius: 4px;">${escapeHtml(user.plan)}</span></td>
+                <td>${escapeHtml(user.tier || '-')}</td>
+                <td>${escapeHtml(expiresDate)}</td>
                 <td>
-                    <button class="btn-small" onclick="viewUserDetail(${user.user_id})">Manage</button>
+                    <button class="btn-small" onclick="viewUserDetail(${parseInt(user.user_id)})">Manage</button>
                 </td>
             `;
             resultsTable.appendChild(row);

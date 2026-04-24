@@ -22,7 +22,7 @@ from pymongo import MongoClient, ASCENDING
 # MongoDB bağlantısı
 MONGO_URI = os.environ.get(
     'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
+    ''
 )
 
 
@@ -42,13 +42,15 @@ def migrate_similarity_db():
 
             # Drop existing indexes
             for idx in celebrities_col.list_indexes():
-                if idx['name'] != '_id_':
-                    celebrities_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    celebrities_col.drop_index(_iname)
 
             # Indexes oluştur
-            celebrities_col.create_index('name')
-            celebrities_col.create_index('sifatlar')
-            celebrities_col.create_index('category')
+            _cidx = celebrities_col.create_index
+            _cidx('name')
+            _cidx('sifatlar')
+            _cidx('category')
 
             print("   ✅ Indexes created: name, sifatlar, category")
         except Exception as e:
@@ -61,12 +63,14 @@ def migrate_similarity_db():
             historical_col = db['similarities_historical']
 
             for idx in historical_col.list_indexes():
-                if idx['name'] != '_id_':
-                    historical_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    historical_col.drop_index(_iname)
 
-            historical_col.create_index('name')
-            historical_col.create_index('sifatlar')
-            historical_col.create_index('era')
+            _cidx = historical_col.create_index
+            _cidx('name')
+            _cidx('sifatlar')
+            _cidx('era')
 
             print("   ✅ Indexes created: name, sifatlar, era")
         except Exception as e:
@@ -79,12 +83,14 @@ def migrate_similarity_db():
             objects_col = db['similarities_objects']
 
             for idx in objects_col.list_indexes():
-                if idx['name'] != '_id_':
-                    objects_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    objects_col.drop_index(_iname)
 
-            objects_col.create_index('name')
-            objects_col.create_index('style_traits')
-            objects_col.create_index('category')
+            _cidx = objects_col.create_index
+            _cidx('name')
+            _cidx('style_traits')
+            _cidx('category')
 
             print("   ✅ Indexes created: name, style_traits, category")
         except Exception as e:
@@ -97,12 +103,14 @@ def migrate_similarity_db():
             plants_col = db['similarities_plants']
 
             for idx in plants_col.list_indexes():
-                if idx['name'] != '_id_':
-                    plants_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    plants_col.drop_index(_iname)
 
-            plants_col.create_index('name')
-            plants_col.create_index('sifatlar')
-            plants_col.create_index('aesthetic_traits')
+            _cidx = plants_col.create_index
+            _cidx('name')
+            _cidx('sifatlar')
+            _cidx('aesthetic_traits')
 
             print("   ✅ Indexes created: name, sifatlar, aesthetic_traits")
         except Exception as e:
@@ -115,12 +123,14 @@ def migrate_similarity_db():
             animals_col = db['similarities_animals']
 
             for idx in animals_col.list_indexes():
-                if idx['name'] != '_id_':
-                    animals_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    animals_col.drop_index(_iname)
 
-            animals_col.create_index('name')
-            animals_col.create_index('sifatlar')
-            animals_col.create_index('behavioral_traits')
+            _cidx = animals_col.create_index
+            _cidx('name')
+            _cidx('sifatlar')
+            _cidx('behavioral_traits')
 
             print("   ✅ Indexes created: name, sifatlar, behavioral_traits")
         except Exception as e:
@@ -133,13 +143,14 @@ def migrate_similarity_db():
             cache_col = db['user_similarities']
 
             for idx in cache_col.list_indexes():
-                if idx['name'] != '_id_':
-                    cache_col.drop_index(idx['name'])
+                _iname = idx['name']
+                if _iname != '_id_':
+                    cache_col.drop_index(_iname)
 
             # Unique index on user_id (one cache per user)
             try:
                 cache_col.create_index('user_id', unique=True)
-            except:
+            except Exception:
                 pass
 
             # TTL index: auto-delete after 30 days

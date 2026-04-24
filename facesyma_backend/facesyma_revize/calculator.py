@@ -4,8 +4,6 @@ from lip import *
 from nose import *
 from forehead import *
 from scorer import score_ratio, get_sifat_score
-import math as m
-import cv2
 
 def help():
     return "Dic Type İndex = {Eye} , {Eyeborn} , {Lip} , {Nose} , {Forehead} \n"
@@ -17,9 +15,13 @@ def Cal(img):
     lip = lip_input(img)
     nose = nose_input(img)
     forehead = forehead_input(img)
+    _lip2  = lip['2']
+    _lip17c = lip['17']
+    _lip2_1 = _lip2[1]
 
     def Eye():
-        eyes_distance = round(abs(eye['ir'][0] - eye['il'][0]) / abs(eye['398'][0] - eye['157'][0]), 2)
+        _e398x = eye['398'][0]; _e157x = eye['157'][0]
+        eyes_distance = round(abs(eye['ir'][0] - eye['il'][0]) / abs(_e398x - _e157x), 2)
 
         if eyes_distance < 1.5371:
             eyes_distance_result = "eyes_near"
@@ -28,7 +30,7 @@ def Cal(img):
         else:
             eyes_distance_result = "eyes_distance_golden"
 
-        eyes_size_r = round(abs(eye['157'][0] - eye['398'][0]) / abs(eye['33'][0] - eye['157'][0]), 2)
+        eyes_size_r = round(abs(_e157x - _e398x) / abs(eye['33'][0] - _e157x), 2)
 
         if eyes_size_r < 1.5371:
             eyes_size_r_result = "eyes_size_r_big"
@@ -37,7 +39,7 @@ def Cal(img):
         else:
             eyes_size_r_result = "eyes_distance_r_golden"
 
-        eyes_size_l = round(abs(eye['157'][0] - eye['398'][0]) / abs(eye['398'][0] - eye['263'][0]), 2)
+        eyes_size_l = round(abs(_e157x - _e398x) / abs(_e398x - eye['263'][0]), 2)
 
         if eyes_size_l < 1.5371:
             eyes_size_l_result = "eyes_size_l_big"
@@ -79,12 +81,14 @@ def Cal(img):
         return eyes_dic
 
     def Eyebrow():
-        oL = abs(eyebrow['105'][1] - eyebrow['159'][1])
-        pL = abs(eyebrow['145'][1] - eyebrow['159'][1])
+        _e159_1 = eyebrow['159'][1]
+        oL = abs(eyebrow['105'][1] - _e159_1)
+        pL = abs(eyebrow['145'][1] - _e159_1)
         eyebrows_eyes_distance_l = round(oL/pL,2)
 
-        oR = abs(eyebrow['334'][1] - eyebrow['386'][1])
-        pR = abs(eyebrow['374'][1] - eyebrow['386'][1])
+        _e386_1 = eyebrow['386'][1]
+        oR = abs(eyebrow['334'][1] - _e386_1)
+        pR = abs(eyebrow['374'][1] - _e386_1)
         eyebrows_eyes_distance_r = round(oR / pR, 2)
 
         if eyebrows_eyes_distance_l > 1.6989 and eyebrows_eyes_distance_r > 1.6989:
@@ -105,6 +109,8 @@ def Cal(img):
 
         return eyebrow_dic
     def Lip():
+        _lip0 = lip['0']; _lip17 = _lip17c
+        _lip17_1 = _lip17[1]
         lips_width = round(abs(lip['61'][0] - lip['291'][0]) / abs(lip['el'][0] - lip['er'][0]), 2)
         if lips_width < 0.95:
             lips_width_result = "lips_narrow"
@@ -113,7 +119,8 @@ def Cal(img):
         else:
             lips_width_result = "lips_width_golden"
 
-        lips_thickness = round(abs(lip['0'][1] - lip['17'][1]) / abs(lip['0'][1] - lip['2'][1]), 2)
+        _l01 = _lip0[1]
+        lips_thickness = round(abs(_l01 - _lip17_1) / abs(_l01 - _lip2_1), 2)
 
         if lips_thickness < 1.5371:
             lips_thickness_result = "lips_thin"
@@ -122,7 +129,7 @@ def Cal(img):
         else:
             lips_thickness_result = "lips_thickness_golden"
 
-        lips_height_compare = round(abs((lip['14'][1] - lip['17'][1]) / abs(lip['13'][1] - lip['0'][1])), 2)
+        lips_height_compare = round(abs((lip['14'][1] - _lip17_1) / abs(lip['13'][1] - _l01)), 2)
 
         if lips_height_compare < 0.95:
             lips_height_compare_result = "upper_lip_bigger_than_lower_lip"
@@ -152,8 +159,9 @@ def Cal(img):
         return lip_dic
 
     def Nose():
-        nU = abs(((nose['il'][1] + nose['ir'][1])/2) - nose['2'][1])
-        nL = abs((lip['2'][1] - lip['17'][1]))
+        _nil = nose['il']; _nir = nose['ir']
+        nU = abs(((_nil[1] + _nir[1])/2) - nose['2'][1])
+        nL = abs((_lip2_1 - _lip17c[1]))
         nose_lenght = round(nU/nL,2)
 
         if nose_lenght < 1.5371:
@@ -163,7 +171,7 @@ def Cal(img):
         else:
             nose_length_result = "nose_length_golden"
 
-        nose_width = round(abs((nose['il'][0] - nose['ir'][0]) / abs(nose['219'][0] - nose['294'][0])), 2)
+        nose_width = round(abs((_nil[0] - _nir[0]) / abs(nose['219'][0] - nose['294'][0])), 2)
 
         if nose_width < 1.5371:
             nose_width_result = "nose_wide"
@@ -195,7 +203,8 @@ def Cal(img):
         return nose_dic
 
     def Forehead():
-        forehead_distance = round(abs((forehead['f'][1] - forehead['152'][1]) / abs(forehead['f'][1] - forehead['8'][1])), 2)
+        _ff1 = forehead['f'][1]
+        forehead_distance = round(abs((_ff1 - forehead['152'][1]) / abs(_ff1 - forehead['8'][1])), 2)
 
         if forehead_distance > 3.15:
             forehead_distance_result = "forehead_distance_near"

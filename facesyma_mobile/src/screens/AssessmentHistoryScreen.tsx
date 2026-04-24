@@ -1,14 +1,17 @@
 // src/screens/AssessmentHistoryScreen.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, FlatList, RefreshControl,
+  ActivityIndicator, Alert, RefreshControl,
 } from 'react-native';
 import { AssessmentAPI } from '../services/api';
 import { Card, SectionLabel, Badge } from '../components/ui';
 import theme from '../utils/theme';
+const { colors } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { ScreenProps } from '../navigation/types';
 
 // Map language codes to locales
 const getLocale = (lang: string): string => {
@@ -45,11 +48,18 @@ const TEST_TYPE_NAMES: Record<string, { key: string; emoji: string }> = {
 };
 
 const LEVEL_COLORS: Record<string, string> = {
+  // Türkçe
   'Çok Yüksek': '#4CAF50',
-  'Yüksek': '#8BC34A',
-  'Orta': '#FF9800',
-  'Düşük': '#FF5722',
-  'Çok Düşük': '#F44336',
+  'Yüksek':     '#8BC34A',
+  'Orta':       '#FF9800',
+  'Düşük':      '#FF5722',
+  'Çok Düşük':  '#F44336',
+  // İngilizce
+  'Very High': '#4CAF50',
+  'High':      '#8BC34A',
+  'Medium':    '#FF9800',
+  'Low':       '#FF5722',
+  'Very Low':  '#F44336',
 };
 
 interface AssessmentResult {
@@ -61,7 +71,9 @@ interface AssessmentResult {
   responses_counted: number;
 }
 
-const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'>) => {
+  const insets    = useSafeAreaInsets();
+  const insetsTop = insets.top;
   const { lang } = useLanguage();
   const [results, setResults] = useState<AssessmentResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,8 +111,8 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
       if (data.success) {
         setResults(data.data.results);
       }
-    } catch (error) {
-      console.error('Refresh error:', error);
+    } catch {
+      // Refresh failure is silent — stale data remains visible
     } finally {
       setRefreshing(false);
     }
@@ -121,7 +133,7 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={theme.colors.gold} />
+        <ActivityIndicator size="large" color={colors.gold} />
         <Text style={styles.loadingText}>{t('assessment_history.loading', lang)}</Text>
       </View>
     );
@@ -131,6 +143,7 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
     return (
       <ScrollView
         style={styles.container}
+        contentContainerStyle={{ paddingTop: insetsTop }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <View style={styles.emptyContainer}>
@@ -153,6 +166,7 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
   return (
     <ScrollView
       style={styles.container}
+      contentContainerStyle={{ paddingTop: insetsTop }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
@@ -161,8 +175,10 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
       </View>
 
       {results.map((result) => {
-        const testInfo = TEST_TYPE_NAMES[result.test_type];
-        const levelColor = LEVEL_COLORS[result.overall_level_tr] || theme.colors.gold;
+        const rType      = result.test_type;
+        const levelTr    = result.overall_level_tr;
+        const testInfo   = TEST_TYPE_NAMES[rType];
+        const levelColor = LEVEL_COLORS[levelTr] || colors.gold;
 
         return (
           <Card key={result.id} style={styles.resultCard}>
@@ -171,17 +187,17 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
                 <Text style={styles.resultEmoji}>{testInfo?.emoji || '📋'}</Text>
                 <View style={styles.resultTitleContent}>
                   <Text style={styles.resultTitle}>
-                    {testInfo ? t(testInfo.key, lang) : result.test_type}
+                    {testInfo ? t(testInfo.key, lang) : rType}
                   </Text>
                   <Text style={styles.resultDate}>{formatDate(result.created_at)}</Text>
                 </View>
               </View>
               <View style={styles.resultScoreGroup}>
                 <Text style={[styles.resultScore, { color: levelColor }]}>
-                  {result.overall_score.toFixed(1)}
+                  {(Number(result.overall_score) || 0).toFixed(1)}
                 </Text>
                 <Text style={[styles.resultLevel, { color: levelColor }]}>
-                  {result.overall_level_tr}
+                  {levelTr}
                 </Text>
               </View>
             </View>
@@ -193,7 +209,7 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
         );
       })}
 
-      <View style={{ height: 20 }} />
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 };
@@ -201,19 +217,19 @@ const AssessmentHistoryScreen: React.FC<{ navigation: any }> = ({ navigation }) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     paddingHorizontal: 16,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: theme.colors.text,
+    color: colors.text,
   },
   header: {
     marginTop: 16,
@@ -222,12 +238,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   resultCard: {
     marginBottom: 12,
@@ -253,12 +269,12 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   resultDate: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   resultScoreGroup: {
     alignItems: 'flex-end',
@@ -274,7 +290,7 @@ const styles = StyleSheet.create({
   },
   resultMeta: {
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+    borderTopColor: colors.border,
     paddingTop: 12,
   },
   emptyContainer: {
@@ -291,18 +307,18 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyDesc: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 24,
   },
   startBtn: {
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -312,6 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  bottomSpacer: { height: 20 },
 });
 
 export default AssessmentHistoryScreen;

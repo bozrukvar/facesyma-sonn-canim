@@ -21,13 +21,16 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from admin_api.utils.auth import _require_admin
+from admin_api.utils.auth import _require_admin, _require_auth
 from core.models.transaction import TransactionType
 from core.services.coin_service import (
     CoinService, CoinError, InsufficientCoinsError, InvalidAmountError
 )
 
 log = logging.getLogger(__name__)
+
+_STREAK_MILESTONES = frozenset({7, 14, 30, 100, 365})
+_STREAK_BONUS_MULTIPLIERS = {7: 1.3, 14: 1.6, 30: 2.0, 100: 2.5, 365: 5.0}
 
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
@@ -158,9 +161,13 @@ class CoinHistoryView(View):
         except (ValueError, PermissionError) as e:
             return _json_error(str(e), 401)
 
-        limit = min(int(request.GET.get("limit", 50)), 200)
-        offset = max(int(request.GET.get("offset", 0)), 0)
-        trans_type = request.GET.get("type", None)
+        _qget = request.GET.get
+        try:
+            limit = min(max(1, int(_qget("limit", 50))), 200)
+            offset = max(int(_qget("offset", 0)), 0)
+        except (ValueError, TypeError):
+            limit, offset = 50, 0
+        trans_type = _qget("type", None)
 
         try:
             transactions, total = CoinService.get_transaction_history(
@@ -222,11 +229,12 @@ class CoinAddView(View):
             return _json_error(str(e), 403)
 
         body = _json(request)
-        user_id = body.get("user_id")
-        amount = body.get("amount")
-        trans_type = body.get("type", "unknown")
-        description = body.get("description", "")
-        metadata = body.get("metadata")
+        _bget = body.get
+        user_id = _bget("user_id")
+        amount = _bget("amount")
+        trans_type = _bget("type", "unknown")
+        description = _bget("description", "")
+        metadata = _bget("metadata")
 
         if not user_id or amount is None:
             return _json_error("Missing user_id or amount", 400)
@@ -291,12 +299,13 @@ class CoinDeductView(View):
             return _json_error(str(e), 403)
 
         body = _json(request)
-        user_id = body.get("user_id")
-        amount = body.get("amount")
-        trans_type = body.get("type", "unknown")
-        description = body.get("description", "")
-        metadata = body.get("metadata")
-        allow_negative = body.get("allow_negative", False)
+        _bget = body.get
+        user_id = _bget("user_id")
+        amount = _bget("amount")
+        trans_type = _bget("type", "unknown")
+        description = _bget("description", "")
+        metadata = _bget("metadata")
+        allow_negative = _bget("allow_negative", False)
 
         if not user_id or amount is None:
             return _json_error("Missing user_id or amount", 400)
@@ -367,23 +376,33 @@ class DailyQuestCompleteView(View):
             return _json_error(str(e), 401)
 
         body = _json(request)
-        modules_completed = body.get("modules_completed", 1)
-        bonus_points = body.get("bonus_points", 0)
+        _bget = body.get
+        modules_completed = _bget("modules_completed", 1)
+        bonus_points = _bget("bonus_points", 0)
 
         if not 1 <= modules_completed <= 4:
             return _json_error("modules_completed must be 1-4", 400)
 
         try:
+            bonus_points = int(bonus_points)
+        except (ValueError, TypeError):
+            bonus_points = 0
+        if not 0 <= bonus_points <= 100:
+            return _json_error("bonus_points must be between 0 and 100", 400)
+
+        try:
             # Calculate coins earned
             base_coins = modules_completed * 10
-            total_coins = base_coins + bonus_points
+            total_coins = min(base_coins + bonus_points, 10000)
 
+            _cas = CoinService.add_coins
+            _tcq = TransactionType.COACHING_QUEST
             # Update streak and award coins
             new_streak = CoinService.update_daily_quest_streak(user_id)
-            new_balance, trans_id = CoinService.add_coins(
+            new_balance, trans_id = _cas(
                 user_id=user_id,
                 amount=total_coins,
-                transaction_type=TransactionType.COACHING_QUEST,
+                transaction_type=_tcq,
                 description=f"Daily coaching quest ({modules_completed} modules)",
                 metadata={
                     "modules": modules_completed,
@@ -393,20 +412,14 @@ class DailyQuestCompleteView(View):
             )
 
             # Check if streak milestone reached for bonus
-            streak_bonus = new_streak in [7, 14, 30, 100, 365]
+            streak_bonus = new_streak in _STREAK_MILESTONES
             if streak_bonus:
-                bonus_multiplier = {
-                    7: 1.3,
-                    14: 1.6,
-                    30: 2.0,
-                    100: 2.5,
-                    365: 5.0,
-                }.get(new_streak, 1.0)
+                bonus_multiplier = _STREAK_BONUS_MULTIPLIERS.get(new_streak, 1.0)
                 bonus_amount = int(total_coins * (bonus_multiplier - 1))
-                new_balance, _ = CoinService.add_coins(
+                new_balance, _ = _cas(
                     user_id=user_id,
                     amount=bonus_amount,
-                    transaction_type=TransactionType.COACHING_QUEST,
+                    transaction_type=_tcq,
                     description=f"Streak bonus: {new_streak} days",
                     metadata={"streak_milestone": new_streak},
                 )
@@ -460,9 +473,10 @@ class CoinAdminAdjustView(View):
             return _json_error(str(e), 403)
 
         body = _json(request)
-        user_id = body.get("user_id")
-        amount = body.get("amount")
-        reason = body.get("reason", "Manual adjustment")
+        _bget = body.get
+        user_id = _bget("user_id")
+        amount = _bget("amount")
+        reason = _bget("reason", "Manual adjustment")
 
         if not user_id or amount is None:
             return _json_error("Missing user_id or amount", 400)

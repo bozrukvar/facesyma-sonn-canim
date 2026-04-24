@@ -123,7 +123,7 @@ class PurchaseService {
       const customerInfo = await Purchases.purchasePackage(pkg);
       this.customerInfo = customerInfo;
 
-      console.log('✅ Purchase successful:', customerInfo);
+      console.log('✅ Purchase successful');
       return customerInfo;
     } catch (error) {
       if (error.userCancelled) {
@@ -208,7 +208,7 @@ class PurchaseService {
     this.purchaseUpdatedListener = Purchases.purchaseUpdatedListener(
       (info) => {
         this.customerInfo = info;
-        console.log('📱 Purchase updated:', info);
+        console.log('📱 Purchase updated');
         // Notify listeners via Redux/Context
       }
     );

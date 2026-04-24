@@ -5,19 +5,20 @@ Public config endpoint — auth gereksiz, app başlangıcında çağrılır.
 Maintenance mode, feature flags, min version gibi app-specific konfigürasyonu döner.
 """
 
+import logging
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
+
+log = logging.getLogger(__name__)
 
 
 def _get_app_registry_col():
-    """Get app_registry collection"""
+    """Get app_registry collection — pooled connection."""
     try:
-        client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-        return client['facesyma-backend']['app_registry']
+        from admin_api.utils.mongo import get_app_registry_col
+        return get_app_registry_col()
     except Exception:
         return None
 
@@ -54,32 +55,33 @@ class AppConfigView(View):
         if app_source not in ('mobile', 'web'):
             app_source = 'mobile'
 
+        _fb = self._fallback_config
         try:
             col = _get_app_registry_col()
             if not col:
                 # Graceful fallback if MongoDB unavailable
-                return JsonResponse(self._fallback_config(app_source))
+                return JsonResponse(_fb(app_source))
 
             app = col.find_one({'app_id': app_source}, {'_id': 0})
             if not app:
                 # Graceful fallback if app not in registry yet
-                return JsonResponse(self._fallback_config(app_source))
+                return JsonResponse(_fb(app_source))
 
-            config = app.get('config', {})
+            _appget = app.get
+            config = _appget('config', {})
+            _cfget = config.get
             return JsonResponse({
-                'app_id': app['app_id'],
-                'status': app.get('status', 'active'),
-                'maintenance_mode': config.get('maintenance_mode', False),
-                'maintenance_message': config.get('maintenance_message', ''),
-                'min_version': config.get('min_version', '0.0.0'),
-                'feature_flags': config.get('feature_flags', {}),
+                'app_id': _appget('app_id', app_source),
+                'status': _appget('status', 'active'),
+                'maintenance_mode': _cfget('maintenance_mode', False),
+                'maintenance_message': _cfget('maintenance_message', ''),
+                'min_version': _cfget('min_version', '0.0.0'),
+                'feature_flags': _cfget('feature_flags', {}),
             })
 
         except Exception as e:
-            # Never block app startup due to config failure
-            import logging
-            logging.warning(f'Config endpoint error: {e}')
-            return JsonResponse(self._fallback_config(app_source))
+            log.warning(f'Config endpoint error: {e}')
+            return JsonResponse(_fb(app_source))
 
     @staticmethod
     def _fallback_config(app_source: str) -> dict:

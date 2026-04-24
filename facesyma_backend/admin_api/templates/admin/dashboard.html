@@ -70,12 +70,12 @@
                 usersData.users.forEach(user => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.email}</td>
-                        <td>${user.username || '-'}</td>
-                        <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${user.plan || 'free'}</span></td>
-                        <td>${new Date(user.date_joined).toLocaleDateString('tr-TR')}</td>
-                        <td><a href="/admin/users/#${user.id}" style="color: #d4af37; text-decoration: none;">Detay</a></td>
+                        <td>${escapeHtml(user.id)}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td>${escapeHtml(user.username || '-')}</td>
+                        <td><span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(user.plan || 'free')}</span></td>
+                        <td>${escapeHtml(new Date(user.date_joined).toLocaleDateString('tr-TR'))}</td>
+                        <td><a href="/admin/users/#${parseInt(user.id)}" style="color: #d4af37; text-decoration: none;">Detay</a></td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -86,7 +86,7 @@
             console.error('Dashboard yükleme hatası:', error);
             document.getElementById('recentUsersTable').innerHTML = `
                 <tr><td colspan="6" style="text-align: center; padding: 20px; color: #F44336;">
-                    Hata: ${error.message}
+                    Hata: ${escapeHtml(error.message)}
                 </td></tr>
             `;
         }

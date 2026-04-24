@@ -12,6 +12,7 @@ URL'ler (urls.py'ye ekle):
     path('auth/', include('facesyma_auth.urls')),
 """
 import json
+import time
 from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -20,16 +21,17 @@ from pymongo import MongoClient
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 import jwt
-import hashlib
 import os
 import re
+from django.contrib.auth.hashers import make_password, check_password
 
-MONGO_URI = os.environ.get(
-    'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/'
-    'myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
-)
-SECRET_KEY = os.environ.get('JWT_SECRET', 'facesyma-secret-change-in-production')
+MONGO_URI  = os.environ.get('MONGO_URI', '')
+SECRET_KEY = os.environ.get('JWT_SECRET', '')
+_RE_EMAIL  = re.compile(r'^[^@]+@[^@]+\.[^@]+$')
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
+if not SECRET_KEY:
+    raise RuntimeError("JWT_SECRET environment variable must be set.")
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
@@ -38,20 +40,28 @@ users_col = db['appfaceapi_myuser']
 
 
 def _hash_password(pw: str) -> str:
-    return hashlib.sha256(pw.encode()).hexdigest()
+    return make_password(pw)
+
+
+def _verify_password(pw: str, hashed: str) -> bool:
+    return check_password(pw, hashed)
+
+
+# Pre-computed dummy hash — used to equalize login timing for non-existent users
+_DUMMY_HASH = make_password('__facesyma_dummy__')
 
 
 def _make_tokens(user_id: int, email: str) -> dict:
-    import time
+    _now = int(time.time())
     access_payload = {
         'user_id': user_id,
         'email':   email,
-        'exp':     int(time.time()) + 3600,      # 1 saat
+        'exp':     _now + 3600,      # 1 saat
         'type':    'access',
     }
     refresh_payload = {
         'user_id': user_id,
-        'exp':     int(time.time()) + 86400 * 30, # 30 gün
+        'exp':     _now + 86400 * 30, # 30 gün
         'type':    'refresh',
     }
     return {
@@ -61,13 +71,14 @@ def _make_tokens(user_id: int, email: str) -> dict:
 
 
 def _user_to_dict(user: dict) -> dict:
+    _uget = user.get
     return {
-        'id':         user.get('id', 0),
-        'email':      user.get('email', ''),
-        'name':       user.get('username', user.get('name', '')),
-        'avatar':     user.get('avatar', None),
-        'plan':       user.get('plan', 'free'),
-        'created_at': str(user.get('date_joined', datetime.now().isoformat())),
+        'id':         _uget('id', 0),
+        'email':      _uget('email', ''),
+        'name':       _uget('username', _uget('name', '')),
+        'avatar':     _uget('avatar', None),
+        'plan':       _uget('plan', 'free'),
+        'created_at': str(_uget('date_joined', datetime.now().isoformat())),
     }
 
 
@@ -82,14 +93,15 @@ def _get_next_id() -> int:
 def register(request):
     try:
         data = json.loads(request.body)
-        email    = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-        name     = data.get('name', '').strip()
+        _dget = data.get
+        email    = _dget('email', '').strip().lower()
+        password = _dget('password', '')
+        name     = _dget('name', '').strip()
 
         if not email or not password or not name:
             return JsonResponse({'detail': 'Email, şifre ve ad gerekli.'}, status=400)
 
-        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+        if not _RE_EMAIL.match(email):
             return JsonResponse({'detail': 'Geçerli bir email adresi girin.'}, status=400)
 
         if len(password) < 6:
@@ -119,8 +131,8 @@ def register(request):
             'user': _user_to_dict(user_doc),
         }, status=201)
 
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Email giriş (JWT token) ────────────────────────────────────────────────────
@@ -129,21 +141,22 @@ def register(request):
 def login(request):
     try:
         data  = json.loads(request.body)
-        email = data.get('email', '').strip().lower()
-        pw    = data.get('password', '')
+        _dget = data.get
+        email = _dget('email', '').strip().lower()
+        pw    = _dget('password', '')
 
         user = users_col.find_one({'email': email})
-        if not user:
-            return JsonResponse({'detail': 'Email veya şifre hatalı.'}, status=401)
-
-        if user.get('password') != _hash_password(pw):
+        # Always call _verify_password to prevent timing oracle (user enumeration)
+        stored_pw = user.get('password', '') if user else _DUMMY_HASH
+        pw_valid  = _verify_password(pw, stored_pw)
+        if not user or not pw_valid:
             return JsonResponse({'detail': 'Email veya şifre hatalı.'}, status=401)
 
         tokens = _make_tokens(user['id'], email)
         return JsonResponse({**tokens, 'user': _user_to_dict(user)})
 
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Google OAuth ───────────────────────────────────────────────────────────────
@@ -168,13 +181,14 @@ def google_auth(request):
                 google_requests.Request(),
                 GOOGLE_CLIENT_ID,
             )
-        except ValueError as e:
-            return JsonResponse({'detail': f'Geçersiz Google token: {e}'}, status=401)
+        except ValueError:
+            return JsonResponse({'detail': 'Geçersiz Google token.'}, status=401)
 
         google_id = id_info['sub']
-        email     = id_info.get('email', '')
-        name      = id_info.get('name', email.split('@')[0])
-        avatar    = id_info.get('picture', None)
+        _iiget = id_info.get
+        email     = _iiget('email', '')
+        name      = _iiget('name', email.split('@')[0])
+        avatar    = _iiget('picture', None)
 
         # Mevcut kullanıcı kontrolü (google_id veya email ile)
         user = users_col.find_one({'$or': [
@@ -210,8 +224,8 @@ def google_auth(request):
         tokens = _make_tokens(user['id'], email)
         return JsonResponse({**tokens, 'user': _user_to_dict(user)})
 
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Token yenile ───────────────────────────────────────────────────────────────
@@ -223,16 +237,17 @@ def token_refresh(request):
         refresh = data.get('refresh', '')
         payload = jwt.decode(refresh, SECRET_KEY, algorithms=['HS256'])
 
-        if payload.get('type') != 'refresh':
+        _pget = payload.get
+        if _pget('type') != 'refresh':
             return JsonResponse({'detail': 'Geçersiz token tipi.'}, status=401)
 
-        tokens = _make_tokens(payload['user_id'], payload.get('email', ''))
+        tokens = _make_tokens(payload['user_id'], _pget('email', ''))
         return JsonResponse({'access': tokens['access']})
 
     except jwt.ExpiredSignatureError:
         return JsonResponse({'detail': 'Token süresi doldu.'}, status=401)
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=401)
+    except Exception:
+        return JsonResponse({'detail': 'Geçersiz token.'}, status=401)
 
 
 # ── Profil ─────────────────────────────────────────────────────────────────────
@@ -248,5 +263,5 @@ def me(request):
         if not user:
             return JsonResponse({'detail': 'Kullanıcı bulunamadı.'}, status=404)
         return JsonResponse(_user_to_dict(user))
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=401)
+    except Exception:
+        return JsonResponse({'detail': 'Geçersiz token.'}, status=401)

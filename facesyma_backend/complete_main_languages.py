@@ -105,8 +105,10 @@ def translate_with_mymemory(text, src_lang='en', tgt_lang='tr'):
 
         if response.status_code == 200:
             data = response.json()
-            if data['responseStatus'] == 200 and data['responseData']['translatedText']:
-                translated = data['responseData']['translatedText']
+            _rdrd = data['responseData']
+            _ttext = _rdrd['translatedText']
+            if data['responseStatus'] == 200 and _ttext:
+                translated = _ttext
                 # Skip if translation is same as original
                 if translated != text and translated.lower() != text.lower():
                     return translated
@@ -124,20 +126,26 @@ def get_untranslated_strings(po_file_path):
     with open(po_file_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
+    _n_lines = len(lines)
     i = 0
-    while i < len(lines):
+    while i < _n_lines:
         # Look for msgid (skip header)
-        if lines[i].startswith('msgid "') and not lines[i].startswith('msgid ""'):
-            msgid_content = lines[i][7:-2]  # Remove 'msgid "' and '"\n'
+        _li = lines[i]
+        _lisw = _li.startswith
+        if _lisw('msgid "') and not _lisw('msgid ""'):
+            msgid_content = _li[7:-2]  # Remove 'msgid "' and '"\n'
 
             # Check for multiline
             i += 1
-            while i < len(lines) and lines[i].startswith('"'):
-                msgid_content += lines[i][1:-2]
+            while i < _n_lines:
+                _li2 = lines[i]
+                if not _li2.startswith('"'):
+                    break
+                msgid_content += _li2[1:-2]
                 i += 1
 
             # Check msgstr
-            if i < len(lines) and lines[i].startswith('msgstr ""'):
+            if i < _n_lines and lines[i].startswith('msgstr ""'):
                 # This is untranslated
                 untranslated.append(msgid_content)
                 i += 1
@@ -163,7 +171,8 @@ def translate_po_file(po_file_path, lang_code):
     if not untranslated:
         return 0
 
-    print(f"  Translating {len(untranslated)} strings...")
+    _lu = len(untranslated)
+    print(f"  Translating {_lu} strings...")
 
     # Read file
     with open(po_file_path, 'r', encoding='utf-8') as f:
@@ -172,7 +181,7 @@ def translate_po_file(po_file_path, lang_code):
     translated_count = 0
 
     for idx, english_string in enumerate(untranslated, 1):
-        print(f"    [{idx}/{len(untranslated)}] {english_string[:40]:<40}", end=' ')
+        print(f"    [{idx}/{_lu}] {english_string[:40]:<40}", end=' ')
 
         # Try fallback first
         if english_string in fallback_dict:

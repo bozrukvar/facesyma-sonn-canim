@@ -29,9 +29,11 @@ chroma_db/
 # Dependencies (regenerate on deploy)
 node_modules/
 
-# Environment
+# Environment — never commit real secrets
 .env
 .env.local
+**/.env
+**/.env.local
 
 # Build artifacts
 *.o

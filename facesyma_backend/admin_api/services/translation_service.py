@@ -8,7 +8,6 @@ Uses Django gettext for proper pluralization and context support.
 """
 
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # MONITORING DASHBOARD TRANSLATIONS

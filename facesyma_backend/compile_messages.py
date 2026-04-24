@@ -33,17 +33,19 @@ def write_mo_file(po_file_path, mo_file_path):
     with open(po_file_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
+    _n_lines = len(lines)
     i = 0
-    while i < len(lines):
+    while i < _n_lines:
         line = lines[i].strip()
+        _lsw = line.startswith
 
         # Skip header and comments
-        if not line or line.startswith('#'):
+        if not line or _lsw('#'):
             i += 1
             continue
 
         # Parse msgid
-        if line.startswith('msgid'):
+        if _lsw('msgid'):
             # Extract string
             msgid_val = line[6:].strip()
             if msgid_val.startswith('"') and msgid_val.endswith('"'):
@@ -53,9 +55,10 @@ def write_mo_file(po_file_path, mo_file_path):
 
             # Check for multiline strings
             i += 1
-            while i < len(lines):
+            while i < _n_lines:
                 next_line = lines[i].strip()
-                if next_line.startswith('"') and next_line.endswith('"'):
+                _nlsw = next_line.startswith
+                if _nlsw('"') and next_line.endswith('"'):
                     msgid_val += next_line[1:-1]
                     i += 1
                 else:
@@ -63,16 +66,18 @@ def write_mo_file(po_file_path, mo_file_path):
 
             # Parse msgstr
             msgstr_val = ''
-            if lines[i].strip().startswith('msgstr'):
-                msgstr_line = lines[i].strip()[7:].strip()
+            _li_s = lines[i].strip()
+            if _li_s.startswith('msgstr'):
+                msgstr_line = _li_s[7:].strip()
                 if msgstr_line.startswith('"') and msgstr_line.endswith('"'):
                     msgstr_val = msgstr_line[1:-1]
 
                 # Check for multiline strings
                 i += 1
-                while i < len(lines):
+                while i < _n_lines:
                     next_line = lines[i].strip()
-                    if next_line.startswith('"') and next_line.endswith('"'):
+                    _nlsw = next_line.startswith
+                    if _nlsw('"') and next_line.endswith('"'):
                         msgstr_val += next_line[1:-1]
                         i += 1
                     else:
@@ -97,7 +102,8 @@ def write_mo_file(po_file_path, mo_file_path):
     strs_data = [m[1].encode('utf-8') for m in messages]
 
     # Create offset tables
-    keyoffset = 7 * 4 + 16 * len(messages)
+    _n_msgs = len(messages)
+    keyoffset = 7 * 4 + 16 * _n_msgs
     valueoffset = keyoffset + sum(len(k) + 1 for k in ids_data)
 
     koffsets = []
@@ -112,36 +118,38 @@ def write_mo_file(po_file_path, mo_file_path):
         voffsets.append(offset)
         offset += len(v) + 1
 
+    _pack = struct.pack
     # Write file
     with open(mo_file_path, 'wb') as f:
+        _write = f.write
         # Magic number
-        f.write(struct.pack('Iiiiiii',
+        _write(_pack('Iiiiiii',
                            0xde120495,           # magic
                            0,                    # version
-                           len(messages),        # number of entries
+                           _n_msgs,        # number of entries
                            7*4,                  # offset of table with original strings
-                           7*4 + 8*len(messages),  # offset of table with translated strings
+                           7*4 + 8*_n_msgs,  # offset of table with translated strings
                            0,                    # size of hash table
                            0))                   # offset of hash table
 
         # Original string table
         for k in ids_data:
-            f.write(struct.pack('ii', len(k), koffsets[ids_data.index(k)]))
+            _write(_pack('ii', len(k), koffsets[ids_data.index(k)]))
 
         # Translated string table
         for v in strs_data:
-            f.write(struct.pack('ii', len(v), voffsets[strs_data.index(v)]))
+            _write(_pack('ii', len(v), voffsets[strs_data.index(v)]))
 
         # Strings
         for k in ids_data:
-            f.write(k)
-            f.write(b'\x00')
+            _write(k)
+            _write(b'\x00')
 
         for v in strs_data:
-            f.write(v)
-            f.write(b'\x00')
+            _write(v)
+            _write(b'\x00')
 
-    return len(messages)
+    return _n_msgs
 
 
 def main():
@@ -153,7 +161,8 @@ def main():
     total_strings = 0
 
     for lang_dir in sorted(locale_dir.iterdir()):
-        if not lang_dir.is_dir() or lang_dir.name.startswith('.'):
+        _lname = lang_dir.name
+        if not lang_dir.is_dir() or _lname.startswith('.'):
             continue
 
         po_file = lang_dir / 'LC_MESSAGES' / 'django.po'
@@ -164,9 +173,9 @@ def main():
                 count = write_mo_file(po_file, mo_file)
                 compiled_count += 1
                 total_strings += count
-                print(f'✓ {lang_dir.name:12} — {mo_file.name:15} ({count:3} strings)')
+                print(f'✓ {_lname:12} — {mo_file.name:15} ({count:3} strings)')
             except Exception as e:
-                print(f'✗ {lang_dir.name:12} — ERROR: {e}')
+                print(f'✗ {_lname:12} — ERROR: {e}')
 
     print(f'\n✅ Compilation complete!')
     print(f'   {compiled_count} .mo files created ({total_strings} total strings)')

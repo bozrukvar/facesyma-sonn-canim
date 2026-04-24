@@ -11,7 +11,7 @@ Uses local Ollama process via subprocess.
 import json
 import logging
 import subprocess
-import tempfile
+from functools import lru_cache
 from typing import Dict, List
 
 log = logging.getLogger(__name__)
@@ -19,15 +19,9 @@ log = logging.getLogger(__name__)
 # Ollama model to use (must be installed locally)
 OLLAMA_MODEL = "mistral"  # Faster than llama2, good quality for Turkish
 
+_REC_SKIP_MARKERS = (':', '**', '##', 'Assessment', 'Score', 'Domain')
 
-def _generate_prompt(test_type: str, breakdown: Dict, overall_score: float, lang: str = 'tr') -> str:
-    """Generate prompt for Ollama — 18 language support"""
-
-    # Normalize lang
-    lang = lang.split('-')[0].lower() if lang else 'tr'
-
-    # Test type names in 18 languages
-    test_names_dict = {
+_TEST_NAMES: dict = {
         'tr': {
             'skills': 'Beceri', 'hr': 'İK Yetkinliği', 'personality': 'Kişilik (Big Five)',
             'career': 'Kariyer Yeteneği', 'relationship': 'İlişki Dinamiği', 'vocation': 'Meslek Uyumu (Holland RIASEC)'
@@ -100,10 +94,9 @@ def _generate_prompt(test_type: str, breakdown: Dict, overall_score: float, lang
             'skills': 'Ocena umiejętności', 'hr': 'Kompetencje HR', 'personality': 'Osobowość (Big Five)',
             'career': 'Uzdolnienie zawodowe', 'relationship': 'Dynamika relacji', 'vocation': 'Dopasowanie zawodowe'
         },
-    }
+}
 
-    # Prompts in 18 languages
-    prompts = {
+_PROMPTS: dict = {
         'tr': """Sen bir kariyer danışmanı ve gelişim koçusun. Aşağıdaki assessment sonuçlarına bakarak kişiye özelleştirilmiş, motive edici ve pratik tavsiye cümleleri oluştur.
 
 Assessment Türü: {test_name}
@@ -391,23 +384,30 @@ Utwórz 3-4 rekomendacje na podstawie:
 4. Podaj konkretne praktyczne kroki
 
 Pisz w ciepłym, profesjonalnym tonie. Maks 15 słów na zdanie. Zacznij od "•". Tylko rekomendacje.""",
-    }
+}
 
-    test_names = test_names_dict.get(lang, test_names_dict['en'])
+
+def _generate_prompt(test_type: str, breakdown: Dict, overall_score: float, lang: str = 'tr') -> str:
+    """Generate prompt for Ollama — 18 language support"""
+
+    lang = lang.split('-')[0].lower() if lang else 'tr'
+
+    test_names = _TEST_NAMES.get(lang, _TEST_NAMES['en'])
     test_name = test_names.get(test_type, test_type)
 
     # Get domains text - use 'level' for all langs, fallback to 'level_tr' if exists
     domains_text = "\n".join([
-        f"• {domain}: {scores['score']:.2f}/5.0 ({scores.get('level', scores.get('level_tr', ''))})"
+        f"• {domain}: {(_sg := scores.get)('score', 0):.2f}/5.0 ({_sg('level', _sg('level_tr', ''))})"
         for domain, scores in breakdown.items()
     ])
 
-    prompt_template = prompts.get(lang, prompts['en'])
+    prompt_template = _PROMPTS.get(lang, _PROMPTS['en'])
     return prompt_template.format(test_name=test_name, overall_score=overall_score, domains_text=domains_text)
 
 
 def _call_ollama_local(prompt: str, max_tokens: int = 300) -> str | None:
     """Call Ollama locally via subprocess."""
+    _logwarn = log.warning
     try:
         # Use subprocess to call ollama
         process = subprocess.run(
@@ -421,17 +421,17 @@ def _call_ollama_local(prompt: str, max_tokens: int = 300) -> str | None:
         if process.returncode == 0:
             return process.stdout.decode('utf-8', errors='ignore').strip()
         else:
-            log.warning(f'Ollama returned error: {process.stderr.decode("utf-8", errors="ignore")}')
+            _logwarn(f'Ollama returned error: {process.stderr.decode("utf-8", errors="ignore")}')
             return None
 
     except FileNotFoundError:
-        log.warning('Ollama not found in PATH. Install ollama or add to PATH.')
+        _logwarn('Ollama not found in PATH. Install ollama or add to PATH.')
         return None
     except subprocess.TimeoutExpired:
-        log.warning('Ollama subprocess timed out')
+        _logwarn('Ollama subprocess timed out')
         return None
     except Exception as e:
-        log.warning(f'Ollama subprocess error: {e}')
+        _logwarn(f'Ollama subprocess error: {e}')
         return None
 
 
@@ -442,6 +442,7 @@ def _parse_recommendations(text: str) -> List[str]:
 
     lines = text.split('\n')
     recommendations = []
+    _rappend = recommendations.append
 
     for line in lines:
         line = line.strip()
@@ -449,11 +450,11 @@ def _parse_recommendations(text: str) -> List[str]:
         if line.startswith('•'):
             rec = line[1:].strip()
             if rec:  # Only add non-empty recommendations
-                recommendations.append(rec)
-        elif line and not any(c in line for c in [':', '**', '##', 'Assessment', 'Score', 'Domain']):
+                _rappend(rec)
+        elif line and not any(c in line for c in _REC_SKIP_MARKERS):
             # Also accept other short lines that look like recommendations
             if 10 < len(line) < 150 and line[0].isupper():
-                recommendations.append(line)
+                _rappend(line)
 
     return recommendations[:4]  # Return max 4 recommendations
 
@@ -514,7 +515,7 @@ def generate_recommendations(test_type: str, breakdown: Dict, overall_score: flo
             'status': 'fallback',
             'recommendations': fallback,
             'count': len(fallback),
-            'error': str(e)
+            'error': 'Recommendation generation failed.'
         }
 
 
@@ -522,7 +523,7 @@ def generate_recommendations(test_type: str, breakdown: Dict, overall_score: flo
 FALLBACK_RECOMMENDATIONS = {
     'tr': {
         'skills': ["Problem çözme becerinizi pratik projelerle güçlendirin.", "En düşük puanlı alanda çevrenizden destek almaktan çekinmeyin.", "Yeni becerileri öğrenme konusundaki hızınızı koruyun.", "Öğrendiklerinizi başkalarıyla paylaşarak pekiştirin."],
-        'hr': ["Ekip çalışmasında örnek olmaya devam edin.", "Liderlik becerilerini mentoring yoluyla geliştirin.", "Stres yönetimi tekniklerini kişisel rutininize ekleyin.", "Geri bildirime açık olmayı bir alışkanlık haline getirin."],
+        'hr': ["Ekip çalışmasında örnek olmaya devam edin.", "Leaderboard becerilerini mentoring yoluyla geliştirin.", "Stres yönetimi tekniklerini kişisel rutininize ekleyin.", "Geri bildirime açık olmayı bir alışkanlık haline getirin."],
         'personality': ["Kişiliğinizin güçlü yönlerini hedef belirlemede kullanın.", "Farklı kişilik tiplerini anlamaya çalışarak empati geliştirin.", "İç dengeyi sağlayan faaliyetleri keşfetmeye zaman ayırın.", "Kendini tanıma yolculuğunda sabırlı ve öz-sempatik olun."],
         'career': ["En ilgi duyduğunuz kariyer alanına yönelik projelerde çalışın.", "Zayıf yönlerinizi geliştirmek için eğitim kaynaklarını araştırın.", "Mentorlük ve networking fırsatlarından yararlanın.", "Düzenli olarak kariyer hedeflerinizi gözden geçirin."],
         'relationship': ["İlişkilerinizde açık ve dürüst iletişimi temel alın.", "Duygusal zeka becerilerinizi pratik hayatta uygulamaya çalışın.", "Bağlılık tarzınızı anlamak gelişim için önemlidir.", "Sağlıklı ilişki dinamikleri hakkında bilgi edinmeye yatırım yapın."],
@@ -667,6 +668,7 @@ FALLBACK_RECOMMENDATIONS = {
 }
 
 
+@lru_cache(maxsize=64)
 def get_fallback_recommendations(test_type: str, lang: str = 'tr') -> List[str]:
     """Get fallback recommendations when Ollama is unavailable."""
     return FALLBACK_RECOMMENDATIONS.get(lang, {}).get(test_type, [])

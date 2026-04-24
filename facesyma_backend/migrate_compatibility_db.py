@@ -49,15 +49,17 @@ def migrate_compatibility_db():
 
         # Drop existing indexes except _id
         for idx in compatibility_col.list_indexes():
-            if idx['name'] != '_id_':
-                compatibility_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                compatibility_col.drop_index(_iname)
 
         # Indexes oluştur
-        compatibility_col.create_index([('user1_id', ASCENDING), ('user2_id', ASCENDING)], unique=True, name='idx_user_pair')
-        compatibility_col.create_index('user1_id')
-        compatibility_col.create_index('user2_id')
-        compatibility_col.create_index('category')
-        compatibility_col.create_index('calculated_at', expireAfterSeconds=2592000)  # 30 gün
+        _cidx = compatibility_col.create_index
+        _cidx([('user1_id', ASCENDING), ('user2_id', ASCENDING)], unique=True, name='idx_user_pair')
+        _cidx('user1_id')
+        _cidx('user2_id')
+        _cidx('category')
+        _cidx('calculated_at', expireAfterSeconds=2592000)  # 30 gün
 
         print("   ✅ Indexes created: user_pair, user1_id, user2_id, category, calculated_at (TTL)")
     except Exception as e:
@@ -70,13 +72,15 @@ def migrate_compatibility_db():
         communities_col = db['communities']
 
         for idx in communities_col.list_indexes():
-            if idx['name'] != '_id_':
-                communities_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                communities_col.drop_index(_iname)
 
-        communities_col.create_index('name')
-        communities_col.create_index('type')
-        communities_col.create_index('trait_name')
-        communities_col.create_index('created_at')
+        _cidx = communities_col.create_index
+        _cidx('name')
+        _cidx('type')
+        _cidx('trait_name')
+        _cidx('created_at')
 
         print("   ✅ Indexes created: name, type, trait_name, created_at")
     except Exception as e:
@@ -89,13 +93,15 @@ def migrate_compatibility_db():
         members_col = db['community_members']
 
         for idx in members_col.list_indexes():
-            if idx['name'] != '_id_':
-                members_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                members_col.drop_index(_iname)
 
-        members_col.create_index([('community_id', ASCENDING), ('user_id', ASCENDING)], unique=True, name='idx_community_user')
-        members_col.create_index('user_id')
-        members_col.create_index('community_id')
-        members_col.create_index('joined_at')
+        _cidx = members_col.create_index
+        _cidx([('community_id', ASCENDING), ('user_id', ASCENDING)], unique=True, name='idx_community_user')
+        _cidx('user_id')
+        _cidx('community_id')
+        _cidx('joined_at')
 
         print("   ✅ Indexes created: community_user (unique), user_id, community_id, joined_at")
     except Exception as e:
@@ -108,13 +114,15 @@ def migrate_compatibility_db():
         messages_col = db['community_messages']
 
         for idx in messages_col.list_indexes():
-            if idx['name'] != '_id_':
-                messages_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                messages_col.drop_index(_iname)
 
-        messages_col.create_index('from_user_id')
-        messages_col.create_index('to_user_id')
-        messages_col.create_index('community_id')
-        messages_col.create_index('created_at', expireAfterSeconds=7776000)  # 90 gün auto-delete
+        _cidx = messages_col.create_index
+        _cidx('from_user_id')
+        _cidx('to_user_id')
+        _cidx('community_id')
+        _cidx('created_at', expireAfterSeconds=7776000)  # 90 gün auto-delete
 
         print("   ✅ Indexes created: from_user_id, to_user_id, community_id, created_at (TTL: 90 days)")
     except Exception as e:
@@ -127,13 +135,15 @@ def migrate_compatibility_db():
         files_col = db['community_files']
 
         for idx in files_col.list_indexes():
-            if idx['name'] != '_id_':
-                files_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                files_col.drop_index(_iname)
 
-        files_col.create_index('owner_id')
-        files_col.create_index('community_id')
-        files_col.create_index('uploaded_at')
-        files_col.create_index('expires_at', expireAfterSeconds=0)  # TTL enabled
+        _cidx = files_col.create_index
+        _cidx('owner_id')
+        _cidx('community_id')
+        _cidx('uploaded_at')
+        _cidx('expires_at', expireAfterSeconds=0)  # TTL enabled
 
         print("   ✅ Indexes created: owner_id, community_id, uploaded_at, expires_at (TTL)")
     except Exception as e:
@@ -146,13 +156,15 @@ def migrate_compatibility_db():
         moderation_col = db['moderation_logs']
 
         for idx in moderation_col.list_indexes():
-            if idx['name'] != '_id_':
-                moderation_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                moderation_col.drop_index(_iname)
 
-        moderation_col.create_index('community_id')
-        moderation_col.create_index('target_user_id')
-        moderation_col.create_index('created_at')
-        moderation_col.create_index('status')
+        _cidx = moderation_col.create_index
+        _cidx('community_id')
+        _cidx('target_user_id')
+        _cidx('created_at')
+        _cidx('status')
 
         print("   ✅ Indexes created: community_id, target_user_id, created_at, status")
     except Exception as e:
@@ -165,13 +177,15 @@ def migrate_compatibility_db():
         subscriptions_col = db['user_subscriptions']
 
         for idx in subscriptions_col.list_indexes():
-            if idx['name'] != '_id_':
-                subscriptions_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                subscriptions_col.drop_index(_iname)
 
-        subscriptions_col.create_index('user_id', unique=True)
-        subscriptions_col.create_index('tier')
-        subscriptions_col.create_index('status')
-        subscriptions_col.create_index('renews_at')
+        _cidx = subscriptions_col.create_index
+        _cidx('user_id', unique=True)
+        _cidx('tier')
+        _cidx('status')
+        _cidx('renews_at')
 
         print("   ✅ Indexes created: user_id (unique), tier, status, renews_at")
     except Exception as e:

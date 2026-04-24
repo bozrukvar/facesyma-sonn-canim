@@ -18,18 +18,17 @@ Report includes:
 
 from io import BytesIO
 from datetime import datetime
+from operator import itemgetter
 from typing import Dict, Optional
 import logging
 
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.pdfgen import canvas
+from reportlab.lib.enums import TA_CENTER
 from PIL import Image as PILImage, ImageDraw
-import io
 
 log = logging.getLogger(__name__)
 
@@ -117,9 +116,10 @@ def create_progress_bar_image(score: float, width: int = 200, height: int = 20) 
     """Create a progress bar image for the score"""
     img = PILImage.new('RGB', (width, height), color='white')
     draw = ImageDraw.Draw(img)
+    _dr = draw.rectangle
 
     # Background
-    draw.rectangle([0, 0, width - 1, height - 1], outline='black', width=1)
+    _dr([0, 0, width - 1, height - 1], outline='black', width=1)
 
     # Fill based on score
     fill_width = int((score / 100) * (width - 2))
@@ -133,7 +133,7 @@ def create_progress_bar_image(score: float, width: int = 200, height: int = 20) 
         color = (100, 200, 100)  # Green
 
     if fill_width > 0:
-        draw.rectangle([1, 1, fill_width, height - 2], fill=color)
+        _dr([1, 1, fill_width, height - 2], fill=color)
 
     # Score text
     draw.text((width // 2 - 10, height // 2 - 5), f"{score:.0f}%", fill='black')
@@ -152,21 +152,24 @@ class PDFReportGenerator:
 
     def _setup_styles(self):
         """Setup custom paragraph styles"""
-        self.styles.add(ParagraphStyle(
+        _styles = self.styles
+        _sa = _styles.add
+        _HexColor = colors.HexColor
+        _sa(ParagraphStyle(
             name='CustomTitle',
-            parent=self.styles['Heading1'],
+            parent=_styles['Heading1'],
             fontSize=24,
-            textColor=colors.HexColor('#1f77b4'),
+            textColor=_HexColor('#1f77b4'),
             spaceAfter=12,
             alignment=TA_CENTER,
             fontName='Helvetica-Bold'
         ))
 
-        self.styles.add(ParagraphStyle(
+        _sa(ParagraphStyle(
             name='CustomHeading',
-            parent=self.styles['Heading2'],
+            parent=_styles['Heading2'],
             fontSize=14,
-            textColor=colors.HexColor('#2ca02c'),
+            textColor=_HexColor('#2ca02c'),
             spaceAfter=10,
             spaceBefore=10,
             fontName='Helvetica-Bold'
@@ -211,19 +214,25 @@ class PDFReportGenerator:
     ) -> list:
         """Build PDF content story"""
         story = []
+        _styles = self.styles
+        _append = story.append
+        _mget = self.metadata.get
+        _HexColor = colors.HexColor
+        _cgrey = colors.grey
+        _now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # Header with Facesyma branding
-        story.append(Paragraph("FACESYMA", self.styles['CustomTitle']))
-        story.append(Paragraph(
-            f"<b>{self.metadata.get('name', 'Test Result')}</b>",
-            self.styles['CustomHeading']
+        _append(Paragraph("FACESYMA", _styles['CustomTitle']))
+        _append(Paragraph(
+            f"<b>{_mget('name', 'Test Result')}</b>",
+            _styles['CustomHeading']
         ))
-        story.append(Spacer(1, 0.2 * inch))
+        _append(Spacer(1, 0.2 * inch))
 
         # Test Info
         info_data = [
-            ["Test Type:", self.metadata.get('name', 'Unknown')],
-            ["Date:", datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
+            ["Test Type:", _mget('name', 'Unknown')],
+            ["Date:", _now_str],
             ["Language:", self.lang.upper()],
             ["Result ID:", result_id[:8] + "..."],
         ]
@@ -232,25 +241,26 @@ class PDFReportGenerator:
 
         info_table = Table(info_data, colWidths=[2 * inch, 4 * inch])
         info_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f0f0')),
+            ('BACKGROUND', (0, 0), (0, -1), _HexColor('#f0f0f0')),
             ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
             ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ('GRID', (0, 0), (-1, -1), 1, _cgrey)
         ]))
-        story.append(info_table)
-        story.append(Spacer(1, 0.3 * inch))
+        _append(info_table)
+        _append(Spacer(1, 0.3 * inch))
 
         # Domain Scores
-        story.append(Paragraph("Test Results", self.styles['Heading2']))
-        story.append(Spacer(1, 0.15 * inch))
+        _h2 = _styles['Heading2']
+        _append(Paragraph("Test Results", _h2))
+        _append(Spacer(1, 0.15 * inch))
 
         scores_data = [["Domain", "Score", "Level", "Assessment"]]
         for domain, score in sorted(domain_scores.items()):
-            domain_name = self.metadata.get('domains', {}).get(domain, domain)
+            domain_name = _mget('domains', {}).get(domain, domain)
             level, assessment = get_score_level(score)
             scores_data.append([
                 domain_name,
@@ -261,45 +271,46 @@ class PDFReportGenerator:
 
         scores_table = Table(scores_data, colWidths=[2 * inch, 1 * inch, 1 * inch, 2.5 * inch])
         scores_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f77b4')),
+            ('BACKGROUND', (0, 0), (-1, 0), _HexColor('#1f77b4')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
             ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9f9f9')])
+            ('GRID', (0, 0), (-1, -1), 1, _cgrey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, _HexColor('#f9f9f9')])
         ]))
-        story.append(scores_table)
-        story.append(Spacer(1, 0.3 * inch))
+        _append(scores_table)
+        _append(Spacer(1, 0.3 * inch))
 
         # AI Interpretation
-        story.append(Paragraph("AI Interpretation", self.styles['Heading2']))
-        story.append(Spacer(1, 0.1 * inch))
-        story.append(Paragraph(
+        _bt = _styles['BodyText']
+        _append(Paragraph("AI Interpretation", _h2))
+        _append(Spacer(1, 0.1 * inch))
+        _append(Paragraph(
             ai_interpretation,
-            self.styles['BodyText']
+            _bt
         ))
-        story.append(Spacer(1, 0.3 * inch))
+        _append(Spacer(1, 0.3 * inch))
 
         # Recommendations
-        story.append(Paragraph("Recommendations", self.styles['Heading2']))
-        story.append(Spacer(1, 0.1 * inch))
+        _append(Paragraph("Recommendations", _h2))
+        _append(Spacer(1, 0.1 * inch))
 
         recommendations = self._get_recommendations(domain_scores)
         for i, rec in enumerate(recommendations, 1):
-            story.append(Paragraph(
+            _append(Paragraph(
                 f"<b>{i}.</b> {rec}",
-                self.styles['BodyText']
+                _bt
             ))
-            story.append(Spacer(1, 0.1 * inch))
+            _append(Spacer(1, 0.1 * inch))
 
         # Footer
-        story.append(Spacer(1, 0.3 * inch))
-        story.append(Paragraph(
-            f"<i>Report generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>",
-            self.styles['Normal']
+        _append(Spacer(1, 0.3 * inch))
+        _append(Paragraph(
+            f"<i>Report generated on {_now_str}</i>",
+            _styles['Normal']
         ))
 
         return story
@@ -307,32 +318,35 @@ class PDFReportGenerator:
     def _get_recommendations(self, domain_scores: Dict[str, float]) -> list:
         """Generate recommendations based on scores"""
         recommendations = []
+        _rapp = recommendations.append
 
         # Find top and bottom domains
-        sorted_domains = sorted(domain_scores.items(), key=lambda x: x[1], reverse=True)
+        sorted_domains = sorted(domain_scores.items(), key=itemgetter(1), reverse=True)
 
+        _domains = _mget('domains', {})
+        _dgget = _domains.get
         if sorted_domains:
             top_domain, top_score = sorted_domains[0]
-            domain_name = self.metadata.get('domains', {}).get(top_domain, top_domain)
-            recommendations.append(
+            domain_name = _dgget(top_domain, top_domain)
+            _rapp(
                 f"Leverage your strength in <b>{domain_name}</b> ({top_score:.0f}%) "
                 f"in your personal and professional development."
             )
 
         if len(sorted_domains) > 1:
             bottom_domain, bottom_score = sorted_domains[-1]
-            domain_name = self.metadata.get('domains', {}).get(bottom_domain, bottom_domain)
-            recommendations.append(
+            domain_name = _dgget(bottom_domain, bottom_domain)
+            _rapp(
                 f"Focus on developing <b>{domain_name}</b> ({bottom_score:.0f}%) "
                 f"through targeted practice and learning."
             )
 
-        recommendations.append(
+        _rapp(
             "Consider consulting with a career coach or counselor to discuss "
             "how these results align with your goals and aspirations."
         )
 
-        recommendations.append(
+        _rapp(
             "Retake this assessment in 6-12 months to track your personal growth "
             "and development over time."
         )

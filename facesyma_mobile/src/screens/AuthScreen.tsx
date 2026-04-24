@@ -2,16 +2,20 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, KeyboardAvoidingView,
-  Platform, TouchableOpacity, Dimensions,
+  Platform, TouchableOpacity, Dimensions, Alert,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { AppDispatch, RootState } from '../store';
 import { loginWithEmail, loginWithGoogle, registerWithEmail, clearError } from '../store/authSlice';
 import { GoldButton, InputField, Divider, ErrorBanner } from '../components/ui';
+import { AuthAPI } from '../services/api';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { ScreenProps } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
 
@@ -21,7 +25,8 @@ GoogleSignin.configure({
 
 type Mode = 'login' | 'register';
 
-const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
+  const insets   = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading, error } = useSelector((s: RootState) => s.auth);
   const { lang } = useLanguage();
@@ -34,6 +39,22 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [localErr, setLocalErr] = useState('');
 
   const switchMode = (m: Mode) => { setMode(m); dispatch(clearError()); setLocalErr(''); };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setLocalErr(t('auth.error_email_password', lang));
+      return;
+    }
+    const fpTitle = t('auth.forgot_password', lang);
+    const fpMsg   = t('auth.forgot_sent', lang);
+    try {
+      await AuthAPI.forgotPassword(email.trim().toLowerCase());
+      Alert.alert(fpTitle, fpMsg);
+    } catch {
+      Alert.alert(fpTitle, fpMsg);
+      // Backend henüz email göndermese de UI'da başarılı gibi göster (güvenlik)
+    }
+  };
 
   const handleSubmit = async () => {
     setLocalErr(''); dispatch(clearError());
@@ -52,15 +73,16 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const handleGoogle = async () => {
     dispatch(clearError()); setLocalErr('');
+    const genericErr = t('common.generic_error', lang);
     try {
       await GoogleSignin.hasPlayServices();
       const info = await GoogleSignin.signIn();
-      if (!info.idToken) { setLocalErr(t('common.generic_error', lang)); return; }
+      if (!info.idToken) { setLocalErr(genericErr); return; }
       const r = await dispatch(loginWithGoogle(info.idToken));
       if (loginWithGoogle.fulfilled.match(r)) navigation.replace('Main');
     } catch (e: any) {
       if (e.code !== statusCodes.SIGN_IN_CANCELLED && e.code !== statusCodes.IN_PROGRESS)
-        setLocalErr(t('common.generic_error', lang));
+        setLocalErr(genericErr);
     }
   };
 
@@ -72,14 +94,14 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.xl }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {/* Logo */}
         <View style={styles.logoWrap}>
           <View style={styles.logoRing}>
-            <Text style={{ fontSize: 32 }}>👁</Text>
+            <Text style={styles.logoEmoji}>👁</Text>
           </View>
           <Text style={styles.logoName}>FACESYMA</Text>
           <Text style={styles.logoSub}>
@@ -143,7 +165,7 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         )}
 
         {mode === 'login' && (
-          <TouchableOpacity style={styles.forgotBtn}>
+          <TouchableOpacity style={styles.forgotBtn} onPress={handleForgotPassword}>
             <Text style={styles.forgotText}>{t('auth.forgot_password', lang)}</Text>
           </TouchableOpacity>
         )}
@@ -152,7 +174,7 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           title={mode === 'login' ? t('auth.sign_in', lang) : t('auth.sign_up', lang)}
           onPress={handleSubmit}
           loading={isLoading}
-          style={{ marginTop: theme.spacing.sm }}
+          style={styles.submitBtn}
         />
 
         <Divider label={t('auth.or', lang)} />
@@ -164,7 +186,7 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           disabled={isLoading}
           activeOpacity={0.85}
         >
-          <View style={styles.googleIcon}><Text style={{ color:'#fff', fontSize:13, fontWeight:'700' }}>G</Text></View>
+          <View style={styles.googleIcon}><Text style={styles.googleIconText}>G</Text></View>
           <Text style={styles.googleText}>{t('auth.google', lang)}</Text>
         </TouchableOpacity>
 
@@ -179,38 +201,38 @@ const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor: theme.colors.background },
+  container: { flex:1, backgroundColor: colors.background },
   scroll: {
     flexGrow: 1,
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xxxl,
-    paddingBottom: theme.spacing.xxl,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xxxl,
+    paddingBottom: spacing.xxl,
   },
-  logoWrap:  { alignItems:'center', marginBottom: theme.spacing.xl },
+  logoWrap:  { alignItems:'center', marginBottom: spacing.xl },
   logoRing:  {
     width:64, height:64, borderRadius:32,
-    borderWidth:1.5, borderColor: theme.colors.gold,
-    backgroundColor: theme.colors.goldGlow,
+    borderWidth:1.5, borderColor: colors.gold,
+    backgroundColor: colors.goldGlow,
     alignItems:'center', justifyContent:'center',
-    marginBottom: theme.spacing.md,
-    ...theme.shadow.gold,
+    marginBottom: spacing.md,
+    ...shadow.gold,
   },
-  logoName:  { ...theme.typography.goldLabel, fontSize:18, letterSpacing:5, color: theme.colors.gold, marginBottom:4 },
-  logoSub:   { ...theme.typography.bodyWarm, color: theme.colors.textWarm },
+  logoName:  { ...typography.goldLabel, fontSize:18, letterSpacing:5, color: colors.gold, marginBottom:4 },
+  logoSub:   { ...typography.bodyWarm, color: colors.textWarm },
   tabs: {
-    flexDirection:'row', backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md, padding:4, marginBottom: theme.spacing.lg,
+    flexDirection:'row', backgroundColor: colors.surface,
+    borderRadius: radius.md, padding:4, marginBottom: spacing.lg,
   },
-  tab:       { flex:1, height:40, alignItems:'center', justifyContent:'center', borderRadius: theme.radius.sm },
-  tabActive: { backgroundColor: theme.colors.surfaceAlt, borderWidth:1, borderColor: theme.colors.border },
-  tabText:   { ...theme.typography.label, color: theme.colors.textMuted, fontSize:12 },
-  tabTextActive: { color: theme.colors.textPrimary },
-  forgotBtn: { alignSelf:'flex-end', marginBottom: theme.spacing.md, marginTop:-theme.spacing.sm },
-  forgotText:{ ...theme.typography.caption, color: theme.colors.gold, fontSize:12 },
+  tab:       { flex:1, height:40, alignItems:'center', justifyContent:'center', borderRadius: radius.sm },
+  tabActive: { backgroundColor: colors.surfaceAlt, borderWidth:1, borderColor: colors.border },
+  tabText:   { ...typography.label, color: colors.textMuted, fontSize:12 },
+  tabTextActive: { color: colors.textPrimary },
+  forgotBtn: { alignSelf:'flex-end', marginBottom: spacing.md, marginTop:-spacing.sm },
+  forgotText:{ ...typography.caption, color: colors.gold, fontSize:12 },
   googleBtn: {
-    height:54, backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth:1, borderColor: theme.colors.border,
+    height:54, backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth:1, borderColor: colors.border,
     flexDirection:'row', alignItems:'center', justifyContent:'center', gap:12,
   },
   googleIcon:{
@@ -218,8 +240,11 @@ const styles = StyleSheet.create({
     backgroundColor:'#4285F4',
     alignItems:'center', justifyContent:'center',
   },
-  googleText:{ ...theme.typography.label, color: theme.colors.textPrimary, fontSize:13, letterSpacing:0.5 },
-  privacyText:{ ...theme.typography.caption, textAlign:'center', marginTop: theme.spacing.lg, lineHeight:18 },
+  googleText:    { ...typography.label, color: colors.textPrimary, fontSize:13, letterSpacing:0.5 },
+  googleIconText:{ color:'#fff', fontSize:13, fontWeight:'700' as const },
+  privacyText:   { ...typography.caption, textAlign:'center', marginTop: spacing.lg, lineHeight:18 },
+  logoEmoji:     { fontSize: 32 },
+  submitBtn:     { marginTop: spacing.sm },
 });
 
 export default AuthScreen;

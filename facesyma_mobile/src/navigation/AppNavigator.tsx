@@ -3,11 +3,13 @@ import React, { useEffect, useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
-import { restoreSession } from '../store/authSlice';
+import { restoreSession, logout } from '../store/authSlice';
+import { registerLogoutHandler } from '../services/api';
 import theme from '../utils/theme';
+const { colors, spacing, typography, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 
@@ -25,8 +27,12 @@ import AssessmentScreen      from '../screens/AssessmentScreen';
 import AssessmentHistoryScreen from '../screens/AssessmentHistoryScreen';
 import FashionScreen    from '../screens/FashionScreen';
 
-const Stack = createNativeStackNavigator();
-const Tab   = createBottomTabNavigator();
+import type { RootStackParamList, TabParamList } from './types';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab   = createBottomTabNavigator<TabParamList>();
+const StackScreen = Stack.Screen;
+const TabScreen   = Tab.Screen;
 
 const getTabs = (lang: string) => [
   { name:'Home',     icon:'🏠', label: t('nav.home', lang), component: HomeScreen },
@@ -43,15 +49,15 @@ const MainTabs = () => {
       screenOptions={({ route }) => ({
         headerShown:   false,
         tabBarStyle: {
-          backgroundColor:   theme.colors.surface,
-          borderTopColor:    theme.colors.borderWarm,
+          backgroundColor:   colors.surface,
+          borderTopColor:    colors.borderWarm,
           borderTopWidth:    1,
           height:            82,
           paddingBottom:     16,
           paddingTop:        8,
         },
-        tabBarActiveTintColor:   theme.colors.gold,
-        tabBarInactiveTintColor: theme.colors.textMuted,
+        tabBarActiveTintColor:   colors.gold,
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarLabel: ({ focused, color }) => {
           const tab = TABS.find(t => t.name === route.name);
           return (
@@ -69,7 +75,7 @@ const MainTabs = () => {
             <View style={{
               alignItems:'center', justifyContent:'center',
               width:40, height:40, borderRadius:20,
-              backgroundColor: focused ? theme.colors.warmAmberGlow : 'transparent',
+              backgroundColor: focused ? colors.warmAmberGlow : 'transparent',
             }}>
               <Text style={{ fontSize: focused ? 21 : 18 }}>{tab?.icon}</Text>
             </View>
@@ -77,32 +83,38 @@ const MainTabs = () => {
         },
       })}
     >
-      {TABS.map(tab => <Tab.Screen key={tab.name} name={tab.name} component={tab.component} />)}
+      <TabScreen name="Home"     component={HomeScreen} />
+      <TabScreen name="Analysis" component={AnalysisScreen} />
+      <TabScreen name="Profile"  component={ProfileScreen} />
     </Tab.Navigator>
   );
 };
 
 const SplashScreen = () => (
-  <View style={{
-    flex:1, backgroundColor: theme.colors.background,
-    alignItems:'center', justifyContent:'center', gap: theme.spacing.lg,
-  }}>
-    <View style={{
-      width:80, height:80, borderRadius:40,
-      borderWidth:1.5, borderColor: theme.colors.gold,
-      backgroundColor: theme.colors.goldGlow,
-      alignItems:'center', justifyContent:'center',
-      ...theme.shadow.gold,
-    }}>
-      <Text style={{ fontSize: 36 }}>👁</Text>
+  <View style={splashStyles.container}>
+    <View style={splashStyles.orb}>
+      <Text style={splashStyles.orbIcon}>👁</Text>
     </View>
-    <Text style={{
-      ...theme.typography.goldLabel, fontSize:16,
-      letterSpacing:5, color: theme.colors.gold,
-    }}>FACESYMA</Text>
-    <ActivityIndicator color={theme.colors.warmAmber} />
+    <Text style={splashStyles.title}>FACESYMA</Text>
+    <ActivityIndicator color={colors.warmAmber} />
   </View>
 );
+
+const splashStyles = StyleSheet.create({
+  container: {
+    flex:1, backgroundColor: colors.background,
+    alignItems:'center' as const, justifyContent:'center' as const, gap: spacing.lg,
+  },
+  orb: {
+    width:80, height:80, borderRadius:40,
+    borderWidth:1.5, borderColor: colors.gold,
+    backgroundColor: colors.goldGlow,
+    alignItems:'center' as const, justifyContent:'center' as const,
+    ...shadow.gold,
+  },
+  orbIcon: { fontSize: 36 },
+  title: { ...typography.goldLabel, fontSize:16, letterSpacing:5, color: colors.gold },
+});
 
 const AppNavigator = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -111,6 +123,8 @@ const AppNavigator = () => {
 
   useEffect(() => {
     dispatch(restoreSession()).finally(() => setReady(true));
+    // Token yenileme tamamen başarısız olursa Redux state'i temizle
+    registerLogoutHandler(() => dispatch(logout()));
   }, []);
 
   if (!ready || isLoading) return <SplashScreen />;
@@ -119,31 +133,31 @@ const AppNavigator = () => {
     <NavigationContainer theme={{
       dark: true,
       colors: {
-        primary:      theme.colors.gold,
-        background:   theme.colors.background,
-        card:         theme.colors.surface,
-        text:         theme.colors.textPrimary,
-        border:       theme.colors.border,
-        notification: theme.colors.warmAmber,
+        primary:      colors.gold,
+        background:   colors.background,
+        card:         colors.surface,
+        text:         colors.textPrimary,
+        border:       colors.border,
+        notification: colors.warmAmber,
       },
     }}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <>
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-            <Stack.Screen name="Auth"       component={AuthScreen} />
+            <StackScreen name="Onboarding" component={OnboardingScreen} />
+            <StackScreen name="Auth"       component={AuthScreen} />
           </>
         ) : (
           <>
-            <Stack.Screen name="Main"              component={MainTabs} />
-            <Stack.Screen name="Chat"              component={ChatScreen} />
-            <Stack.Screen name="Twins"             component={TwinsScreen} />
-            <Stack.Screen name="Astrology"         component={AstrologyScreen} />
-            <Stack.Screen name="ArtMatch"          component={ArtMatchScreen} />
-            <Stack.Screen name="Daily"             component={DailyScreen} />
-            <Stack.Screen name="Assessment"        component={AssessmentScreen} />
-            <Stack.Screen name="AssessmentHistory" component={AssessmentHistoryScreen} />
-            <Stack.Screen name="Fashion"           component={FashionScreen} />
+            <StackScreen name="Main"              component={MainTabs} />
+            <StackScreen name="Chat"              component={ChatScreen} />
+            <StackScreen name="Twins"             component={TwinsScreen} />
+            <StackScreen name="Astrology"         component={AstrologyScreen} />
+            <StackScreen name="ArtMatch"          component={ArtMatchScreen} />
+            <StackScreen name="Daily"             component={DailyScreen} />
+            <StackScreen name="Assessment"        component={AssessmentScreen} />
+            <StackScreen name="AssessmentHistory" component={AssessmentHistoryScreen} />
+            <StackScreen name="Fashion"           component={FashionScreen} />
           </>
         )}
       </Stack.Navigator>

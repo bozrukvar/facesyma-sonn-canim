@@ -219,6 +219,7 @@ def _trunc(v, maxlen=250):
 
 # ── JSON tabanlı örnek üretici ────────────────────────────────────────────────
 def make_json_sample(sifat: str, data: dict, lang: str, n_turns: int = 2) -> dict | None:
+    _choice = random.choice
     sys_p  = LLAMA_SYSTEM.get(lang, LLAMA_SYSTEM["tr"])
     qs     = QUESTIONS.get(lang, QUESTIONS["tr"])
     intros = INTROS.get(lang, INTROS["tr"])
@@ -235,17 +236,19 @@ def make_json_sample(sifat: str, data: dict, lang: str, n_turns: int = 2) -> dic
                               ensure_ascii=False, indent=2)
 
     messages = []
+    _mapp = messages.append
 
     # İlk tur — analiz JSON'u ile birlikte
-    first_q = random.choice(qs["initial"])
+    first_q = _choice(qs["initial"])
     user_content = (
         f"[ANALİZ SONUCU]\n```json\n{analysis_str}\n```\n\n{first_q}"
     )
 
     # İlk asistan cevabı
-    intro  = random.choice(intros)
-    close  = random.choice(closes)
-    core   = data.get("kariyer", data.get("tavsiye", ""))
+    _dget  = data.get
+    intro  = _choice(intros)
+    close  = _choice(closes)
+    core   = _dget("kariyer", _dget("tavsiye", ""))
     if not core:
         return None
 
@@ -255,24 +258,24 @@ def make_json_sample(sifat: str, data: dict, lang: str, n_turns: int = 2) -> dic
         f"{close}"
     )
 
-    messages.append({"role": "user",      "content": user_content})
-    messages.append({"role": "assistant", "content": reply})
+    _mapp({"role": "user",      "content": user_content})
+    _mapp({"role": "assistant", "content": reply})
 
     # Takip turları
-    available_mods = [m for m in qs if m not in ("initial", "genel") and data.get(m)]
+    available_mods = [m for m in qs if m not in ("initial", "genel") and _dget(m)]
     random.shuffle(available_mods)
 
     for mod in available_mods[:n_turns]:
-        q   = random.choice(qs[mod])
-        val = data.get(mod, "")
+        q   = _choice(qs[mod])
+        val = _dget(mod, "")
         if not val:
             continue
         ans = (
-            f"{random.choice(intros)}**{mod.capitalize()}** alanında "
-            f"{_trunc(val, 220)}{random.choice(closes)}"
+            f"{_choice(intros)}**{mod.capitalize()}** alanında "
+            f"{_trunc(val, 220)}{_choice(closes)}"
         )
-        messages.append({"role": "user",      "content": q})
-        messages.append({"role": "assistant", "content": ans})
+        _mapp({"role": "user",      "content": q})
+        _mapp({"role": "assistant", "content": ans})
 
     return {
         "messages": [{"role": "system", "content": sys_p}] + messages,
@@ -295,28 +298,31 @@ def convert_photo_result(record: dict, lang: str) -> dict | None:
       ... diğer modüller ...
     }
     """
+    _choice = random.choice
     sys_p  = LLAMA_SYSTEM.get(lang, LLAMA_SYSTEM["tr"])
     qs     = QUESTIONS.get(lang, QUESTIONS["tr"])
     intros = INTROS.get(lang, INTROS["tr"])
     closes = CLOSES.get(lang, CLOSES["tr"])
 
     # Analiz verisini özetle
-    attrs = record.get("attributes", [])
+    _rget = record.get
+    attrs = _rget("attributes", [])
     top_attrs = [a.get("name", "") for a in attrs[:5] if a.get("name")]
 
     analysis_str = json.dumps({
         "top_attributes": top_attrs,
-        "golden_ratio": record.get("golden_ratio"),
-        "face_type": record.get("face_type"),
-        **{k: _trunc(record.get(k, "")) for k in
-           ("kariyer", "liderlik", "duygusal", "motivasyon") if record.get(k)},
+        "golden_ratio": _rget("golden_ratio"),
+        "face_type": _rget("face_type"),
+        **{k: _trunc(_rget(k, "")) for k in
+           ("kariyer", "liderlik", "duygusal", "motivasyon") if _rget(k)},
     }, ensure_ascii=False, indent=2)
 
     messages = []
-    first_q = random.choice(qs["initial"])
+    _mapp = messages.append
+    first_q = _choice(qs["initial"])
     user_content = f"[ANALİZ SONUCU]\n```json\n{analysis_str}\n```\n\n{first_q}"
 
-    core = record.get("kariyer") or record.get("tavsiye") or (
+    core = _rget("kariyer") or _rget("tavsiye") or (
         attrs[0].get("description", "") if attrs else ""
     )
     if not core:
@@ -324,27 +330,27 @@ def convert_photo_result(record: dict, lang: str) -> dict | None:
 
     dominant = top_attrs[0] if top_attrs else "analiz verisi"
     reply = (
-        f"{random.choice(intros)}**{dominant.capitalize()}** özelliğin öne çıkıyor. "
+        f"{_choice(intros)}**{dominant.capitalize()}** özelliğin öne çıkıyor. "
         f"{_trunc(core, 200)}"
-        f"{random.choice(closes)}"
+        f"{_choice(closes)}"
     )
 
-    messages.append({"role": "user",      "content": user_content})
-    messages.append({"role": "assistant", "content": reply})
+    _mapp({"role": "user",      "content": user_content})
+    _mapp({"role": "assistant", "content": reply})
 
     # 1-2 takip turu ekle
     for mod in random.sample(list(qs.keys()), min(2, len(qs))):
         if mod in ("initial", "genel"):
             continue
-        val = record.get(mod, "")
+        val = _rget(mod, "")
         if not val:
             continue
-        q   = random.choice(qs[mod])
+        q   = _choice(qs[mod])
         ans = (
-            f"{random.choice(intros)}{_trunc(val, 200)}{random.choice(closes)}"
+            f"{_choice(intros)}{_trunc(val, 200)}{_choice(closes)}"
         )
-        messages.append({"role": "user",      "content": q})
-        messages.append({"role": "assistant", "content": ans})
+        _mapp({"role": "user",      "content": q})
+        _mapp({"role": "assistant", "content": ans})
 
     return {
         "messages": [{"role": "system", "content": sys_p}] + messages,
@@ -367,15 +373,17 @@ def generate_json_mode(sifat_db_path: Path, output: Path,
     with open(sifat_db_path, encoding="utf-8") as f:
         db = json.load(f)
 
+    _choice  = random.choice
     items    = list(db.items())
     examples = []
     seen     = set()
     attempts = 0
+    _ne      = 0
 
-    while len(examples) < n_samples and attempts < n_samples * 6:
+    while _ne < n_samples and attempts < n_samples * 6:
         attempts += 1
-        sifat, data = random.choice(items)
-        key = (sifat, len(examples) // max(1, n_samples // len(items) + 1))
+        sifat, data = _choice(items)
+        key = (sifat, _ne // max(1, n_samples // len(items) + 1))
         if key in seen:
             continue
         seen.add(key)
@@ -383,8 +391,9 @@ def generate_json_mode(sifat_db_path: Path, output: Path,
         sample = make_json_sample(sifat, data, lang, n_turns)
         if sample:
             examples.append(sample)
-        if len(examples) % 1000 == 0 and len(examples):
-            print(f"  {len(examples):,}/{n_samples:,}...")
+            _ne += 1
+            if _ne % 1000 == 0:
+                print(f"  {_ne:,}/{n_samples:,}...")
 
     write_jsonl(examples, output)
 
@@ -435,48 +444,54 @@ def merge_mode(inputs: list, output: Path, shuffle: bool):
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def main():
+    _exit = sys.exit
     p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
         description=__doc__)
-    p.add_argument("--mode",    required=True, choices=["json", "photos", "merge"])
-    p.add_argument("--sifat-db",     default="sifat_veritabani.json")
-    p.add_argument("--photo-results",default="analysis_results.jsonl")
-    p.add_argument("--inputs",  nargs="+", help="merge modu için giriş dosyaları")
-    p.add_argument("--output",  required=True)
-    p.add_argument("--lang",    default="tr",
+    _addarg = p.add_argument
+    _addarg("--mode",    required=True, choices=["json", "photos", "merge"])
+    _addarg("--sifat-db",     default="sifat_veritabani.json")
+    _addarg("--photo-results",default="analysis_results.jsonl")
+    _addarg("--inputs",  nargs="+", help="merge modu için giriş dosyaları")
+    _addarg("--output",  required=True)
+    _addarg("--lang",    default="tr",
                    choices=["tr","en","de","ru","ar","es","ko","ja"])
-    p.add_argument("--samples", type=int, default=8000)
-    p.add_argument("--turns",   type=int, default=2)
-    p.add_argument("--shuffle", action="store_true")
+    _addarg("--samples", type=int, default=8000)
+    _addarg("--turns",   type=int, default=2)
+    _addarg("--shuffle", action="store_true")
     args = p.parse_args()
+    _amode = args.mode
+    _alang = args.lang
+    _ao = args.output
 
-    output = Path(args.output)
+    output = Path(_ao)
 
-    if args.mode == "json":
+    if _amode == "json":
         sifat_path = Path(args.sifat_db)
         if not sifat_path.exists():
-            alt = Path(f"sifat_veritabani_{args.lang}.json")
+            alt = Path(f"sifat_veritabani_{_alang}.json")
             if alt.exists():
                 sifat_path = alt
             else:
                 print(f"HATA: {sifat_path} bulunamadı")
-                sys.exit(1)
-        generate_json_mode(sifat_path, output, args.lang, args.samples, args.turns)
+                _exit(1)
+        generate_json_mode(sifat_path, output, _alang, args.samples, args.turns)
 
-    elif args.mode == "photos":
+    elif _amode == "photos":
         photo_path = Path(args.photo_results)
         if not photo_path.exists():
             print(f"HATA: {photo_path} bulunamadı")
-            sys.exit(1)
-        generate_photo_mode(photo_path, output, args.lang)
+            _exit(1)
+        generate_photo_mode(photo_path, output, _alang)
 
-    elif args.mode == "merge":
-        if not args.inputs:
+    elif _amode == "merge":
+        _ai = args.inputs
+        if not _ai:
             print("HATA: --inputs gerekli")
-            sys.exit(1)
-        merge_mode(args.inputs, output, args.shuffle)
+            _exit(1)
+        merge_mode(_ai, output, args.shuffle)
 
     print("\nSonraki adım:")
-    print(f"  python ../training/train.py --dataset {args.output}")
+    print(f"  python ../training/train.py --dataset {_ao}")
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ models.py
 Pydantic veri modelleri - Beslenme koçluğu için type hints ve validation
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from pydantic import BaseModel, Field
 
 

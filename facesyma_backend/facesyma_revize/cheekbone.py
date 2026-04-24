@@ -67,11 +67,16 @@ def measure_cheekbone(img):
     """
     cheekbone = cheekbone_input(img)
 
+    _c234 = cheekbone["234"]
+    _c454 = cheekbone["454"]
+    _c172 = cheekbone["172"]
+    _c397 = cheekbone["397"]
+
     # Cheekbone width: distance between left and right cheekbones
-    cheek_width = abs(cheekbone["234"][0] - cheekbone["454"][0])
+    cheek_width = abs(_c234[0] - _c454[0])
 
     # Jaw width reference
-    jaw_width = abs(cheekbone["172"][0] - cheekbone["397"][0])
+    jaw_width = abs(_c172[0] - _c397[0])
 
     # Cheekbone to jaw ratio
     cheekbone_ratio = round(cheek_width / jaw_width, 2)
@@ -85,8 +90,8 @@ def measure_cheekbone(img):
         cheekbone_category = "cheekbone_golden"
 
     # Cheekbone prominence: vertical distance from cheekbone to jaw
-    cheek_y = (cheekbone["234"][1] + cheekbone["454"][1]) / 2
-    jaw_y = (cheekbone["172"][1] + cheekbone["397"][1]) / 2
+    cheek_y = (_c234[1] + _c454[1]) / 2
+    jaw_y = (_c172[1] + _c397[1]) / 2
     prominence = abs(cheek_y - jaw_y)
 
     return {

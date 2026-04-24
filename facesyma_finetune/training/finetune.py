@@ -27,7 +27,8 @@ with open(DATASET, "r", encoding="utf-8") as f:
                 if "messages" in obj:
                     prompt = ""
                     for msg in obj["messages"]:
-                        role, content = msg.get("role", ""), msg.get("content", "")
+                        _mget = msg.get
+                        role, content = _mget("role", ""), _mget("content", "")
                         if role == "system":
                             prompt += f"<|im_start|>system\n{content}<|im_end|>\n"
                         elif role == "user":
@@ -35,7 +36,7 @@ with open(DATASET, "r", encoding="utf-8") as f:
                         elif role == "assistant":
                             prompt += f"<|im_start|>assistant\n{content}<|im_end|>\n"
                     examples.append({"text": prompt})
-            except:
+            except Exception:
                 pass
 
 print(f"✓ Loaded {len(examples):,} examples\n")

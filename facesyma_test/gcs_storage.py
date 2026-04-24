@@ -43,8 +43,9 @@ class GCSStorageManager:
 
     def _initialize(self):
         """Initialize GCS client"""
+        _lwarn = log.warning
         if not GOOGLE_CLOUD_AVAILABLE:
-            log.warning("Google Cloud Storage library not installed")
+            _lwarn("Google Cloud Storage library not installed")
             return
 
         try:
@@ -64,7 +65,7 @@ class GCSStorageManager:
             self.bucket = self.client.bucket(self.bucket_name)
             log.info(f"✓ GCS initialized: bucket={self.bucket_name}")
         except Exception as e:
-            log.warning(f"GCS initialization failed: {e}")
+            _lwarn(f"GCS initialization failed: {e}")
             self.client = None
             self.bucket = None
 

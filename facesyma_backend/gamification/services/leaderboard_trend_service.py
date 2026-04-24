@@ -1,5 +1,4 @@
 """Leaderboard trend service"""
-from typing import Optional, Dict, Any, List
 
 
 class LeaderboardTrendService:

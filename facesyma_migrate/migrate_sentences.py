@@ -44,8 +44,7 @@ log = logging.getLogger(__name__)
 
 MONGO_URI = os.environ.get(
     "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-    "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
+    ''
 )
 EXCEL_PATH = Path(__file__).parent / "Facesyma_201_Sifat_Tam.xlsx"
 
@@ -71,22 +70,24 @@ PROGRESS_FILE    = Path("migration_progress.json")
 def translate_batch(texts: list, target: str) -> list:
     from deep_translator import GoogleTranslator
     results = []
+    _rext = results.extend
+    _sleep = time.sleep
     for i in range(0, len(texts), BATCH_SIZE):
         chunk = texts[i:i + BATCH_SIZE]
         for attempt in range(1, MAX_RETRY + 1):
             try:
                 translated = GoogleTranslator(source="tr", target=target).translate_batch(chunk)
-                results.extend(t if t else chunk[j] for j, t in enumerate(translated))
+                _rext(t if t else chunk[j] for j, t in enumerate(translated))
                 break
             except Exception as e:
                 wait = attempt * 2
                 log.warning(f"  Çeviri hatası (deneme {attempt}/{MAX_RETRY}): {e}")
                 if attempt < MAX_RETRY:
-                    time.sleep(wait)
+                    _sleep(wait)
                 else:
                     log.error(f"  Başarısız — orijinal kullanılıyor")
-                    results.extend(chunk)
-        time.sleep(DELAY_SEC)
+                    _rext(chunk)
+        _sleep(DELAY_SEC)
     return results
 
 
@@ -116,11 +117,13 @@ def load_excel(path: Path) -> dict:
     ws     = wb.active
     data, cur = {}, None
     for row in ws.iter_rows(min_row=2):
-        if row[0].value is not None and row[3].value is not None:
-            cur = str(row[3].value).strip()
+        _r3v = row[3].value
+        if row[0].value is not None and _r3v is not None:
+            cur = str(_r3v).strip()
             data[cur] = []
-        if row[4].value and row[5].value and cur:
-            data[cur].append(str(row[5].value).strip())
+        _r5v = row[5].value
+        if row[4].value and _r5v and cur:
+            data[cur].append(str(_r5v).strip())
     log.info(f"Excel: {len(data)} sıfat, {sum(len(v) for v in data.values()):,} cümle")
     return data
 
@@ -141,9 +144,10 @@ def read_tr_attr_mapping(client: MongoClient) -> dict:
 
 
 def migrate_attribute(client, langs, done, dry_run):
-    log.info("\n" + "="*55)
-    log.info("MODÜL 1: database_attribute_* (201 sıfat × 30 cümle)")
-    log.info("="*55)
+    _info = log.info
+    _info("\n" + "="*55)
+    _info("MODÜL 1: database_attribute_* (201 sıfat × 30 cümle)")
+    _info("="*55)
 
     excel_data = load_excel(EXCEL_PATH)
     tr_mapping = read_tr_attr_mapping(client)
@@ -154,7 +158,7 @@ def migrate_attribute(client, langs, done, dry_run):
         info     = LANG_MAP[lang_code]
         gt_code  = info["gt"]
         db_target= client[info["attr_db"]]
-        log.info(f"\n  [{lang_code.upper()}] {info['name']}")
+        _info(f"\n  [{lang_code.upper()}] {info['name']}")
 
         bulk = {}
         for idx, sifat in enumerate(common, 1):
@@ -166,7 +170,7 @@ def migrate_attribute(client, langs, done, dry_run):
             path_key  = f"{meta['value_key']}.{sifat}"
             tr_cumles = excel_data[sifat]
 
-            log.info(f"  [{idx:3d}/{len(common)}] {sifat[:45]}")
+            _info(f"  [{idx:3d}/{len(common)}] {sifat[:45]}")
             translated = translate_batch(tr_cumles, gt_code)
 
             col_bulk = bulk.setdefault(meta["collection"], {})
@@ -180,7 +184,7 @@ def migrate_attribute(client, langs, done, dry_run):
             if written % 20 == 0 and not dry_run:
                 _flush_attr(db_target, bulk)
                 bulk.clear()
-                log.info(f"  → {written} sıfat ara kaydedildi")
+                _info(f"  → {written} sıfat ara kaydedildi")
 
         if bulk and not dry_run:
             _flush_attr(db_target, bulk)
@@ -188,7 +192,7 @@ def migrate_attribute(client, langs, done, dry_run):
             for cn, docs in bulk.items():
                 for did, fields in docs.items():
                     for fp, c in list(fields.items())[:1]:
-                        log.info(f"  DRY: {cn}/{did}/{fp} → {c[0][:50]}")
+                        _info(f"  DRY: {cn}/{did}/{fp} → {c[0][:50]}")
                     break
                 break
 
@@ -207,26 +211,29 @@ def _flush_attr(db, bulk):
 # ── MODÜL 2: appfaceapi_advisor ───────────────────────────────────
 
 def migrate_advisor(client, langs, done, dry_run):
-    log.info("\n" + "="*55)
-    log.info("MODÜL 2: appfaceapi_advisor (sıfat tavsiye cümleleri)")
-    log.info("="*55)
+    _info = log.info
+    _info("\n" + "="*55)
+    _info("MODÜL 2: appfaceapi_advisor (sıfat tavsiye cümleleri)")
+    _info("="*55)
 
     col     = client["facesyma-backend"]["appfaceapi_advisor"]
     docs    = list(col.find({}))
     written = 0
 
-    log.info(f"  Toplam döküman: {len(docs)}")
+    _info(f"  Toplam döküman: {len(docs)}")
 
     for lang_code in langs:
         info    = LANG_MAP[lang_code]
         gt_code = info["gt"]
+        _iname  = info["name"]
         field   = f"cumle_{lang_code}"    # cumle_en, cumle_de, ...
-        log.info(f"\n  [{lang_code.upper()}] {info['name']} → alan: {field}")
+        _info(f"\n  [{lang_code.upper()}] {_iname} → alan: {field}")
 
         ops = []
         for doc in docs:
-            sifat = doc.get("sifat", "")
-            cumle_tr = doc.get("cumle_tr", "")
+            _dget = doc.get
+            sifat = _dget("sifat", "")
+            cumle_tr = _dget("cumle_tr", "")
             if not cumle_tr:
                 continue
 
@@ -234,7 +241,7 @@ def migrate_advisor(client, langs, done, dry_run):
             if key in done:
                 continue
 
-            log.info(f"  {sifat[:40]}")
+            _info(f"  {sifat[:40]}")
             translated = translate_single(cumle_tr, gt_code)
             ops.append(UpdateOne(
                 {"_id": doc["_id"]},
@@ -246,9 +253,9 @@ def migrate_advisor(client, langs, done, dry_run):
 
         if ops and not dry_run:
             r = col.bulk_write(ops, ordered=False)
-            log.info(f"  {info['name']}: {r.modified_count} döküman güncellendi")
+            _info(f"  {_iname}: {r.modified_count} döküman güncellendi")
         elif dry_run and ops:
-            log.info(f"  DRY: {len(ops)} döküman güncellenecekti")
+            _info(f"  DRY: {len(ops)} döküman güncellenecekti")
 
     return written
 
@@ -256,14 +263,15 @@ def migrate_advisor(client, langs, done, dry_run):
 # ── MODÜL 3: database_daily_* ─────────────────────────────────────
 
 def migrate_daily(client, langs, done, dry_run):
-    log.info("\n" + "="*55)
-    log.info("MODÜL 3: database_daily_* (günlük motivasyon cümleleri)")
-    log.info("="*55)
+    _info = log.info
+    _info("\n" + "="*55)
+    _info("MODÜL 3: database_daily_* (günlük motivasyon cümleleri)")
+    _info("="*55)
 
     # Sadece daily_db'si olan diller
     daily_langs = [l for l in langs if LANG_MAP[l].get("daily_db")]
     if not daily_langs:
-        log.info("  Bu dillerde database_daily koleksiyonu yok, atlanıyor.")
+        _info("  Bu dillerde database_daily koleksiyonu yok, atlanıyor.")
         return 0
 
     # TR referans
@@ -272,13 +280,13 @@ def migrate_daily(client, langs, done, dry_run):
     tr_neg  = list(tr_db["negative"].find())
     written = 0
 
-    log.info(f"  TR positive dökümanı: {len(tr_pos)}, negative: {len(tr_neg)}")
+    _info(f"  TR positive dökümanı: {len(tr_pos)}, negative: {len(tr_neg)}")
 
     for lang_code in daily_langs:
         info     = LANG_MAP[lang_code]
         gt_code  = info["gt"]
         daily_db = client[info["daily_db"]]
-        log.info(f"\n  [{lang_code.upper()}] {info['name']}")
+        _info(f"\n  [{lang_code.upper()}] {info['name']}")
 
         for col_name, tr_docs, list_key in [
             ("positive", tr_pos, "positive_daily"),
@@ -286,7 +294,7 @@ def migrate_daily(client, langs, done, dry_run):
         ]:
             key = f"daily:{lang_code}:{col_name}"
             if key in done:
-                log.info(f"  {col_name}: atlandı (tamamlanmış)")
+                _info(f"  {col_name}: atlandı (tamamlanmış)")
                 continue
 
             for doc in tr_docs:
@@ -294,7 +302,7 @@ def migrate_daily(client, langs, done, dry_run):
                 if not tr_cumleler:
                     continue
 
-                log.info(f"  {col_name}: {len(tr_cumleler)} cümle çevriliyor...")
+                _info(f"  {col_name}: {len(tr_cumleler)} cümle çevriliyor...")
                 translated = translate_batch(tr_cumleler, gt_code)
 
                 if not dry_run:
@@ -303,9 +311,9 @@ def migrate_daily(client, langs, done, dry_run):
                         {"$set": {list_key: translated}},
                         upsert=True
                     )
-                    log.info(f"  {col_name}: yazıldı ✓")
+                    _info(f"  {col_name}: yazıldı ✓")
                 else:
-                    log.info(f"  DRY: {col_name} → {translated[0][:60]}")
+                    _info(f"  DRY: {col_name} → {translated[0][:60]}")
 
                 done.add(key)
                 save_progress(done)
@@ -317,11 +325,12 @@ def migrate_daily(client, langs, done, dry_run):
 # ── Ana fonksiyon ─────────────────────────────────────────────────
 
 def migrate(langs, modules, dry_run, resume):
+    _info = log.info
     t0     = datetime.now()
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)
     try:
         client.admin.command("ping")
-        log.info("MongoDB OK ✓")
+        _info("MongoDB OK ✓")
     except Exception as e:
         log.error(f"MongoDB bağlantısı başarısız: {e}")
         sys.exit(1)
@@ -339,15 +348,15 @@ def migrate(langs, modules, dry_run, resume):
         total += migrate_daily(client, langs, done, dry_run)
 
     elapsed = (datetime.now() - t0).total_seconds()
-    log.info(f"\n{'='*55}")
-    log.info(f"TAMAMLANDI")
-    log.info(f"Süre    : {elapsed:.0f}s ({elapsed/60:.1f} dk)")
-    log.info(f"Toplam  : {total:,} cümle/alan işlendi")
-    log.info(f"Diller  : {', '.join(langs)}")
-    log.info(f"Modüller: {', '.join(modules)}")
+    _info(f"\n{'='*55}")
+    _info(f"TAMAMLANDI")
+    _info(f"Süre    : {elapsed:.0f}s ({elapsed/60:.1f} dk)")
+    _info(f"Toplam  : {total:,} cümle/alan işlendi")
+    _info(f"Diller  : {', '.join(langs)}")
+    _info(f"Modüller: {', '.join(modules)}")
     if dry_run:
-        log.info("NOT: Dry run — MongoDB'ye yazılmadı.")
-    log.info(f"{'='*55}")
+        _info("NOT: Dry run — MongoDB'ye yazılmadı.")
+    _info(f"{'='*55}")
 
     if not dry_run and PROGRESS_FILE.exists():
         PROGRESS_FILE.unlink()
@@ -356,6 +365,7 @@ def migrate(langs, modules, dry_run, resume):
 # ── CLI ───────────────────────────────────────────────────────────
 
 def main():
+    _exit = sys.exit
     p = argparse.ArgumentParser(
         description="Facesyma tam veritabanı migration",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -374,13 +384,14 @@ Modüller:
   python migrate_sentences.py --dry-run --langs en     # Test
         """
     )
-    p.add_argument("--langs",    default=",".join(LANG_MAP))
-    p.add_argument("--only",     default="",                help="Sadece bu modüller (virgülle)")
-    p.add_argument("--skip",     default="",                help="Bu modülleri atla (virgülle)")
-    p.add_argument("--dry-run",  action="store_true")
-    p.add_argument("--resume",   action="store_true")
-    p.add_argument("--delay",    type=float, default=DELAY_SEC)
-    p.add_argument("--excel",    default=str(EXCEL_PATH))
+    _addarg = p.add_argument
+    _addarg("--langs",    default=",".join(LANG_MAP))
+    _addarg("--only",     default="",                help="Sadece bu modüller (virgülle)")
+    _addarg("--skip",     default="",                help="Bu modülleri atla (virgülle)")
+    _addarg("--dry-run",  action="store_true")
+    _addarg("--resume",   action="store_true")
+    _addarg("--delay",    type=float, default=DELAY_SEC)
+    _addarg("--excel",    default=str(EXCEL_PATH))
     args = p.parse_args()
 
     global DELAY_SEC, EXCEL_PATH
@@ -389,16 +400,16 @@ Modüller:
 
     if not EXCEL_PATH.exists():
         print(f"HATA: Excel bulunamadı → {EXCEL_PATH}")
-        sys.exit(1)
+        _exit(1)
 
-    langs = [l.strip() for l in args.langs.split(",") if l.strip() and l.strip() in LANG_MAP]
+    langs = [s for l in args.langs.split(",") if (s := l.strip()) and s in LANG_MAP]
     if not langs:
         print(f"HATA: Geçerli dil yok. Seçenekler: {list(LANG_MAP.keys())}")
-        sys.exit(1)
+        _exit(1)
 
     all_modules = ["attribute", "advisor", "daily"]
     if args.only:
-        modules = [m.strip() for m in args.only.split(",") if m.strip() in all_modules]
+        modules = [s for m in args.only.split(",") if (s := m.strip()) in all_modules]
     elif args.skip:
         skip    = {m.strip() for m in args.skip.split(",")}
         modules = [m for m in all_modules if m not in skip]
@@ -433,13 +444,13 @@ Modüller:
     cevap = input("Başlansın mı? (e/h): ").strip().lower()
     if cevap not in ("e", "evet", "y", "yes"):
         print("İptal.")
-        sys.exit(0)
+        _exit(0)
 
     try:
         migrate(langs=langs, modules=modules, dry_run=args.dry_run, resume=args.resume)
     except KeyboardInterrupt:
         log.warning("\nDurduruldu. --resume ile devam edebilirsiniz.")
-        sys.exit(0)
+        _exit(0)
 
 
 if __name__ == "__main__":

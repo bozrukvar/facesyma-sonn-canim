@@ -49,10 +49,12 @@ log = logging.getLogger(__name__)
 # ── Yapılandırma ───────────────────────────────────────────────────────────────
 VLLM_URL    = os.environ.get("VLLM_URL",   "http://localhost:8001")
 MODEL_ID    = os.environ.get("MODEL_ID",   "facesyma-llama3.1-8b")
-MONGO_URI   = os.environ.get("MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-    "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE")
-JWT_SECRET  = os.environ.get("JWT_SECRET", "facesyma-jwt-secret")
+MONGO_URI   = os.environ.get("MONGO_URI", "")
+JWT_SECRET  = os.environ.get("JWT_SECRET", "")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET environment variable must be set.")
 MAX_TOKENS  = int(os.environ.get("MAX_TOKENS", "1024"))
 TEMPERATURE = float(os.environ.get("TEMPERATURE", "0.7"))
 MAX_TURNS   = 12
@@ -88,9 +90,13 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"],
 
 
 # ── MongoDB ────────────────────────────────────────────────────────────────────
+_mongo_client: Optional[MongoClient] = None
+
 def get_col():
-    return MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)[
-        "facesyma-backend"]["ai_conversations_v2"]
+    global _mongo_client
+    if _mongo_client is None:
+        _mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    return _mongo_client["facesyma-backend"]["ai_conversations_v2"]
 
 
 # ── JWT ───────────────────────────────────────────────────────────────────────
@@ -114,16 +120,32 @@ from peft import PeftModel
 _model = None
 _tokenizer = None
 
+_TEMPLATE_KEYWORDS = ["character", "emotion", "career", "personality", "strength", "challenge",
+                       "potential", "growth", "skill", "talent", "path", "future", "insight",
+                       "advice", "suggestion", "recommendation"]
+
+_RESPONSE_TEMPLATES = {
+    "character": "Based on your face, I can see someone with strong character traits. Your analysis shows interesting patterns in emotional expressiveness.",
+    "emotion": "Your emotional profile reveals a balanced nature. I notice expressiveness in your features that suggests emotional awareness.",
+    "career": "For career development, your face shows qualities suited for roles requiring people skills. Consider paths in coaching, counseling, or leadership.",
+    "personality": "Your personality appears thoughtful and observant. The symmetry in your features suggests someone who takes time to make considered decisions.",
+    "strength": "Your key strengths include your ability to connect with others and your emotional intelligence. These are valuable assets.",
+    "future": "The future looks promising with your natural abilities. Focus on developing your interpersonal skills further.",
+    "advice": "My suggestion is to leverage your emotional awareness in your career path. People gravitate towards your balanced perspective.",
+    "growth": "Personal growth opportunities lie in building confidence and taking more social initiative.",
+}
+
 def load_local_model():
     global _model, _tokenizer
     if _model is None:
-        log.info("Loading local GPT2 model with LoRA...")
+        _linfo = log.info
+        _linfo("Loading local GPT2 model with LoRA...")
         model_path = os.path.abspath("../training/facesyma-gpt2-lora/checkpoint-12000")
         _tokenizer = AutoTokenizer.from_pretrained("gpt2")
         base_model = AutoModelForCausalLM.from_pretrained("gpt2", dtype=torch.float16, device_map="cuda")
         _model = PeftModel.from_pretrained(base_model, model_path)
         _model.eval()
-        log.info("✓ Model loaded!")
+        _linfo("✓ Model loaded!")
     return _model, _tokenizer
 
 def local_generate(prompt: str, max_tokens: int = 128) -> str:
@@ -139,39 +161,23 @@ async def call_vllm(messages: list, stream: bool = False):
         user_msg = ""
 
         for msg in messages:
-            if msg.get("role") == "system":
+            _mget = msg.get
+            if _mget("role") == "system":
                 # Keep just the persona/tone part, skip the full analysis data
-                content = msg.get("content", "")
+                content = _mget("content", "")
                 lines = content.split('\n')
                 system_msg = '\n'.join(lines[:5])  # Just first few lines (persona)
-            elif msg.get("role") == "user":
-                user_msg = msg.get("content", "")[:150]
+            elif _mget("role") == "user":
+                user_msg = _mget("content", "")[:150]
 
         if not user_msg:
             user_msg = "Tell me about my character."
 
-        # Use a template-based approach with keyword extraction
-        # This is more reliable for smaller models
-        keywords = ["character", "emotion", "career", "personality", "strength", "challenge",
-                   "potential", "growth", "skill", "talent", "path", "future", "insight",
-                   "advice", "suggestion", "recommendation"]
-
-        response_templates = {
-            "character": "Based on your face, I can see someone with strong character traits. Your analysis shows interesting patterns in emotional expressiveness.",
-            "emotion": "Your emotional profile reveals a balanced nature. I notice expressiveness in your features that suggests emotional awareness.",
-            "career": "For career development, your face shows qualities suited for roles requiring people skills. Consider paths in coaching, counseling, or leadership.",
-            "personality": "Your personality appears thoughtful and observant. The symmetry in your features suggests someone who takes time to make considered decisions.",
-            "strength": "Your key strengths include your ability to connect with others and your emotional intelligence. These are valuable assets.",
-            "future": "The future looks promising with your natural abilities. Focus on developing your interpersonal skills further.",
-            "advice": "My suggestion is to leverage your emotional awareness in your career path. People gravitate towards your balanced perspective.",
-            "growth": "Personal growth opportunities lie in building confidence and taking more social initiative.",
-        }
-
         # Find relevant keyword and return template
         matching_template = None
-        for keyword in keywords:
-            if keyword.lower() in user_msg.lower():
-                matching_template = response_templates.get(keyword)
+        for keyword in _TEMPLATE_KEYWORDS:
+            if keyword in user_msg.lower():
+                matching_template = _RESPONSE_TEMPLATES.get(keyword)
                 if matching_template:
                     break
 
@@ -191,8 +197,9 @@ async def vllm_complete(messages: list) -> str:
         # Extract user message for keyword matching
         user_msg = ""
         for msg in messages:
-            if msg.get("role") == "user":
-                user_msg = msg.get("content", "").lower()
+            _mget = msg.get
+            if _mget("role") == "user":
+                user_msg = _mget("content", "").lower()
                 break
 
         # Simple keyword-based response system
@@ -234,15 +241,19 @@ async def start_conversation(
     """
     Analiz sonucunu alır, asistan ilk yorumu yapar, sohbet başlatır.
     """
+    _lang = body.lang
     user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Kimlik doğrulama gerekli.")
     # Paylaşılan system_prompt modülünü kullan — 18 dil desteği
-    system_with_data = build_system_prompt(body.analysis_result, body.lang)
+    _bar = body.analysis_result
+    system_with_data = build_system_prompt(_bar, _lang)
 
     # İlk kullanıcı mesajı
     first_q = body.first_message or {
         "tr": "Analiz sonuçlarımı açıklar mısın?",
         "en": "Can you explain my analysis results?",
-    }.get(body.lang, "Analiz sonuçlarımı açıklar mısın?")
+    }.get(_lang, "Analiz sonuçlarımı açıklar mısın?")
 
     messages = [
         {"role": "system", "content": system_with_data},
@@ -262,11 +273,11 @@ async def start_conversation(
         get_col().insert_one({
             "_id":        conv_id,
             "user_id":    user_id,
-            "lang":       body.lang,
-            "analysis":   body.analysis_result,
+            "lang":       _lang,
+            "analysis":   _bar,
             "messages":   messages,
-            "created_at": datetime.now().isoformat(),
-            "updated_at": datetime.now().isoformat(),
+            "created_at": (_ts := datetime.now().isoformat()),
+            "updated_at": _ts,
         })
     except Exception as e:
         log.warning(f"Kayıt hatası: {e}")
@@ -274,7 +285,7 @@ async def start_conversation(
     return {
         "conversation_id":   conv_id,
         "assistant_message": reply,
-        "lang":              body.lang,
+        "lang":              _lang,
     }
 
 
@@ -285,13 +296,21 @@ async def send_message(
     authorization: Optional[str] = Header(default=None),
 ):
     """Mevcut sohbete mesaj ekle, cevap al. Stream destekli."""
+    _cid = body.conversation_id
+    user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Kimlik doğrulama gerekli.")
     col  = get_col()
-    conv = col.find_one({"_id": body.conversation_id})
+    conv = col.find_one({"_id": _cid})
     if not conv:
         raise HTTPException(404, "Konuşma bulunamadı.")
+    _cvget = conv.get
+    if _cvget("user_id") != user_id:
+        raise HTTPException(403, "Bu konuşmaya erişim izniniz yok.")
 
-    messages = conv.get("messages", [])[-MAX_TURNS:]
-    messages.append({"role": "user", "content": body.message})
+    messages = _cvget("messages", [])[-MAX_TURNS:]
+    _madd = messages.append
+    _madd({"role": "user", "content": body.message})
 
     if body.stream:
         # Streaming cevap
@@ -309,9 +328,9 @@ async def send_message(
                         except Exception:
                             pass
             # Kaydet
-            messages.append({"role": "assistant", "content": full})
+            _madd({"role": "assistant", "content": full})
             col.update_one(
-                {"_id": body.conversation_id},
+                {"_id": _cid},
                 {"$set": {"messages": messages,
                            "updated_at": datetime.now().isoformat()}},
             )
@@ -322,17 +341,18 @@ async def send_message(
     try:
         reply = await vllm_complete(messages)
     except Exception as e:
-        raise HTTPException(503, f"Model servisi hatası: {e}")
+        log.error(f"vLLM hatası: {e}")
+        raise HTTPException(503, "Model servisi geçici olarak kullanılamıyor.")
 
-    messages.append({"role": "assistant", "content": reply})
+    _madd({"role": "assistant", "content": reply})
     col.update_one(
-        {"_id": body.conversation_id},
+        {"_id": _cid},
         {"$set": {"messages": messages,
                    "updated_at": datetime.now().isoformat()}},
     )
 
     return {
-        "conversation_id":   body.conversation_id,
+        "conversation_id":   _cid,
         "assistant_message": reply,
     }
 
@@ -366,8 +386,7 @@ async def health():
         vllm_ok = False
 
     return {
-        "status":   "ok" if vllm_ok else "degraded",
-        "vllm":     vllm_ok,
-        "model":    MODEL_ID,
-        "vllm_url": VLLM_URL,
+        "status": "ok" if vllm_ok else "degraded",
+        "vllm":   vllm_ok,
+        "model":  MODEL_ID,
     }

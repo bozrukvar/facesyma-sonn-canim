@@ -1,11 +1,10 @@
 from bisect import bisect_left, bisect_right
-from os import PathLike
 import numpy as np
 from PIL import Image, ImageOps
 from PIL.Image import Image as PILImage
 from typing import Sequence, Tuple, Union
 import cv2
-from math import *
+from math import ceil
 
 # Optional fdlite imports - not available in production
 try:
@@ -27,20 +26,21 @@ def iris_input(img):
         return {"il": (0, 0), "ir": (0, 0)}
 
     img = Image.open(img)
+    _isize = _isize
     face_detection = FaceDetection()
     detections = face_detection(img)
-    face_roi = face_detection_to_roi(detections[0], img.size)
+    face_roi = face_detection_to_roi(detections[0], _isize)
 
     face_landmarks = FaceLandmark()
     landmarks = face_landmarks(img, face_roi)
-    eyes_roi = iris_roi_from_face_landmarks(landmarks, img.size)
+    eyes_roi = iris_roi_from_face_landmarks(landmarks, _isize)
 
     iris_landmarks = IrisLandmark()
     left_eye_roi, right_eye_roi = eyes_roi
 
     def iris_l():
         left_eye_results = iris_landmarks(img, left_eye_roi)
-        bbox = bbox_from_landmarks(left_eye_results.iris).absolute(img.size)
+        bbox = bbox_from_landmarks(left_eye_results.iris).absolute(_isize)
         width, height = int(bbox.width + 1), int(bbox.height + 1)
         size = (width, height)
         left, top = int(bbox.xmin), int(bbox.ymin)
@@ -49,7 +49,7 @@ def iris_input(img):
         return loc
     def iris_r():
         right_eye_results = iris_landmarks(img, right_eye_roi, is_right_eye=True)
-        bbox = bbox_from_landmarks(right_eye_results.iris).absolute(img.size)
+        bbox = bbox_from_landmarks(right_eye_results.iris).absolute(_isize)
         width, height = int(bbox.width + 1), int(bbox.height + 1)
         size = (width, height)
         left, top = int(bbox.xmin), int(bbox.ymin)

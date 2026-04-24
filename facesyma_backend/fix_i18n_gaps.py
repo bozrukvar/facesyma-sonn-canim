@@ -20,12 +20,13 @@ def add_i18n_to_templates():
     admin_templates = list(templates_dir.glob('admin/*.html'))
 
     for tmpl_file in admin_templates:
+        _tfn = tmpl_file.name
         with open(tmpl_file, 'r', encoding='utf-8') as f:
             content = f.read()
 
         # Check if already has i18n load
         if '{% load i18n %}' in content:
-            print(f'  ✅ {tmpl_file.name} - already has i18n')
+            print(f'  ✅ {_tfn} - already has i18n')
             continue
 
         # Check if it's a template that extends another
@@ -46,7 +47,7 @@ def add_i18n_to_templates():
         with open(tmpl_file, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        print(f'  ✅ {tmpl_file.name} - added i18n load tag')
+        print(f'  ✅ {_tfn} - added i18n load tag')
 
 def check_dashboard_translations():
     """Check if metrics_service is using translation_service properly"""

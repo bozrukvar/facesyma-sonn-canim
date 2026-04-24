@@ -8,10 +8,16 @@ to trigger real-time leaderboard updates.
 """
 
 import logging
-import asyncio
 from asgiref.sync import async_to_sync
 
 log = logging.getLogger(__name__)
+
+try:
+    from gamification.consumers import broadcast_leaderboard_update as _broadcast_leaderboard_update
+    from gamification.consumers import broadcast_rank_change as _broadcast_rank_change
+except Exception:
+    _broadcast_leaderboard_update = None
+    _broadcast_rank_change = None
 
 
 # Called from cache_invalidation.py when leaderboards are invalidated
@@ -36,13 +42,16 @@ def on_leaderboard_invalidated(
         community_id: Required if leaderboard_type='community'
         reason: Why cache was invalidated (coins_awarded, badge_unlocked, etc)
     """
-    try:
-        from gamification.consumers import broadcast_leaderboard_update
+    _ldeb = log.debug
+    if _broadcast_leaderboard_update is None:
+        _ldeb("Channels not available, skipping WebSocket broadcast")
+        return
 
+    try:
         # If no specific leaderboard type, invalidate all
         if leaderboard_type is None:
             # Broadcast to global
-            async_to_sync(broadcast_leaderboard_update)(
+            async_to_sync(_broadcast_leaderboard_update)(
                 "global",
                 reason=reason
             )
@@ -52,30 +61,26 @@ def on_leaderboard_invalidated(
             # Instead, clients should refresh when they see a global update.
 
         elif leaderboard_type == "global":
-            async_to_sync(broadcast_leaderboard_update)(
+            async_to_sync(_broadcast_leaderboard_update)(
                 "global",
                 reason=reason
             )
 
         elif leaderboard_type == "trait":
-            async_to_sync(broadcast_leaderboard_update)(
+            async_to_sync(_broadcast_leaderboard_update)(
                 "trait",
                 trait_id=trait_id,
                 reason=reason
             )
 
         elif leaderboard_type == "community":
-            async_to_sync(broadcast_leaderboard_update)(
+            async_to_sync(_broadcast_leaderboard_update)(
                 "community",
                 community_id=community_id,
                 reason=reason
             )
 
-        log.debug(f"✓ WebSocket broadcast: {leaderboard_type or 'all'} ({reason})")
-
-    except ImportError:
-        # Channels not available, skip WebSocket broadcast
-        log.debug(f"Channels not available, skipping WebSocket broadcast")
+        _ldeb(f"✓ WebSocket broadcast: {leaderboard_type or 'all'} ({reason})")
 
     except Exception as e:
         log.error(f"Error broadcasting leaderboard update: {e}")
@@ -110,14 +115,16 @@ def on_user_rank_changed(
         trait_id: Required if leaderboard_type='trait'
         community_id: Required if leaderboard_type='community'
     """
+    if old_rank == new_rank:
+        return
+
+    _ldeb = log.debug
+    if _broadcast_rank_change is None:
+        _ldeb("Channels not available, skipping rank change broadcast")
+        return
+
     try:
-        # Only broadcast if rank actually changed
-        if old_rank == new_rank:
-            return
-
-        from gamification.consumers import broadcast_rank_change
-
-        async_to_sync(broadcast_rank_change)(
+        async_to_sync(_broadcast_rank_change)(
             leaderboard_type,
             user_id,
             username,
@@ -128,14 +135,10 @@ def on_user_rank_changed(
             community_id
         )
 
-        log.debug(
+        _ldeb(
             f"✓ WebSocket rank change: {username} "
             f"({old_rank} → {new_rank}) +{coins_gained} coins"
         )
-
-    except ImportError:
-        # Channels not available, skip WebSocket broadcast
-        log.debug(f"Channels not available, skipping WebSocket broadcast")
 
     except Exception as e:
         log.error(f"Error broadcasting rank change: {e}")

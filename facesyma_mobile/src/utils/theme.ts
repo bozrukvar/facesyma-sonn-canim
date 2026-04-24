@@ -32,6 +32,15 @@ export const theme = {
     white:         '#FFFFFF',
     black:         '#000000',
     transparent:   'transparent',
+
+    // ── Aliases (backward compat — eski component referansları) ──────────────
+    bg:         '#0A0A0F',   // = background
+    warmGreen:  '#5CB87A',   // = success
+    warmRed:    '#D95F5F',   // = error
+    warmBlue:   '#5A9AE0',   // = info
+    warmOrange: '#E08030',   // turuncu (yoktu)
+    cardBg:     '#13131A',   // = surface
+    text:       '#F0EDE6',   // = textPrimary
   },
   typography: {
     display:  { fontFamily:'Georgia', fontSize:30, fontWeight:'700' as const, letterSpacing:-0.5, color:'#F0EDE6' },

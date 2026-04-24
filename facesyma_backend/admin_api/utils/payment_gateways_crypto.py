@@ -115,19 +115,20 @@ class CoinbaseCommerceGateway(BaseCryptoGateway):
             response.raise_for_status()
 
             data = response.json().get('data', {})
-            charge_code = data.get('code')
+            _dget = data.get
+            charge_code = _dget('code')
 
             # Get payment addresses for requested crypto
-            addresses = data.get('addresses', {})
+            addresses = _dget('addresses', {})
             address = addresses.get(crypto_code.lower())
 
             return {
                 'address': address or '',
-                'amount': data.get('pricing', {}).get(crypto_code, {}).get('amount', ''),
+                'amount': _dget('pricing', {}).get(crypto_code, {}).get('amount', ''),
                 'currency': crypto_code,
-                'expires_at': data.get('expire_at', ''),
+                'expires_at': _dget('expire_at', ''),
                 'payment_id': charge_code,
-                'qr_code_url': data.get('hosted_url', ''),
+                'qr_code_url': _dget('hosted_url', ''),
             }
 
         except Exception as e:

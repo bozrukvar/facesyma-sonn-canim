@@ -2,6 +2,29 @@
 // Microservis mimarisi — her servis ayrı endpoint
 import axios, { AxiosInstance } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { AssessmentResult } from '../types/api';
+
+// ── Force-logout callback ──────────────────────────────────────────────────────
+// Circular import'u önlemek için: App.tsx'te registerLogoutHandler ile set edilir.
+// Token yenileme tamamen başarısız olursa Redux state + navigation sıfırlanır.
+let _logoutHandler: (() => void) | null = null;
+export const registerLogoutHandler = (fn: () => void): void => {
+  _logoutHandler = fn;
+};
+
+// ── In-memory token cache ──────────────────────────────────────────────────────
+// AsyncStorage her istekte storage I/O yapar; bu cache bunu tek seferlik yapar.
+let _cachedToken: string | null = undefined as unknown as string | null;
+
+export const setCachedToken = (token: string | null): void => {
+  _cachedToken = token;
+};
+
+const getToken = async (): Promise<string | null> => {
+  if (_cachedToken !== (undefined as unknown as string | null)) return _cachedToken;
+  _cachedToken = await AsyncStorage.getItem('access_token');
+  return _cachedToken;
+};
 
 // ── Servis URL'leri ────────────────────────────────────────────────────────────
 // Tek Django backend — tüm endpoint'ler /api/v1/ altında
@@ -33,9 +56,9 @@ function createClient(baseURL: string): AxiosInstance {
     headers: { 'Content-Type': 'application/json' },
   });
 
-  // JWT interceptor — her isteğe token ekle
+  // JWT interceptor — her isteğe token ekle (in-memory cache kullanır)
   client.interceptors.request.use(async (config) => {
-    const token = await AsyncStorage.getItem('access_token');
+    const token = await getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,7 +69,9 @@ function createClient(baseURL: string): AxiosInstance {
   client.interceptors.response.use(
     (res) => res,
     async (error) => {
-      if (error.response?.status === 401) {
+      const cfg = error.config;
+      if (error.response?.status === 401 && !cfg._retried) {
+        cfg._retried = true;
         try {
           const refresh = await AsyncStorage.getItem('refresh_token');
           if (refresh) {
@@ -55,11 +80,14 @@ function createClient(baseURL: string): AxiosInstance {
             });
             const newToken = res.data.access;
             await AsyncStorage.setItem('access_token', newToken);
-            error.config.headers.Authorization = `Bearer ${newToken}`;
-            return client(error.config);
+            setCachedToken(newToken);
+            cfg.headers.Authorization = `Bearer ${newToken}`;
+            return client(cfg);
           }
         } catch {
+          setCachedToken(null);
           await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+          _logoutHandler?.();
         }
       }
       return Promise.reject(error);
@@ -106,14 +134,24 @@ export const AuthAPI = {
     return res.data;
   },
 
-  // Şifre sıfırlama
+  // Şifre sıfırlama (e-posta gönderir)
   forgotPassword: async (email: string) => {
     const res = await authClient.post('/password/reset/', { email });
     return res.data;
   },
 
+  // Şifre değiştir (authenticated — eski şifre gerekli)
+  changePassword: async (oldPassword: string, newPassword: string) => {
+    const res = await authClient.post('/password/change/', {
+      old_password: oldPassword,
+      new_password: newPassword,
+    });
+    return res.data;
+  },
+
   // Token kaydet
   saveTokens: async (access: string, refresh: string) => {
+    setCachedToken(access);
     await AsyncStorage.multiSet([
       ['access_token', access],
       ['refresh_token', refresh],
@@ -122,13 +160,19 @@ export const AuthAPI = {
 
   // Logout
   logout: async () => {
+    setCachedToken(null);
     await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
   },
 
   // Mevcut kullanıcıyı kontrol et
   getCurrentUser: async () => {
     const userStr = await AsyncStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
   },
 };
 
@@ -141,7 +185,7 @@ export const AnalysisAPI = {
       uri: imageUri,
       name: 'photo.jpg',
       type: 'image/jpeg',
-    } as any);
+    } as unknown as Blob);
     formData.append('lang', lang);
 
     const res = await analysisClient.post('/analyze/', formData, {
@@ -154,7 +198,7 @@ export const AnalysisAPI = {
   // Astroloji analizi
   analyzeAstrology: async (imageUri: string, birthDate: string, birthTime?: string, lang = 'tr') => {
     const formData = new FormData();
-    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as any);
+    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
     formData.append('lang', lang);
     formData.append('birth_date', birthDate);
     if (birthTime) formData.append('birth_time', birthTime);
@@ -170,7 +214,7 @@ export const AnalysisAPI = {
   analyzeTwins: async (imageUris: string[], lang = 'tr') => {
     const formData = new FormData();
     imageUris.forEach((uri, i) => {
-      formData.append(`image_${i}`, { uri, name: `photo_${i}.jpg`, type: 'image/jpeg' } as any);
+      formData.append(`image_${i}`, { uri, name: `photo_${i}.jpg`, type: 'image/jpeg' } as unknown as Blob);
     });
     formData.append('lang', lang);
     formData.append('count', String(imageUris.length));
@@ -183,11 +227,12 @@ export const AnalysisAPI = {
   },
 
   // Art match
-  analyzeArt: async (imageUri: string) => {
+  analyzeArt: async (imageUri: string, lang = 'tr') => {
     const formData = new FormData();
-    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as any);
+    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
+    formData.append('lang', lang);
 
-    const res = await artClient.post('/match/', formData, {
+    const res = await artClient.post('/analyze/art/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     });
@@ -202,7 +247,7 @@ export const AnalysisAPI = {
 
   // Günlük motivasyon
   getDailyMotivation: async (lang = 'tr') => {
-    const res = await analysisClient.get(`/daily/?lang=${lang}`);
+    const res = await analysisClient.get('/daily/', { params: { lang } });
     return res.data;
   },
 };
@@ -211,13 +256,13 @@ export const AnalysisAPI = {
 export const AssessmentAPI = {
   // Get questions for a test type
   getQuestions: async (testType: string, lang = 'tr') => {
-    const res = await analysisClient.get(`/assessment/questions/${testType}/?lang=${lang}`);
+    const res = await analysisClient.get(`/assessment/questions/${encodeURIComponent(testType)}/`, { params: { lang } });
     return res.data;
   },
 
   // Submit responses and get scoring + recommendations
   submitAssessment: async (testType: string, responses: Array<{ q_id: string; score: number }>, lang = 'tr') => {
-    const res = await analysisClient.post(`/assessment/submit/${testType}/`, {
+    const res = await analysisClient.post(`/assessment/submit/${encodeURIComponent(testType)}/`, {
       lang,
       responses,
     });
@@ -225,8 +270,8 @@ export const AssessmentAPI = {
   },
 
   // Save assessment result to MongoDB
-  saveResult: async (testType: string, result: any) => {
-    const res = await analysisClient.post(`/assessment/results/${testType}/`, {
+  saveResult: async (testType: string, result: { data: AssessmentResult }) => {
+    const res = await analysisClient.post(`/assessment/results/${encodeURIComponent(testType)}/`, {
       overall_score: result.data.overall_score,
       overall_level_tr: result.data.overall_level_tr,
       breakdown: result.data.breakdown,
@@ -243,34 +288,57 @@ export const AssessmentAPI = {
   },
 };
 
-// ── Chat API ──────────────────────────────────────────────────────────────────
-// ── AI Chat API (FastAPI :8002) ───────────────────────────────────────────────
+// ── AI Chat API (FastAPI :8002, routed through nginx /chat/) ─────────────────
+// DEV: direct to port 8002. PROD: via nginx location /chat/ → ai_chat:8002
 const AI_CHAT_BASE = __DEV__
   ? 'http://10.0.2.2:8002'
-  : 'https://api.facesyma.com/ai';
+  : 'https://api.facesyma.com';
 
 const aiChatAxios = axios.create({ baseURL: AI_CHAT_BASE, timeout: 60000 });
 aiChatAxios.interceptors.request.use(async (cfg) => {
-  const t = await AsyncStorage.getItem('access_token');
-  if (t) cfg.headers.Authorization = `Bearer ${t}`;
+  const token = await AsyncStorage.getItem('access_token');
+  if (token) cfg.headers.Authorization = `Bearer ${token}`;
   return cfg;
 });
+aiChatAxios.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const cfg = error.config;
+    if (error.response?.status === 401 && !cfg._retried) {
+      cfg._retried = true;
+      try {
+        const refresh = await AsyncStorage.getItem('refresh_token');
+        if (refresh) {
+          const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
+          const newToken = res.data.access;
+          await AsyncStorage.setItem('access_token', newToken);
+          cfg.headers.Authorization = `Bearer ${newToken}`;
+          return aiChatAxios(cfg);
+        }
+      } catch {
+        await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+        _logoutHandler?.();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const ChatAPI = {
   startChat: async (analysisResult: object, lang = 'tr', firstMessage?: string) => {
-    const res = await aiChatAxios.post('/v1/chat/analyze', {
+    const res = await aiChatAxios.post('/chat/start', {
       analysis_result: analysisResult, lang, first_message: firstMessage,
     });
     return res.data as { conversation_id: string; assistant_message: string; lang: string };
   },
   sendMessage: async (conversationId: string, message: string, lang = 'tr') => {
-    const res = await aiChatAxios.post('/v1/chat/message', {
+    const res = await aiChatAxios.post('/chat/message', {
       conversation_id: conversationId, message, lang,
     });
     return res.data as { conversation_id: string; assistant_message: string };
   },
   getHistory: async () => {
-    const res = await aiChatAxios.get('/v1/chat/history');
+    const res = await aiChatAxios.get('/chat/history');
     return res.data as { conversations: object[] };
   },
   getConversation: async (id: string) => {
@@ -286,17 +354,41 @@ export const ChatAPI = {
   },
 };
 
-// ── Coach API (FastAPI :8003) ─────────────────────────────────────────────────
+// ── Coach API (FastAPI :8003, routed through nginx /coach/) ──────────────────
+// nginx location /coach/ → coach:8003 — full path preserved, no rewrite
 const COACH_BASE = __DEV__
   ? 'http://10.0.2.2:8003'
-  : 'https://api.facesyma.com/coach';
+  : 'https://api.facesyma.com';
 
 const coachAxios = axios.create({ baseURL: COACH_BASE, timeout: 30000 });
 coachAxios.interceptors.request.use(async (cfg) => {
-  const t = await AsyncStorage.getItem('access_token');
-  if (t) cfg.headers.Authorization = `Bearer ${t}`;
+  const token = await AsyncStorage.getItem('access_token');
+  if (token) cfg.headers.Authorization = `Bearer ${token}`;
   return cfg;
 });
+coachAxios.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const cfg = error.config;
+    if (error.response?.status === 401 && !cfg._retried) {
+      cfg._retried = true;
+      try {
+        const refresh = await AsyncStorage.getItem('refresh_token');
+        if (refresh) {
+          const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
+          const newToken = res.data.access;
+          await AsyncStorage.setItem('access_token', newToken);
+          cfg.headers.Authorization = `Bearer ${newToken}`;
+          return coachAxios(cfg);
+        }
+      } catch {
+        await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+        _logoutHandler?.();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const CoachAPI = {
   getModules: async () => (await coachAxios.get('/coach/modules')).data,
@@ -304,17 +396,17 @@ export const CoachAPI = {
     lang: string; birth_date?: string; birth_time?: string;
     birth_city?: string; dominant_sifatlar?: string[];
   }) => (await coachAxios.post('/coach/profile', data)).data,
-  getProfile: async (userId: number) => (await coachAxios.get(`/coach/profile/${userId}`)).data,
+  getProfile: async (userId: number) => (await coachAxios.get(`/coach/profile/${encodeURIComponent(userId)}`)).data,
   analyzeWithCoach: async (analysisResult: object, lang = 'tr', modules?: string[]) =>
     (await coachAxios.post('/coach/analyze', { analysis_result: analysisResult, lang, include_modules: modules })).data,
   birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr') =>
     (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang })).data,
   getGoals: async (userId: number, status?: string) =>
-    (await coachAxios.get(`/coach/goals/${userId}`, { params: status ? { status } : {} })).data,
+    (await coachAxios.get(`/coach/goals/${encodeURIComponent(userId)}`, { params: status ? { status } : {} })).data,
   addGoal: async (data: { title: string; module?: string; target_date?: string; priority?: string }) =>
     (await coachAxios.post('/coach/goals', data)).data,
   updateGoal: async (goalId: string, status: string) =>
-    (await coachAxios.put(`/coach/goals/${goalId}`, null, { params: { status } })).data,
+    (await coachAxios.put(`/coach/goals/${encodeURIComponent(goalId)}`, null, { params: { status } })).data,
   getFashionAdvice: async (
     analysisResult: object,
     lang = 'tr',

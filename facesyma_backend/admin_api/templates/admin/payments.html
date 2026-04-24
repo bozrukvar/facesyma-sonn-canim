@@ -66,8 +66,9 @@
             </select>
             <select id="providerFilter" style="padding: 8px 12px; border: 1px solid #444; background: #1a1a1a; color: #fff; border-radius: 4px;">
                 <option value="">All Providers</option>
-                <option value="stripe">Stripe</option>
-                <option value="iyzico">iyzico</option>
+                <option value="google_pay">Google Pay</option>
+                <option value="apple_pay">Apple Pay</option>
+                <option value="vakifbank_vpp" disabled>Vakıfbank VPP (yakında)</option>
             </select>
             <button type="button" onclick="loadTransactions()" style="padding: 8px 16px; background: #d4af37; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
                 Filter
@@ -288,8 +289,8 @@ async function loadStats() {
         for (const [provider, count] of Object.entries(data.data.by_provider)) {
             const row = providerTable.insertRow();
             row.innerHTML = `
-                <td>${provider.toUpperCase()}</td>
-                <td>${count}</td>
+                <td>${escapeHtml(provider.toUpperCase())}</td>
+                <td>${escapeHtml(String(count))}</td>
             `;
         }
     } catch (error) {
@@ -319,20 +320,20 @@ async function loadTransactions() {
             const statusClass = `status-${trans.status}`;
             const row = table.insertRow();
             row.innerHTML = `
-                <td>${date}</td>
-                <td>${trans.user_id || '-'}</td>
-                <td>${trans.amount.toFixed(2)}</td>
-                <td>${trans.currency}</td>
-                <td>${trans.provider.toUpperCase()}</td>
-                <td><span class="status-badge ${statusClass}">${trans.status}</span></td>
+                <td>${escapeHtml(date)}</td>
+                <td>${escapeHtml(trans.user_id || '-')}</td>
+                <td>${escapeHtml(trans.amount.toFixed(2))}</td>
+                <td>${escapeHtml(trans.currency)}</td>
+                <td>${escapeHtml(trans.provider.toUpperCase())}</td>
+                <td><span class="status-badge ${statusClass}">${escapeHtml(trans.status)}</span></td>
                 <td>
-                    ${trans.status === 'success' ? `<button onclick="openRefundModal('${trans._id}')" style="padding: 4px 8px; background: #d4af37; color: #000; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Refund</button>` : '-'}
+                    ${trans.status === 'success' ? `<button onclick="openRefundModal(this.dataset.id)" data-id="${escapeHtml(trans._id)}" style="padding: 4px 8px; background: #d4af37; color: #000; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Refund</button>` : '-'}
                 </td>
             `;
         });
     } catch (error) {
         console.error('Load error:', error);
-        document.getElementById('transactionsTable').innerHTML = `<tr><td colspan="7" style="text-align: center; color: #f44336;">Error: ${error.message}</td></tr>`;
+        document.getElementById('transactionsTable').innerHTML = `<tr><td colspan="7" style="text-align: center; color: #f44336;">Error: ${escapeHtml(error.message)}</td></tr>`;
     }
 }
 

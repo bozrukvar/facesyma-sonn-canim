@@ -32,11 +32,12 @@ def log_admin_action(admin_payload: dict, action: str, target_type: str,
     """
     try:
         col = _get_db()['admin_activity_log']
+        _apget = admin_payload.get
 
         col.insert_one({
             'id': _next_id(col),
-            'admin_id': admin_payload.get('user_id'),
-            'admin_email': admin_payload.get('email'),
+            'admin_id': _apget('user_id'),
+            'admin_email': _apget('email'),
             'action': action,
             'target_type': target_type,
             'target_id': target_id,
@@ -54,9 +55,10 @@ def log_admin_action(admin_payload: dict, action: str, target_type: str,
 
 def extract_ip(request) -> str:
     """Extract client IP from request, handling proxies."""
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    _rmg = request.META.get
+    x_forwarded_for = _rmg('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0].strip()
     else:
-        ip = request.META.get('REMOTE_ADDR', '')
+        ip = _rmg('REMOTE_ADDR', '')
     return ip

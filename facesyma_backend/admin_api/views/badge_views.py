@@ -25,6 +25,9 @@ from gamification.services.badge_service import (
 
 log = logging.getLogger(__name__)
 
+_VALID_BADGE_METRICS   = frozenset({'platinum_count', 'gold_count', 'silver_count', 'bronze_count', 'total_count'})
+_GOLD_AND_ABOVE_TIERS  = frozenset({'gold', 'platinum'})
+
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
     """Return error JSON response"""
@@ -148,13 +151,14 @@ class UserBadgesView(View):
             badges_dict = BadgeService.get_user_badges(user_id=user_id)
 
             # Calculate stats
+            _vals = badges_dict.values()
             platinum_count = len([
-                b for b in badges_dict.values()
+                b for b in _vals
                 if b.get("current_tier") == "platinum"
             ])
             gold_and_above = len([
-                b for b in badges_dict.values()
-                if b.get("current_tier") in ["gold", "platinum"]
+                b for b in _vals
+                if b.get("current_tier") in _GOLD_AND_ABOVE_TIERS
             ])
 
             badges_data = [
@@ -166,7 +170,7 @@ class UserBadgesView(View):
                     "tier_unlocks": b["tier_unlocks"],
                     "total_coins_earned": b["total_coins_earned"],
                 }
-                for b in badges_dict.values()
+                for b in _vals
             ]
 
             return JsonResponse({
@@ -178,7 +182,7 @@ class UserBadgesView(View):
             })
 
         except BadgeError as e:
-            return _json_error(f"Badge error: {str(e)}", status=400)
+            return _json_error("Badge error.", status=400)
         except Exception as e:
             log.error(f"UserBadgesView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -224,17 +228,19 @@ class BadgeDetailView(View):
                 badges_dict = BadgeService.get_user_badges(user_id=user_id)
                 if badge_id in badges_dict:
                     user_badge = badges_dict[badge_id]
-                    current_tier = user_badge.get("current_tier")
-                    current_progress = user_badge.get("current_progress", 0)
+                    _ubget = user_badge.get
+                    current_tier = _ubget("current_tier")
+                    current_progress = _ubget("current_progress", 0)
 
                     # Find next threshold
                     next_threshold = None
                     for tier in badge_def.tiers:
+                        _tt = tier.threshold
                         if (
                             current_tier is None or
-                            tier.threshold > current_progress
+                            _tt > current_progress
                         ):
-                            next_threshold = tier.threshold
+                            next_threshold = _tt
                             break
 
                     user_progress = {
@@ -268,9 +274,9 @@ class BadgeDetailView(View):
             return JsonResponse(response_data)
 
         except BadgeNotFoundError as e:
-            return _json_error(f"Badge not found: {str(e)}", status=404)
+            return _json_error("Badge not found.", status=404)
         except BadgeError as e:
-            return _json_error(f"Badge error: {str(e)}", status=400)
+            return _json_error("Badge error.", status=400)
         except Exception as e:
             log.error(f"BadgeDetailView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -313,9 +319,12 @@ class BadgeLeaderboardView(View):
     def get(self, request, badge_id):
         try:
             # Get metric and limit from query params
-            metric = request.GET.get("metric", "platinum_count")
+            _qget = request.GET.get
+            metric = _qget("metric", "platinum_count")
+            if metric not in _VALID_BADGE_METRICS:
+                metric = "platinum_count"
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
@@ -347,10 +356,10 @@ class BadgeLeaderboardView(View):
                 "entries": entries_data,
             })
 
-        except BadgeNotFoundError as e:
-            return _json_error(f"Badge not found: {str(e)}", status=404)
-        except BadgeError as e:
-            return _json_error(f"Badge error: {str(e)}", status=400)
+        except BadgeNotFoundError:
+            return _json_error("Badge not found.", status=404)
+        except BadgeError:
+            return _json_error("Badge processing error.", status=400)
         except Exception as e:
             log.error(f"BadgeLeaderboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)

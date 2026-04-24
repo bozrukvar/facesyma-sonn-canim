@@ -14,7 +14,7 @@ from pymongo import MongoClient
 
 MONGO_URI = os.environ.get(
     'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
+    ''
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -157,6 +157,11 @@ ANIMAL_URLS = {
 
 def add_urls():
     """Add image URLs to all entries"""
+    _n_cel  = len(CELEBRITY_URLS)
+    _n_his  = len(HISTORICAL_URLS)
+    _n_obj  = len(OBJECT_URLS)
+    _n_pla  = len(PLANT_URLS)
+    _n_ani  = len(ANIMAL_URLS)
     try:
         client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=30000)
         db = client['facesyma-backend']
@@ -171,7 +176,7 @@ def add_urls():
                 {"name": name},
                 {"$set": {"image_url": url}}
             )
-        print(f"   ✅ {len(CELEBRITY_URLS)} celebrities updated")
+        print(f"   ✅ {_n_cel} celebrities updated")
 
         # ── Historical ─────────────────────────────────────────────────────────
         print("📜 Updating historical figures...")
@@ -181,7 +186,7 @@ def add_urls():
                 {"name": name},
                 {"$set": {"image_url": url}}
             )
-        print(f"   ✅ {len(HISTORICAL_URLS)} historical figures updated")
+        print(f"   ✅ {_n_his} historical figures updated")
 
         # ── Objects ────────────────────────────────────────────────────────────
         print("🎨 Updating objects...")
@@ -191,7 +196,7 @@ def add_urls():
                 {"name": name},
                 {"$set": {"image_url": url}}
             )
-        print(f"   ✅ {len(OBJECT_URLS)} objects updated")
+        print(f"   ✅ {_n_obj} objects updated")
 
         # ── Plants ─────────────────────────────────────────────────────────────
         print("🌸 Updating plants...")
@@ -201,7 +206,7 @@ def add_urls():
                 {"name": name},
                 {"$set": {"image_url": url}}
             )
-        print(f"   ✅ {len(PLANT_URLS)} plants updated")
+        print(f"   ✅ {_n_pla} plants updated")
 
         # ── Animals ────────────────────────────────────────────────────────────
         print("🦁 Updating animals...")
@@ -211,21 +216,20 @@ def add_urls():
                 {"name": name},
                 {"$set": {"image_url": url}}
             )
-        print(f"   ✅ {len(ANIMAL_URLS)} animals updated")
+        print(f"   ✅ {_n_ani} animals updated")
 
         print("\n" + "="*70)
         print("✅ Image URLs Added Successfully!")
         print("="*70)
 
         # Summary
-        total_urls = (len(CELEBRITY_URLS) + len(HISTORICAL_URLS) +
-                     len(OBJECT_URLS) + len(PLANT_URLS) + len(ANIMAL_URLS))
+        total_urls = _n_cel + _n_his + _n_obj + _n_pla + _n_ani
         print(f"\n📸 Total Image URLs Added: {total_urls}")
-        print(f"   🎬 Celebrities: {len(CELEBRITY_URLS)}")
-        print(f"   📜 Historical: {len(HISTORICAL_URLS)}")
-        print(f"   🎨 Objects: {len(OBJECT_URLS)}")
-        print(f"   🌸 Plants: {len(PLANT_URLS)}")
-        print(f"   🦁 Animals: {len(ANIMAL_URLS)}")
+        print(f"   🎬 Celebrities: {_n_cel}")
+        print(f"   📜 Historical: {_n_his}")
+        print(f"   🎨 Objects: {_n_obj}")
+        print(f"   🌸 Plants: {_n_pla}")
+        print(f"   🦁 Animals: {_n_ani}")
 
         print(f"\n✨ Phase 1 Similarity Module FULLY READY with images!")
 

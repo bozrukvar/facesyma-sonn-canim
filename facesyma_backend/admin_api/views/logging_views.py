@@ -2,33 +2,24 @@
 admin_api/views/logging_views.py
 ================================
 Log Aggregation & Analysis
-
-Features:
-  - Centralized log collection
-  - Log analysis and pattern detection
-  - Log export (CSV, JSON)
-  - Error trend analysis
 """
 
 import json
 import logging
+import csv
 from datetime import datetime, timedelta
+from io import StringIO
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
-import csv
-from io import StringIO
+from admin_api.utils.mongo import _get_db
+from admin_api.utils.auth import _require_admin
 
 log = logging.getLogger(__name__)
 
-
-def _get_db():
-    """MongoDB bağlantısı"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
+_VALID_LEVELS = {'INFO', 'WARNING', 'ERROR', 'CRITICAL', 'DEBUG'}
+_VALID_SERVICES = {'django', 'fastapi-chat', 'coach-service', 'face-validation', 'finetune', 'test-service'}
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -36,44 +27,54 @@ class LogAggregationView(View):
     """Merkezi log toplama ve filtreleme"""
 
     def get(self, request):
-        """Toplanan logları getir"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             db = _get_db()
             log_col = db['application_logs']
 
-            # Filtreler
-            level = request.GET.get('level')  # INFO, WARNING, ERROR, CRITICAL
-            service = request.GET.get('service')  # django, fastapi, coach
-            days = int(request.GET.get('days', '7'))
-            limit = int(request.GET.get('limit', '100'))
+            _qp = request.GET
+            _qpget = _qp.get
+            level = _qpget('level')
+            service = _qpget('service')
+            try:
+                days = min(max(1, int(_qpget('days', 7))), 90)
+                limit = min(max(1, int(_qpget('limit', 100))), 500)
+            except (ValueError, TypeError):
+                days = 7
+                limit = 100
 
             start_date = datetime.utcnow() - timedelta(days=days)
-
             query = {'timestamp': {'$gte': start_date}}
-            if level:
+            if level and level in _VALID_LEVELS:
                 query['level'] = level
-            if service:
+            if service and service in _VALID_SERVICES:
                 query['service'] = service
 
-            logs = list(log_col.find(query)
-                       .sort('timestamp', -1)
-                       .limit(limit))
+            logs = list(log_col.find(query).sort('timestamp', -1).limit(limit))
+            for entry in logs:
+                _oid = entry['_id']
+                entry['_id'] = str(_oid)
 
-            for l in logs:
-                l['_id'] = str(l['_id'])
-
-            # İstatistik
-            stats = {}
-            for level_name in ['INFO', 'WARNING', 'ERROR', 'CRITICAL']:
-                stats[level_name] = log_col.count_documents({
-                    'level': level_name,
-                    'timestamp': {'$gte': start_date}
-                })
+            _ls = next(log_col.aggregate([{'$facet': {
+                'total':    [{'$match': query}, {'$count': 'n'}],
+                'INFO':     [{'$match': {'level': 'INFO',     'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
+                'WARNING':  [{'$match': {'level': 'WARNING',  'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
+                'ERROR':    [{'$match': {'level': 'ERROR',    'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
+                'CRITICAL': [{'$match': {'level': 'CRITICAL', 'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
+            }}]), {})
+            stats = {lvl: (_ls.get(lvl, [{}])[0] or {}).get('n', 0) for lvl in ('INFO', 'WARNING', 'ERROR', 'CRITICAL')}
+            total_logs = (_ls.get('total', [{}])[0] or {}).get('n', 0)
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'total_logs': log_col.count_documents(query),
+                    'total_logs': total_logs,
                     'logs': logs,
                     'level_breakdown': stats,
                     'period_days': days
@@ -81,8 +82,8 @@ class LogAggregationView(View):
             })
 
         except Exception as e:
-            log.exception(f'Log aggregation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Log aggregation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -90,70 +91,61 @@ class LogAnalysisView(View):
     """Log analizi - pattern tespiti"""
 
     def get(self, request):
-        """Log desenlerini analiz et"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             db = _get_db()
             log_col = db['application_logs']
 
-            days = int(request.GET.get('days', '30'))
+            try:
+                _qp = request.GET
+                _qpget = _qp.get
+                days = min(max(1, int(_qpget('days', 30))), 90)
+            except (ValueError, TypeError):
+                days = 30
+
             start_date = datetime.utcnow() - timedelta(days=days)
 
-            # En sık hatalar
-            top_errors = list(log_col.aggregate([
-                {'$match': {
-                    'level': 'ERROR',
-                    'timestamp': {'$gte': start_date}
-                }},
-                {'$group': {
-                    '_id': '$message',
-                    'count': {'$sum': 1}
-                }},
-                {'$sort': {'count': -1}},
-                {'$limit': 10}
-            ]))
-
-            # Hata oranı trendi
-            error_trend = list(log_col.aggregate([
-                {'$match': {
-                    'level': 'ERROR',
-                    'timestamp': {'$gte': start_date}
-                }},
-                {'$group': {
-                    '_id': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$timestamp'}},
-                    'error_count': {'$sum': 1}
-                }},
-                {'$sort': {'_id': 1}}
-            ]))
-
-            # Service-wise breakdown
-            service_breakdown = list(log_col.aggregate([
-                {'$match': {'timestamp': {'$gte': start_date}}},
-                {'$group': {
-                    '_id': '$service',
-                    'count': {'$sum': 1},
-                    'errors': {
-                        '$sum': {'$cond': [{'$eq': ['$level', 'ERROR']}, 1, 0]}
-                    }
-                }}
-            ]))
-
-            analysis = {
-                'period_days': days,
-                'top_errors': top_errors,
-                'error_trend': error_trend,
-                'service_breakdown': service_breakdown,
-                'total_errors': sum(e['count'] for e in top_errors),
-                'critical_issues': len([e for e in top_errors if e['count'] > 100])
-            }
+            _lr = next(log_col.aggregate([{'$match': {'timestamp': {'$gte': start_date}}}, {'$facet': {
+                'top_errors': [
+                    {'$match': {'level': 'ERROR'}},
+                    {'$group': {'_id': '$message', 'count': {'$sum': 1}}},
+                    {'$sort': {'count': -1}}, {'$limit': 10},
+                ],
+                'error_trend': [
+                    {'$match': {'level': 'ERROR'}},
+                    {'$group': {'_id': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$timestamp'}}, 'error_count': {'$sum': 1}}},
+                    {'$sort': {'_id': 1}},
+                ],
+                'service_breakdown': [
+                    {'$group': {'_id': '$service', 'count': {'$sum': 1}, 'errors': {'$sum': {'$cond': [{'$eq': ['$level', 'ERROR']}, 1, 0]}}}},
+                ],
+            }}]), {})
+            _lrget = _lr.get
+            top_errors        = _lrget('top_errors', [])
+            error_trend       = _lrget('error_trend', [])
+            service_breakdown = _lrget('service_breakdown', [])
 
             return JsonResponse({
                 'success': True,
-                'data': analysis
+                'data': {
+                    'period_days': days,
+                    'top_errors': top_errors,
+                    'error_trend': error_trend,
+                    'service_breakdown': service_breakdown,
+                    'total_errors': sum(e['count'] for e in top_errors),
+                    'critical_issues': len([e for e in top_errors if e['count'] > 100])
+                }
             })
 
         except Exception as e:
-            log.exception(f'Log analysis hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Log analysis error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -161,59 +153,67 @@ class LogExportView(View):
     """Log export - CSV/JSON"""
 
     def post(self, request):
-        """Log'ları dış formatında export et"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             data = json.loads(request.body)
-            format_type = data.get('format', 'json')  # json, csv
-            days = data.get('days', 7)
-            level = data.get('level')
+            _dget = data.get
+            format_type = str(_dget('format', 'json'))
+            if format_type not in ('json', 'csv'):
+                format_type = 'json'
+            try:
+                days = min(max(1, int(_dget('days', 7))), 90)
+            except (TypeError, ValueError):
+                days = 7
+            level = _dget('level')
 
+            _now = datetime.utcnow()
             db = _get_db()
             log_col = db['application_logs']
 
-            start_date = datetime.utcnow() - timedelta(days=days)
+            start_date = _now - timedelta(days=days)
             query = {'timestamp': {'$gte': start_date}}
-            if level:
+            if level and level in _VALID_LEVELS:
                 query['level'] = level
 
-            logs = list(log_col.find(query).sort('timestamp', -1))
+            logs = list(log_col.find(query).sort('timestamp', -1).limit(10000))
+            _now_fmt = _now_fmt
 
             if format_type == 'csv':
-                # CSV formatı
                 output = StringIO()
                 if logs:
-                    writer = csv.DictWriter(
-                        output,
-                        fieldnames=['timestamp', 'level', 'service', 'message']
-                    )
+                    writer = csv.DictWriter(output, fieldnames=['timestamp', 'level', 'service', 'message'])
                     writer.writeheader()
-
                     for log_entry in logs:
+                        _leget = log_entry.get
                         writer.writerow({
-                            'timestamp': log_entry.get('timestamp', ''),
-                            'level': log_entry.get('level', ''),
-                            'service': log_entry.get('service', ''),
-                            'message': log_entry.get('message', '')
+                            'timestamp': _leget('timestamp', ''),
+                            'level': _leget('level', ''),
+                            'service': _leget('service', ''),
+                            'message': _leget('message', '')
                         })
-
-                csv_data = output.getvalue()
 
                 return JsonResponse({
                     'success': True,
                     'data': {
                         'format': 'csv',
                         'records': len(logs),
-                        'content': csv_data,
-                        'filename': f'logs_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.csv'
+                        'content': output.getvalue(),
+                        'filename': f'logs_{_now_fmt}.csv'
                     }
                 })
-
             else:
-                # JSON formatı
-                for l in logs:
-                    l['_id'] = str(l['_id'])
-                    if isinstance(l.get('timestamp'), datetime):
-                        l['timestamp'] = l['timestamp'].isoformat()
+                for entry in logs:
+                    _oid = entry['_id']
+                    entry['_id'] = str(_oid)
+                    _ts = entry.get('timestamp')
+                    if isinstance(_ts, datetime):
+                        entry['timestamp'] = _ts.isoformat()
 
                 return JsonResponse({
                     'success': True,
@@ -221,10 +221,10 @@ class LogExportView(View):
                         'format': 'json',
                         'records': len(logs),
                         'logs': logs,
-                        'filename': f'logs_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.json'
+                        'filename': f'logs_{_now_fmt}.json'
                     }
                 })
 
         except Exception as e:
-            log.exception(f'Log export hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Log export error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

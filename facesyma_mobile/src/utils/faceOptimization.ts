@@ -39,21 +39,25 @@ export async function validateAndOptimizeFacePhoto(
 ): Promise<FaceValidationResult> {
   const issues: string[] = [];
   const recommendations: string[] = [];
+  const _ip = issues.push.bind(issues);
+  const _rp = recommendations.push.bind(recommendations);
   let score = 100;
 
   // 1. Yüz boyutu kontrolü
   const faceBox = estimateFaceBox(imageDimensions);
-  const faceArea = (faceBox.width * faceBox.height) / (imageDimensions.width * imageDimensions.height);
+  const faceWidth  = faceBox.width;
+  const faceHeight = faceBox.height;
+  const faceArea = (faceWidth * faceHeight) / (imageDimensions.width * imageDimensions.height);
 
   if (faceArea < 0.15) {
-    issues.push('Yüz çok küçük');
-    recommendations.push('Kameraya yaklaşın veya daha yakın bir fotoğraf yükleyin');
+    _ip('Yüz çok küçük');
+    _rp('Kameraya yaklaşın veya daha yakın bir fotoğraf yükleyin');
     score -= 25;
   }
 
   if (faceArea > 0.85) {
-    issues.push('Yüz çok büyük');
-    recommendations.push('Kamerada biraz geriye çekilin');
+    _ip('Yüz çok büyük');
+    _rp('Kamerada biraz geriye çekilin');
     score -= 20;
   }
 
@@ -61,28 +65,26 @@ export async function validateAndOptimizeFacePhoto(
   const centerX = imageDimensions.width / 2;
   const centerY = imageDimensions.height / 2;
   const faceCenter = {
-    x: faceBox.x + faceBox.width / 2,
-    y: faceBox.y + faceBox.height / 2,
+    x: faceBox.x + faceWidth / 2,
+    y: faceBox.y + faceHeight / 2,
   };
 
   const offsetX = Math.abs(faceCenter.x - centerX) / centerX;
   const offsetY = Math.abs(faceCenter.y - centerY) / centerY;
 
   if (offsetX > 0.2 || offsetY > 0.15) {
-    issues.push('Yüz merkeze kurgulanmamış');
-    recommendations.push('Yüzü ekranın ortasına alacak şekilde çekin');
+    _ip('Yüz merkeze kurgulanmamış');
+    _rp('Yüzü ekranın ortasına alacak şekilde çekin');
     score -= 15;
   }
 
   // 3. Açı kontrolü (frontal check)
-  const faceWidth = faceBox.width;
-  const faceHeight = faceBox.height;
   const aspectRatio = faceWidth / faceHeight;
 
   // İdeal insan yüzü aspect ratio ≈ 0.7-0.8
   if (aspectRatio < 0.65 || aspectRatio > 0.95) {
-    issues.push('Yüz eğik açıda');
-    recommendations.push('Kameraya düz bakacak şekilde pozisyon alın');
+    _ip('Yüz eğik açıda');
+    _rp('Kameraya düz bakacak şekilde pozisyon alın');
     score -= 20;
   }
 
@@ -97,13 +99,13 @@ export async function validateAndOptimizeFacePhoto(
   // 5. Aydınlatma kontrolü (basit contrast check)
   const estimatedBrightness = estimateBrightness(imageDimensions);
   if (estimatedBrightness < 60) {
-    issues.push('Çok karanlık');
-    recommendations.push('Daha aydınlık bir yere gitmeyi deneyin');
+    _ip('Çok karanlık');
+    _rp('Daha aydınlık bir yere gitmeyi deneyin');
     score -= 15;
   }
   if (estimatedBrightness > 95) {
-    issues.push('Çok parlak (contast düşük)');
-    recommendations.push('Doğrudan güneş ışığından kaçının');
+    _ip('Çok parlak (contast düşük)');
+    _rp('Doğrudan güneş ışığından kaçının');
     score -= 10;
   }
 

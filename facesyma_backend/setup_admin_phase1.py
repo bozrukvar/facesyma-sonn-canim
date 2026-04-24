@@ -1,3 +1,4 @@
+import os
 """
 setup_admin_phase1.py
 =====================
@@ -15,12 +16,13 @@ import logging
 
 log = logging.getLogger(__name__)
 
-MONGO_URI = "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
+MONGO_URI = os.environ.get('MONGO_URI', '')
 
 
 def setup_collections():
     """MongoDB collections ve indexes'i oluştur"""
 
+    _cidx = col.create_index
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
     db = client['facesyma-backend']
 
@@ -33,11 +35,11 @@ def setup_collections():
     try:
         col = db['payment_transactions']
 
-        col.create_index([('provider', ASCENDING)])
-        col.create_index([('status', ASCENDING)])
-        col.create_index([('created_at', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
-        col.create_index([('user_id', ASCENDING)])
-        col.create_index([('payment_intent_id', ASCENDING), ('charge_id', ASCENDING)])
+        _cidx([('provider', ASCENDING)])
+        _cidx([('status', ASCENDING)])
+        _cidx([('created_at', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
+        _cidx([('user_id', ASCENDING)])
+        _cidx([('payment_intent_id', ASCENDING), ('charge_id', ASCENDING)])
 
         print("   ✅ payment_transactions OK")
         print("   - Index 1: (provider)")
@@ -54,9 +56,9 @@ def setup_collections():
     try:
         col = db['payment_refunds']
 
-        col.create_index([('transaction_id', ASCENDING)])
-        col.create_index([('status', ASCENDING)])
-        col.create_index([('created_at', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
+        _cidx([('transaction_id', ASCENDING)])
+        _cidx([('status', ASCENDING)])
+        _cidx([('created_at', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
 
         print("   ✅ payment_refunds OK")
         print("   - Index 1: (transaction_id)")
@@ -71,9 +73,9 @@ def setup_collections():
     try:
         col = db['uptime_logs']
 
-        col.create_index([('timestamp', DESCENDING)])
-        col.create_index([('status', ASCENDING)])
-        col.create_index([('timestamp', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
+        _cidx([('timestamp', DESCENDING)])
+        _cidx([('status', ASCENDING)])
+        _cidx([('timestamp', ASCENDING)], expireAfterSeconds=7776000)  # 90 days
 
         print("   ✅ uptime_logs OK")
         print("   - Index 1: (timestamp DESC)")
@@ -88,10 +90,10 @@ def setup_collections():
     try:
         col = db['error_logs']
 
-        col.create_index([('timestamp', DESCENDING)])
-        col.create_index([('endpoint', ASCENDING)])
-        col.create_index([('error_type', ASCENDING)])
-        col.create_index([('timestamp', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
+        _cidx([('timestamp', DESCENDING)])
+        _cidx([('endpoint', ASCENDING)])
+        _cidx([('error_type', ASCENDING)])
+        _cidx([('timestamp', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
 
         print("   ✅ error_logs OK")
         print("   - Index 1: (timestamp DESC)")
@@ -107,10 +109,10 @@ def setup_collections():
     try:
         col = db['api_logs']
 
-        col.create_index([('timestamp', DESCENDING)])
-        col.create_index([('endpoint', ASCENDING)])
-        col.create_index([('response_time_ms', ASCENDING)])
-        col.create_index([('timestamp', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
+        _cidx([('timestamp', DESCENDING)])
+        _cidx([('endpoint', ASCENDING)])
+        _cidx([('response_time_ms', ASCENDING)])
+        _cidx([('timestamp', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
 
         print("   ✅ api_logs OK")
         print("   - Index 1: (timestamp DESC)")
@@ -126,9 +128,9 @@ def setup_collections():
     try:
         col = db['alerts']
 
-        col.create_index([('status', ASCENDING)])
-        col.create_index([('created_at', DESCENDING)])
-        col.create_index([('type', ASCENDING)])
+        _cidx([('status', ASCENDING)])
+        _cidx([('created_at', DESCENDING)])
+        _cidx([('type', ASCENDING)])
 
         print("   ✅ alerts OK")
         print("   - Index 1: (status)")
@@ -143,10 +145,10 @@ def setup_collections():
     try:
         col = db['system_logs']
 
-        col.create_index([('timestamp', DESCENDING)])
-        col.create_index([('level', ASCENDING)])
-        col.create_index([('service', ASCENDING)])
-        col.create_index([('timestamp', ASCENDING)], expireAfterSeconds=1296000)  # 15 days
+        _cidx([('timestamp', DESCENDING)])
+        _cidx([('level', ASCENDING)])
+        _cidx([('service', ASCENDING)])
+        _cidx([('timestamp', ASCENDING)], expireAfterSeconds=1296000)  # 15 days
 
         print("   ✅ system_logs OK")
         print("   - Index 1: (timestamp DESC)")
@@ -171,10 +173,9 @@ def setup_collections():
     client.close()
     print("\n✨ Setup complete!")
     print("\nNote: Make sure these environment variables are set:")
-    print("  - STRIPE_API_KEY")
-    print("  - STRIPE_WEBHOOK_SECRET")
-    print("  - IYZICO_API_KEY")
-    print("  - IYZICO_SECRET_KEY")
+    print("  - GOOGLE_PAY_MERCHANT_ID  (Google Pay merchant ID)")
+    print("  - APPLE_PAY_MERCHANT_ID   (Apple Pay merchant ID)")
+    print("  # Vakıfbank VPP: ileriki versiyon güncellemesi ile eklenecek")
 
 
 if __name__ == '__main__':

@@ -40,7 +40,7 @@ class TestCompatibilityAlgorithm(unittest.TestCase):
             'username': 'Ali',
             'golden_ratio': 1.618,
             'top_sifats': ['Lider', 'Disiplinli', 'Analitik'],
-            'modules': ['Liderlik', 'Kariyer', 'İletişim']
+            'modules': ['Leaderboard', 'Kariyer', 'İletişim']
         }
 
         self.user2 = {
@@ -48,7 +48,7 @@ class TestCompatibilityAlgorithm(unittest.TestCase):
             'username': 'Ayşe',
             'golden_ratio': 1.625,
             'top_sifats': ['Lider', 'Sosyal', 'Analitik'],
-            'modules': ['Liderlik', 'Duygusal Zeka', 'İletişim']
+            'modules': ['Leaderboard', 'Duygusal Zeka', 'İletişim']
         }
 
         self.user_incompatible = {
@@ -124,7 +124,7 @@ class TestCompatibilityAlgorithm(unittest.TestCase):
     def test_module_overlap_calculation(self):
         """Test shared modules calculation"""
         result = calculate_compatibility(self.user1, self.user2)
-        # Both have 'Liderlik' and 'İletişim'
+        # Both have 'Leaderboard' and 'İletişim'
         self.assertGreaterEqual(result['module_overlap'], 2)
 
     def test_conflict_detection(self):
@@ -180,7 +180,7 @@ class TestCompatibilityAlgorithm(unittest.TestCase):
             'golden_ratio': 1.618,
             'top_sifats': ['Lider', 'Disiplinli', 'Analitik', 'Sosyal',
                           'Yaratıcı', 'Empatik', 'Cesur', 'Enerjik'],
-            'modules': ['Liderlik', 'Kariyer', 'İletişim', 'Duygusal Zeka']
+            'modules': ['Leaderboard', 'Kariyer', 'İletişim', 'Duygusal Zeka']
         }
         result = calculate_compatibility(self.user1, many_sifats)
         self.assertGreater(result['sifat_overlap'], 0)
@@ -223,7 +223,7 @@ class TestCategoryAssignment(unittest.TestCase):
     def test_same_category_assignment(self):
         """Test SAME_CATEGORY assignment"""
         sifats1 = {'Lider'}
-        sifats2 = {'Otoriter'}  # Both in 'Liderlik' category
+        sifats2 = {'Otoriter'}  # Both in 'Leaderboard' category
         category, can_message = assign_category(50, 0, sifats1, sifats2)
         self.assertEqual(category, 'SAME_CATEGORY')
 
@@ -276,19 +276,20 @@ class TestConflictDetection(unittest.TestCase):
     def test_conflict_analysis_structure(self):
         """Test conflict analysis returns proper structure"""
         result = get_conflict_analysis(['Lider', 'Disiplinli'])
-        self.assertIn('conflicts', result)
-        self.assertIn('risk_level', result)
-        self.assertIn('recommendations', result)
-        self.assertIn(result['risk_level'], ['low', 'medium', 'high'])
+        _assertIn = self.assertIn
+        _assertIn('conflicts', result)
+        _assertIn('risk_level', result)
+        _assertIn('recommendations', result)
+        _assertIn(result['risk_level'], ['low', 'medium', 'high'])
 
 
 class TestSifatCategories(unittest.TestCase):
     """Test sifat categorization"""
 
     def test_leadership_category(self):
-        """Test 'Lider' belongs to Liderlik category"""
+        """Test 'Lider' belongs to Leaderboard category"""
         category = get_sifat_category('Lider')
-        self.assertEqual(category, 'Liderlik')
+        self.assertEqual(category, 'Leaderboard')
 
     def test_empathy_category(self):
         """Test 'Empatik' belongs to Empatik category"""
@@ -308,7 +309,7 @@ class TestSifatCategories(unittest.TestCase):
     def test_all_categories_defined(self):
         """Test all major categories are defined"""
         expected_categories = [
-            'Liderlik', 'Sosyallik', 'Analitik', 'Yaratıcılık',
+            'Leaderboard', 'Sosyallik', 'Analitik', 'Yaratıcılık',
             'Empatik', 'Disiplin', 'Estetik'
         ]
         for cat in expected_categories:
@@ -331,7 +332,7 @@ class TestUserMatching(unittest.TestCase):
             'username': 'Ali',
             'golden_ratio': 1.618,
             'top_sifats': ['Lider', 'Disiplinli'],
-            'modules': ['Liderlik']
+            'modules': ['Leaderboard']
         }
 
         self.users = [
@@ -341,14 +342,14 @@ class TestUserMatching(unittest.TestCase):
                 'username': 'Ayşe',
                 'golden_ratio': 1.625,
                 'top_sifats': ['Lider', 'Sosyal'],
-                'modules': ['Liderlik']
+                'modules': ['Leaderboard']
             },
             {
                 'id': 3,
                 'username': 'Cemre',
                 'golden_ratio': 1.620,
                 'top_sifats': ['Lider', 'Analitik'],
-                'modules': ['Liderlik']
+                'modules': ['Leaderboard']
             },
             {
                 'id': 4,
@@ -410,7 +411,7 @@ class TestEdgeCases(unittest.TestCase):
     def test_identical_users(self):
         """Test compatibility of identical user profiles"""
         user = {'id': 1, 'username': 'Test', 'golden_ratio': 1.618,
-               'top_sifats': ['Lider', 'Disiplinli'], 'modules': ['Liderlik']}
+               'top_sifats': ['Lider', 'Disiplinli'], 'modules': ['Leaderboard']}
         result = calculate_compatibility(user, user)
         # Should be high (perfect golden ratio + shared traits/modules)
         self.assertGreater(result['score'], 70)
@@ -419,7 +420,7 @@ class TestEdgeCases(unittest.TestCase):
         """Test completely opposite profiles"""
         user1 = {'id': 1, 'username': 'Test', 'golden_ratio': 1.618,
                 'top_sifats': ['Lider', 'Özgüvenli', 'Dışadönük'],
-                'modules': ['Liderlik']}
+                'modules': ['Leaderboard']}
         user2 = {'id': 2, 'username': 'Test2', 'golden_ratio': 1.600,
                 'top_sifats': ['Pasif', 'İçine kapalı', 'İçedönük'],
                 'modules': ['Koçluk']}
@@ -433,7 +434,7 @@ class TestEdgeCases(unittest.TestCase):
                 'modules': ['Duygusal Zeka']}
         user2 = {'id': 2, 'username': 'Ümit', 'golden_ratio': 1.620,
                 'top_sifats': ['Cesur', 'Sosyal'],
-                'modules': ['Liderlik']}
+                'modules': ['Leaderboard']}
         result = calculate_compatibility(user1, user2)
         self.assertGreaterEqual(result['score'], 0)
 
@@ -442,7 +443,7 @@ class TestEdgeCases(unittest.TestCase):
         user1 = {'id': 1, 'username': 'Test', 'golden_ratio': 0,
                 'top_sifats': ['Lider'], 'modules': []}
         user2 = {'id': 2, 'username': 'Test2', 'golden_ratio': 1.618,
-                'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+                'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
         result = calculate_compatibility(user1, user2)
         self.assertGreaterEqual(result['score'], 0)
 
@@ -453,12 +454,14 @@ def run_tests():
     suite = unittest.TestSuite()
 
     # Add all test cases
-    suite.addTests(loader.loadTestsFromTestCase(TestCompatibilityAlgorithm))
-    suite.addTests(loader.loadTestsFromTestCase(TestCategoryAssignment))
-    suite.addTests(loader.loadTestsFromTestCase(TestConflictDetection))
-    suite.addTests(loader.loadTestsFromTestCase(TestSifatCategories))
-    suite.addTests(loader.loadTestsFromTestCase(TestUserMatching))
-    suite.addTests(loader.loadTestsFromTestCase(TestEdgeCases))
+    _add  = suite.addTests
+    _load = loader.loadTestsFromTestCase
+    _add(_load(TestCompatibilityAlgorithm))
+    _add(_load(TestCategoryAssignment))
+    _add(_load(TestConflictDetection))
+    _add(_load(TestSifatCategories))
+    _add(_load(TestUserMatching))
+    _add(_load(TestEdgeCases))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

@@ -51,8 +51,9 @@ class Session:
     def __init__(self, user_id: str, duration_hours: int = 24):
         self.session_id = str(uuid.uuid4())
         self.user_id = user_id
-        self.created_at = datetime.now().isoformat()
-        self.expires_at = (datetime.now() + timedelta(hours=duration_hours)).isoformat()
+        _now = datetime.now()
+        self.created_at = _now.isoformat()
+        self.expires_at = (_now + timedelta(hours=duration_hours)).isoformat()
         self.is_active = True
 
     def is_valid(self) -> bool:
@@ -146,13 +147,14 @@ class AuthManager:
         self.save_users()
 
         session = Session(user.user_id)
-        self.sessions[session.session_id] = session
+        _sid = session.session_id
+        self.sessions[_sid] = session
 
         # Store session in Redis with TTL matching session expiry
         session_data = json.dumps(session.to_dict())
-        redis_set(f"session:v1:{session.session_id}", session_data.encode(), ttl=SESSION_STORAGE_TTL)
+        redis_set(f"session:v1:{_sid}", session_data.encode(), ttl=SESSION_STORAGE_TTL)
 
-        log.info(f"User logged in: {email} (session: {session.session_id})")
+        log.info(f"User logged in: {email} (session: {_sid})")
         return session
 
     def validate_session(self, session_id: str) -> Optional[User]:

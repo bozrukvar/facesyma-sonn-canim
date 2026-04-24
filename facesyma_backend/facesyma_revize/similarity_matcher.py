@@ -13,12 +13,33 @@ similarity_matcher.py
 Tüm kategoriler: Top 3 sonuç döner.
 """
 
+import heapq
 import logging
+from operator import itemgetter
 from pymongo import MongoClient
 from typing import Dict, List, Tuple
 import os
 
 log = logging.getLogger(__name__)
+
+_KEY_SCORE = itemgetter(1)
+_KEY_SCORE_OVERLAP = lambda x: (x[1], x[2])
+
+_STYLE_MAPPING: dict = {
+    'Zarafet': 'Elegant', 'Saflık': 'Minimalist', 'Lüks': 'Luxury',
+    'Doğallık': 'Natural', 'Modern': 'Modern', 'Klasik': 'Classic',
+    'Profesyonel': 'Professional', 'Yaratıcı': 'Creative',
+}
+
+_singleton: 'SimilarityMatcher | None' = None
+
+
+def get_similarity_matcher() -> 'SimilarityMatcher':
+    """Return module-level singleton to avoid per-request MongoClient creation."""
+    global _singleton
+    if _singleton is None:
+        _singleton = SimilarityMatcher()
+    return _singleton
 
 
 class SimilarityMatcher:
@@ -34,10 +55,7 @@ class SimilarityMatcher:
     def __init__(self, mongo_uri: str = None):
         """Initialize MongoDB connection"""
         if mongo_uri is None:
-            mongo_uri = os.environ.get(
-                'MONGO_URI',
-                'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
-            )
+            mongo_uri = os.environ.get('MONGO_URI', '')
 
         try:
             self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
@@ -45,6 +63,16 @@ class SimilarityMatcher:
         except Exception as e:
             log.error(f"MongoDB connection failed: {e}")
             raise
+        self._col_cache: dict = {}
+
+    def _load_col(self, col_name: str, limit: int = 5000) -> list:
+        """Load and cache a full collection in process memory."""
+        _cache = self._col_cache
+        if col_name not in _cache:
+            _cv = list(self.db[col_name].find({}, {'_id': 0}).limit(limit))
+            _cache[col_name] = _cv
+            return _cv
+        return _cache[col_name]
 
     def match_user_to_similarities(self, user_sifatlar: List[str], lang: str = 'tr') -> Dict:
         """
@@ -75,38 +103,35 @@ class SimilarityMatcher:
         Returns: List of top 3 matches
         """
         try:
-            celebrities_col = self.db['similarities_celebrities']
-
-            # Tüm ünlüleri al
-            all_celebrities = list(celebrities_col.find({}, {'_id': 0}))
+            # Tüm ünlüleri al (process-level cache)
+            all_celebrities = self._load_col('similarities_celebrities')
 
             if not all_celebrities:
                 log.warning("No celebrities in database")
                 return []
 
             # Sıfat overlap hesapla
+            user_set = set(user_sifatlar)
             matches = []
             for celeb in all_celebrities:
-                celeb_sifatlar = celeb.get('sifatlar', [])
-
-                # Jaccard similarity
-                intersection = len(set(user_sifatlar) & set(celeb_sifatlar))
-                union = len(set(user_sifatlar) | set(celeb_sifatlar))
+                celeb_set = set(celeb.get('sifatlar', []))
+                intersection = len(user_set & celeb_set)
+                union = len(user_set | celeb_set)
                 similarity = intersection / union if union > 0 else 0
-
                 matches.append((celeb, similarity, intersection))
 
             # Top 3 döner
-            top_3 = sorted(matches, key=lambda x: (x[1], x[2]), reverse=True)[:3]
+            top_3 = heapq.nlargest(3, matches, key=_KEY_SCORE_OVERLAP)
 
             results = []
             for rank, (celeb, similarity, overlap_count) in enumerate(top_3, 1):
+                _cget = celeb.get
                 results.append({
                     'rank': rank,
-                    'name': celeb.get('name', 'Unknown'),
+                    'name': _cget('name', 'Unknown'),
                     'score': round(similarity * 100, 1),
-                    'image_url': celeb.get('image_url', ''),
-                    'sifatlar': celeb.get('sifatlar', [])[:5],
+                    'image_url': _cget('image_url', ''),
+                    'sifatlar': _cget('sifatlar', [])[:5],
                     'match_reason': f"{overlap_count} ortak sıfat + kişilik uyumu"
                 })
 
@@ -121,37 +146,35 @@ class SimilarityMatcher:
         Tarihi şahsiyetleri eşleştir (sıfat overlap'ı)
         """
         try:
-            historical_col = self.db['similarities_historical']
-
-            all_figures = list(historical_col.find({}, {'_id': 0}))
+            all_figures = self._load_col('similarities_historical')
 
             if not all_figures:
                 log.warning("No historical figures in database")
                 return []
 
+            user_set = set(user_sifatlar)
             matches = []
             for figure in all_figures:
-                figure_sifatlar = figure.get('sifatlar', [])
-
-                intersection = len(set(user_sifatlar) & set(figure_sifatlar))
-                union = len(set(user_sifatlar) | set(figure_sifatlar))
+                figure_set = set(figure.get('sifatlar', []))
+                intersection = len(user_set & figure_set)
+                union = len(user_set | figure_set)
                 similarity = intersection / union if union > 0 else 0
-
                 matches.append((figure, similarity, intersection))
 
-            top_3 = sorted(matches, key=lambda x: (x[1], x[2]), reverse=True)[:3]
+            top_3 = heapq.nlargest(3, matches, key=_KEY_SCORE_OVERLAP)
 
             results = []
             for rank, (figure, similarity, overlap_count) in enumerate(top_3, 1):
+                _fget = figure.get
                 desc_key = f'description_{lang}'
                 results.append({
                     'rank': rank,
-                    'name': figure.get('name', 'Unknown'),
-                    'era': figure.get('era', ''),
+                    'name': _fget('name', 'Unknown'),
+                    'era': _fget('era', ''),
                     'score': round(similarity * 100, 1),
-                    'image_url': figure.get('image_url', ''),
-                    'sifatlar': figure.get('sifatlar', [])[:5],
-                    'description': figure.get(desc_key, figure.get('description_en', ''))
+                    'image_url': _fget('image_url', ''),
+                    'sifatlar': _fget('sifatlar', [])[:5],
+                    'description': _fget(desc_key, _fget('description_en', ''))
                 })
 
             return results
@@ -165,53 +188,41 @@ class SimilarityMatcher:
         Eşya/Stil'i eşleştir (style traits + elegance)
         """
         try:
-            objects_col = self.db['similarities_objects']
-
-            all_objects = list(objects_col.find({}, {'_id': 0}))
+            all_objects = self._load_col('similarities_objects')
 
             if not all_objects:
                 log.warning("No objects in database")
                 return []
 
-            # Style mapping: sıfatları style traits'e çevir
-            style_mapping = {
-                'Zarafet': 'Elegant',
-                'Saflık': 'Minimalist',
-                'Lüks': 'Luxury',
-                'Doğallık': 'Natural',
-                'Modern': 'Modern',
-                'Klasik': 'Classic',
-                'Profesyonel': 'Professional',
-                'Yaratıcı': 'Creative'
-            }
+            user_style = [_STYLE_MAPPING.get(s, s) for s in user_sifatlar if s in _STYLE_MAPPING]
 
-            user_style = [style_mapping.get(s, s) for s in user_sifatlar if s in style_mapping]
-
+            user_style_set = set(user_style)
             matches = []
             for obj in all_objects:
-                obj_style_traits = obj.get('style_traits', [])
-
-                overlap = len(set(user_style) & set(obj_style_traits))
+                _oget2 = obj.get
+                obj_style_traits = _oget2('style_traits', [])
+                overlap = len(user_style_set & set(obj_style_traits))
                 style_score = overlap / max(len(user_style), len(obj_style_traits)) if user_style else 0
 
                 # Elegance bonus
-                elegance_bonus = (obj.get('elegance_score', 0) / 100) * 0.3
+                elegance_bonus = (_oget2('elegance_score', 0) / 100) * 0.3
 
                 combined_score = (style_score * 0.7) + elegance_bonus
 
                 matches.append((obj, combined_score))
 
-            top_3 = sorted(matches, key=lambda x: x[1], reverse=True)[:3]
+            top_3 = heapq.nlargest(3, matches, key=_KEY_SCORE)
 
             results = []
             for rank, (obj, score) in enumerate(top_3, 1):
+                _oget = obj.get
                 results.append({
                     'rank': rank,
-                    'name': obj.get('name', 'Unknown'),
+                    'name': _oget('name', 'Unknown'),
                     'score': round(score * 100, 1),
-                    'image_url': obj.get('image_url', ''),
-                    'style_traits': obj.get('style_traits', [])[:4],
-                    'elegance_score': obj.get('elegance_score', 0)
+                    'image_url': _oget('image_url', ''),
+                    'style_traits': _oget('style_traits', [])[:4],
+                    'elegance_score': _oget('elegance_score', 0)
                 })
 
             return results
@@ -225,36 +236,34 @@ class SimilarityMatcher:
         Bitki/Çiçek'i eşleştir (aesthetic + sıfat)
         """
         try:
-            plants_col = self.db['similarities_plants']
-
-            all_plants = list(plants_col.find({}, {'_id': 0}))
+            all_plants = self._load_col('similarities_plants')
 
             if not all_plants:
                 log.warning("No plants in database")
                 return []
 
+            user_set = set(user_sifatlar)
             matches = []
             for plant in all_plants:
-                plant_sifatlar = plant.get('sifatlar', [])
-
-                intersection = len(set(user_sifatlar) & set(plant_sifatlar))
-                union = len(set(user_sifatlar) | set(plant_sifatlar))
+                plant_set = set(plant.get('sifatlar', []))
+                intersection = len(user_set & plant_set)
+                union = len(user_set | plant_set)
                 similarity = intersection / union if union > 0 else 0
-
                 matches.append((plant, similarity))
 
-            top_3 = sorted(matches, key=lambda x: x[1], reverse=True)[:3]
+            top_3 = heapq.nlargest(3, matches, key=_KEY_SCORE)
 
             results = []
             for rank, (plant, similarity) in enumerate(top_3, 1):
+                _pget = plant.get
                 results.append({
                     'rank': rank,
-                    'name': plant.get('name', 'Unknown'),
+                    'name': _pget('name', 'Unknown'),
                     'score': round(similarity * 100, 1),
-                    'image_url': plant.get('image_url', ''),
-                    'aesthetic_traits': plant.get('aesthetic_traits', [])[:4],
-                    'color': plant.get('color', 'Natural'),
-                    'meaning': plant.get('meanings', ['Beauty'])[0] if plant.get('meanings') else 'Nature'
+                    'image_url': _pget('image_url', ''),
+                    'aesthetic_traits': _pget('aesthetic_traits', [])[:4],
+                    'color': _pget('color', 'Natural'),
+                    'meaning': (_pget('meanings') or ['Nature'])[0]
                 })
 
             return results
@@ -268,35 +277,33 @@ class SimilarityMatcher:
         Hayvan'ı eşleştir (behavioral + sıfat)
         """
         try:
-            animals_col = self.db['similarities_animals']
-
-            all_animals = list(animals_col.find({}, {'_id': 0}))
+            all_animals = self._load_col('similarities_animals')
 
             if not all_animals:
                 log.warning("No animals in database")
                 return []
 
+            user_set = set(user_sifatlar)
             matches = []
             for animal in all_animals:
-                animal_sifatlar = animal.get('sifatlar', [])
-
-                intersection = len(set(user_sifatlar) & set(animal_sifatlar))
-                union = len(set(user_sifatlar) | set(animal_sifatlar))
+                animal_set = set(animal.get('sifatlar', []))
+                intersection = len(user_set & animal_set)
+                union = len(user_set | animal_set)
                 similarity = intersection / union if union > 0 else 0
-
                 matches.append((animal, similarity))
 
-            top_3 = sorted(matches, key=lambda x: x[1], reverse=True)[:3]
+            top_3 = heapq.nlargest(3, matches, key=_KEY_SCORE)
 
             results = []
             for rank, (animal, similarity) in enumerate(top_3, 1):
+                _aget2 = animal.get
                 results.append({
                     'rank': rank,
-                    'name': animal.get('name', 'Unknown'),
+                    'name': _aget2('name', 'Unknown'),
                     'score': round(similarity * 100, 1),
-                    'image_url': animal.get('image_url', ''),
-                    'behavioral_traits': animal.get('behavioral_traits', [])[:4],
-                    'habitat': animal.get('habitat', 'Wild')
+                    'image_url': _aget2('image_url', ''),
+                    'behavioral_traits': _aget2('behavioral_traits', [])[:4],
+                    'habitat': _aget2('habitat', 'Wild')
                 })
 
             return results
@@ -310,21 +317,25 @@ class SimilarityMatcher:
         5 kategori sonucundan kısa bir özet yaz.
         """
         try:
-            top_celeb = results.get('celebrities', [{}])[0]
-            top_animal = results.get('animals', [{}])[0]
-            top_plant = results.get('plants', [{}])[0]
+            _rget = results.get
+            top_celeb = _rget('celebrities', [{}])[0]
+            top_animal = _rget('animals', [{}])[0]
+            top_plant = _rget('plants', [{}])[0]
+            _cn = top_celeb.get('name', 'bilinmeyen' if lang == 'tr' else 'someone')
+            _an = top_animal.get('name', 'hayvan' if lang == 'tr' else 'animal')
+            _pn = top_plant.get('name', 'çiçek' if lang == 'tr' else 'flower')
 
             if lang == 'tr':
                 return (
-                    f"Sen {top_celeb.get('name', 'bilinmeyen')}'nin güzelliğini taşıyorsun, "
-                    f"bir {top_animal.get('name', 'hayvan')}'nın gücü ve zarafi ile, "
-                    f"bir {top_plant.get('name', 'çiçek')}'in yaşamı kadar güzelsin! 🌟"
+                    f"Sen {_cn}'nin güzelliğini taşıyorsun, "
+                    f"bir {_an}'nın gücü ve zarafi ile, "
+                    f"bir {_pn}'in yaşamı kadar güzelsin! 🌟"
                 )
             else:
                 return (
-                    f"You carry the beauty of {top_celeb.get('name', 'someone')}, "
-                    f"with the grace and power of a {top_animal.get('name', 'animal')}, "
-                    f"and the life of a {top_plant.get('name', 'flower')}! 🌟"
+                    f"You carry the beauty of {_cn}, "
+                    f"with the grace and power of a {_an}, "
+                    f"and the life of a {_pn}! 🌟"
                 )
         except Exception as e:
             log.error(f"Summary generation error: {e}")

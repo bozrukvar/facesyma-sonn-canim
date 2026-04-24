@@ -16,44 +16,47 @@ Veritabanı:
 import json
 import logging
 import time
-from pymongo import MongoClient
-from django.conf import settings
 
 log = logging.getLogger(__name__)
 
+_ANALYSIS_CACHE_PROJ = {'_id': 1, 'result': 1}
+_COMPAT_CACHE_PROJ = {
+    '_id': 0, 'score': 1, 'category': 1, 'can_message': 1,
+    'golden_ratio_diff': 1, 'sifat_overlap': 1, 'module_overlap': 1, 'conflict_count': 1,
+}
+
 
 # ── MongoDB Bağlantı ──────────────────────────────────────────────────────────
+_indexes_created = False
+
+
 def _get_db():
     """Get facesyma-backend database with pooled connection"""
     from admin_api.utils.mongo import _get_main_client
     return _get_main_client()['facesyma-backend']
 
 
-def _get_analysis_cache_col():
-    """analysis_cache koleksiyonunu al ve TTL index oluştur"""
-    db = _get_db()
-    col = db['analysis_cache']
-
-    # TTL index: 30 gün = 2592000 saniye
+def _ensure_indexes():
+    global _indexes_created
+    if _indexes_created:
+        return
     try:
-        col.create_index('created_at', expireAfterSeconds=2592000)
+        db = _get_db()
+        db['analysis_cache'].create_index('created_at', expireAfterSeconds=2592000)
+        db['compatibility_cache'].create_index('created_at', expireAfterSeconds=2592000)
+        _indexes_created = True
     except Exception as e:
-        log.warning(f'TTL index oluşturma başarısız: {e}')
+        log.warning(f'TTL index creation failed: {e}')
 
-    return col
+
+def _get_analysis_cache_col():
+    _ensure_indexes()
+    return _get_db()['analysis_cache']
 
 
 def _get_compatibility_cache_col():
-    """compatibility_cache koleksiyonunu al ve TTL index oluştur"""
-    db = _get_db()
-    col = db['compatibility_cache']
-
-    try:
-        col.create_index('created_at', expireAfterSeconds=2592000)
-    except Exception as e:
-        log.warning(f'TTL index oluşturma başarısız: {e}')
-
-    return col
+    _ensure_indexes()
+    return _get_db()['compatibility_cache']
 
 
 def _get_user_profiles_col():
@@ -83,13 +86,14 @@ def cache_analysis_result(user_id: int, lang: str, analysis_result: dict, photo_
             'photo_hash': photo_hash or 'latest'
         }
 
+        _now = time.time()
         update_doc = {
             'user_id': user_id,
             'lang': lang,
             'photo_hash': photo_hash or 'latest',
             'result': analysis_result,
-            'created_at': time.time(),
-            'accessed_at': time.time()
+            'created_at': _now,
+            'accessed_at': _now,
         }
 
         col.update_one(filter_doc, {'$set': update_doc}, upsert=True)
@@ -114,17 +118,18 @@ def get_analysis_result(user_id: int, lang: str, use_latest: bool = True) -> dic
     """
     try:
         col = _get_analysis_cache_col()
+        _fo = col.find_one
 
         if use_latest:
-            # En yeni result'ı al (created_at'a göre)
-            doc = col.find_one(
+            doc = _fo(
                 {'user_id': user_id, 'lang': lang},
+                _ANALYSIS_CACHE_PROJ,
                 sort=[('created_at', -1)]
             )
         else:
-            # En son kullanılan
-            doc = col.find_one(
+            doc = _fo(
                 {'user_id': user_id, 'lang': lang},
+                _ANALYSIS_CACHE_PROJ,
                 sort=[('accessed_at', -1)]
             )
 
@@ -141,7 +146,7 @@ def get_analysis_result(user_id: int, lang: str, use_latest: bool = True) -> dic
         return None
 
     except Exception as e:
-        log.error(f'Analysis cache okunamadı: {e}')
+        log.error(f'Analysis cache read error: {e}')
         return None
 
 
@@ -157,7 +162,7 @@ def get_user_partner_id(user_id: int) -> int | None:
         profile = col.find_one({'user_id': user_id}, {'partner_id': 1})
         return profile.get('partner_id') if profile else None
     except Exception as e:
-        log.warning(f'Partner ID alınamadı: {e}')
+        log.warning(f'Partner ID fetch error: {e}')
         return None
 
 
@@ -175,16 +180,17 @@ def cache_compatibility(user1_id: int, user2_id: int, compatibility_result: dict
         # Düşük ID'yi başa koy (symmetry)
         uid1, uid2 = (user1_id, user2_id) if user1_id < user2_id else (user2_id, user1_id)
 
+        _crget = compatibility_result.get
         doc = {
             'user1_id': uid1,
             'user2_id': uid2,
-            'score': compatibility_result.get('score', 0),
-            'category': compatibility_result.get('category', 'UNKNOWN'),
-            'can_message': compatibility_result.get('can_message', False),
-            'golden_ratio_diff': compatibility_result.get('golden_ratio_diff', 0),
-            'sifat_overlap': compatibility_result.get('sifat_overlap', 0),
-            'module_overlap': compatibility_result.get('module_overlap', 0),
-            'conflict_count': compatibility_result.get('conflict_count', 0),
+            'score': _crget('score', 0),
+            'category': _crget('category', 'UNKNOWN'),
+            'can_message': _crget('can_message', False),
+            'golden_ratio_diff': _crget('golden_ratio_diff', 0),
+            'sifat_overlap': _crget('sifat_overlap', 0),
+            'module_overlap': _crget('module_overlap', 0),
+            'conflict_count': _crget('conflict_count', 0),
             'result': compatibility_result,
             'created_at': time.time()
         }
@@ -214,7 +220,7 @@ def get_compatibility(user1_id: int, user2_id: int) -> dict | None:
         # Düşük ID'yi başa koy
         uid1, uid2 = (user1_id, user2_id) if user1_id < user2_id else (user2_id, user1_id)
 
-        doc = col.find_one({'user1_id': uid1, 'user2_id': uid2})
+        doc = col.find_one({'user1_id': uid1, 'user2_id': uid2}, _COMPAT_CACHE_PROJ)
 
         if doc:
             log.info(f'Compatibility cache hit: {uid1} ↔ {uid2}')
@@ -224,7 +230,7 @@ def get_compatibility(user1_id: int, user2_id: int) -> dict | None:
         return None
 
     except Exception as e:
-        log.error(f'Compatibility cache okunamadı: {e}')
+        log.error(f'Compatibility cache read error: {e}')
         return None
 
 
@@ -250,11 +256,13 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
     Returns:
         Context dict (Ollama prompt'unda kullanılacak)
     """
+    _info = log.info
+    _built_at = time.time()
     try:
         context = {
             'user_id': user_id,
             'lang': lang,
-            'context_built_at': time.time(),
+            'context_built_at': _built_at,
             'user': None,
             'partner': None,
             'compatibility': None
@@ -264,7 +272,7 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
         user_analysis = get_analysis_result(user_id, lang)
         if user_analysis:
             context['user'] = user_analysis.get('result', {})
-            log.info(f'User analysis loaded from cache: user_id={user_id}')
+            _info(f'User analysis loaded from cache: user_id={user_id}')
         else:
             log.warning(f'User analysis not found: user_id={user_id}')
             return context  # Boş context dön
@@ -278,34 +286,35 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
             partner_analysis = get_analysis_result(partner_id, lang)
             if partner_analysis:
                 context['partner'] = partner_analysis.get('result', {})
-                log.info(f'Partner analysis loaded: partner_id={partner_id}')
+                _info(f'Partner analysis loaded: partner_id={partner_id}')
 
                 # 4. Compatibility'yi al
                 compat = get_compatibility(user_id, partner_id)
                 if compat:
+                    _cget = compat.get
                     context['compatibility'] = {
-                        'score': compat.get('score'),
-                        'category': compat.get('category'),
-                        'can_message': compat.get('can_message'),
-                        'golden_ratio_diff': compat.get('golden_ratio_diff'),
-                        'sifat_overlap': compat.get('sifat_overlap'),
-                        'module_overlap': compat.get('module_overlap'),
-                        'conflict_count': compat.get('conflict_count')
+                        'score': _cget('score'),
+                        'category': _cget('category'),
+                        'can_message': _cget('can_message'),
+                        'golden_ratio_diff': _cget('golden_ratio_diff'),
+                        'sifat_overlap': _cget('sifat_overlap'),
+                        'module_overlap': _cget('module_overlap'),
+                        'conflict_count': _cget('conflict_count')
                     }
-                    log.info(f'Compatibility loaded: {user_id} ↔ {partner_id}')
+                    _info(f'Compatibility loaded: {user_id} ↔ {partner_id}')
 
         return context
 
     except Exception as e:
-        log.exception(f'Context building hatası: {e}')
+        log.exception(f'Context building error: {e}')
         return {
             'user_id': user_id,
             'lang': lang,
-            'context_built_at': time.time(),
+            'context_built_at': _built_at,
             'user': None,
             'partner': None,
             'compatibility': None,
-            'error': str(e)
+            'error': 'Context unavailable.',
         }
 
 
@@ -319,5 +328,5 @@ def format_context_for_prompt(context: dict) -> str:
     try:
         return json.dumps(context, ensure_ascii=False, indent=2)
     except Exception as e:
-        log.error(f'Context formatting hatası: {e}')
+        log.error(f'Context formatting error: {e}')
         return '{}'

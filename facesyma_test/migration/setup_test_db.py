@@ -11,10 +11,9 @@ Run once during deployment:
 import os
 from pymongo import MongoClient, ASCENDING, DESCENDING
 
-MONGO_URI = os.environ.get(
-    "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-)
+MONGO_URI = os.environ.get("MONGO_URI", "")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
 
 def setup_database():
     """Create indexes and collections"""
@@ -28,19 +27,21 @@ def setup_database():
     # ── test_sessions collection ──────────────────────────────────────────
     print("\n[1/3] Setting up test_sessions collection...")
     sessions = db["test_sessions"]
-    sessions.create_index([("user_id", ASCENDING)])
-    sessions.create_index([("test_type", ASCENDING)])
-    sessions.create_index([("created_at", DESCENDING)])
-    sessions.create_index([("status", ASCENDING)])
+    _sidx = sessions.create_index
+    _sidx([("user_id", ASCENDING)])
+    _sidx([("test_type", ASCENDING)])
+    _sidx([("created_at", DESCENDING)])
+    _sidx([("status", ASCENDING)])
     print("      ✓ Indexes created")
 
     # ── test_results collection ───────────────────────────────────────────
     print("\n[2/3] Setting up test_results collection...")
     results = db["test_results"]
-    results.create_index([("user_id", ASCENDING)])
-    results.create_index([("test_type", ASCENDING)])
-    results.create_index([("created_at", DESCENDING)])
-    results.create_index([("session_id", ASCENDING)])
+    _ridx = results.create_index
+    _ridx([("user_id", ASCENDING)])
+    _ridx([("test_type", ASCENDING)])
+    _ridx([("created_at", DESCENDING)])
+    _ridx([("session_id", ASCENDING)])
     print("      ✓ Indexes created")
 
     # ── Verify ──────────────────────────────────────────────────────────

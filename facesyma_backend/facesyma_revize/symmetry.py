@@ -86,11 +86,12 @@ def measure_symmetry(img):
         if left_idx in landmarks and right_idx in landmarks:
             left_point = landmarks[left_idx]
             right_point = landmarks[right_idx]
+            _lp0 = left_point[0]; _rp0 = right_point[0]
 
             # Distance from center for left point
-            left_distance = abs(left_point[0] - center_x)
+            left_distance = abs(_lp0 - center_x)
             # Distance from center for right point
-            right_distance = abs(right_point[0] - center_x)
+            right_distance = abs(_rp0 - center_x)
 
             # Y-coordinate should be similar
             y_diff = abs(left_point[1] - right_point[1])
@@ -109,13 +110,14 @@ def measure_symmetry(img):
             pair_scores.append(pair_score)
 
     # Calculate averages by category
-    eyes_score = pair_scores[0] if len(pair_scores) > 0 else 0.5
-    cheekbones_score = (pair_scores[3] + pair_scores[4]) / 2 if len(pair_scores) > 4 else 0.5
-    jaw_score = (pair_scores[5] + pair_scores[6]) / 2 if len(pair_scores) > 6 else 0.5
-    mouth_score = pair_scores[-1] if len(pair_scores) > 0 else 0.5
+    _n = len(pair_scores)
+    eyes_score = pair_scores[0] if _n > 0 else 0.5
+    cheekbones_score = (pair_scores[3] + pair_scores[4]) / 2 if _n > 4 else 0.5
+    jaw_score = (pair_scores[5] + pair_scores[6]) / 2 if _n > 6 else 0.5
+    mouth_score = pair_scores[-1] if _n > 0 else 0.5
 
     # Overall symmetry
-    overall_symmetry = round(sum(pair_scores) / len(pair_scores) if pair_scores else 0.5, 3)
+    overall_symmetry = round(sum(pair_scores) / _n if _n else 0.5, 3)
 
     # Categorize
     if overall_symmetry > 0.85:

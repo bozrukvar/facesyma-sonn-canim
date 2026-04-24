@@ -5,10 +5,14 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { Card, GoldButton, SectionLabel } from '../components/ui';
 import { AnalysisAPI } from '../services/api';
 import theme from '../utils/theme';
+const { colors, spacing, typography } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { ScreenProps } from '../navigation/types';
 
-const DailyScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, route }) => {
+const DailyScreen = ({ navigation, route }: ScreenProps<'Daily'>) => {
+  const insets = useSafeAreaInsets();
   const [daily,   setDaily]   = useState<string>('');
   const [loading, setLoading] = useState(true);
   const { lang } = useLanguage();
@@ -16,24 +20,24 @@ const DailyScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, ro
   useEffect(() => {
     AnalysisAPI.getDailyMotivation(lang)
       .then(d => setDaily(d?.message || d?.daily || ''))
-      .catch(() => {})
+      .catch(() => setDaily(t('common.generic_error', lang)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [lang]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('daily.title', lang)}</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.spacer} />
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Card variant="warm" style={{ marginBottom: 16 }}>
-          <Text style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>🌟</Text>
+        <Card variant="warm" style={styles.card}>
+          <Text style={styles.cardEmoji}>🌟</Text>
           {loading
-            ? <ActivityIndicator color={theme.colors.warmAmber} />
+            ? <ActivityIndicator color={colors.warmAmber} />
             : <Text style={styles.dailyText}>{daily || t('daily.loading', lang)}</Text>
           }
         </Card>
@@ -48,16 +52,19 @@ const DailyScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, ro
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
+  container: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg + 44,
-    paddingBottom: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  back:      { ...theme.typography.body, color: theme.colors.gold, fontSize: 22 },
-  title:     { ...theme.typography.h3 },
-  scroll:    { padding: theme.spacing.lg, paddingBottom: theme.spacing.xxxl },
-  dailyText: { ...theme.typography.bodyWarm, fontSize: 16, lineHeight: 26, textAlign: 'center' },
+  back:      { ...typography.body, color: colors.gold, fontSize: 22 },
+  title:     { ...typography.h3 },
+  scroll:    { padding: spacing.lg, paddingBottom: spacing.xxxl },
+  dailyText: { ...typography.bodyWarm, fontSize: 16, lineHeight: 26, textAlign: 'center' },
+  spacer:    { width: 40 },
+  card:      { marginBottom: 16 },
+  cardEmoji: { fontSize: 40, textAlign: 'center' as const, marginBottom: 12 },
 });
 
 export default DailyScreen;

@@ -9,9 +9,25 @@ JWT tabanlı kimlik doğrulama.
 """
 import json
 import hashlib
+import hmac
+import os
 import time
 import re
+import logging
 from datetime import datetime
+from django.core.cache import cache
+
+_PBKDF2_ITERATIONS = 260_000
+# Pre-computed dummy hash used to equalize login timing for non-existent users
+_DUMMY_HASH = 'pbkdf2:sha256:260000$' + ('00' * 16) + '$' + ('00' * 32)
+
+_RE_EMAIL      = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
+_RE_WHITESPACE = re.compile(r'\s+')
+
+_GOOGLE_LOGIN_PROJ = {
+    '_id': 1, 'id': 1, 'email': 1, 'username': 1, 'google_id': 1,
+    'avatar': 1, 'plan': 1, 'auth_method': 1, 'app_source': 1, 'is_active': 1,
+}
 
 import jwt
 from django.conf      import settings
@@ -19,57 +35,92 @@ from django.http      import JsonResponse
 from django.views     import View
 from django.views.decorators.csrf  import csrf_exempt
 from django.utils.decorators       import method_decorator
-from pymongo import MongoClient
 
+log = logging.getLogger(__name__)
 
-# ── MongoDB bağlantısı ────────────────────────────────────────────────────────
-def get_users_col():
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']['appfaceapi_myuser']
+try:
+    from admin_api.consumers import send_admin_event as _send_admin_event
+except Exception:
+    _send_admin_event = None
+
+_JWT_SECRET: str = settings.JWT_SECRET
+_GOOGLE_CLIENT_ID: str = settings.GOOGLE_CLIENT_ID
+_JWT_ACCESS_EXP_SEC: int = settings.JWT_ACCESS_EXP_HOURS * 3600
+_JWT_REFRESH_EXP_SEC: int = settings.JWT_REFRESH_EXP_DAYS * 86400
+
+# Connection pooling — her request'te yeni bağlantı açmaz
+from admin_api.utils.mongo import get_users_col, _next_id
 
 
 # ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
 def _hash(pw: str) -> str:
-    return hashlib.sha256(pw.encode()).hexdigest()
+    """Hash password with PBKDF2-HMAC-SHA256 + random salt.
+    Format: pbkdf2:sha256:<iterations>$<hex-salt>$<hex-hash>
+    """
+    salt = os.urandom(16)
+    dk = hashlib.pbkdf2_hmac('sha256', pw.encode(), salt, _PBKDF2_ITERATIONS)
+    return f'pbkdf2:sha256:{_PBKDF2_ITERATIONS}${salt.hex()}${dk.hex()}'
+
+
+def _check_hash(pw: str, stored: str) -> bool:
+    """Verify password. Supports new PBKDF2 format and legacy bare SHA256."""
+    _bfh = bytes.fromhex
+    _pwe = pw.encode
+    _hcd = hmac.compare_digest
+    if stored.startswith('pbkdf2:sha256:'):
+        try:
+            _, _, rest = stored.split(':', 2)
+            iterations_str, salt_hex, dk_hex = rest.split('$')
+            iterations = int(iterations_str)
+            if not (100_000 <= iterations <= 1_000_000):
+                return False
+            salt = _bfh(salt_hex)
+            expected = _bfh(dk_hex)
+            computed = hashlib.pbkdf2_hmac('sha256', _pwe(), salt, iterations)
+            return _hcd(computed, expected)
+        except Exception:
+            return False
+    return _hcd(hashlib.sha256(_pwe()).hexdigest(), stored)
 
 
 def _make_tokens(user_id: int, email: str) -> dict:
     now = int(time.time())
-    access = jwt.encode(
+    _je = jwt.encode
+    access = _je(
         {'user_id': user_id, 'email': email,
-         'exp': now + settings.JWT_ACCESS_EXP_HOURS * 3600, 'type': 'access'},
-        settings.JWT_SECRET, algorithm='HS256'
+         'exp': now + _JWT_ACCESS_EXP_SEC, 'type': 'access'},
+        _JWT_SECRET, algorithm='HS256'
     )
-    refresh = jwt.encode(
+    refresh = _je(
         {'user_id': user_id,
-         'exp': now + settings.JWT_REFRESH_EXP_DAYS * 86400, 'type': 'refresh'},
-        settings.JWT_SECRET, algorithm='HS256'
+         'exp': now + _JWT_REFRESH_EXP_SEC, 'type': 'refresh'},
+        _JWT_SECRET, algorithm='HS256'
     )
     return {'access': access, 'refresh': refresh}
 
 
+_USER_PROJECTION = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1}
+_LOGIN_PROJECTION = {'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1, 'password': 1, 'is_active': 1}
+
+
 def _user_dict(u: dict) -> dict:
+    _uget = u.get
     return {
-        'id':         u.get('id', 0),
-        'email':      u.get('email', ''),
-        'name':       u.get('username', u.get('name', '')),
-        'avatar':     u.get('avatar'),
-        'plan':       u.get('plan', 'free'),
-        'created_at': str(u.get('date_joined', '')),
+        'id':         _uget('id', 0),
+        'email':      _uget('email', ''),
+        'name':       _uget('username', _uget('name', '')),
+        'avatar':     _uget('avatar'),
+        'plan':       _uget('plan', 'free'),
+        'created_at': str(_uget('date_joined', '')),
     }
-
-
-def _next_id(col) -> int:
-    last = col.find_one(sort=[('id', -1)])
-    return (last['id'] + 1) if last and 'id' in last else 1
 
 
 def _decode_token(request) -> dict:
     auth = request.headers.get('Authorization', '')
     if not auth.startswith('Bearer '):
-        raise ValueError('Token bulunamadı.')
+        raise ValueError('Token not found.')
     token = auth.split(' ', 1)[1]
-    return jwt.decode(token, settings.JWT_SECRET, algorithms=['HS256'])
+    return jwt.decode(token, _JWT_SECRET, algorithms=['HS256'])
 
 
 def _json(request):
@@ -84,30 +135,35 @@ def _json(request):
 class RegisterView(View):
     def post(self, request):
         data     = _json(request)
-        email    = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-        name     = data.get('name', '').strip()
+        _dget    = data.get
+        email    = _dget('email', '').strip().lower()[:254]
+        password = _dget('password', '')
+        name     = _RE_WHITESPACE.sub(' ', _dget('name', '').strip())[:100]
 
         if not email or not password or not name:
-            return JsonResponse({'detail': 'Email, şifre ve ad zorunlu.'}, status=400)
-        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
-            return JsonResponse({'detail': 'Geçersiz email.'}, status=400)
-        if len(password) < 6:
-            return JsonResponse({'detail': 'Şifre en az 6 karakter.'}, status=400)
+            return JsonResponse({'detail': 'Email, password and name are required.'}, status=400)
+        if not _RE_EMAIL.match(email):
+            return JsonResponse({'detail': 'Invalid email address.'}, status=400)
+        _pw_len = len(password)
+        if _pw_len < 6:
+            return JsonResponse({'detail': 'Password must be at least 6 characters.'}, status=400)
+        if _pw_len > 128:
+            return JsonResponse({'detail': 'Password must be at most 128 characters.'}, status=400)
 
         col = get_users_col()
-        if col.find_one({'email': email}):
-            return JsonResponse({'detail': 'Bu email zaten kayıtlı.'}, status=400)
+        if col.find_one({'email': email}, {'_id': 1}):
+            return JsonResponse({'detail': 'This email is already registered.'}, status=400)
 
         uid = _next_id(col)
         app_source = request.headers.get('X-App-Source', 'mobile').lower()
         if app_source not in ('mobile', 'web'):
             app_source = 'mobile'
+        _now_iso = datetime.utcnow().isoformat()
         doc = {
             'id': uid, 'email': email, 'username': name,
             'password': _hash(password), 'plan': 'free',
             'auth_method': 'email',
-            'date_joined': datetime.now().isoformat(),
+            'date_joined': _now_iso,
             'is_active': True,
             'app_source': app_source,
         }
@@ -115,16 +171,16 @@ class RegisterView(View):
         tokens = _make_tokens(uid, email)
 
         # Broadcast new user event to admin panel (WS)
-        try:
-            from admin_api.consumers import send_admin_event
-            send_admin_event('new_user', {
-                'user_id': uid,
-                'email': email,
-                'app_source': app_source,
-                'time': datetime.now().isoformat()
-            })
-        except Exception:
-            pass  # WS broadcast failure shouldn't break registration
+        if _send_admin_event:
+            try:
+                _send_admin_event('new_user', {
+                    'user_id': uid,
+                    'email': email,
+                    'app_source': app_source,
+                    'time': _now_iso,
+                })
+            except Exception:
+                pass  # WS broadcast failure shouldn't break registration
 
         return JsonResponse({**tokens, 'user': _user_dict(doc)}, status=201)
 
@@ -132,15 +188,49 @@ class RegisterView(View):
 # ── Giriş ─────────────────────────────────────────────────────────────────────
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
+    _MAX_ATTEMPTS = 10   # 10 hatalı denemeden sonra kilitle
+    _LOCKOUT_SECS = 600  # 10 dakika
+
     def post(self, request):
         data  = _json(request)
-        email = data.get('email', '').strip().lower()
-        pw    = data.get('password', '')
+        _dget = data.get
+        email = _dget('email', '').strip().lower()[:254]
+        pw    = _dget('password', '')
+        if len(pw) > 128:
+            return JsonResponse({'detail': 'Invalid email or password.'}, status=401)
+
+        # Brute-force koruması — IP + email bazlı
+        _rmg = request.META.get
+        ip        = _rmg('HTTP_X_FORWARDED_FOR', _rmg('REMOTE_ADDR', ''))
+        cache_key = f'login_fail:{ip}:{email}'
+        fail_count = 0
+        try:
+            fail_count = cache.get(cache_key, 0)
+            if fail_count >= self._MAX_ATTEMPTS:
+                return JsonResponse({'detail': 'Too many failed attempts. Please wait 10 minutes.'}, status=429)
+        except Exception:
+            pass  # Cache access failure should not block login
 
         col  = get_users_col()
-        user = col.find_one({'email': email})
-        if not user or user.get('password') != _hash(pw):
-            return JsonResponse({'detail': 'Email veya şifre hatalı.'}, status=401)
+        user = col.find_one({'email': email}, _LOGIN_PROJECTION)
+        # Always call _check_hash to prevent timing oracle (user enumeration via response time)
+        stored_pw = user.get('password', '') if user else _DUMMY_HASH
+        pw_valid  = _check_hash(pw, stored_pw)
+        if not user or not pw_valid:
+            try:
+                cache.set(cache_key, fail_count + 1, timeout=self._LOCKOUT_SECS)
+            except Exception:
+                pass
+            return JsonResponse({'detail': 'Invalid email or password.'}, status=401)
+
+        try:
+            cache.delete(cache_key)  # Başarılı girişte sayacı sıfırla
+        except Exception:
+            pass
+
+        # Upgrade legacy bare-SHA256 to PBKDF2 on successful login
+        if not stored_pw.startswith('pbkdf2:'):
+            col.update_one({'_id': user['_id']}, {'$set': {'password': _hash(pw)}})
 
         tokens = _make_tokens(user['id'], email)
         return JsonResponse({**tokens, 'user': _user_dict(user)})
@@ -153,7 +243,7 @@ class GoogleAuthView(View):
         data         = _json(request)
         id_token_str = data.get('id_token', '')
         if not id_token_str:
-            return JsonResponse({'detail': 'Google token gerekli.'}, status=400)
+            return JsonResponse({'detail': 'Google token is required.'}, status=400)
 
         # Google token doğrula
         try:
@@ -162,22 +252,33 @@ class GoogleAuthView(View):
             id_info = id_token.verify_oauth2_token(
                 id_token_str,
                 g_req.Request(),
-                settings.GOOGLE_CLIENT_ID,
+                _GOOGLE_CLIENT_ID,
             )
-        except Exception as e:
-            return JsonResponse({'detail': f'Geçersiz Google token: {e}'}, status=401)
+        except Exception:
+            return JsonResponse({'detail': 'Invalid Google token.'}, status=401)
 
-        google_id = id_info['sub']
-        email     = id_info.get('email', '')
-        name      = id_info.get('name', email.split('@')[0])
-        avatar    = id_info.get('picture')
+        _iiget = id_info.get
+        google_id = id_info['sub'][:128]
+        email     = _iiget('email', '')[:254]
+        if not email:
+            return JsonResponse({'detail': 'Google account has no email address.'}, status=400)
+        name      = _iiget('name', email.split('@')[0])[:100]
+        avatar    = _iiget('picture')
 
         col  = get_users_col()
-        user = col.find_one({'$or': [{'google_id': google_id}, {'email': email}]})
+        user = col.find_one(
+            {'$or': [{'google_id': google_id}, {'email': email}]},
+            _GOOGLE_LOGIN_PROJ,
+        )
 
         if user:
-            # Var ama google_id yoksa ekle
-            if not user.get('google_id'):
+            existing_gid = user.get('google_id')
+            if existing_gid and existing_gid != google_id:
+                # Different Google account trying to use an email already linked to another gid
+                log.warning(f"Google ID mismatch for email={email}: existing={existing_gid} incoming={google_id}")
+                return JsonResponse({'detail': 'This email is already linked to a different Google account.'}, status=409)
+            if not existing_gid:
+                # Email-registered user logging in with Google for the first time — link accounts
                 col.update_one({'_id': user['_id']},
                                {'$set': {'google_id': google_id, 'avatar': avatar}})
                 user['google_id'] = google_id
@@ -192,7 +293,7 @@ class GoogleAuthView(View):
                 'id': uid, 'email': email, 'username': name,
                 'google_id': google_id, 'avatar': avatar,
                 'plan': 'free', 'auth_method': 'google',
-                'date_joined': datetime.now().isoformat(),
+                'date_joined': datetime.utcnow().isoformat(),
                 'is_active': True,
                 'app_source': app_source,
             }
@@ -209,15 +310,21 @@ class TokenRefreshView(View):
         data    = _json(request)
         refresh = data.get('refresh', '')
         try:
-            payload = jwt.decode(refresh, settings.JWT_SECRET, algorithms=['HS256'])
-            if payload.get('type') != 'refresh':
-                raise ValueError('Geçersiz tip.')
-            tokens = _make_tokens(payload['user_id'], payload.get('email', ''))
+            payload = jwt.decode(refresh, _JWT_SECRET, algorithms=['HS256'])
+            _pget = payload.get
+            if _pget('type') != 'refresh':
+                raise ValueError('Invalid token type.')
+            user_id = payload['user_id']
+            col = get_users_col()
+            user = col.find_one({'id': user_id}, {'is_active': 1, 'email': 1})
+            if not user or not user.get('is_active', True):
+                return JsonResponse({'detail': 'Account is disabled.'}, status=401)
+            tokens = _make_tokens(user_id, _pget('email', ''))
             return JsonResponse({'access': tokens['access']})
         except jwt.ExpiredSignatureError:
-            return JsonResponse({'detail': 'Token süresi doldu.'}, status=401)
-        except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=401)
+            return JsonResponse({'detail': 'Token has expired.'}, status=401)
+        except Exception:
+            return JsonResponse({'detail': 'Invalid or malformed token.'}, status=401)
 
 
 # ── Profil ────────────────────────────────────────────────────────────────────
@@ -227,14 +334,15 @@ class MeView(View):
         try:
             payload = _decode_token(request)
             col     = get_users_col()
-            user    = col.find_one({'id': payload['user_id']})
+            user    = col.find_one({'id': payload['user_id']}, _USER_PROJECTION)
             if not user:
-                return JsonResponse({'detail': 'Kullanıcı bulunamadı.'}, status=404)
+                return JsonResponse({'detail': 'User not found.'}, status=404)
             return JsonResponse(_user_dict(user))
         except jwt.ExpiredSignatureError:
-            return JsonResponse({'detail': 'Token süresi doldu.'}, status=401)
+            return JsonResponse({'detail': 'Token has expired.'}, status=401)
         except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=401)
+            log.exception('Profile fetch error')
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
 
     def patch(self, request):
         """Profil güncelleme"""
@@ -242,11 +350,111 @@ class MeView(View):
             payload  = _decode_token(request)
             data     = _json(request)
             col      = get_users_col()
-            allowed  = {k: v for k, v in data.items()
-                        if k in ('username', 'avatar', 'plan')}
-            if allowed:
-                col.update_one({'id': payload['user_id']}, {'$set': allowed})
-            user = col.find_one({'id': payload['user_id']})
+            update = {}
+            if 'username' in data:
+                update['username'] = str(data['username'])[:100]
+            if 'avatar' in data:
+                update['avatar'] = str(data['avatar'])[:512]
+            _puid = payload['user_id']
+            if update:
+                col.update_one({'id': _puid}, {'$set': update})
+            user = col.find_one({'id': _puid}, _USER_PROJECTION)
+            if not user:
+                return JsonResponse({'detail': 'User not found.'}, status=404)
             return JsonResponse(_user_dict(user))
         except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=401)
+            log.exception('Profile update error')
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+
+# ── Şifre Değiştir ────────────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class ChangePasswordView(View):
+    """Authenticated kullanıcının şifresini değiştirir."""
+
+    _MAX_ATTEMPTS = 5
+    _LOCKOUT_SECS = 900  # 15 minutes
+
+    def post(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Invalid token.'}, status=401)
+
+        # Rate-limit by user_id to prevent old-password brute-forcing
+        user_id   = payload.get('user_id', '')
+        rate_key  = f'chgpw_fail:{user_id}'
+        fail_count = 0
+        try:
+            fail_count = cache.get(rate_key, 0)
+            if fail_count >= self._MAX_ATTEMPTS:
+                return JsonResponse({'detail': 'Too many attempts. Please wait 15 minutes.'}, status=429)
+        except Exception:
+            pass
+
+        data         = _json(request)
+        _dget        = data.get
+        old_password = _dget('old_password', '')
+        new_password = _dget('new_password', '')
+
+        if not old_password or not new_password:
+            return JsonResponse({'detail': 'Old and new password are required.'}, status=400)
+        _new_pw_len = len(new_password)
+        if len(old_password) > 128 or _new_pw_len > 128:
+            return JsonResponse({'detail': 'Password must be at most 128 characters.'}, status=400)
+        if _new_pw_len < 6:
+            return JsonResponse({'detail': 'New password must be at least 6 characters.'}, status=400)
+
+        col  = get_users_col()
+        user = col.find_one({'id': user_id}, {'_id': 0, 'password': 1})
+        if not user:
+            return JsonResponse({'detail': 'User not found.'}, status=404)
+        if not _check_hash(old_password, user.get('password', '')):
+            try:
+                cache.set(rate_key, fail_count + 1, timeout=self._LOCKOUT_SECS)
+            except Exception:
+                pass
+            return JsonResponse({'detail': 'Current password is incorrect.'}, status=400)
+
+        try:
+            cache.delete(rate_key)
+        except Exception:
+            pass
+        col.update_one({'id': user_id}, {'$set': {'password': _hash(new_password)}})
+        return JsonResponse({'detail': 'Password changed successfully.'})
+
+
+# ── Şifre Sıfırlama İsteği ────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class PasswordResetRequestView(View):
+    """Şifre sıfırlama e-postası gönderir.
+    Güvenlik gereği kullanıcı var olup olmadığını açıklamaz — her durumda 200 döner.
+    """
+
+    def post(self, request):
+        data  = _json(request)
+        email = data.get('email', '').strip().lower()[:254]
+        if not email:
+            return JsonResponse({'detail': 'Email zorunlu.'}, status=400)
+
+        # Rate-limit: 3 requests per hour per IP+email to prevent spam
+        _rmg = request.META.get
+        ip       = _rmg('HTTP_X_FORWARDED_FOR', _rmg('REMOTE_ADDR', ''))
+        rate_key = f'pwreset:{ip}:{email}'
+        try:
+            count = cache.get(rate_key, 0)
+            if count >= 3:
+                return JsonResponse({'detail': 'Password reset instructions have been sent to your email.'})
+            cache.set(rate_key, count + 1, timeout=3600)
+        except Exception:
+            pass
+
+        col  = get_users_col()
+        user = col.find_one({'email': email}, {'_id': 0, 'email': 1})
+        if user:
+            # TODO: Generate and send reset token once email service is integrated.
+            # For now, just log.
+            log.info(f'Password reset requested for: {email}')
+
+        # Güvenlik: kullanıcı var olup olmadığından bağımsız aynı yanıt
+        return JsonResponse({'detail': 'Password reset instructions have been sent to your email.'})

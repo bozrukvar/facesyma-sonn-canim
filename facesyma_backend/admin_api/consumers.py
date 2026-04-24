@@ -7,11 +7,32 @@ Broadcast helpers allow sync views to push events to connected admin clients.
 """
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync, sync_to_async
 import json
 import logging
+import jwt
+from urllib.parse import parse_qs
+from django.conf import settings
+from admin_api.utils.mongo import get_admin_col
 
 log = logging.getLogger(__name__)
+
+_ADMIN_JWT_SECRET: str = settings.ADMIN_JWT_SECRET
+
+
+def _verify_admin_token(token: str) -> bool:
+    """Verify an admin JWT synchronously — runs in thread pool via sync_to_async."""
+    try:
+        payload = jwt.decode(token, _ADMIN_JWT_SECRET, algorithms=['HS256'])
+        _pget = payload.get
+        if _pget('type') != 'admin_access' or not _pget('is_admin'):
+            return False
+        col = get_admin_col()
+        admin = col.find_one({'id': _pget('admin_id')}, {'_id': 0, 'is_active': 1})
+        return bool(admin and admin.get('is_active'))
+    except Exception:
+        return False
 
 
 class AdminLiveConsumer(AsyncWebsocketConsumer):
@@ -20,15 +41,23 @@ class AdminLiveConsumer(AsyncWebsocketConsumer):
     GROUP_NAME = 'admin_live'
 
     async def connect(self):
-        """Add consumer to broadcast group."""
-        await self.channel_layer.group_add(self.GROUP_NAME, self.channel_name)
+        """Authenticate via ?token= query param, then join broadcast group."""
+        qs = parse_qs(self.scope.get('query_string', b'').decode())
+        token = (qs.get('token') or [''])[0]
+        if not token or not await sync_to_async(_verify_admin_token)(token):
+            log.warning(f'Admin WS rejected unauthenticated connection')
+            await self.close(code=4401)
+            return
+        _cn = self.channel_name
+        await self.channel_layer.group_add(self.GROUP_NAME, _cn)
         await self.accept()
-        log.debug(f'Admin WS client connected: {self.channel_name}')
+        log.debug(f'Admin WS client connected: {_cn}')
 
     async def disconnect(self, close_code):
         """Remove consumer from broadcast group."""
-        await self.channel_layer.group_discard(self.GROUP_NAME, self.channel_name)
-        log.debug(f'Admin WS client disconnected: {self.channel_name}')
+        _cn = self.channel_name
+        await self.channel_layer.group_discard(self.GROUP_NAME, _cn)
+        log.debug(f'Admin WS client disconnected: {_cn}')
 
     # ── Event handlers (receive from group_send) ────────────────────────────────
 
@@ -74,7 +103,6 @@ def send_admin_event(event_type: str, data: dict):
         data: dict - event payload
     """
     try:
-        from channels.layers import get_channel_layer
         channel_layer = get_channel_layer()
         if channel_layer is None:
             return

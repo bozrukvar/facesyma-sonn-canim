@@ -2,13 +2,16 @@
 import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Dimensions, ActivityIndicator, Alert, FlatList,
+  Dimensions, ActivityIndicator, Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AssessmentAPI } from '../services/api';
 import { Card, GoldButton, SectionLabel, Badge } from '../components/ui';
 import theme from '../utils/theme';
+const { colors } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import type { ScreenProps } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
 
@@ -89,7 +92,8 @@ interface SubmissionResponse {
   };
 }
 
-const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState<AssessmentStep>('select');
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const { lang, setLang } = useLanguage();
@@ -97,12 +101,16 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [responses, setResponses] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
+  // Must be at top level — not inside conditionals (Rules of Hooks)
+  const LIKERT_LABELS = useMemo(() => getLikertLabels(lang), [lang]);
 
   // Seç: Test türü seç
   const startTest = async (testId: string) => {
     setSelectedTest(testId);
     setStep('loading_questions');
     setLoading(true);
+    const errTitle = t('common.error', lang);
+    const errGeneric = t('assessment.error_generic', lang);
 
     try {
       const data = await AssessmentAPI.getQuestions(testId, lang);
@@ -111,11 +119,11 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         setResponses({}); // Reset responses
         setStep('answering');
       } else {
-        Alert.alert(t('common.error', lang), t('assessment.error_load', lang));
+        Alert.alert(errTitle, t('assessment.error_load', lang));
         setStep('select');
       }
     } catch (error: any) {
-      Alert.alert(t('common.error', lang), error.response?.data?.detail || t('assessment.error_generic', lang));
+      Alert.alert(errTitle, error.response?.data?.detail || errGeneric);
       setStep('select');
     } finally {
       setLoading(false);
@@ -134,6 +142,8 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     setStep('submitting');
     setLoading(true);
 
+    const errTitle = t('common.error', lang);
+    const errGeneric = t('assessment.error_generic', lang);
     try {
       const formattedResponses = Object.entries(responses).map(([q_id, score]) => ({
         q_id,
@@ -145,17 +155,17 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         // Try to save result to MongoDB (optional - won't block if it fails)
         try {
           await AssessmentAPI.saveResult(selectedTest, data);
-        } catch (saveError) {
-          console.log('Note: Result not saved to history (requires authentication)');
+        } catch {
+          // Save to history is optional — unauthenticated users can still see results
         }
 
         setResult(data);
         setStep('results');
       } else {
-        Alert.alert(t('common.error', lang), t('assessment.error_generic', lang));
+        Alert.alert(errTitle, errGeneric);
       }
     } catch (error: any) {
-      Alert.alert(t('common.error', lang), error.response?.data?.detail || t('assessment.error_generic', lang));
+      Alert.alert(errTitle, error.response?.data?.detail || errGeneric);
       setStep('answering');
     } finally {
       setLoading(false);
@@ -175,8 +185,8 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   if (step === 'select') {
     return (
       <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <View style={{ flex: 1 }}>
+        <View style={[styles.header, { marginTop: insets.top + 8 }]}>
+          <View style={styles.flex1}>
             <Text style={styles.title}>{t('assessment.title', lang)}</Text>
             <Text style={styles.subtitle}>{t('assessment.subtitle', lang)}</Text>
           </View>
@@ -194,30 +204,30 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          {AVAILABLE_LANGUAGES.map(langOption => (
+          {AVAILABLE_LANGUAGES.map(({ code: lCode, flag: lFlag, name: lName }) => (
             <TouchableOpacity
-              key={langOption.code}
-              style={[styles.langBtn, lang === langOption.code && styles.langBtnActive]}
-              onPress={() => setLang(langOption.code)}
+              key={lCode}
+              style={[styles.langBtn, lang === lCode && styles.langBtnActive]}
+              onPress={() => setLang(lCode)}
             >
-              <Text style={styles.langBtnText}>{langOption.flag} {langOption.name}</Text>
+              <Text style={styles.langBtnText}>{lFlag} {lName}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         {/* Test Kartları */}
-        {TEST_TYPES.map((test) => (
+        {TEST_TYPES.map(({ id: tId, emoji: tEmoji, key: tKey, key_desc: tKeyDesc }) => (
           <TouchableOpacity
-            key={test.id}
-            onPress={() => startTest(test.id)}
+            key={tId}
+            onPress={() => startTest(tId)}
             activeOpacity={0.7}
           >
             <Card style={styles.testCard}>
               <View style={styles.testCardContent}>
-                <Text style={styles.testEmoji}>{test.emoji}</Text>
+                <Text style={styles.testEmoji}>{tEmoji}</Text>
                 <View style={styles.testInfo}>
-                  <Text style={styles.testName}>{t(test.key, lang)}</Text>
-                  <Text style={styles.testDesc}>{t(test.key_desc, lang)}</Text>
+                  <Text style={styles.testName}>{t(tKey, lang)}</Text>
+                  <Text style={styles.testDesc}>{t(tKeyDesc, lang)}</Text>
                   <Badge label={t('assessment.questions', lang)} />
                 </View>
                 <Text style={styles.arrow}>→</Text>
@@ -226,7 +236,7 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </TouchableOpacity>
         ))}
 
-        <View style={{ height: 20 }} />
+        <View style={styles.spacer20} />
       </ScrollView>
     );
   }
@@ -235,17 +245,17 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   if (step === 'loading_questions' && loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={theme.colors.gold} />
+        <ActivityIndicator size="large" color={colors.gold} />
         <Text style={styles.loadingText}>{t('assessment.loading_questions', lang)}</Text>
       </View>
     );
   }
 
   // ─── Adım 3: Cevaplar ──────────────────────────────────────────────────────────
-  if (step === 'answering' && questions.length > 0) {
+  const questionsLen = questions.length;
+  if (step === 'answering' && questionsLen > 0) {
     const answeredCount = Object.keys(responses).length;
     const testInfo = TEST_TYPES.find(t => t.id === selectedTest);
-    const LIKERT_LABELS = useMemo(() => getLikertLabels(lang), [lang]);
 
     return (
       <ScrollView style={styles.container}>
@@ -255,7 +265,7 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={styles.backBtn}>{t('assessment.back', lang)}</Text>
           </TouchableOpacity>
           <Text style={styles.testTitle}>{testInfo ? t(testInfo.key, lang) : ''}</Text>
-          <View style={{ width: 60 }} />
+          <View style={styles.spacer60} />
         </View>
 
         {/* İlerleme */}
@@ -264,16 +274,19 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <View
               style={[
                 styles.progressFill,
-                { width: `${(answeredCount / questions.length) * 100}%` },
+                { width: `${(answeredCount / questionsLen) * 100}%` },
               ]}
             />
           </View>
-          <Text style={styles.progressText}>{answeredCount} / {questions.length} {t('assessment.answered', lang)}</Text>
+          <Text style={styles.progressText}>{answeredCount} / {questionsLen} {t('assessment.answered', lang)}</Text>
         </View>
 
         {/* Sorular */}
-        {questions.map((question, index) => (
-          <Card key={question.q_id} style={styles.questionCard}>
+        {questions.map((question, index) => {
+          const qId       = question.q_id;
+          const qResponse = responses[qId];
+          return (
+          <Card key={qId} style={styles.questionCard}>
             <Text style={styles.questionNumber}>{t('assessment.question_number', lang)} {index + 1}</Text>
             <Text style={styles.questionText}>{question.text}</Text>
 
@@ -284,19 +297,19 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   key={score}
                   style={[
                     styles.likertBtn,
-                    responses[question.q_id] === score && styles.likertBtnSelected,
+                    qResponse === score && styles.likertBtnSelected,
                   ]}
                   onPress={() =>
                     setResponses(prev => ({
                       ...prev,
-                      [question.q_id]: score,
+                      [qId]: score,
                     }))
                   }
                 >
                   <Text
                     style={[
                       styles.likertBtnText,
-                      responses[question.q_id] === score && styles.likertBtnTextSelected,
+                      qResponse === score && styles.likertBtnTextSelected,
                     ]}
                   >
                     {score}
@@ -305,18 +318,19 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               ))}
             </View>
             <Text style={styles.likertLabel}>
-              {responses[question.q_id]
-                ? LIKERT_LABELS[responses[question.q_id] - 1]
+              {responses[qId]
+                ? (LIKERT_LABELS[responses[qId] - 1] ?? t('assessment.choose_answer', lang))
                 : t('assessment.choose_answer', lang)}
             </Text>
           </Card>
-        ))}
+          );
+        })}
 
         {/* Gönder Butonu */}
         <TouchableOpacity
           style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
           onPress={submitResponses}
-          disabled={loading || Object.keys(responses).length < questions.length}
+          disabled={loading || Object.keys(responses).length < questionsLen}
         >
           {loading ? (
             <ActivityIndicator color="white" />
@@ -325,7 +339,7 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           )}
         </TouchableOpacity>
 
-        <View style={{ height: 20 }} />
+        <View style={styles.spacer20} />
       </ScrollView>
     );
   }
@@ -344,34 +358,34 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {/* Genel Skor */}
         <Card style={styles.scoreCard}>
           <Text style={styles.scoreLabel}>{t('assessment.overall_score', lang)}</Text>
-          <Text style={styles.scoreBig}>{data.overall_score.toFixed(2)}/5.0</Text>
+          <Text style={styles.scoreBig}>{(Number(data.overall_score) || 0).toFixed(2)}/5.0</Text>
           <Badge label={lang === 'tr' ? data.overall_level_tr : data.overall_level} />
         </Card>
 
         {/* Alan Puanları */}
-        <SectionLabel label={t('assessment.field_scores', lang)} />
+        <SectionLabel>{t('assessment.field_scores', lang)}</SectionLabel>
         {Object.entries(data.breakdown).map(([domain, scores]) => (
           <Card key={domain} style={styles.domainCard}>
             <View style={styles.domainHeader}>
               <Text style={styles.domainName}>{domain}</Text>
-              <Text style={styles.domainScore}>{(scores as any).score.toFixed(2)}</Text>
+              <Text style={styles.domainScore}>{(Number(scores.score) || 0).toFixed(2)}</Text>
             </View>
             <View style={styles.domainBar}>
               <View
                 style={[
                   styles.domainBarFill,
-                  { width: `${((scores as any).score / 5) * 100}%` },
+                  { width: `${Math.min(Math.max((Number(scores.score) || 0) / 5 * 100, 0), 100)}%` },
                 ]}
               />
             </View>
-            <Text style={styles.domainLevel}>{lang === 'tr' ? (scores as any).level_tr : (scores as any).level}</Text>
+            <Text style={styles.domainLevel}>{lang === 'tr' ? scores.level_tr : scores.level}</Text>
           </Card>
         ))}
 
         {/* Tavsiyeler */}
         {data.recommendations.length > 0 && (
           <>
-            <SectionLabel label={t('assessment.recommendations', lang)} />
+            <SectionLabel>{t('assessment.recommendations', lang)}</SectionLabel>
             {data.recommendations.map((rec, idx) => (
               <Card key={idx} style={styles.recommendationCard}>
                 <Text style={styles.recommendationBullet}>•</Text>
@@ -379,7 +393,7 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </Card>
             ))}
             <Text style={styles.recommendationStatus}>
-              {data.recommendations_status === 'success' ? '✅ AI Generated' : '✓ Template Suggestions'}
+              {data.recommendations_status === 'success' ? t('assessment.ai_generated', lang) : t('assessment.template_suggestions', lang)}
             </Text>
           </>
         )}
@@ -392,7 +406,7 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Text style={styles.retakeBtnText}>{t('assessment.another_test', lang)}</Text>
         </TouchableOpacity>
 
-        <View style={{ height: 20 }} />
+        <View style={styles.spacer20} />
       </ScrollView>
     );
   }
@@ -403,17 +417,16 @@ const AssessmentScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     paddingHorizontal: 16,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   header: {
-    marginTop: 24,
     marginBottom: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -423,9 +436,9 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -435,12 +448,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   langSelector: {
     flexDirection: 'row',
@@ -452,19 +465,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
   },
   langBtnActive: {
-    backgroundColor: theme.colors.gold,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.gold,
+    borderColor: colors.gold,
   },
   langBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
   },
   testCard: {
     marginBottom: 12,
@@ -484,17 +497,17 @@ const styles = StyleSheet.create({
   testName: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   testDesc: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   arrow: {
     fontSize: 20,
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   // Test Header
   testHeader: {
@@ -506,13 +519,13 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     fontSize: 16,
-    color: theme.colors.gold,
+    color: colors.gold,
     fontWeight: '600',
   },
   testTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
   },
   // Progress
   progressContainer: {
@@ -520,18 +533,18 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: theme.colors.border,
+    backgroundColor: colors.border,
     borderRadius: 3,
     marginBottom: 8,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
   },
   progressText: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   // Sorular
   questionCard: {
@@ -539,13 +552,13 @@ const styles = StyleSheet.create({
   },
   questionNumber: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   questionText: {
     fontSize: 16,
     fontWeight: '500',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 16,
     lineHeight: 22,
   },
@@ -560,32 +573,32 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 4,
     borderRadius: 8,
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     borderWidth: 2,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   likertBtnSelected: {
-    backgroundColor: theme.colors.gold,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.gold,
+    borderColor: colors.gold,
   },
   likertBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   likertBtnTextSelected: {
     color: 'white',
   },
   likertLabel: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   // Gönder
   submitBtn: {
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -607,24 +620,24 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: colors.text,
   },
   scoreCard: {
-    backgroundColor: `${theme.colors.gold}15`,
+    backgroundColor: `${colors.gold}15`,
     borderWidth: 2,
-    borderColor: theme.colors.gold,
+    borderColor: colors.gold,
     alignItems: 'center',
     marginBottom: 24,
   },
   scoreLabel: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   scoreBig: {
     fontSize: 48,
     fontWeight: '700',
-    color: theme.colors.gold,
+    color: colors.gold,
     marginBottom: 8,
   },
   // Alan Puanları
@@ -640,28 +653,28 @@ const styles = StyleSheet.create({
   domainName: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     flex: 1,
   },
   domainScore: {
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   domainBar: {
     height: 6,
-    backgroundColor: theme.colors.border,
+    backgroundColor: colors.border,
     borderRadius: 3,
     marginBottom: 4,
     overflow: 'hidden',
   },
   domainBarFill: {
     height: '100%',
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
   },
   domainLevel: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   // Tavsiyeler
   recommendationCard: {
@@ -670,26 +683,26 @@ const styles = StyleSheet.create({
   },
   recommendationBullet: {
     fontSize: 18,
-    color: theme.colors.gold,
+    color: colors.gold,
     marginRight: 12,
     fontWeight: '700',
   },
   recommendationText: {
     flex: 1,
     fontSize: 14,
-    color: theme.colors.text,
+    color: colors.text,
     lineHeight: 20,
   },
   recommendationStatus: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 8,
     marginBottom: 16,
     textAlign: 'center',
   },
   // Yeniden Test Butonu
   retakeBtn: {
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -703,8 +716,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: theme.colors.text,
+    color: colors.text,
   },
+  flex1:     { flex: 1 },
+  spacer20:  { height: 20 },
+  spacer60:  { width: 60 },
 });
 
 export default AssessmentScreen;

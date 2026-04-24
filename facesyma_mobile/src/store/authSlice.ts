@@ -1,7 +1,7 @@
 // src/store/authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthAPI } from '../services/api';
+import { AuthAPI, setCachedToken } from '../services/api';
 
 export interface User {
   id: number;
@@ -34,10 +34,11 @@ export const loginWithEmail = createAsyncThunk(
     try {
       const data = await AuthAPI.loginEmail(email, password);
       await AuthAPI.saveTokens(data.access, data.refresh);
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      return data.user as User;
+      const user = data.user as User;
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      return user;
     } catch (e: any) {
-      return rejectWithValue(e.response?.data?.detail || 'Giriş başarısız');
+      return rejectWithValue(e.response?.data?.detail || 'Login failed');
     }
   }
 );
@@ -48,10 +49,11 @@ export const loginWithGoogle = createAsyncThunk(
     try {
       const data = await AuthAPI.loginGoogle(idToken);
       await AuthAPI.saveTokens(data.access, data.refresh);
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      return data.user as User;
+      const user = data.user as User;
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      return user;
     } catch (e: any) {
-      return rejectWithValue(e.response?.data?.detail || 'Google girişi başarısız');
+      return rejectWithValue(e.response?.data?.detail || 'Google login failed');
     }
   }
 );
@@ -65,7 +67,7 @@ export const registerWithEmail = createAsyncThunk(
       await AsyncStorage.setItem('user', JSON.stringify(res.user));
       return res.user as User;
     } catch (e: any) {
-      return rejectWithValue(e.response?.data?.email?.[0] || 'Kayıt başarısız');
+      return rejectWithValue(e.response?.data?.email?.[0] || 'Registration failed');
     }
   }
 );
@@ -77,11 +79,12 @@ export const restoreSession = createAsyncThunk(
       const userStr = await AsyncStorage.getItem('user');
       const token   = await AsyncStorage.getItem('access_token');
       if (userStr && token) {
+        setCachedToken(token);
         return JSON.parse(userStr) as User;
       }
       return null;
     } catch {
-      return rejectWithValue('Oturum yüklenemedi');
+      return rejectWithValue('Session could not be restored');
     }
   }
 );
@@ -105,11 +108,12 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     const pending   = (state: AuthState) => { state.isLoading = true; state.error = null; };
     const fulfilled = (state: AuthState, action: PayloadAction<User | null>) => {
+      const p = action.payload;
       state.isLoading = false;
-      state.user = action.payload;
-      state.isAuthenticated = !!action.payload;
+      state.user = p;
+      state.isAuthenticated = !!p;
     };
-    const rejected  = (state: AuthState, action: any) => {
+    const rejected  = (state: AuthState, action: { payload: unknown }) => {
       state.isLoading = false;
       state.error = action.payload as string;
     };

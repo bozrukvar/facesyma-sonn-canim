@@ -36,7 +36,7 @@ Kullanım:
   python generate_coach_dataset.py --push-mongo
 """
 
-import json, random, argparse, sys, copy
+import json, os, random, argparse, sys, copy
 from pathlib import Path
 from datetime import datetime
 
@@ -835,9 +835,11 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
         combined = [item for lst in lists for item in lst]
         return random.choice(combined) if combined else ""
 
+    _njoin = '\n'.join
+
     if is_tr:
         entry = {
-            "saglik_esenwlik": "\n".join([
+            "saglik_esenwlik": _njoin([
                 "🌿 Güçlü Yönler",
                 *_pick(SAGLIK_TR["pozitif"], 2),
                 "\n📈 Gelişim Alanları",
@@ -847,7 +849,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n✅ Pratik Adımlar",
                 *_pick(SAGLIK_TR["pratik"], 2),
             ]),
-            "dogruluk_sadakat": "\n".join([
+            "dogruluk_sadakat": _njoin([
                 "🔍 Profil",
                 *_pick(DOGRULUK_TR["profil"], 1),
                 "\n💪 Güçlü Yönler",
@@ -855,7 +857,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n⚠️ Dikkat",
                 *_pick(DOGRULUK_TR["dikkat"], 1),
             ]),
-            "guvenlik": "\n".join([
+            "guvenlik": _njoin([
                 "🛡️ Kişisel Güvenlik",
                 *_pick(GUVENLIK_TR["kisisel"], 1),
                 "\n💙 Duygusal Güvenlik",
@@ -865,7 +867,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n✅ Tavsiyeler",
                 *_pick(GUVENLIK_TR["tavsiye"], 2),
             ]),
-            "suc_egilim": "\n".join([
+            "suc_egilim": _njoin([
                 "📊 Risk Profili",
                 *_pick(SUC_EGILIM_TR["risk_alma"], 1),
                 "\n🛡️ Koruyucu Faktörler",
@@ -874,7 +876,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 *_pick(SUC_EGILIM_TR["tavsiye"], 1),
                 f"\n⚕️ Not: {SUC_EGILIM_TR['profesyonel_not']}",
             ]),
-            "iliski_yonetimi": "\n".join([
+            "iliski_yonetimi": _njoin([
                 "💑 İlişki Stili",
                 *_pick(ILISKI_TR["stil"], 1),
                 "\n💪 Güçlü Yönler",
@@ -884,7 +886,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n✅ Tavsiyeler",
                 *_pick(ILISKI_TR["tavsiye"], 2),
             ]),
-            "iletisim_becerileri": "\n".join([
+            "iletisim_becerileri": _njoin([
                 "🗣️ İletişim Stili",
                 *_pick(ILETISIM_TR["stil"], 1),
                 "\n💪 Güçlü Yönler",
@@ -894,7 +896,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n💻 Dijital İletişim",
                 *_pick(ILETISIM_TR["dijital"], 1),
             ]),
-            "stres_yonetimi": "\n".join([
+            "stres_yonetimi": _njoin([
                 "🔴 Tetikleyiciler",
                 *_pick(STRES_TR["tetikleyici"], 2),
                 "\n💚 Başa Çıkma Yöntemleri",
@@ -902,7 +904,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n🔵 Uzun Vadeli Stratejiler",
                 *_pick(STRES_TR["uzun_vadeli"], 1),
             ]),
-            "ozguven": "\n".join([
+            "ozguven": _njoin([
                 "📊 Mevcut Düzey",
                 *_pick(OZGUVEN_TR["mevcut_duzey"], 1),
                 "\n🎯 Pratik Adımlar",
@@ -910,7 +912,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n🧍 Beden Dili",
                 *_pick(OZGUVEN_TR["beden_dili"], 1),
             ]),
-            "zaman_yonetimi": "\n".join([
+            "zaman_yonetimi": _njoin([
                 "⏰ Zaman Stili",
                 *_pick(ZAMAN_TR["stil"], 1),
                 "\n🛠️ Teknikler",
@@ -918,7 +920,7 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n⚠️ Tuzaklar",
                 *_pick(ZAMAN_TR["tuzaklar"], 1),
             ]),
-            "kisisel_hedefler": "\n".join([
+            "kisisel_hedefler": _njoin([
                 "🎯 Kısa Vadeli (1-3 ay)",
                 *_pick(HEDEF_TR["kisa_vadeli"], 1),
                 "\n📅 Orta Vadeli (3-12 ay)",
@@ -928,28 +930,28 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
                 "\n💪 Engelleri Aşmak",
                 *_pick(HEDEF_TR["engeller"], 1),
             ]),
-            "astroloji_harita": "\n".join([
+            "astroloji_harita": _njoin([
                 f"ℹ️ {ASTROLOJI_HARITA_TR['aciklama']}",
                 "\n🪐 Gezegen Etkileri",
                 *[f"• {k.capitalize()}: {v}" for k, v in ASTROLOJI_HARITA_TR["planet_etkileri"].items()],
                 "\n🔮 Yorumlar",
                 *_pick(ASTROLOJI_HARITA_TR["yorumlar"], 2),
             ]),
-            "dogum_analizi": "\n".join([
+            "dogum_analizi": _njoin([
                 f"ℹ️ {DOGUM_ANALIZI_TR['aciklama']}",
                 "\n🔢 Numeroloji",
                 *[f"• {k}: {v}" for k, v in DOGUM_ANALIZI_TR["numeroloji"].items()],
                 "\n⏰ Doğum Saati Enerjisi",
                 *[f"• {k}: {v}" for k, v in DOGUM_ANALIZI_TR["saatlik_enerji"].items()],
             ]),
-            "yas_koc_ozet": "\n".join([
+            "yas_koc_ozet": _njoin([
                 *_pick(KOC_OZET_TR["giriş"], 1),
                 "\n📊 Yaşam Alanları",
                 *KOC_OZET_TR["alanlar"],
                 "\n🎯 Eylem Planı",
                 *KOC_OZET_TR["eylem_plani"],
             ]),
-            "vucut_dil": "\n".join([
+            "vucut_dil": _njoin([
                 "😊 Yüz İfadesi",
                 *_pick(VUCUT_DIL_TR["yuz_ifadesi"], 2),
                 "\n🧍 Postür Tavsiyeleri",
@@ -961,84 +963,84 @@ def generate_coach_entry(sifat: str, existing: dict, lang: str) -> dict:
     else:
         # EN (diğer tüm diller EN şablonla üretilir, daha sonra çeviri API ile çevrilir)
         entry = {
-            "saglik_esenwlik": "\n".join([
+            "saglik_esenwlik": _njoin([
                 "🌿 Strengths", *_pick(SAGLIK_EN["pozitif"], 2),
                 "\n📈 Growth Areas", *_pick(SAGLIK_EN["gelisim"], 2),
                 "\n⚠️ Watch Out", *_pick(SAGLIK_EN["risk"], 1),
                 "\n✅ Practical Steps", *_pick(SAGLIK_EN["pratik"], 2),
             ]),
-            "dogruluk_sadakat": "\n".join([
+            "dogruluk_sadakat": _njoin([
                 "🔍 Profile", *_pick(DOGRULUK_EN["profil"], 1),
                 "\n💪 Strengths", *_pick(DOGRULUK_EN["guclu"], 2),
                 "\n⚠️ Watch Out", *_pick(DOGRULUK_EN["dikkat"], 1),
             ]),
-            "guvenlik": "\n".join([
+            "guvenlik": _njoin([
                 "🛡️ Personal Security", *_pick(GUVENLIK_EN["kisisel"], 1),
                 "\n💙 Emotional Security", *_pick(GUVENLIK_EN["duygusal"], 1),
                 "\n💰 Financial Security", *_pick(GUVENLIK_EN["finansal"], 1),
                 "\n✅ Recommendations", *_pick(GUVENLIK_EN["tavsiye"], 2),
             ]),
-            "suc_egilim": "\n".join([
+            "suc_egilim": _njoin([
                 "📊 Risk Profile", *_pick(SUC_EGILIM_EN["risk_alma"], 1),
                 "\n🛡️ Protective Factors", *_pick(SUC_EGILIM_EN["koruyucu"], 2),
                 "\n💡 Recommendations", *_pick(SUC_EGILIM_EN["tavsiye"], 1),
                 f"\n⚕️ Note: {SUC_EGILIM_EN['profesyonel_not']}",
             ]),
-            "iliski_yonetimi": "\n".join([
+            "iliski_yonetimi": _njoin([
                 "💑 Relationship Style", *_pick(ILISKI_EN["stil"], 1),
                 "\n💪 Strengths", *_pick(ILISKI_EN["guclu"], 2),
                 "\n⚠️ Challenges", *_pick(ILISKI_EN["zorluk"], 1),
                 "\n✅ Recommendations", *_pick(ILISKI_EN["tavsiye"], 2),
             ]),
-            "iletisim_becerileri": "\n".join([
+            "iletisim_becerileri": _njoin([
                 "🗣️ Communication Style", *_pick(ILETISIM_EN["stil"], 1),
                 "\n💪 Strengths", *_pick(ILETISIM_EN["guclu"], 2),
                 "\n📈 Growth Steps", *_pick(ILETISIM_EN["gelisim"], 2),
                 "\n💻 Digital Communication", *_pick(ILETISIM_EN["dijital"], 1),
             ]),
-            "stres_yonetimi": "\n".join([
+            "stres_yonetimi": _njoin([
                 "🔴 Triggers", *_pick(STRES_EN["tetikleyici"], 2),
                 "\n💚 Coping Methods", *_pick(STRES_EN["basa_cikma"], 2),
                 "\n🔵 Long-Term Strategies", *_pick(STRES_EN["uzun_vadeli"], 1),
             ]),
-            "ozguven": "\n".join([
+            "ozguven": _njoin([
                 "📊 Current Level", *_pick(OZGUVEN_EN["mevcut_duzey"], 1),
                 "\n🎯 Practical Steps", *_pick(OZGUVEN_EN["pratik_adimlar"], 2),
                 "\n🧍 Body Language", *_pick(OZGUVEN_EN["beden_dili"], 1),
             ]),
-            "zaman_yonetimi": "\n".join([
+            "zaman_yonetimi": _njoin([
                 "⏰ Time Style", *_pick(ZAMAN_EN["stil"], 1),
                 "\n🛠️ Techniques", *_pick(ZAMAN_EN["tekniker"], 2),
                 "\n⚠️ Pitfalls", *_pick(ZAMAN_EN["tuzaklar"], 1),
             ]),
-            "kisisel_hedefler": "\n".join([
+            "kisisel_hedefler": _njoin([
                 "🎯 Short-Term (1-3 months)", *_pick(HEDEF_EN["kisa_vadeli"], 1),
                 "\n📅 Mid-Term (3-12 months)", *_pick(HEDEF_EN["orta_vadeli"], 1),
                 "\n🚀 Long-Term (1-5 years)", *_pick(HEDEF_EN["uzun_vadeli"], 1),
                 "\n💪 Overcoming Barriers", *_pick(HEDEF_EN["engeller"], 1),
             ]),
-            "astroloji_harita": "\n".join([
+            "astroloji_harita": _njoin([
                 f"ℹ️ {ASTROLOJI_HARITA_EN['aciklama']}",
                 "\n🪐 Planetary Influences",
                 *[f"• {k.capitalize()}: {v}" for k, v in ASTROLOJI_HARITA_EN["planet_etkileri"].items()],
                 "\n🔮 Interpretations",
                 *_pick(ASTROLOJI_HARITA_EN["yorumlar"], 2),
             ]),
-            "dogum_analizi": "\n".join([
+            "dogum_analizi": _njoin([
                 f"ℹ️ {DOGUM_ANALIZI_EN['aciklama']}",
                 "\n🔢 Numerology",
                 *[f"• {k}: {v}" for k, v in DOGUM_ANALIZI_EN["numeroloji"].items()],
                 "\n⏰ Birth Time Energy",
                 *[f"• {k}: {v}" for k, v in DOGUM_ANALIZI_EN["saatlik_enerji"].items()],
             ]),
-            "yas_koc_ozet": "\n".join([
+            "yas_koc_ozet": _njoin([
                 *_pick(KOC_OZET_EN["giriş"], 1),
                 "\n📊 Life Domains",
                 *KOC_OZET_EN["alanlar"],
                 "\n🎯 Action Plan",
                 *KOC_OZET_EN["eylem_plani"],
             ]),
-            "vucut_dil": "\n".join([
+            "vucut_dil": _njoin([
                 "😊 Facial Expression", *_pick(VUCUT_DIL_EN["yuz_ifadesi"], 2),
                 "\n🧍 Posture Recommendations", *_pick(VUCUT_DIL_EN["postür_tavsiye"], 2),
                 "\n💼 Professional Setting", *_pick(VUCUT_DIL_EN["profesyonel"], 2),
@@ -1064,7 +1066,8 @@ def generate_full_coach_db(
     with open(input_path, encoding="utf-8") as f:
         source_db = json.load(f)
 
-    print(f"Kaynak: {len(source_db)} sıfat okundu")
+    _lsdb = len(source_db)
+    print(f"Kaynak: {_lsdb} sıfat okundu")
     print(f"Dil: {lang} | Çıktı: {output_path}")
 
     coach_db = {}
@@ -1077,7 +1080,7 @@ def generate_full_coach_db(
         coach_db[sifat] = merged
 
         if (i + 1) % 50 == 0:
-            print(f"  {i+1}/{len(source_db)} sıfat işlendi...")
+            print(f"  {i+1}/{_lsdb} sıfat işlendi...")
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(coach_db, f, ensure_ascii=False, indent=2)
@@ -1133,19 +1136,19 @@ def push_to_backup_mongodb(
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
+    _addarg = p.add_argument
     p = argparse.ArgumentParser(
         description="Facesyma koç veri seti üreticisi — 14 yeni modül, 18 dil"
     )
-    p.add_argument("--input",  default="../facesyma_migrate/sifat_veritabani.json")
-    p.add_argument("--output", default="sifat_coach_{lang}.json")
-    p.add_argument("--lang",   default="tr",
+    _addarg("--input",  default="../facesyma_migrate/sifat_veritabani.json")
+    _addarg("--output", default="sifat_coach_{lang}.json")
+    _addarg("--lang",   default="tr",
                    choices=["tr","en","de","ru","ar","es","ko","ja",
                             "zh","hi","fr","pt","bn","id","ur","it","vi","pl"])
-    p.add_argument("--all-langs",  action="store_true", help="Tüm dilleri üret")
-    p.add_argument("--push-mongo", action="store_true", help="MongoDB backup'a yaz")
-    p.add_argument("--mongo-uri",
-                   default="mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-                           "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE")
+    _addarg("--all-langs",  action="store_true", help="Tüm dilleri üret")
+    _addarg("--push-mongo", action="store_true", help="MongoDB backup'a yaz")
+    _addarg("--mongo-uri",
+                   default=os.environ.get("MONGO_URI", ""))
     args = p.parse_args()
 
     input_path = Path(args.input)
@@ -1156,15 +1159,16 @@ def main():
     langs = (["tr","en","de","ru","ar","es","ko","ja","zh","hi","fr","pt","bn","id","ur","it","vi","pl"]
              if args.all_langs else [args.lang])
 
+    _apm = args.push_mongo
     for lang in langs:
         out = Path(args.output.replace("{lang}", lang))
         db  = generate_full_coach_db(input_path, out, lang)
 
-        if args.push_mongo:
+        if _apm:
             push_to_backup_mongodb(db, lang, args.mongo_uri)
 
     print("\n✓ Tüm işlemler tamamlandı")
-    if not args.push_mongo:
+    if not _apm:
         print("\nMongoDB'ye yazmak için:")
         print("  python generate_coach_dataset.py --push-mongo")
 

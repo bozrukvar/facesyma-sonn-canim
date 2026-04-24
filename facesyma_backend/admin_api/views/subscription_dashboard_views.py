@@ -2,92 +2,69 @@
 admin_api/views/subscription_dashboard_views.py
 ================================================
 Subscription dashboard and management views for admin panel.
-Real-time metrics, user lookup, and subscription management.
 """
 
 import json
 import logging
+import re
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
+from admin_api.utils.mongo import _get_db
+from admin_api.utils.auth import _require_admin
 
 log = logging.getLogger(__name__)
 
+_VALID_SUB_ACTIONS = frozenset({'grant_premium', 'downgrade_to_free', 'issue_refund'})
+_SUB_DETAIL_PROJ = {
+    '_id': 0, 'plan': 1, 'active': 1, 'provider': 1, 'tier': 1,
+    'expires_date': 1, 'verified_at': 1, 'cancelled_at': 1, 'entitlements': 1,
+    'original_purchase_date': 1, 'monthly_price': 1, 'billing_currency': 1,
+}
+_SUB_LIST_PROJ    = {'_id': 0, 'user_id': 1, 'plan': 1, 'tier': 1, 'expires_date': 1, 'verified_at': 1}
+_SUB_USER_PROJ    = {'id': 1, 'email': 1, 'username': 1}
+_SUB_USER_ID_PROJ = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'date_joined': 1}
+_SUB_ATRISK_PROJ  = {'_id': 0, 'user_id': 1, 'expires_date': 1, 'tier': 1}
 
-def _get_db():
-    """MongoDB connection"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SUBSCRIPTION METRICS DASHBOARD
-# ══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SubscriptionMetricsView(View):
-    """
-    Real-time subscription metrics dashboard.
-    Shows MRR, active subscriptions, churn rate, etc.
-    """
+    """Real-time subscription metrics dashboard."""
 
     def get(self, request):
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             subscriptions = db['user_subscriptions']
-            now = datetime.now().isoformat()
+            _now = datetime.utcnow()
+            now   = _now.isoformat()
+            ago30 = (_now - timedelta(days=30)).isoformat()
+            ago7  = (_now - timedelta(days=7)).isoformat()
+            _sm = next(subscriptions.aggregate([{'$facet': {
+                'active':   [{'$match': {'plan': 'premium', 'expires_date': {'$gt': now}}}, {'$count': 'n'}],
+                'cancel30': [{'$match': {'cancelled_at': {'$exists': True, '$gte': ago30}}}, {'$count': 'n'}],
+                'new7d':    [{'$match': {'verified_at': {'$gte': ago7}}}, {'$count': 'n'}],
+                'by_tier':  [
+                    {'$match': {'plan': 'premium', 'expires_date': {'$gt': now}}},
+                    {'$group': {'_id': '$tier', 'count': {'$sum': 1}, 'avg_price': {'$avg': '$monthly_price'}}},
+                ],
+            }}]), {})
+            _smget = _sm.get
+            active_count  = (_smget('active',   [{}])[0] or {}).get('n', 0)
+            cancelled_30d = (_smget('cancel30', [{}])[0] or {}).get('n', 0)
+            new_7d        = (_smget('new7d',    [{}])[0] or {}).get('n', 0)
+            by_tier       = _smget('by_tier', [])
 
-            # Active subscriptions
-            active_count = subscriptions.count_documents({
-                'plan': 'premium',
-                'expires_date': {'$gt': now}
-            })
-
-            # Cancelled last 30 days
-            cancelled_30d = subscriptions.count_documents({
-                'cancelled_at': {
-                    '$exists': True,
-                    '$gte': (datetime.now() - timedelta(days=30)).isoformat()
-                }
-            })
-
-            # Calculate MRR (estimate from active subscriptions)
-            by_tier = list(subscriptions.aggregate([
-                {
-                    '$match': {
-                        'plan': 'premium',
-                        'expires_date': {'$gt': now}
-                    }
-                },
-                {
-                    '$group': {
-                        '_id': '$tier',
-                        'count': {'$sum': 1},
-                        'avg_price': {'$avg': '$monthly_price'}
-                    }
-                }
-            ]))
-
-            # Estimate MRR
-            mrr = sum(tier.get('count', 0) * tier.get('avg_price', 0) for tier in by_tier) if by_tier else 0
-
-            # Churn rate
+            mrr = sum((_tg := tier.get)('count', 0) * _tg('avg_price', 0) for tier in by_tier) if by_tier else 0
             churn_rate = (cancelled_30d / active_count * 100) if active_count > 0 else 0
-
-            # New subscriptions (last 7 days)
-            new_7d = subscriptions.count_documents({
-                'verified_at': {
-                    '$gte': (datetime.now() - timedelta(days=7)).isoformat()
-                }
-            })
-
-            # Conversion rate (trial to paid - estimated)
-            # This would need additional tracking in real implementation
-            conversion_rate = 18.5  # Placeholder - should come from payment_transactions
 
             return JsonResponse({
                 'metrics': {
@@ -96,14 +73,13 @@ class SubscriptionMetricsView(View):
                     'arr': round(mrr * 12, 2),
                     'churn_rate_30d': round(churn_rate, 1),
                     'new_subscriptions_7d': new_7d,
-                    'conversion_rate': conversion_rate,
-                    'timestamp': datetime.now().isoformat()
+                    'timestamp': now
                 },
                 'by_tier': [
                     {
-                        'tier': tier.get('_id', 'unknown'),
-                        'count': tier.get('count', 0),
-                        'estimated_mrr': round(tier.get('count', 0) * tier.get('avg_price', 0), 2)
+                        'tier': (_tg := tier.get)('_id', 'unknown'),
+                        'count': (_tc := _tg('count', 0)),
+                        'estimated_mrr': round(_tc * _tg('avg_price', 0), 2)
                     }
                     for tier in by_tier
                 ]
@@ -111,192 +87,181 @@ class SubscriptionMetricsView(View):
 
         except Exception as e:
             log.exception(f'Subscription metrics error: {e}')
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': 'Internal server error.'}, status=500)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# USER SUBSCRIPTION LOOKUP & MANAGEMENT
-# ══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserSubscriptionDetailView(View):
-    """
-    Get detailed subscription info for a user.
-    Admin can view and manage subscription.
-    """
+    """Get and manage subscription for a specific user."""
 
     def get(self, request, user_id):
-        """Get user subscription details"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             db = _get_db()
             subscriptions = db['user_subscriptions']
             users = db['appfaceapi_myuser']
 
-            # Get user info
-            user = users.find_one({'id': int(user_id)})
+            try:
+                uid = int(user_id)
+            except (TypeError, ValueError):
+                return JsonResponse({'error': 'Invalid user_id'}, status=400)
+
+            user = users.find_one({'id': uid}, _SUB_USER_ID_PROJ)
             if not user:
                 return JsonResponse({'error': 'User not found'}, status=404)
 
-            # Get subscription
-            sub = subscriptions.find_one({'user_id': int(user_id)})
+            sub = subscriptions.find_one({'user_id': uid}, _SUB_DETAIL_PROJ)
+
+            _uget = user.get
+            user_data = {
+                'id': user['id'],
+                'email': _uget('email', ''),
+                'username': _uget('username', ''),
+                'date_joined': _uget('date_joined', '')
+            }
 
             if not sub:
-                # Return default free subscription
                 return JsonResponse({
-                    'user': {
-                        'id': user['id'],
-                        'email': user.get('email', ''),
-                        'username': user.get('username', ''),
-                        'date_joined': user.get('date_joined', '')
-                    },
-                    'subscription': {
-                        'plan': 'free',
-                        'active': False,
-                        'provider': None,
-                        'expires_date': None,
-                        'verified_at': None,
-                        'entitlements': []
-                    }
+                    'user': user_data,
+                    'subscription': {'plan': 'free', 'active': False, 'provider': None, 'expires_date': None, 'verified_at': None, 'entitlements': []}
                 })
 
+            _subget = sub.get
+            _plan = _subget('plan', 'free')
             return JsonResponse({
-                'user': {
-                    'id': user['id'],
-                    'email': user.get('email', ''),
-                    'username': user.get('username', ''),
-                    'date_joined': user.get('date_joined', '')
-                },
+                'user': user_data,
                 'subscription': {
-                    'plan': sub.get('plan', 'free'),
-                    'active': sub.get('plan') == 'premium',
-                    'provider': sub.get('provider', ''),
-                    'tier': sub.get('tier', ''),
-                    'expires_date': sub.get('expires_date'),
-                    'verified_at': sub.get('verified_at'),
-                    'cancelled_at': sub.get('cancelled_at'),
-                    'entitlements': list(sub.get('entitlements', {}).keys()),
-                    'original_purchase_date': sub.get('original_purchase_date'),
-                    'monthly_price': sub.get('monthly_price'),
-                    'billing_currency': sub.get('billing_currency')
+                    'plan': _plan,
+                    'active': _plan == 'premium',
+                    'provider': _subget('provider', ''),
+                    'tier': _subget('tier', ''),
+                    'expires_date': _subget('expires_date'),
+                    'verified_at': _subget('verified_at'),
+                    'cancelled_at': _subget('cancelled_at'),
+                    'entitlements': list(_subget('entitlements', {}).keys()),
+                    'original_purchase_date': _subget('original_purchase_date'),
+                    'monthly_price': _subget('monthly_price'),
+                    'billing_currency': _subget('billing_currency')
                 }
             })
 
         except Exception as e:
             log.exception(f'User subscription lookup error: {e}')
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': 'Internal server error.'}, status=500)
 
     def post(self, request, user_id):
-        """Update user subscription (admin override)"""
+        try:
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             data = json.loads(request.body)
+            _admin_email = admin_payload.get('email', 'admin')
+            _now = datetime.utcnow()
+            _now_iso = _now.isoformat()
             db = _get_db()
             subscriptions = db['user_subscriptions']
             users = db['appfaceapi_myuser']
 
-            action = data.get('action')
-            user_id = int(user_id)
+            try:
+                uid = int(user_id)
+            except (TypeError, ValueError):
+                return JsonResponse({'error': 'Invalid user_id'}, status=400)
+
+            _dget = data.get
+            _li   = log.info
+            action = _dget('action')
+            if action not in _VALID_SUB_ACTIONS:
+                return JsonResponse({'error': f'Unknown action. Allowed: {", ".join(sorted(_VALID_SUB_ACTIONS))}'}, status=400)
 
             if action == 'grant_premium':
-                # Grant premium access
-                tier = data.get('tier', 'tier_d')
-                days = data.get('days', 30)
+                tier = _dget('tier', 'tier_d')
+                if tier not in ('tier_a', 'tier_b', 'tier_c', 'tier_d'):
+                    return JsonResponse({'error': 'Invalid tier. Allowed: tier_a, tier_b, tier_c, tier_d'}, status=400)
+                try:
+                    days = min(max(1, int(_dget('days', 30))), 365)
+                except (TypeError, ValueError):
+                    days = 30
 
-                expires = (datetime.now() + timedelta(days=days)).isoformat()
+                expires = (_now + timedelta(days=days)).isoformat()
 
                 subscriptions.update_one(
-                    {'user_id': user_id},
-                    {
-                        '$set': {
-                            'plan': 'premium',
-                            'tier': tier,
-                            'provider': 'admin_grant',
-                            'expires_date': expires,
-                            'verified_at': datetime.now().isoformat(),
-                            'entitlements': {'premium': True}
-                        }
-                    },
+                    {'user_id': uid},
+                    {'$set': {'plan': 'premium', 'tier': tier, 'provider': 'admin_grant', 'expires_date': expires, 'verified_at': _now_iso, 'entitlements': {'premium': True}, 'granted_by': _admin_email}},
                     upsert=True
                 )
+                users.update_one({'id': uid}, {'$set': {'plan': 'premium'}})
+                _li(f"Admin {_admin_email} granted premium to user {uid} for {days} days")
 
-                users.update_one(
-                    {'id': user_id},
-                    {'$set': {'plan': 'premium'}}
-                )
-
-                log.info(f"✅ Admin granted premium to user {user_id} for {days} days")
-
-                return JsonResponse({
-                    'success': True,
-                    'message': f'Premium granted for {days} days',
-                    'expires': expires
-                })
+                return JsonResponse({'success': True, 'message': f'Premium granted for {days} days', 'expires': expires})
 
             elif action == 'downgrade_to_free':
-                # Downgrade to free
                 subscriptions.update_one(
-                    {'user_id': user_id},
-                    {
-                        '$set': {
-                            'plan': 'free',
-                            'cancelled_at': datetime.now().isoformat()
-                        }
-                    }
+                    {'user_id': uid},
+                    {'$set': {'plan': 'free', 'cancelled_at': _now_iso, 'cancelled_by': _admin_email}}
                 )
+                users.update_one({'id': uid}, {'$set': {'plan': 'free'}})
+                _li(f"Admin {_admin_email} downgraded user {uid} to free")
 
-                users.update_one(
-                    {'id': user_id},
-                    {'$set': {'plan': 'free'}}
-                )
-
-                log.info(f"✅ Admin downgraded user {user_id} to free")
-
-                return JsonResponse({
-                    'success': True,
-                    'message': 'User downgraded to free plan'
-                })
+                return JsonResponse({'success': True, 'message': 'User downgraded to free plan'})
 
             elif action == 'issue_refund':
-                # Record refund
-                amount = data.get('amount', 0)
-                reason = data.get('reason', 'Admin refund')
+                try:
+                    amount = float(_dget('amount', 0))
+                except (TypeError, ValueError):
+                    amount = 0.0
+                reason = str(_dget('reason', 'Admin refund'))[:500]
 
                 db['payment_transactions'].insert_one({
-                    'user_id': user_id,
+                    'user_id': uid,
                     'provider': 'admin_refund',
                     'amount': -amount,
                     'status': 'refunded',
                     'reason': reason,
-                    'created_at': datetime.now().isoformat()
+                    'issued_by': _admin_email,
+                    'created_at': _now_iso
                 })
+                _li(f"Admin {_admin_email} issued refund to user {uid}: ${amount}")
 
-                log.info(f"✅ Admin refund issued to user {user_id}: ${amount}")
-
-                return JsonResponse({
-                    'success': True,
-                    'message': f'Refund of ${amount} recorded'
-                })
-
-            else:
-                return JsonResponse({'error': 'Unknown action'}, status=400)
+                return JsonResponse({'success': True, 'message': f'Refund of ${amount} recorded'})
 
         except Exception as e:
             log.exception(f'Subscription update error: {e}')
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': 'Internal server error.'}, status=500)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SUBSCRIPTION SEARCH
-# ══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SubscriptionSearchView(View):
-    """Search users by subscription status or email"""
+    """Search users by subscription status or email."""
 
     def get(self, request):
         try:
-            query = request.GET.get('q', '').strip()
-            status = request.GET.get('status', 'all')  # all, premium, free
-            limit = int(request.GET.get('limit', 50))
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            query = _qpget('q', '').strip()[:100]
+            status = _qpget('status', 'all')
+            if status not in ('all', 'premium', 'free'):
+                status = 'all'
+            try:
+                limit = min(max(1, int(_qpget('limit', 50))), 200)
+            except (ValueError, TypeError):
+                limit = 50
 
             if not query and status == 'all':
                 return JsonResponse({'error': 'Provide search query or status filter'}, status=400)
@@ -305,21 +270,17 @@ class SubscriptionSearchView(View):
             subscriptions = db['user_subscriptions']
             users = db['appfaceapi_myuser']
 
-            # Build MongoDB query
             mongo_query = {}
-
             if status != 'all':
                 mongo_query['plan'] = status
 
             if query:
-                # Search by email or username
+                safe_query = re.escape(query)
                 user_list = list(users.find(
-                    {
-                        '$or': [
-                            {'email': {'$regex': query, '$options': 'i'}},
-                            {'username': {'$regex': query, '$options': 'i'}}
-                        ]
-                    },
+                    {'$or': [
+                        {'email': {'$regex': safe_query, '$options': 'i'}},
+                        {'username': {'$regex': safe_query, '$options': 'i'}}
+                    ]},
                     {'_id': 0, 'id': 1}
                 ).limit(limit))
 
@@ -329,64 +290,69 @@ class SubscriptionSearchView(View):
                 user_ids = [u['id'] for u in user_list]
                 mongo_query['user_id'] = {'$in': user_ids}
 
-            # Find subscriptions
-            results = list(subscriptions.find(mongo_query).limit(limit))
+            results = list(subscriptions.find(mongo_query, _SUB_LIST_PROJ).limit(limit))
 
-            # Enrich with user info
+            sub_user_ids = [s['user_id'] for s in results]
+            users_map = {u['id']: u for u in users.find(
+                {'id': {'$in': sub_user_ids}}, _SUB_USER_PROJ
+            )}
             enriched = []
             for sub in results:
-                user = users.find_one({'id': sub['user_id']})
+                _uid = sub['user_id']
+                user = users_map.get(_uid)
+                _s2get = sub.get
                 enriched.append({
-                    'user_id': sub['user_id'],
+                    'user_id': _uid,
                     'email': user.get('email', '') if user else '',
                     'username': user.get('username', '') if user else '',
-                    'plan': sub.get('plan', 'free'),
-                    'tier': sub.get('tier', ''),
-                    'expires_date': sub.get('expires_date'),
-                    'verified_at': sub.get('verified_at')
+                    'plan': _s2get('plan', 'free'),
+                    'tier': _s2get('tier', ''),
+                    'expires_date': _s2get('expires_date'),
+                    'verified_at': _s2get('verified_at')
                 })
 
-            return JsonResponse({
-                'count': len(enriched),
-                'results': enriched
-            })
+            return JsonResponse({'count': len(enriched), 'results': enriched})
 
         except Exception as e:
             log.exception(f'Subscription search error: {e}')
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': 'Internal server error.'}, status=500)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# CHURN ANALYSIS
-# ══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChurnAnalysisView(View):
-    """Analyze churn patterns and at-risk users"""
+    """Analyze churn patterns and at-risk users."""
 
     def get(self, request):
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             subscriptions = db['user_subscriptions']
-            now = datetime.now()
+            now = datetime.utcnow()
 
-            # Calculate churn for different periods
-            churn_data = {}
-            for days in [7, 30, 90]:
-                period_start = (now - timedelta(days=days)).isoformat()
-                cancelled = subscriptions.count_documents({
-                    'cancelled_at': {'$gte': period_start}
-                })
-                churn_data[f'churn_{days}d'] = cancelled
+            p7  = (now - timedelta(days=7)).isoformat()
+            p30 = (now - timedelta(days=30)).isoformat()
+            p90 = (now - timedelta(days=90)).isoformat()
+            _churn = next(subscriptions.aggregate([{'$group': {'_id': None,
+                'churn_7d':  {'$sum': {'$cond': [{'$gte': ['$cancelled_at', p7]},  1, 0]}},
+                'churn_30d': {'$sum': {'$cond': [{'$gte': ['$cancelled_at', p30]}, 1, 0]}},
+                'churn_90d': {'$sum': {'$cond': [{'$gte': ['$cancelled_at', p90]}, 1, 0]}},
+            }}]), {'churn_7d': 0, 'churn_30d': 0, 'churn_90d': 0})
+            churn_data = {
+                'churn_7d':  _churn['churn_7d'],
+                'churn_30d': _churn['churn_30d'],
+                'churn_90d': _churn['churn_90d'],
+            }
 
-            # At-risk users (expiring soon - within 7 days)
             expiring_soon = (now + timedelta(days=7)).isoformat()
             at_risk = list(subscriptions.find(
-                {
-                    'plan': 'premium',
-                    'expires_date': {'$lt': expiring_soon, '$gt': now.isoformat()}
-                },
-                {'_id': 0, 'user_id': 1, 'expires_date': 1, 'tier': 1}
+                {'plan': 'premium', 'expires_date': {'$lt': expiring_soon, '$gt': now.isoformat()}},
+                _SUB_ATRISK_PROJ
             ).limit(50))
 
             return JsonResponse({
@@ -397,4 +363,4 @@ class ChurnAnalysisView(View):
 
         except Exception as e:
             log.exception(f'Churn analysis error: {e}')
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': 'Internal server error.'}, status=500)

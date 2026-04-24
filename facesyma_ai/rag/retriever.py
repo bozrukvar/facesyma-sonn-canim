@@ -25,30 +25,69 @@ log = logging.getLogger(__name__)
 def _load_question_files():
     """Load 18-language conversation and module-specific question files"""
     questions_data = {}
+    _osp = os.path
+    _ospj = _osp.join
+    _ospe = _osp.exists
+    _jl = json.load
 
-    base_path = os.path.dirname(__file__)
+    base_path = _osp.dirname(__file__)
+    _lwarn = log.warning
 
     # Load conversation starters
-    conv_file = os.path.join(base_path, 'data', 'conversation_starters_18lang.json')
-    if os.path.exists(conv_file):
+    conv_file = _ospj(base_path, 'data', 'conversation_starters_18lang.json')
+    if _ospe(conv_file):
         try:
             with open(conv_file, 'r', encoding='utf-8') as f:
-                questions_data['conversation_starters'] = json.load(f)
+                questions_data['conversation_starters'] = _jl(f)
         except Exception as e:
-            log.warning(f"Could not load conversation starters: {e}")
+            _lwarn(f"Could not load conversation starters: {e}")
 
     # Load module-specific questions
-    mod_file = os.path.join(base_path, 'data', 'module_specific_questions_18lang.json')
-    if os.path.exists(mod_file):
+    mod_file = _ospj(base_path, 'data', 'module_specific_questions_18lang.json')
+    if _ospe(mod_file):
         try:
             with open(mod_file, 'r', encoding='utf-8') as f:
-                questions_data['module_questions'] = json.load(f)
+                questions_data['module_questions'] = _jl(f)
         except Exception as e:
-            log.warning(f"Could not load module questions: {e}")
+            _lwarn(f"Could not load module questions: {e}")
 
     return questions_data
 
 _QUESTIONS_CACHE = _load_question_files()
+
+_CATEGORY_KEYWORDS = {
+    'self_discovery': ['kendimi', 'ben', 'kimim', 'özgün', 'hakiki', 'gerçek', 'myself', 'who am i', 'true self', 'authentic'],
+    'relationships': ['ilişki', 'kişi', 'arkadaş', 'aile', 'sevgi', 'bağlantı', 'relationship', 'friend', 'family', 'love'],
+    'career': ['kariyer', 'işim', 'meslek', 'başarı', 'hedef', 'career', 'job', 'profession', 'success'],
+    'purpose': ['amaç', 'anlam', 'yaşam', 'hayat', 'purpose', 'meaning', 'life'],
+    'potential': ['yetenekler', 'potansiyel', 'başarabilir', 'gelişim', 'talent', 'potential', 'capability'],
+    'transformation': ['değişim', 'dönüşüm', 'gelişim', 'öğrendim', 'change', 'growth', 'transformation'],
+    'shadows': ['gölgeler', 'karanlık', 'çelişki', 'shadow', 'conflict', 'darkness'],
+}
+
+_MODULE_KEYWORDS = {
+    'career': ['kariyer', 'işim', 'meslekçi', 'career', 'job', 'work'],
+    'music': ['müzik', 'şarkı', 'ritim', 'music', 'song', 'rhythm'],
+    'relationships': ['ilişki', 'aşk', 'partner', 'relationship', 'love'],
+    'education': ['öğrenme', 'eğitim', 'okul', 'learning', 'education', 'school'],
+    'sports': ['spor', 'fizik', 'atletik', 'sports', 'athletic', 'exercise'],
+    'creativity': ['yaratıcılık', 'sanat', 'tasarım', 'creativity', 'art', 'design'],
+}
+
+_RATIO_KEYWORDS = [
+    "oran", "ratio", "skor", "score", "güzel", "beautiful",
+    "uyum", "harmony", "estetik", "aesthetic", "altın", "golden"
+]
+
+_PERSONALITY_KEYWORDS = [
+    "mbti", "tip", "kişilik", "personality", "type", "tür",
+    "introverted", "extroverted", "thinking", "feeling", "türü"
+]
+
+_COMPARISON_KEYWORDS = [
+    "gibi", "like", "benzer", "similar", "ünlü", "celebrity",
+    "eşi", "match", "uyar", "resemble", "figure", "figür"
+]
 
 
 def _get_relevant_questions(user_message: str, lang: str = "tr", limit: int = 3) -> Optional[str]:
@@ -61,57 +100,40 @@ def _get_relevant_questions(user_message: str, lang: str = "tr", limit: int = 3)
 
     message_lower = user_message.lower()
     relevant_questions = []
+    _rqe = relevant_questions.extend
 
     # Define keyword -> category mappings
-    category_keywords = {
-        'self_discovery': ['kendimi', 'ben', 'kimim', 'özgün', 'hakiki', 'gerçek', 'myself', 'who am i', 'true self', 'authentic'],
-        'relationships': ['ilişki', 'kişi', 'arkadaş', 'aile', 'sevgi', 'bağlantı', 'relationship', 'friend', 'family', 'love'],
-        'career': ['kariyer', 'işim', 'meslek', 'başarı', 'hedef', 'career', 'job', 'profession', 'success'],
-        'purpose': ['amaç', 'anlam', 'yaşam', 'hayat', 'purpose', 'meaning', 'life'],
-        'potential': ['yetenekler', 'potansiyel', 'başarabilir', 'gelişim', 'talent', 'potential', 'capability'],
-        'transformation': ['değişim', 'dönüşüm', 'gelişim', 'öğrendim', 'change', 'growth', 'transformation'],
-        'shadows': ['gölgeler', 'karanlık', 'çelişki', 'shadow', 'conflict', 'darkness'],
-    }
 
     # Try to find conversation starters
     if 'conversation_starters' in _QUESTIONS_CACHE:
         conv_data = _QUESTIONS_CACHE['conversation_starters']
         categories = conv_data.get('questions_by_category', {})
 
-        for category, keywords in category_keywords.items():
+        for category, keywords in _CATEGORY_KEYWORDS.items():
             if category in categories and any(kw in message_lower for kw in keywords):
                 lang_key = f"questions_{lang}"
                 questions = categories[category].get(lang_key, [])
 
                 if questions:
                     # Take first 2 questions from matching category
-                    relevant_questions.extend(questions[:2])
+                    _rqe(questions[:2])
 
                 if len(relevant_questions) >= limit:
                     break
 
     # Try module-specific questions if looking for specific modules
-    module_keywords = {
-        'career': ['kariyer', 'işim', 'meslekçi', 'career', 'job', 'work'],
-        'music': ['müzik', 'şarkı', 'ritim', 'music', 'song', 'rhythm'],
-        'relationships': ['ilişki', 'aşk', 'partner', 'relationship', 'love'],
-        'education': ['öğrenme', 'eğitim', 'okul', 'learning', 'education', 'school'],
-        'sports': ['spor', 'fizik', 'atletik', 'sports', 'athletic', 'exercise'],
-        'creativity': ['yaratıcılık', 'sanat', 'tasarım', 'creativity', 'art', 'design'],
-    }
-
     if 'module_questions' in _QUESTIONS_CACHE:
         mod_data = _QUESTIONS_CACHE['module_questions']
         modules = mod_data.get('modules', {})
 
-        for module, keywords in module_keywords.items():
+        for module, keywords in _MODULE_KEYWORDS.items():
             if module in modules and any(kw in message_lower for kw in keywords):
                 lang_key = f"questions_{module}"
                 questions = modules[module].get(lang_key, [])
 
                 if questions:
                     # Take first 2 questions from matching module
-                    relevant_questions.extend(questions[:2])
+                    _rqe(questions[:2])
 
                 if len(relevant_questions) >= limit:
                     break
@@ -143,100 +165,95 @@ def get_relevant_context(
     if not user_message or not isinstance(user_message, str):
         return ""
 
+    _warn = log.warning
+    _debug = log.debug
     message_lower = user_message.lower()
     parts = []
+    _pappend = parts.append
+    _njoin = '\n'.join
+    _sjoin = ' '.join
+    _sif3 = sifatlar[:3]
+    _sif5 = sifatlar[:5]
 
     # 1. Sifat characteristics (semantic search from 30+ characteristic sentences)
     # Always try first since characteristics are most specific
     try:
         collection_name = f"sifat_characteristics_{lang}"
-        query = f"{user_message} {' '.join(sifatlar[:3])}"
+        query = f"{user_message} {_sjoin(_sif3)}"
 
         # Try to get characteristics for top 3 sifatlar
         characteristics_found = False
-        for sifat in sifatlar[:3]:
+        for sifat in _sif3:
             try:
                 # Search with sifat name + query for more relevant results
                 search_query = f"{sifat} {user_message}"
                 chunks = search_knowledge_base(collection_name, search_query, n_results=5)
                 if chunks:
-                    formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-                    parts.append(f"## {sifat.title()} Karakteristikleri\n{formatted}")
+                    formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+                    _pappend(f"## {sifat.title()} Karakteristikleri\n{formatted}")
                     characteristics_found = True
             except Exception as e:
-                log.debug(f"Error retrieving characteristics for {sifat}: {e}")
+                _debug(f"Error retrieving characteristics for {sifat}: {e}")
                 continue
 
         if not characteristics_found:
             # Fallback: generic search for characteristics
             chunks = search_knowledge_base(collection_name, query, n_results=5)
             if chunks:
-                formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-                parts.append(f"## Karakteristik Özellikler\n{formatted}")
+                formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+                _pappend(f"## Karakteristik Özellikler\n{formatted}")
     except Exception as e:
-        log.debug(f"sifat_characteristics collection may not exist yet: {e}")
+        _debug(f"sifat_characteristics collection may not exist yet: {e}")
 
     # 2. Sifat profiles (always relevant)
     try:
         collection_name = f"sifat_profiles_{lang}"
-        query = f"{user_message} {' '.join(sifatlar[:5])}"
+        query = f"{user_message} {_sjoin(_sif5)}"
         chunks = search_knowledge_base(collection_name, query, n_results=3)
         if chunks:
-            formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-            parts.append(f"## Kişilik Profilleri\n{formatted}")
+            formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+            _pappend(f"## Kişilik Profilleri\n{formatted}")
     except Exception as e:
-        log.warning(f"Error retrieving sifat profiles: {e}")
+        _warn(f"Error retrieving sifat profiles: {e}")
 
     # 2. Golden ratio interpretation (if ratio-related keywords found)
-    ratio_keywords = [
-        "oran", "ratio", "skor", "score", "güzel", "beautiful",
-        "uyum", "harmony", "estetik", "aesthetic", "altın", "golden"
-    ]
-    if any(kw in message_lower for kw in ratio_keywords):
+    if any(kw in message_lower for kw in _RATIO_KEYWORDS):
         try:
             chunks = search_knowledge_base("golden_ratio_guide", user_message, n_results=2)
             if chunks:
-                formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-                parts.append(f"## Altın Oran Rehberi\n{formatted}")
+                formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+                _pappend(f"## Altın Oran Rehberi\n{formatted}")
         except Exception as e:
-            log.warning(f"Error retrieving golden ratio guide: {e}")
+            _warn(f"Error retrieving golden ratio guide: {e}")
 
     # 3. Personality typing (if personality-related keywords found)
-    personality_keywords = [
-        "mbti", "tip", "kişilik", "personality", "type", "tür",
-        "introverted", "extroverted", "thinking", "feeling", "türü"
-    ]
-    if any(kw in message_lower for kw in personality_keywords):
+    if any(kw in message_lower for kw in _PERSONALITY_KEYWORDS):
         try:
-            query = f"{user_message} {' '.join(sifatlar[:5])}"
+            query = f"{user_message} {_sjoin(_sif5)}"
             chunks = search_knowledge_base("personality_types", query, n_results=2)
             if chunks:
-                formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-                parts.append(f"## Kişilik Tipolojisi\n{formatted}")
+                formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+                _pappend(f"## Kişilik Tipolojisi\n{formatted}")
         except Exception as e:
-            log.warning(f"Error retrieving personality types: {e}")
+            _warn(f"Error retrieving personality types: {e}")
 
     # 4. Celebrity/historical figure similarities (if comparison-related)
-    comparison_keywords = [
-        "gibi", "like", "benzer", "similar", "ünlü", "celebrity",
-        "eşi", "match", "uyar", "resemble", "figure", "figür"
-    ]
-    if any(kw in message_lower for kw in comparison_keywords):
+    if any(kw in message_lower for kw in _COMPARISON_KEYWORDS):
         try:
             chunks = search_knowledge_base("celebrities", user_message, n_results=2)
             if chunks:
-                formatted = "\n".join([f"  • {chunk}" for chunk in chunks])
-                parts.append(f"## Ünlü & Tarihi Figürler\n{formatted}")
+                formatted = _njoin([f"  • {chunk}" for chunk in chunks])
+                _pappend(f"## Ünlü & Tarihi Figürler\n{formatted}")
         except Exception as e:
-            log.warning(f"Error retrieving celebrities: {e}")
+            _warn(f"Error retrieving celebrities: {e}")
 
     # 5. Relevant conversation starters and module questions (18 languages)
     try:
         questions_context = _get_relevant_questions(user_message, lang, limit=3)
         if questions_context:
-            parts.append(questions_context)
+            _pappend(questions_context)
     except Exception as e:
-        log.debug(f"Error retrieving questions: {e}")
+        _debug(f"Error retrieving questions: {e}")
 
     # Join all parts with newlines
     if parts:

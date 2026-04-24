@@ -67,7 +67,8 @@ def populate_sifat_profiles(lang: str = "tr"):
 
     Each sifat is stored as a document with description.
     """
-    log.info(f"Loading sifat_profiles_{lang}...")
+    _info = log.info
+    _info(f"Loading sifat_profiles_{lang}...")
 
     data = load_json_file(f"sifat_profiles_{lang}.json")
     if not data:
@@ -80,8 +81,8 @@ def populate_sifat_profiles(lang: str = "tr"):
     # Delete existing collection if present
     try:
         client.delete_collection(name=collection_name)
-        log.info(f"  → Deleted existing collection: {collection_name}")
-    except:
+        _info(f"  → Deleted existing collection: {collection_name}")
+    except Exception:
         pass
 
     # Create new collection
@@ -96,8 +97,9 @@ def populate_sifat_profiles(lang: str = "tr"):
 
     for idx, sifat in enumerate(sifatlar, 1):
         try:
-            sifat_name = sifat.get("name", f"sifat_{idx}")
-            description = sifat.get("description", "")
+            _sget = sifat.get
+            sifat_name = _sget("name", f"sifat_{idx}")
+            description = _sget("description", "")
 
             if not description:
                 continue
@@ -118,17 +120,18 @@ def populate_sifat_profiles(lang: str = "tr"):
             )
 
             if idx % 50 == 0:
-                log.info(f"  → Processed {idx}/{total} sifatlar...")
+                _info(f"  → Processed {idx}/{total} sifatlar...")
 
         except Exception as e:
             log.error(f"Error processing sifat {sifat_name}: {e}")
 
-    log.info(f"✓ Loaded {total} sifat profiles into {collection_name}")
+    _info(f"✓ Loaded {total} sifat profiles into {collection_name}")
 
 
 def populate_celebrities():
     """Load celebrity and historical figure profiles"""
-    log.info("Loading celebrities...")
+    _info = log.info
+    _info("Loading celebrities...")
 
     data = load_json_file("celebrities.json")
     if not data:
@@ -141,8 +144,8 @@ def populate_celebrities():
     # Delete existing collection if present
     try:
         client.delete_collection(name=collection_name)
-        log.info(f"  → Deleted existing collection: {collection_name}")
-    except:
+        _info(f"  → Deleted existing collection: {collection_name}")
+    except Exception:
         pass
 
     # Create new collection
@@ -157,8 +160,9 @@ def populate_celebrities():
 
     for idx, profile in enumerate(profiles, 1):
         try:
-            name = profile.get("name", f"profile_{idx}")
-            description = profile.get("description", "")
+            _pget = profile.get
+            name = _pget("name", f"profile_{idx}")
+            description = _pget("description", "")
 
             if not description:
                 continue
@@ -171,23 +175,24 @@ def populate_celebrities():
                 embeddings=[embedding],
                 metadatas=[{
                     "name": name,
-                    "category": profile.get("category", "celebrity"),
+                    "category": _pget("category", "celebrity"),
                     "type": "celebrity_profile"
                 }]
             )
 
             if idx % 10 == 0:
-                log.info(f"  → Processed {idx}/{total} profiles...")
+                _info(f"  → Processed {idx}/{total} profiles...")
 
         except Exception as e:
             log.error(f"Error processing {name}: {e}")
 
-    log.info(f"✓ Loaded {total} celebrity profiles")
+    _info(f"✓ Loaded {total} celebrity profiles")
 
 
 def populate_golden_ratio_guide():
     """Load golden ratio score interpretation ranges"""
-    log.info("Loading golden_ratio_guide...")
+    _info = log.info
+    _info("Loading golden_ratio_guide...")
 
     data = load_json_file("golden_ratio_guide.json")
     if not data:
@@ -200,8 +205,8 @@ def populate_golden_ratio_guide():
     # Delete existing collection if present
     try:
         client.delete_collection(name=collection_name)
-        log.info(f"  → Deleted existing collection: {collection_name}")
-    except:
+        _info(f"  → Deleted existing collection: {collection_name}")
+    except Exception:
         pass
 
     # Create new collection
@@ -216,8 +221,9 @@ def populate_golden_ratio_guide():
 
     for idx, range_item in enumerate(ranges, 1):
         try:
+            _riget = range_item.get
             range_id = f"ratio_{idx}"
-            description = range_item.get("description", "")
+            description = _riget("description", "")
 
             if not description:
                 continue
@@ -229,9 +235,9 @@ def populate_golden_ratio_guide():
                 documents=[description],
                 embeddings=[embedding],
                 metadatas=[{
-                    "min": range_item.get("min", 0),
-                    "max": range_item.get("max", 1),
-                    "interpretation": range_item.get("interpretation", ""),
+                    "min": _riget("min", 0),
+                    "max": _riget("max", 1),
+                    "interpretation": _riget("interpretation", ""),
                     "type": "golden_ratio_range"
                 }]
             )
@@ -239,12 +245,13 @@ def populate_golden_ratio_guide():
         except Exception as e:
             log.error(f"Error processing golden ratio range: {e}")
 
-    log.info(f"✓ Loaded {total} golden ratio ranges")
+    _info(f"✓ Loaded {total} golden ratio ranges")
 
 
 def populate_personality_types():
     """Load personality type mappings (sifat -> MBTI/Big Five)"""
-    log.info("Loading personality_types...")
+    _info = log.info
+    _info("Loading personality_types...")
 
     data = load_json_file("personality_types.json")
     if not data:
@@ -257,8 +264,8 @@ def populate_personality_types():
     # Delete existing collection if present
     try:
         client.delete_collection(name=collection_name)
-        log.info(f"  → Deleted existing collection: {collection_name}")
-    except:
+        _info(f"  → Deleted existing collection: {collection_name}")
+    except Exception:
         pass
 
     # Create new collection
@@ -273,8 +280,9 @@ def populate_personality_types():
 
     for idx, mapping in enumerate(mappings, 1):
         try:
-            sifat = mapping.get("sifat", f"sifat_{idx}")
-            description = mapping.get("description", "")
+            _mapget = mapping.get
+            sifat = _mapget("sifat", f"sifat_{idx}")
+            description = _mapget("description", "")
 
             if not description:
                 continue
@@ -287,19 +295,19 @@ def populate_personality_types():
                 embeddings=[embedding],
                 metadatas=[{
                     "sifat": sifat,
-                    "mbti": mapping.get("mbti", ""),
-                    "big_five": mapping.get("big_five", ""),
+                    "mbti": _mapget("mbti", ""),
+                    "big_five": _mapget("big_five", ""),
                     "type": "personality_mapping"
                 }]
             )
 
             if idx % 50 == 0:
-                log.info(f"  → Processed {idx}/{total} mappings...")
+                _info(f"  → Processed {idx}/{total} mappings...")
 
         except Exception as e:
             log.error(f"Error processing {sifat}: {e}")
 
-    log.info(f"✓ Loaded {total} personality type mappings")
+    _info(f"✓ Loaded {total} personality type mappings")
 
 
 def populate_sifat_characteristics(lang: str = "tr"):
@@ -312,7 +320,8 @@ def populate_sifat_characteristics(lang: str = "tr"):
     Args:
         lang: Language code (tr or en)
     """
-    log.info(f"Loading sifat_characteristics_{lang}...")
+    _info = log.info
+    _info(f"Loading sifat_characteristics_{lang}...")
 
     data = load_json_file(f"sifat_characteristics_{lang}.json")
     if not data:
@@ -325,8 +334,8 @@ def populate_sifat_characteristics(lang: str = "tr"):
     # Delete existing collection if present
     try:
         client.delete_collection(name=collection_name)
-        log.info(f"  → Deleted existing collection: {collection_name}")
-    except:
+        _info(f"  → Deleted existing collection: {collection_name}")
+    except Exception:
         pass
 
     # Create new collection
@@ -342,8 +351,9 @@ def populate_sifat_characteristics(lang: str = "tr"):
 
     for sifat_idx, sifat in enumerate(sifatlar, 1):
         try:
-            sifat_name = sifat.get("name", f"sifat_{sifat_idx}")
-            cumleler = sifat.get("cumleler", [])
+            _sget = sifat.get
+            sifat_name = _sget("name", f"sifat_{sifat_idx}")
+            cumleler = _sget("cumleler", [])
 
             # Each sentence is a separate document for semantic search
             for sentence_no, sentence in enumerate(cumleler, 1):
@@ -367,12 +377,12 @@ def populate_sifat_characteristics(lang: str = "tr"):
                 total_documents += 1
 
             if sifat_idx % 50 == 0:
-                log.info(f"  → Processed {sifat_idx}/{total_sifatlar} sifatlar...")
+                _info(f"  → Processed {sifat_idx}/{total_sifatlar} sifatlar...")
 
         except Exception as e:
             log.error(f"Error processing sifat {sifat_name}: {e}")
 
-    log.info(f"✓ Loaded {total_sifatlar} sifatlar with {total_documents} characteristic sentences into {collection_name}")
+    _info(f"✓ Loaded {total_sifatlar} sifatlar with {total_documents} characteristic sentences into {collection_name}")
 
 
 def clear_all_collections():
@@ -381,26 +391,29 @@ def clear_all_collections():
     collections = client.list_collections()
 
     for collection in collections:
+        _cn = collection.name
         try:
-            client.delete_collection(name=collection.name)
-            log.info(f"✓ Deleted collection: {collection.name}")
+            client.delete_collection(name=_cn)
+            log.info(f"✓ Deleted collection: {_cn}")
         except Exception as e:
-            log.error(f"Error deleting {collection.name}: {e}")
+            log.error(f"Error deleting {_cn}: {e}")
 
 
 def main():
+    _info = log.info
     parser = argparse.ArgumentParser(description="Populate Chroma vector database")
-    parser.add_argument(
+    _addarg = parser.add_argument
+    _addarg(
         "--collection",
         type=str,
         help="Load specific collection only"
     )
-    parser.add_argument(
+    _addarg(
         "--clear",
         action="store_true",
         help="Clear all collections before loading"
     )
-    parser.add_argument(
+    _addarg(
         "--lang",
         type=str,
         default="tr",
@@ -412,33 +425,34 @@ def main():
     # Create data directory if it doesn't exist
     DATA_PATH.mkdir(parents=True, exist_ok=True)
 
-    log.info(f"Chroma database path: {CHROMA_PATH}")
+    _info(f"Chroma database path: {CHROMA_PATH}")
 
     if args.clear:
-        log.info("Clearing all collections...")
+        _info("Clearing all collections...")
         clear_all_collections()
 
     # Load specific collection or all
-    if args.collection:
-        if args.collection == "sifat_profiles_tr":
+    _col = args.collection
+    if _col:
+        if _col == "sifat_profiles_tr":
             populate_sifat_profiles("tr")
-        elif args.collection == "sifat_profiles_en":
+        elif _col == "sifat_profiles_en":
             populate_sifat_profiles("en")
-        elif args.collection == "sifat_characteristics_tr":
+        elif _col == "sifat_characteristics_tr":
             populate_sifat_characteristics("tr")
-        elif args.collection == "sifat_characteristics_en":
+        elif _col == "sifat_characteristics_en":
             populate_sifat_characteristics("en")
-        elif args.collection == "celebrities":
+        elif _col == "celebrities":
             populate_celebrities()
-        elif args.collection == "golden_ratio_guide":
+        elif _col == "golden_ratio_guide":
             populate_golden_ratio_guide()
-        elif args.collection == "personality_types":
+        elif _col == "personality_types":
             populate_personality_types()
         else:
-            log.error(f"Unknown collection: {args.collection}")
+            log.error(f"Unknown collection: {_col}")
     else:
         # Load all
-        log.info("Loading all collections...")
+        _info("Loading all collections...")
         populate_sifat_profiles("tr")
         populate_sifat_profiles("en")
         populate_sifat_characteristics("tr")
@@ -447,7 +461,7 @@ def main():
         populate_golden_ratio_guide()
         populate_personality_types()
 
-    log.info("✓ Database population complete!")
+    _info("✓ Database population complete!")
 
 
 if __name__ == "__main__":

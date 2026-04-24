@@ -22,6 +22,10 @@ from admin_api.utils.mongo import _get_db
 
 log = logging.getLogger(__name__)
 
+_VALID_RENEWAL_EVENT_TYPES = frozenset({'expired', 'reminder', 'renewed', 'canceled', 'upgraded', 'downgraded'})
+_PROJ_SUB_EXPIRY   = {'_id': 0, 'user_id': 1, 'expires_date': 1, 'renews_at': 1}
+_PROJ_RENEWAL_TYPE = {'_id': 0, 'user_id': 1, 'type': 1}
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RenewalJobStatusView(View):
@@ -44,30 +48,30 @@ class RenewalJobStatusView(View):
             notif_col = db["subscription_notifications"]
 
             now = datetime.utcnow()
+            now_iso = now.isoformat()
             now_ts = time.time()
 
             # Scheduler status
             scheduler_status = get_scheduler_status()
 
-            # Count users expiring today
+            # Count users expiring today and in 7 days — single $facet
             today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
             today_end = today_start + timedelta(days=1)
-
-            expiring_today = subs_col.count_documents({
-                "$or": [
-                    {"expires_date": {"$gte": today_start.isoformat(), "$lt": today_end.isoformat()}, "plan": "premium"},
-                    {"renews_at": {"$gte": now_ts, "$lt": now_ts + 86400}, "tier": "premium"}
-                ]
-            })
-
-            # Count users expiring in 7 days
             future_7d = now + timedelta(days=7)
-            expiring_7d = subs_col.count_documents({
-                "$or": [
-                    {"expires_date": {"$gte": now.isoformat(), "$lt": future_7d.isoformat()}, "plan": "premium"},
-                    {"renews_at": {"$gte": now_ts, "$lt": now_ts + (7*86400)}, "tier": "premium"}
-                ]
-            })
+
+            _rc = next(subs_col.aggregate([{'$facet': {
+                'today': [{'$match': {'$or': [
+                    {'expires_date': {'$gte': today_start.isoformat(), '$lt': today_end.isoformat()}, 'plan': 'premium'},
+                    {'renews_at': {'$gte': now_ts, '$lt': now_ts + 86400}, 'tier': 'premium'},
+                ]}}, {'$count': 'n'}],
+                'week': [{'$match': {'$or': [
+                    {'expires_date': {'$gte': now_iso, '$lt': future_7d.isoformat()}, 'plan': 'premium'},
+                    {'renews_at': {'$gte': now_ts, '$lt': now_ts + (7 * 86400)}, 'tier': 'premium'},
+                ]}}, {'$count': 'n'}],
+            }}]), {})
+            _rcget = _rc.get
+            expiring_today = (_rcget('today', [{}])[0] or {}).get('n', 0)
+            expiring_7d    = (_rcget('week',  [{}])[0] or {}).get('n', 0)
 
             # Get users expiring soon (max 20)
             expiring_soon_users = []
@@ -75,21 +79,22 @@ class RenewalJobStatusView(View):
 
             users = list(subs_col.find({
                 "$or": [
-                    {"expires_date": {"$gte": now.isoformat(), "$lt": future_30d.isoformat()}, "plan": "premium"},
+                    {"expires_date": {"$gte": now_iso, "$lt": future_30d.isoformat()}, "plan": "premium"},
                     {"renews_at": {"$gte": now_ts, "$lt": now_ts + (30*86400)}, "tier": "premium"}
                 ]
-            }).sort("expires_date", 1).limit(20))
+            }, _PROJ_SUB_EXPIRY).sort("expires_date", 1).limit(20))
 
             for sub in users:
-                user_id = sub.get("user_id")
-                expires_date = sub.get("expires_date")
-                renews_at = sub.get("renews_at")
+                _sget = sub.get
+                user_id = _sget("user_id")
+                expires_date = _sget("expires_date")
+                renews_at = _sget("renews_at")
 
                 if expires_date:
                     try:
                         exp_dt = datetime.fromisoformat(expires_date.replace("Z", "+00:00"))
                         days_left = (exp_dt - now).days
-                    except:
+                    except Exception:
                         days_left = 0
                 elif renews_at:
                     days_left = int((renews_at - now_ts) / 86400)
@@ -105,7 +110,8 @@ class RenewalJobStatusView(View):
             # Recent events (last 10)
             recent_events = list(events_col.find({}).sort("_id", -1).limit(10))
             for event in recent_events:
-                event["_id"] = str(event["_id"])
+                _oid = event["_id"]
+                event["_id"] = str(_oid)
 
             return JsonResponse({
                 'scheduler': scheduler_status,
@@ -120,7 +126,7 @@ class RenewalJobStatusView(View):
 
         except Exception as e:
             log.exception(f'Renewal status error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -144,23 +150,22 @@ class ManualRenewalTriggerView(View):
             # Count events from last few seconds
             db = _get_db()
             events_col = db["subscription_events"]
+            _cutoff = (datetime.utcnow() - timedelta(seconds=5)).isoformat()
+            _q = {"event_at": {"$gte": _cutoff}}
 
-            recent_events = list(events_col.find({
-                "event_at": {"$gte": (datetime.utcnow() - timedelta(seconds=5)).isoformat()}
-            }))
-
-            expired_count = len(recent_events)
+            expired_count = events_col.count_documents(_q)
+            recent_events = list(events_col.find(_q, _PROJ_RENEWAL_TYPE, limit=10))
 
             return JsonResponse({
                 'success': True,
                 'message': f'Renewal check completed. {expired_count} subscriptions downgraded.',
                 'expired_count': expired_count,
-                'events': [{'user_id': e.get('user_id'), 'type': e.get('type')} for e in recent_events[:10]]
+                'events': [{'user_id': (_eg := e.get)('user_id'), 'type': _eg('type')} for e in recent_events]
             })
 
         except Exception as e:
             log.exception(f'Manual renewal trigger error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -176,9 +181,16 @@ class RenewalEventsView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            page = max(1, int(request.GET.get('page', 1)))
-            limit = min(int(request.GET.get('limit', 20)), 100)
-            event_type = request.GET.get('type', '')  # 'expired', 'reminder', etc.
+            _qget = request.GET.get
+            try:
+                page = max(1, int(_qget('page', 1)))
+                limit = min(max(1, int(_qget('limit', 20))), 100)
+            except (ValueError, TypeError):
+                page, limit = 1, 20
+
+            event_type = _qget('type', '')
+            if event_type not in _VALID_RENEWAL_EVENT_TYPES:
+                event_type = ''
 
             db = _get_db()
             events_col = db["subscription_events"]
@@ -202,7 +214,8 @@ class RenewalEventsView(View):
 
             # Format response
             for event in events:
-                event['_id'] = str(event['_id'])
+                _oid = event['_id']
+                event['_id'] = str(_oid)
 
             return JsonResponse({
                 'events': events,
@@ -216,7 +229,7 @@ class RenewalEventsView(View):
 
         except Exception as e:
             log.exception(f'Renewal events error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -232,14 +245,18 @@ class SubscriptionNotificationsView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            page = max(1, int(request.GET.get('page', 1)))
-            limit = min(int(request.GET.get('limit', 20)), 100)
+            _qget = request.GET.get
+            try:
+                page = max(1, int(_qget('page', 1)))
+                limit = min(max(1, int(_qget('limit', 20))), 100)
+            except (ValueError, TypeError):
+                page, limit = 1, 20
 
             db = _get_db()
             notif_col = db["subscription_notifications"]
 
             # Total count
-            total = notif_col.count_documents({})
+            total = notif_col.estimated_document_count()
 
             # Paginate
             skip = (page - 1) * limit
@@ -252,7 +269,8 @@ class SubscriptionNotificationsView(View):
 
             # Format response
             for notif in notifications:
-                notif['_id'] = str(notif['_id'])
+                _oid = notif['_id']
+                notif['_id'] = str(_oid)
 
             return JsonResponse({
                 'notifications': notifications,
@@ -266,4 +284,4 @@ class SubscriptionNotificationsView(View):
 
         except Exception as e:
             log.exception(f'Notifications error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

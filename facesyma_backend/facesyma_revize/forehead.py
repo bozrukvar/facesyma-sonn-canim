@@ -35,9 +35,11 @@ def forehead_input(img):
                 lis.append((x,y))
             return lis
     list = draw()
-    a = list[2][0]
-    b = list[2][1] - list[3][1]
-    c = list[2][1] + b
+    _l2 = list[2]
+    _l2_1 = _l2[1]
+    a = _l2[0]
+    b = _l2_1 - list[3][1]
+    c = _l2_1 + b
     f = (a,c)
 
     forehead_cor = {"f":f,"8":list[0],"9":list[1],"152":list[4]}

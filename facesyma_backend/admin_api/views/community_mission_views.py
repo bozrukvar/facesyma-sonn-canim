@@ -98,14 +98,16 @@ class ActiveMissionsView(View):
     def get(self, request):
         try:
             # Get optional community_id
+            _qget = request.GET.get
             try:
-                community_id = int(request.GET.get("community_id")) if request.GET.get("community_id") else None
+                _cid = _qget("community_id")
+                community_id = int(_cid) if _cid else None
             except ValueError:
                 community_id = None
 
             # Get limit
             try:
-                limit = int(request.GET.get("limit", 50))
+                limit = int(_qget("limit", 50))
                 limit = min(max(limit, 1), 500)
             except ValueError:
                 limit = 50
@@ -192,11 +194,11 @@ class JoinMissionView(View):
             })
 
         except MissionNotFoundError as e:
-            return _json_error(f"Mission not found: {str(e)}", status=404)
+            return _json_error("Mission not found.", status=404)
         except UserAlreadyJoinedError as e:
-            return _json_error(f"Already joined: {str(e)}", status=400)
+            return _json_error("Already joined.", status=400)
         except MissionError as e:
-            return _json_error(f"Mission error: {str(e)}", status=400)
+            return _json_error("Mission error.", status=400)
         except Exception as e:
             log.error(f"JoinMissionView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -223,12 +225,13 @@ class ContributeMissionView(View):
 
             # Parse request
             body = _json(request)
-            mission_id = body.get("mission_id", "").strip()
-            contribution = body.get("contribution", 0)
-            metadata = body.get("metadata", {})
+            _bget = body.get
+            mission_id = _bget("mission_id", "").strip()
+            contribution = _bget("contribution", 0)
+            metadata = _bget("metadata", {})
 
-            if not mission_id or not isinstance(contribution, int) or contribution <= 0:
-                return _json_error("Invalid mission_id or contribution", status=400)
+            if not mission_id or not isinstance(contribution, int) or contribution <= 0 or contribution > 1_000_000:
+                return _json_error("Invalid mission_id or contribution (must be 1–1000000)", status=400)
 
             # Contribute
             new_progress, progress_percent = CommunityMissionService.contribute(
@@ -247,9 +250,9 @@ class ContributeMissionView(View):
             })
 
         except MissionNotFoundError as e:
-            return _json_error(f"Mission not found: {str(e)}", status=404)
+            return _json_error("Mission not found.", status=404)
         except MissionError as e:
-            return _json_error(f"Mission error: {str(e)}", status=400)
+            return _json_error("Mission error.", status=400)
         except Exception as e:
             log.error(f"ContributeMissionView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -270,6 +273,7 @@ class MissionDetailsView(View):
     def get(self, request, mission_id):
         try:
             mission = CommunityMissionService.get_mission(mission_id)
+            _mget = mission.get
 
             return JsonResponse({
                 "mission_id": mission["mission_id"],
@@ -279,16 +283,16 @@ class MissionDetailsView(View):
                 "current_progress": mission["current_progress"],
                 "target_progress": mission["target_progress"],
                 "progress_percent": mission["progress_percent"],
-                "participants_count": len(mission.get("participants", [])),
+                "participants_count": len(_mget("participants", [])),
                 "coin_reward_per_person": mission["coin_reward_per_person"],
                 "total_coins_distributed": mission["total_coins_distributed"],
                 "start_date": mission["start_date"],
                 "end_date": mission["end_date"],
-                "completed_at": mission.get("completed_at"),
+                "completed_at": _mget("completed_at"),
             })
 
         except MissionNotFoundError as e:
-            return _json_error(f"Mission not found: {str(e)}", status=404)
+            return _json_error("Mission not found.", status=404)
         except Exception as e:
             log.error(f"MissionDetailsView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -339,9 +343,9 @@ class MissionLeaderboardView(View):
             })
 
         except MissionNotFoundError as e:
-            return _json_error(f"Mission not found: {str(e)}", status=404)
+            return _json_error("Mission not found.", status=404)
         except MissionError as e:
-            return _json_error(f"Mission error: {str(e)}", status=400)
+            return _json_error("Mission error.", status=400)
         except Exception as e:
             log.error(f"MissionLeaderboardView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)

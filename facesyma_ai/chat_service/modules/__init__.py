@@ -9,7 +9,7 @@ Exports:
   - executor: Module execution engine
 """
 
-from .registry import ModuleRegistry, get_registry, init_registry
+from .registry import get_registry, init_registry
 from .definitions import ALL_MODULES
 from .executor import execute_module, format_module_result
 

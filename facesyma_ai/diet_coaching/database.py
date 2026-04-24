@@ -7,7 +7,7 @@ Yemek veri havuzunu yönet - JSON dosyalarından yükleme, sorgulama
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from .models import CountryMeals, Meal, SifatMapping
 
 log = logging.getLogger(__name__)
@@ -79,13 +79,14 @@ class MealDatabase:
             return None
 
         # Sabah, öğlen, akşam içinde ara
-        for meal in country.meals.breakfast:
+        _cm = country.meals
+        for meal in _cm.breakfast:
             if meal.id == meal_id:
                 return meal
-        for meal in country.meals.lunch:
+        for meal in _cm.lunch:
             if meal.id == meal_id:
                 return meal
-        for meal in country.meals.dinner:
+        for meal in _cm.dinner:
             if meal.id == meal_id:
                 return meal
 
@@ -99,12 +100,13 @@ class MealDatabase:
         if not country:
             return []
 
+        _cm = country.meals
         if meal_type == "breakfast":
-            return country.meals.breakfast
+            return _cm.breakfast
         elif meal_type == "lunch":
-            return country.meals.lunch
+            return _cm.lunch
         elif meal_type == "dinner":
-            return country.meals.dinner
+            return _cm.dinner
 
         return []
 
@@ -125,13 +127,14 @@ class MealDatabase:
         """Mevcut ülkelerin listesi"""
         countries = []
         for lang_code, country_data in self.meals.items():
+            _cdm = country_data.meals
             countries.append({
                 "name": country_data.country,
                 "language_code": lang_code,
                 "meal_count": (
-                    len(country_data.meals.breakfast)
-                    + len(country_data.meals.lunch)
-                    + len(country_data.meals.dinner)
+                    len(_cdm.breakfast)
+                    + len(_cdm.lunch)
+                    + len(_cdm.dinner)
                 ),
             })
         return countries

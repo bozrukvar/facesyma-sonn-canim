@@ -15,7 +15,7 @@ from pymongo import MongoClient
 
 MONGO_URI = os.environ.get(
     'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
+    ''
 )
 
 # ── Celebrities (100 entries) ──────────────────────────────────────────────────
@@ -210,67 +210,71 @@ def seed_data():
         # ── Celebrities ────────────────────────────────────────────────────────
         print("🎬 Seeding celebrities (simulated sample)...")
         celebrities_col = db['similarities_celebrities']
+        _ccd = celebrities_col.count_documents
         celebrities_col.delete_many({})
         if CELEBRITIES:
             celebrities_col.insert_many(CELEBRITIES)
             print(f"   ✅ {len(CELEBRITIES)} celebrities added (sample)")
-        print(f"   📊 Total in DB: {celebrities_col.count_documents({})}")
+        print(f"   📊 Total in DB: {_ccd({})}")
 
         # ── Historical ─────────────────────────────────────────────────────────
         print("\n📜 Seeding historical figures (simulated sample)...")
         historical_col = db['similarities_historical']
+        _hcd = historical_col.count_documents
         historical_col.delete_many({})
         if HISTORICAL:
             historical_col.insert_many(HISTORICAL)
             print(f"   ✅ {len(HISTORICAL)} historical figures added (sample)")
-        print(f"   📊 Total in DB: {historical_col.count_documents({})}")
+        print(f"   📊 Total in DB: {_hcd({})}")
 
         # ── Objects ────────────────────────────────────────────────────────────
         print("\n🎨 Seeding objects/style...")
         objects_col = db['similarities_objects']
+        _ocd = objects_col.count_documents
         objects_col.delete_many({})
         if OBJECTS:
             objects_col.insert_many(OBJECTS)
             print(f"   ✅ {len(OBJECTS)} objects added (sample)")
-        print(f"   📊 Total in DB: {objects_col.count_documents({})}")
+        print(f"   📊 Total in DB: {_ocd({})}")
 
         # ── Plants ─────────────────────────────────────────────────────────────
         print("\n🌸 Seeding plants/flowers...")
         plants_col = db['similarities_plants']
+        _pcd = plants_col.count_documents
         plants_col.delete_many({})
         if PLANTS:
             plants_col.insert_many(PLANTS)
             print(f"   ✅ {len(PLANTS)} plants added (sample)")
-        print(f"   📊 Total in DB: {plants_col.count_documents({})}")
+        print(f"   📊 Total in DB: {_pcd({})}")
 
         # ── Animals ────────────────────────────────────────────────────────────
         print("\n🦁 Seeding animals...")
         animals_col = db['similarities_animals']
+        _acd = animals_col.count_documents
         animals_col.delete_many({})
         if ANIMALS:
             animals_col.insert_many(ANIMALS)
             print(f"   ✅ {len(ANIMALS)} animals added (sample)")
-        print(f"   📊 Total in DB: {animals_col.count_documents({})}")
+        print(f"   📊 Total in DB: {_acd({})}")
 
         # ── Summary ────────────────────────────────────────────────────────────
         print("\n" + "="*60)
         print("✅ Data Seeding Complete!")
         print("="*60)
 
-        total_entries = (
-            celebrities_col.count_documents({}) +
-            historical_col.count_documents({}) +
-            objects_col.count_documents({}) +
-            plants_col.count_documents({}) +
-            animals_col.count_documents({})
-        )
+        _n_cel = _ccd({})
+        _n_his = _hcd({})
+        _n_obj = _ocd({})
+        _n_pla = _pcd({})
+        _n_ani = _acd({})
+        total_entries = _n_cel + _n_his + _n_obj + _n_pla + _n_ani
 
         print(f"\n📊 Toplam Entries: {total_entries}")
-        print("   🎬 Celebrities:", celebrities_col.count_documents({}))
-        print("   📜 Historical:", historical_col.count_documents({}))
-        print("   🎨 Objects:", objects_col.count_documents({}))
-        print("   🌸 Plants:", plants_col.count_documents({}))
-        print("   🦁 Animals:", animals_col.count_documents({}))
+        print("   🎬 Celebrities:", _n_cel)
+        print("   📜 Historical:", _n_his)
+        print("   🎨 Objects:", _n_obj)
+        print("   🌸 Plants:", _n_pla)
+        print("   🦁 Animals:", _n_ani)
 
         print("\n⚠️  Not: Bu sample verisidir. Production için 440 entry gerekli.")
         print("    Expansion listeleri README'de sunulmuştur.")

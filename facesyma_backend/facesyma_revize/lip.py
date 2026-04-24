@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 from eye import eye_input
 
 #lip = ([61,291,87,317,37,267,17,152,2,38,268])
@@ -36,12 +35,14 @@ def lip_input(img):
 
     list = draw()
     #print(eye["il"][0])
-    onex = int((eye["il"][0] + eye["157"][0]) / 2)
-    oney = int((eye["il"][1] + eye["157"][1]) / 2)
+    _eil = eye["il"]; _e157 = eye["157"]
+    onex = int((_eil[0] + _e157[0]) / 2)
+    oney = int((_eil[1] + _e157[1]) / 2)
     el = (onex,oney)
 
-    twox = int((eye["ir"][0] + eye["398"][0]) / 2)
-    twoy = int((eye["ir"][1] + eye["398"][1]) / 2)
+    _eir = eye["ir"]; _e398 = eye["398"]
+    twox = int((_eir[0] + _e398[0]) / 2)
+    twoy = int((_eir[1] + _e398[1]) / 2)
     er = (twox,twoy)
 
     lip_cor = {"el": el, "er": er, "0":list[0], "2":list[1], "13":list[2], "14":list[3], "17":list[4], "37":list[5],

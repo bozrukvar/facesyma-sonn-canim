@@ -11,7 +11,7 @@ import logging
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 from pydantic import ValidationError
 
 from diet_coaching.models.meal import (
@@ -86,8 +86,9 @@ class MealService:
             MealError: If JSON invalid
         """
         # Check cache first
-        if country in cls._meals_cache:
-            return cls._meals_cache[country]
+        _cache = cls._meals_cache
+        if country in _cache:
+            return _cache[country]
 
         filepath = cls._get_meals_file(country)
 
@@ -99,7 +100,7 @@ class MealService:
             meals = [Meal(**meal_data) for meal_data in data]
 
             # Cache
-            cls._meals_cache[country] = meals
+            _cache[country] = meals
             log.info(f"✓ Loaded {len(meals)} meals for {country}")
             return meals
 
@@ -186,12 +187,13 @@ class MealService:
                 f"Meal {meal_id} not found in {country}"
             )
 
+        _mne = meal.name_en
         # Record selection in MongoDB
         sel_col = _get_db()["meal_selections"]
         selection_doc = {
             "user_id": user_id,
             "meal_id": meal_id,
-            "meal_name_en": meal.name_en,
+            "meal_name_en": _mne,
             "meal_name_tr": getattr(meal, "name_tr", ""),
             "country": country,
             "selected_at": datetime.utcnow().isoformat(),
@@ -207,11 +209,11 @@ class MealService:
             user_id=user_id,
             amount=10,
             transaction_type=TransactionType.MEAL_GAME,
-            description=f"Selected meal: {meal.name_en} ({country})",
+            description=f"Selected meal: {_mne} ({country})",
             metadata={
                 "meal_id": meal_id,
                 "country": country,
-                "meal_name": meal.name_en,
+                "meal_name": _mne,
             },
         )
 
@@ -259,6 +261,7 @@ class MealService:
         # TODO: Replace with actual sıfat profile comparison
         # For now: 70% chance user's guess is "correct"
         is_correct = random.random() < 0.70
+        _msa = meal.sifat_appeal
 
         bonus = 0
         feedback = ""
@@ -268,7 +271,7 @@ class MealService:
                 bonus = 5
                 feedback = (
                     f"✓ Correct! This meal appeals to "
-                    f"{', '.join(meal.sifat_appeal)} personalities."
+                    f"{', '.join(_msa)} personalities."
                 )
 
                 # Award bonus coins
@@ -280,13 +283,13 @@ class MealService:
                     metadata={
                         "meal_id": meal_id,
                         "guess": guess,
-                        "sifat_appeal": meal.sifat_appeal,
+                        "sifat_appeal": _msa,
                     },
                 )
             else:
                 feedback = (
                     f"Not quite! This meal appeals to "
-                    f"{', '.join(meal.sifat_appeal)} personalities."
+                    f"{', '.join(_msa)} personalities."
                 )
         else:
             feedback = "No worries! You'll learn more as you explore."
@@ -333,8 +336,9 @@ class MealService:
             List of leaderboard entries
         """
         week_key = MealService._get_week_key()
-        sel_col = _get_db()["meal_selections"]
-        users_col = _get_db()["appfaceapi_myuser"]
+        _db = _get_db()
+        sel_col = _db["meal_selections"]
+        users_col = _db["appfaceapi_myuser"]
 
         # Aggregate: count meals + calculate accuracy
         pipeline = [
@@ -380,27 +384,32 @@ class MealService:
 
         results = list(sel_col.aggregate(pipeline))
 
+        user_ids = [doc["_id"] for doc in results]
+        users_map = {u["id"]: u for u in users_col.find(
+            {"id": {"$in": user_ids}}, {"id": 1, "username": 1, "avatar": 1}
+        ).limit(len(user_ids) or 1)}
+
         entries = []
         for rank, doc in enumerate(results, 1):
             user_id = doc["_id"]
-
-            # Get user details
-            user = users_col.find_one({"id": user_id})
+            user = users_map.get(user_id)
             if not user:
                 continue
 
             # Calculate accuracy
-            guesses = doc.get("sifat_guesses", 0)
-            correct = doc.get("sifat_correct", 0)
+            _dget   = doc.get
+            guesses = _dget("sifat_guesses", 0)
+            correct = _dget("sifat_correct", 0)
             accuracy = (correct / guesses * 100) if guesses > 0 else 0
 
+            _uget = user.get
             entries.append(MealLeaderboardEntry(
                 rank=rank,
                 user_id=user_id,
-                username=user.get("username", "Unknown"),
-                avatar=user.get("avatar"),
-                meals_completed=doc.get("meals_completed", 0),
-                coins_earned=doc.get("coins_earned", 0),
+                username=_uget("username", "Unknown"),
+                avatar=_uget("avatar"),
+                meals_completed=_dget("meals_completed", 0),
+                coins_earned=_dget("coins_earned", 0),
                 accuracy_percent=round(accuracy, 1),
             ))
 
@@ -435,6 +444,7 @@ class MealService:
 
         # Convert ObjectId to string
         for doc in docs:
-            doc["_id"] = str(doc["_id"])
+            _oid = doc["_id"]
+            doc["_id"] = str(_oid)
 
         return docs, total

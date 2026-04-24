@@ -6,12 +6,15 @@ Continous scoring for facial measurements using golden ratio bounds.
 Converts categorical measurements (golden/near/far) into 0-1 confidence scores.
 """
 
+from functools import lru_cache
+
 # Golden ratio bounds
 PHI_LOW = 1.5371      # Lower bound for golden zone
 PHI_HIGH = 1.6989     # Upper bound for golden zone
 PHI_MID = (PHI_LOW + PHI_HIGH) / 2  # 1.618... ≈ golden ratio
 
 
+@lru_cache(maxsize=512)
 def score_ratio(ratio: float) -> float:
     """
     Convert facial measurement ratio to 0-1 confidence score.
@@ -56,6 +59,7 @@ def score_ratio(ratio: float) -> float:
         return round(0.74 - 0.44 * penalty, 3)
 
 
+@lru_cache(maxsize=512)
 def get_sifat_score(measurement_category: str, measurement_ratio: float) -> float:
     """
     Get sıfat confidence score based on measurement category and ratio.
@@ -67,18 +71,20 @@ def get_sifat_score(measurement_category: str, measurement_ratio: float) -> floa
     Returns:
         Confidence score 0-1
     """
+    _cat_lower = measurement_category.lower()
+
     # If golden category, use the ratio scorer
-    if "golden" in measurement_category.lower():
+    if "golden" in _cat_lower:
         return score_ratio(measurement_ratio)
 
     # For near/small/narrow categories
-    elif any(x in measurement_category.lower() for x in ["near", "small", "narrow"]):
+    elif any(x in _cat_lower for x in ["near", "small", "narrow"]):
         ratio_score = score_ratio(measurement_ratio)
         # Penalize if ratio indicates it's actually too far from golden
         return max(0.3, ratio_score - 0.15)
 
     # For far/big/wide categories
-    elif any(x in measurement_category.lower() for x in ["far", "big", "wide"]):
+    elif any(x in _cat_lower for x in ["far", "big", "wide"]):
         ratio_score = score_ratio(measurement_ratio)
         # Penalize if ratio indicates it's actually too far from golden
         return max(0.3, ratio_score - 0.15)

@@ -1,10 +1,12 @@
 // src/store/index.ts
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSlice';
+import authReducer     from './authSlice';
+import analysisReducer from './analysisSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth:     authReducer,
+    analysis: analysisReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

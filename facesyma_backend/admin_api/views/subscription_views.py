@@ -10,26 +10,54 @@ Mobile In-App Purchase Verification (RevenueCat)
 
 import json
 import requests
+import jwt
 from datetime import datetime
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
+from admin_api.utils.mongo import _get_db
 from django.conf import settings
 
 import logging
 log = logging.getLogger(__name__)
+
+_JWT_SECRET: str  = settings.JWT_SECRET
+_SUB_DETAIL_PROJ  = {'_id': 0, 'plan': 1, 'entitlements': 1, 'expires_date': 1, 'verified_at': 1}
+
+_FREE_FEATURES = frozenset([
+    'compatibility_check_1_per_day',
+    'community_browse',
+    'profile_view',
+])
+_PREMIUM_FEATURES = _FREE_FEATURES | frozenset([
+    'unlimited_checks',
+    'unlimited_communities',
+    'file_sharing',
+    'advanced_search',
+    'priority_support',
+])
+
+
+def _get_user_id(request):
+    """Extract user_id from JWT Bearer token."""
+    auth = request.headers.get('Authorization', '')
+    if not auth.startswith('Bearer '):
+        return None
+    try:
+        payload = jwt.decode(
+            auth.split(' ', 1)[1], _JWT_SECRET, algorithms=['HS256']
+        )
+        return payload.get('user_id')
+    except Exception:
+        return None
 
 # ── RevenueCat API Configuration ────────────────────────────────────────────
 REVENUECAT_API_KEY = getattr(settings, 'REVENUECAT_API_KEY', 'sk_test_xxxxx')
 REVENUECAT_BASE_URL = 'https://api.revenuecat.com/v1'
 
 
-def _get_db():
-    """MongoDB bağlantısı"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
+
 
 
 def _verify_receipt_with_revenuecat(receipt, is_ios=True):
@@ -46,9 +74,10 @@ def _verify_receipt_with_revenuecat(receipt, is_ios=True):
         # RevenueCat customer endpoint
         url = f'{REVENUECAT_BASE_URL}/receipts'
 
+        _rget = receipt.get
         payload = {
-            'app_user_id': receipt.get('user_id'),
-            'fetch_token': receipt.get('fetch_token'),  # RevenueCat subscription token
+            'app_user_id': _rget('user_id'),
+            'fetch_token': _rget('fetch_token'),  # RevenueCat subscription token
         }
 
         response = requests.post(url, json=payload, headers=headers, timeout=10)
@@ -70,14 +99,18 @@ class VerifySubscriptionView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            user_id = data.get('user_id')
-            fetch_token = data.get('fetch_token')  # RevenueCat token
-            is_ios = data.get('is_ios', True)
+            user_id = _get_user_id(request)
+            if not user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
-            if not user_id or not fetch_token:
+            data = json.loads(request.body)
+            _dget = data.get
+            fetch_token = _dget('fetch_token')  # RevenueCat token
+            is_ios = _dget('is_ios', True)
+
+            if not fetch_token:
                 return JsonResponse(
-                    {'detail': 'user_id ve fetch_token zorunlu.'},
+                    {'detail': 'fetch_token zorunlu.'},
                     status=400
                 )
 
@@ -95,8 +128,9 @@ class VerifySubscriptionView(View):
 
             # Extract subscription info
             subscriber = rc_response.get('subscriber', {})
-            entitlements = subscriber.get('entitlements', {})
-            active_subscriptions = subscriber.get('subscriptions', {})
+            _subget = subscriber.get
+            entitlements = _subget('entitlements', {})
+            active_subscriptions = _subget('subscriptions', {})
 
             # Determine plan
             plan = 'free'
@@ -104,6 +138,8 @@ class VerifySubscriptionView(View):
                 plan = 'premium'
 
             # Update MongoDB
+            _now = datetime.utcnow()
+            _now_iso = _now.isoformat()
             db = _get_db()
             users_col = db['appfaceapi_myuser']
             subscriptions_col = db['user_subscriptions']
@@ -114,21 +150,22 @@ class VerifySubscriptionView(View):
                 {
                     '$set': {
                         'plan': plan,
-                        'updated_at': datetime.now().isoformat(),
+                        'updated_at': _now_iso,
                     }
                 }
             )
 
             # Store subscription details
+            _expires_date = _subget('expires_date')
             subscription_doc = {
                 'user_id': user_id,
                 'plan': plan,
                 'provider': 'revenuecat',
                 'entitlements': entitlements,
                 'subscriptions': active_subscriptions,
-                'original_purchase_date': subscriber.get('original_purchase_date'),
-                'expires_date': subscriber.get('expires_date'),
-                'verified_at': datetime.now().isoformat(),
+                'original_purchase_date': _subget('original_purchase_date'),
+                'expires_date': _expires_date,
+                'verified_at': _now_iso,
             }
 
             subscriptions_col.update_one(
@@ -141,14 +178,14 @@ class VerifySubscriptionView(View):
                 'success': True,
                 'plan': plan,
                 'entitlements': list(entitlements.keys()),
-                'expires_date': subscriber.get('expires_date'),
+                'expires_date': _expires_date,
             })
 
         except json.JSONDecodeError:
             return JsonResponse({'detail': 'Invalid JSON'}, status=400)
         except Exception as e:
-            log.exception(f'Subscription verification error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception('Subscription verification error')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Get Subscription Status ─────────────────────────────────────────────────
@@ -158,10 +195,14 @@ class SubscriptionStatusView(View):
 
     def get(self, request, user_id):
         try:
+            token_user_id = _get_user_id(request)
+            if not token_user_id or token_user_id != user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
             db = _get_db()
             subscriptions_col = db['user_subscriptions']
 
-            sub = subscriptions_col.find_one({'user_id': int(user_id)})
+            sub = subscriptions_col.find_one({'user_id': user_id}, _SUB_DETAIL_PROJ)
 
             if not sub:
                 return JsonResponse({
@@ -170,17 +211,19 @@ class SubscriptionStatusView(View):
                     'entitlements': [],
                 })
 
+            _sget2 = sub.get
+            _plan = _sget2('plan', 'free')
             return JsonResponse({
-                'plan': sub.get('plan', 'free'),
-                'active': sub.get('plan') == 'premium',
-                'entitlements': list(sub.get('entitlements', {}).keys()),
-                'expires_date': sub.get('expires_date'),
-                'verified_at': sub.get('verified_at'),
+                'plan': _plan,
+                'active': _plan == 'premium',
+                'entitlements': list(_sget2('entitlements', {}).keys()),
+                'expires_date': _sget2('expires_date'),
+                'verified_at': _sget2('verified_at'),
             })
 
         except Exception as e:
-            log.exception(f'Error getting subscription status: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception('Error getting subscription status')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Check Feature Access ────────────────────────────────────────────────────
@@ -193,6 +236,10 @@ class FeatureAccessView(View):
 
     def get(self, request, user_id):
         try:
+            token_user_id = _get_user_id(request)
+            if not token_user_id or token_user_id != user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
             feature = request.GET.get('feature', '')
             if not feature:
                 return JsonResponse({'detail': 'feature parameter required'}, status=400)
@@ -200,31 +247,16 @@ class FeatureAccessView(View):
             db = _get_db()
             users_col = db['appfaceapi_myuser']
 
-            user = users_col.find_one({'id': int(user_id)})
+            user = users_col.find_one({'id': user_id}, {'_id': 0, 'plan': 1})
             if not user:
                 return JsonResponse({'detail': 'User not found'}, status=404)
 
             plan = user.get('plan', 'free')
 
-            # Feature matrix
-            free_features = [
-                'compatibility_check_1_per_day',
-                'community_browse',
-                'profile_view',
-            ]
-
-            premium_features = free_features + [
-                'unlimited_checks',
-                'unlimited_communities',
-                'file_sharing',
-                'advanced_search',
-                'priority_support',
-            ]
-
             if plan == 'premium':
-                has_access = feature in premium_features
+                has_access = feature in _PREMIUM_FEATURES
             else:
-                has_access = feature in free_features
+                has_access = feature in _FREE_FEATURES
 
             return JsonResponse({
                 'feature': feature,
@@ -234,8 +266,8 @@ class FeatureAccessView(View):
             })
 
         except Exception as e:
-            log.exception(f'Feature access check error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception('Feature access check error')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Cancel Subscription ─────────────────────────────────────────────────────
@@ -245,24 +277,28 @@ class CancelSubscriptionView(View):
 
     def post(self, request, user_id):
         try:
+            token_user_id = _get_user_id(request)
+            if not token_user_id or token_user_id != user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
             db = _get_db()
             subscriptions_col = db['user_subscriptions']
             users_col = db['appfaceapi_myuser']
 
             # Mark subscription as cancelled
             subscriptions_col.update_one(
-                {'user_id': int(user_id)},
+                {'user_id': user_id},
                 {
                     '$set': {
                         'plan': 'free',
-                        'cancelled_at': datetime.now().isoformat(),
+                        'cancelled_at': datetime.utcnow().isoformat(),
                     }
                 }
             )
 
             # Update user plan
             users_col.update_one(
-                {'id': int(user_id)},
+                {'id': user_id},
                 {'$set': {'plan': 'free'}}
             )
 
@@ -273,5 +309,5 @@ class CancelSubscriptionView(View):
             })
 
         except Exception as e:
-            log.exception(f'Cancellation error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception('Cancellation error')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

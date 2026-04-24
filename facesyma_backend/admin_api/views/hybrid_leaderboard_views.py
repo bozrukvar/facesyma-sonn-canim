@@ -10,10 +10,12 @@ Endpoints:
   GET  /api/v1/leaderboards/community - Community leaderboard
 """
 
-import json
 import logging
+import re as _re
 from django.http import JsonResponse
 from django.views import View
+
+_RE_TRAIT_ID = _re.compile(r'^[a-zA-Z0-9_-]{1,50}$')
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
@@ -24,6 +26,10 @@ from gamification.services.hybrid_leaderboard_service import (
 )
 
 log = logging.getLogger(__name__)
+
+_VALID_LB_TYPES   = frozenset({'global', 'trait', 'community'})
+_VALID_LB_PERIODS = frozenset({'all_time', '7d', '30d', '90d', 'monthly'})
+_VALID_LB_SORT    = frozenset({'coins', 'rank', 'name', 'badges', 'accuracy'})
 
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
@@ -50,22 +56,34 @@ class HybridLeaderboardView(View):
             user_id = _require_auth(request)
 
             # Parse query parameters
-            leaderboard_type = request.GET.get("leaderboard_type", "global").strip()
-            trait_id = request.GET.get("trait_id", "").strip() or None
-            community_id_str = request.GET.get("community_id", "").strip()
-            time_period = request.GET.get("time_period", "all_time").strip()
-            sort_by = request.GET.get("sort_by", "coins").strip()
+
+
+
+
+            _qp = request.GET
+            _qpget = _qp.get
+            leaderboard_type = _qpget("leaderboard_type", "global").strip()
+            if leaderboard_type not in _VALID_LB_TYPES:
+                return _json_error(f"Invalid leaderboard_type. Allowed: {', '.join(sorted(_VALID_LB_TYPES))}", status=400)
+            trait_id = _qpget("trait_id", "").strip() or None
+            community_id_str = _qpget("community_id", "").strip()
+            time_period = _qpget("time_period", "all_time").strip()
+            if time_period not in _VALID_LB_PERIODS:
+                time_period = "all_time"
+            sort_by = _qpget("sort_by", "coins").strip()
+            if sort_by not in _VALID_LB_SORT:
+                sort_by = "coins"
 
             # Parse limit
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qpget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
 
             # Parse offset
             try:
-                offset = int(request.GET.get("offset", 0))
+                offset = int(_qpget("offset", 0))
                 offset = max(offset, 0)
             except ValueError:
                 offset = 0
@@ -75,6 +93,8 @@ class HybridLeaderboardView(View):
             if community_id_str:
                 try:
                     community_id = int(community_id_str)
+                    if community_id <= 0 or community_id > 2_147_483_647:
+                        raise ValueError
                 except ValueError:
                     return _json_error("Invalid community_id", status=400)
 
@@ -114,6 +134,7 @@ class HybridLeaderboardView(View):
                 for e in leaderboard.entries
             ]
 
+            _lce = leaderboard.cache_expiry
             return JsonResponse({
                 "leaderboard_type": leaderboard.leaderboard_type,
                 "leaderboard_name": leaderboard.leaderboard_name,
@@ -122,17 +143,19 @@ class HybridLeaderboardView(View):
                 "total_entries": leaderboard.total_entries,
                 "user_rank": leaderboard.user_rank,
                 "cached": leaderboard.cached,
-                "cache_expiry": leaderboard.cache_expiry.isoformat() if leaderboard.cache_expiry else None,
+                "cache_expiry": _lce.isoformat() if _lce else None,
                 "entries": entries_data,
             })
 
-        except LeaderboardError as e:
-            return _json_error(f"Leaderboard error: {str(e)}", status=400)
-        except ValueError as e:
-            return _json_error(f"Invalid parameter: {str(e)}", status=400)
+        except PermissionError as e:
+            return _json_error(str(e), status=401)
+        except LeaderboardError:
+            return _json_error("Leaderboard processing error.", status=400)
+        except ValueError:
+            return _json_error("Invalid parameter.", status=400)
         except Exception as e:
             log.error(f"HybridLeaderboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -152,17 +175,23 @@ class GlobalLeaderboardView(View):
             user_id = _require_auth(request)
 
             # Parse parameters
-            time_period = request.GET.get("time_period", "all_time").strip()
-            sort_by = request.GET.get("sort_by", "coins").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            time_period = _qpget("time_period", "all_time").strip()
+            if time_period not in _VALID_LB_PERIODS:
+                time_period = "all_time"
+            sort_by = _qpget("sort_by", "coins").strip()
+            if sort_by not in _VALID_LB_SORT:
+                sort_by = "coins"
 
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qpget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
 
             try:
-                offset = int(request.GET.get("offset", 0))
+                offset = int(_qpget("offset", 0))
                 offset = max(offset, 0)
             except ValueError:
                 offset = 0
@@ -205,11 +234,13 @@ class GlobalLeaderboardView(View):
                 "entries": entries_data,
             })
 
-        except LeaderboardError as e:
-            return _json_error(f"Leaderboard error: {str(e)}", status=400)
+        except PermissionError as e:
+            return _json_error(str(e), status=401)
+        except LeaderboardError:
+            return _json_error("Leaderboard processing error.", status=400)
         except Exception as e:
             log.error(f"GlobalLeaderboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -229,21 +260,29 @@ class TraitLeaderboardView(View):
             user_id = _require_auth(request)
 
             # Parse parameters
-            trait_id = request.GET.get("trait_id", "").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            trait_id = _qpget("trait_id", "").strip()
             if not trait_id:
                 return _json_error("Missing trait_id", status=400)
+            if not _RE_TRAIT_ID.match(trait_id):
+                return _json_error("Invalid trait_id format.", status=400)
 
-            time_period = request.GET.get("time_period", "all_time").strip()
-            sort_by = request.GET.get("sort_by", "coins").strip()
+            time_period = _qpget("time_period", "all_time").strip()
+            if time_period not in _VALID_LB_PERIODS:
+                time_period = "all_time"
+            sort_by = _qpget("sort_by", "coins").strip()
+            if sort_by not in _VALID_LB_SORT:
+                sort_by = "coins"
 
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qpget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
 
             try:
-                offset = int(request.GET.get("offset", 0))
+                offset = int(_qpget("offset", 0))
                 offset = max(offset, 0)
             except ValueError:
                 offset = 0
@@ -288,11 +327,13 @@ class TraitLeaderboardView(View):
                 "entries": entries_data,
             })
 
-        except LeaderboardError as e:
-            return _json_error(f"Leaderboard error: {str(e)}", status=400)
+        except PermissionError as e:
+            return _json_error(str(e), status=401)
+        except LeaderboardError:
+            return _json_error("Leaderboard processing error.", status=400)
         except Exception as e:
             log.error(f"TraitLeaderboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -312,7 +353,9 @@ class CommunityLeaderboardView(View):
             user_id = _require_auth(request)
 
             # Parse parameters
-            community_id_str = request.GET.get("community_id", "").strip()
+            _qp = request.GET
+            _qpget = _qp.get
+            community_id_str = _qpget("community_id", "").strip()
             if not community_id_str:
                 return _json_error("Missing community_id", status=400)
 
@@ -321,17 +364,21 @@ class CommunityLeaderboardView(View):
             except ValueError:
                 return _json_error("Invalid community_id", status=400)
 
-            time_period = request.GET.get("time_period", "all_time").strip()
-            sort_by = request.GET.get("sort_by", "coins").strip()
+            time_period = _qpget("time_period", "all_time").strip()
+            if time_period not in _VALID_LB_PERIODS:
+                time_period = "all_time"
+            sort_by = _qpget("sort_by", "coins").strip()
+            if sort_by not in _VALID_LB_SORT:
+                sort_by = "coins"
 
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qpget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
 
             try:
-                offset = int(request.GET.get("offset", 0))
+                offset = int(_qpget("offset", 0))
                 offset = max(offset, 0)
             except ValueError:
                 offset = 0
@@ -376,8 +423,10 @@ class CommunityLeaderboardView(View):
                 "entries": entries_data,
             })
 
-        except LeaderboardError as e:
-            return _json_error(f"Leaderboard error: {str(e)}", status=400)
+        except PermissionError as e:
+            return _json_error(str(e), status=401)
+        except LeaderboardError:
+            return _json_error("Leaderboard processing error.", status=400)
         except Exception as e:
             log.error(f"CommunityLeaderboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)

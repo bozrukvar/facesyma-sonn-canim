@@ -17,12 +17,12 @@ Kullanım:
 """
 
 import json
+import os
 import random
 import argparse
 import sys
 from pathlib import Path
 from datetime import datetime
-import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ def translate_coaching(text: str, target_lang: str) -> str:
         translated = GoogleTranslator(source='tr', target=target_lang).translate(text)
         TRANSLATION_CACHE[cache_key] = translated
         return translated
-    except Exception as e:
+    except Exception:
         pass
 
     return text  # Fallback: original
@@ -1540,21 +1540,22 @@ def generate_giyim_for_sifat(sifat_adi: str, lang: str = "tr") -> dict:
     template = STIL_TEMPLATES.get(stil_tipi, STIL_TEMPLATES["karma-adaptif"])
 
     # Coaching'i dile çevir (paralel batch)
-    coaching = template.get("coaching", {})
+    _tget = template.get
+    coaching = _tget("coaching", {})
     if lang != "tr" and coaching:
         coaching = translate_coaching_batch(coaching, lang)
 
     giyim_data = {
         "stil_tipi": stil_tipi,
         "coaching": coaching,
-        "renk_paleti": template.get("renk_paleti", {}),
+        "renk_paleti": _tget("renk_paleti", {}),
         "yuz_sekli_notu": YUZ_SEKLI_NOTLARI,
         "mevsim": {}
     }
 
     # Mevsim ve kategori kombinasyonlarını ekle
     for mevsim in ["ilkbahar", "yaz", "sonbahar", "kis"]:
-        giyim_data["mevsim"][mevsim] = template.get(mevsim, {})
+        giyim_data["mevsim"][mevsim] = _tget(mevsim, {})
 
     return giyim_data
 
@@ -1577,9 +1578,10 @@ def generate_giyim_dataset(input_path: Path, output_path: Path, lang: str = "tr"
 
     giyim_db = {}
 
-    print(f"Toplam sıfat: {len(sifatlar)}")
+    _n_sifat = len(sifatlar)
+    print(f"Toplam sıfat: {_n_sifat}")
     print(f"Mevsim × Kategori kombinasyonu: 4 × 4 = 16")
-    print(f"Toplam kombinasyon: {len(sifatlar)} × 16 = {len(sifatlar) * 16}")
+    print(f"Toplam kombinasyon: {_n_sifat} × 16 = {_n_sifat * 16}")
 
     for i, (sifat_id, sifat_data) in enumerate(sifatlar.items()):
         # Handle different data types
@@ -1592,7 +1594,7 @@ def generate_giyim_dataset(input_path: Path, output_path: Path, lang: str = "tr"
         giyim_db[sifat_adi] = giyim_data
 
         if (i + 1) % 50 == 0:
-            print(f"  {i+1}/{len(sifatlar)} sıfat işlendi...")
+            print(f"  {i+1}/{_n_sifat} sıfat işlendi...")
 
     # JSON'a yaz
     with open(output_path, "w", encoding="utf-8") as f:
@@ -1630,8 +1632,10 @@ def push_to_mongodb(giyim_db: dict, lang: str, mongo_uri: str):
 
         if ops:
             result = col.bulk_write(ops)
-            total = result.modified_count + result.upserted_count
-            print(f"✓ MongoDB: {result.modified_count} güncellendi, {result.upserted_count} yeni oluşturuldu (toplam: {total})")
+            _rmc = result.modified_count
+            _ruc = result.upserted_count
+            total = _rmc + _ruc
+            print(f"✓ MongoDB: {_rmc} güncellendi, {_ruc} yeni oluşturuldu (toplam: {total})")
             print(f"  DB: facesyma-coach-backup")
             print(f"  Koleksiyon: coach_attributes_{lang}")
 
@@ -1645,17 +1649,17 @@ def push_to_mongodb(giyim_db: dict, lang: str, mongo_uri: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
+    _addarg = p.add_argument
     p = argparse.ArgumentParser(description="Facesyma giyim veri seti üreticisi")
-    p.add_argument("--input",  default="../facesyma_migrate/sifat_veritabani.json")
-    p.add_argument("--output", default="sifat_giyim_{lang}.json")
-    p.add_argument("--lang", default="tr",
+    _addarg("--input",  default="../facesyma_migrate/sifat_veritabani.json")
+    _addarg("--output", default="sifat_giyim_{lang}.json")
+    _addarg("--lang", default="tr",
                    choices=["tr","en","de","ru","ar","es","ko","ja",
                            "zh","hi","fr","pt","bn","id","ur","it","vi","pl"])
-    p.add_argument("--all-langs", action="store_true", help="Tüm dilleri üret")
-    p.add_argument("--push-mongo", action="store_true", help="MongoDB'ye yaz")
-    p.add_argument("--mongo-uri",
-                   default="mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-                          "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE")
+    _addarg("--all-langs", action="store_true", help="Tüm dilleri üret")
+    _addarg("--push-mongo", action="store_true", help="MongoDB'ye yaz")
+    _addarg("--mongo-uri",
+                   default=os.environ.get("MONGO_URI", ""))
     args = p.parse_args()
 
     input_path = Path(args.input)
@@ -1666,15 +1670,16 @@ def main():
     langs = (["tr","en","de","ru","ar","es","ko","ja","zh","hi","fr","pt","bn","id","ur","it","vi","pl"]
              if args.all_langs else [args.lang])
 
+    _apm = args.push_mongo
     for lang in langs:
         out = Path(args.output.replace("{lang}", lang))
         db = generate_giyim_dataset(input_path, out, lang)
 
-        if args.push_mongo:
+        if _apm:
             push_to_mongodb(db, lang, args.mongo_uri)
 
     print("\n✓ Tüm işlemler tamamlandı")
-    if not args.push_mongo:
+    if not _apm:
         print("\nMongoDB'ye yazmak için:")
         print("  python generate_giyim_dataset.py --push-mongo")
 

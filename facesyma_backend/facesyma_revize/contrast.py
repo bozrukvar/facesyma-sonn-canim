@@ -1,6 +1,7 @@
+import os
 from pymongo import MongoClient
 
-CONNECTION_STRING = "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
+CONNECTION_STRING = os.environ.get('MONGO_URI', "")
 client = MongoClient(CONNECTION_STRING)
 
 dbname = client['contrast']
@@ -9,27 +10,28 @@ contrast = dbname['attribute']
 collection = contrast.find_one({"_id": "compare"})
 
 def Param(text):
+    _tr = text.remove
     try:
-        text.remove('att1')
-        text.remove('att2')
-    except:
+        _tr('att1')
+        _tr('att2')
+    except Exception:
         pass
 
     # Fixed: collect items to remove first, then remove them
     # This avoids mutating list during iteration
     to_remove = set()
+    _tra = to_remove.add
     for i in list(text):  # iterate over copy of list
         try:
-            if i in collection:
-                # Check for conflicting attributes
-                conflicts = collection.get(i, [])
+            conflicts = collection.get(i)
+            if conflicts is not None:
                 if isinstance(conflicts, list):
                     for conflict in conflicts[:3]:
                         if isinstance(conflict, str) and len(conflict) > 2:
-                            to_remove.add(conflict)
+                            _tra(conflict)
                 elif isinstance(conflicts, str) and len(conflicts) > 2:
-                    to_remove.add(conflicts)
-        except:
+                    _tra(conflicts)
+        except Exception:
             continue
 
     # Remove all conflicting attributes at once

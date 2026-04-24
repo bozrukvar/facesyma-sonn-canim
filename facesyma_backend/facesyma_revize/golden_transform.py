@@ -10,10 +10,31 @@ Gösteriş Amaçlı: Yüzünüz orijinal halinde korunmuş, sadece görselleşti
 """
 
 import cv2
-import numpy as np
 import base64
 import io
-from PIL import Image, ImageDraw, ImageFont
+import logging
+from functools import lru_cache
+from PIL import Image, ImageDraw
+
+log = logging.getLogger(__name__)
+
+_KVKK_POINTS_TR = [
+    '✓ Orijinal Fotoğraf Korunmuş: Hiçbir biometrik veriye değişiklik yapılmamıştır',
+    '✓ Veri Depolanmıyor: Bu gösterim geçicidir, hiçbir yerde kaydedilmez',
+    '✓ Paylaşılmıyor: Üçüncü partiye hiçbir vergi aktarılmaz',
+    '✓ Sadece Cihazda: Görselleştirme yalnızca sizin cihazınızda görülür',
+    '✓ Siz Kontrol: İstediğiniz zaman silme/gizleme hakkına sahipsiniz',
+    '✓ Tamamen Seçmeli: Kullanmak istemiyor iseniz hiçbir etki yoktur'
+]
+
+_KVKK_POINTS_EN = [
+    '✓ Original Photo Protected: No biometric data has been modified',
+    '✓ No Data Storage: This visualization is temporary and not stored',
+    '✓ Not Shared: No data is transferred to third parties',
+    '✓ Device Only: Visualization is only visible on your device',
+    '✓ Your Control: You have the right to delete/hide at any time',
+    '✓ Completely Optional: No impact if you choose not to use'
+]
 
 def create_golden_transform_preview(img_path, lang='tr'):
     """
@@ -66,11 +87,12 @@ def create_golden_transform_preview(img_path, lang='tr'):
             'comparison_b64': comparison_b64,
             'transformation_guide': transformation_guide,
             'kvkk_disclaimer': kvkk_disclaimer,
-            'message': 'Bu sadece gösterim amaçlı bir önizlemedir. Hiçbir veri kaydedilmemiştir.'
+            'message': 'This is a preview for display purposes only. No data has been saved.'
         }
 
     except Exception as e:
-        return {'error': str(e), 'success': False}
+        log.error('golden_transform preview failed', exc_info=True)
+        return {'error': 'Preview generation failed.', 'success': False}
 
 
 def apply_golden_adjustments(img_pil, lang='tr'):
@@ -78,12 +100,16 @@ def apply_golden_adjustments(img_pil, lang='tr'):
     Golden ratio optimizasyonlarını görsel olarak göster.
     (Gerçek değişiklik yapma - sadece overlay/simülasyon)
     """
-    draw = ImageDraw.Draw(img_pil, 'RGBA')
-    w, h = img_pil.size
+    _Draw = ImageDraw.Draw
+    draw = _Draw(img_pil, 'RGBA')
+    _ips = img_pil.size
+    w, h = _ips
 
     # Overlay katmanı: Ayarlamalar neler olabilir göster
-    overlay = Image.new('RGBA', img_pil.size, (0, 0, 0, 0))
-    overlay_draw = ImageDraw.Draw(overlay)
+    overlay = Image.new('RGBA', _ips, (0, 0, 0, 0))
+    overlay_draw = _Draw(overlay)
+    _ell = overlay_draw.ellipse
+    _odl = overlay_draw.line
 
     # Golden ratio bölgeleri işaretle
     # Gözler arası mesafe (optimal: 1.618)
@@ -92,17 +118,17 @@ def apply_golden_adjustments(img_pil, lang='tr'):
     eye_right = int(w * 0.75)
 
     # Gözler
-    overlay_draw.ellipse(
+    _ell(
         [(eye_left-30, eye_y-20), (eye_left+30, eye_y+20)],
         outline=(76, 175, 80, 200), width=3
     )
-    overlay_draw.ellipse(
+    _ell(
         [(eye_right-30, eye_y-20), (eye_right+30, eye_y+20)],
         outline=(76, 175, 80, 200), width=3
     )
 
     # Gözler arası ideal mesafe göster
-    overlay_draw.line(
+    _odl(
         [(eye_left, eye_y), (eye_right, eye_y)],
         fill=(76, 175, 80, 150), width=2
     )
@@ -112,14 +138,14 @@ def apply_golden_adjustments(img_pil, lang='tr'):
     lips_left = int(w * 0.3)
     lips_right = int(w * 0.7)
 
-    overlay_draw.ellipse(
+    _ell(
         [(lips_left-40, lips_y-15), (lips_right+40, lips_y+15)],
         outline=(255, 193, 7, 200), width=3
     )
 
     # Kaşlar
     brow_y = int(h * 0.28)
-    overlay_draw.line(
+    _odl(
         [(int(w*0.2), brow_y), (int(w*0.8), brow_y)],
         fill=(139, 95, 191, 150), width=2
     )
@@ -131,12 +157,13 @@ def apply_golden_adjustments(img_pil, lang='tr'):
     ).convert('RGB')
 
     # Başlık ekle
-    draw = ImageDraw.Draw(img_pil)
+    draw = _Draw(img_pil)
+    _dt = draw.text
     title = "🎨 Golden Ratio Önizlemesi" if lang == 'tr' else "🎨 Golden Ratio Preview"
-    draw.text((20, 20), title, fill=(76, 175, 80, 255), font=None)
+    _dt((20, 20), title, fill=(76, 175, 80, 255), font=None)
 
     subtitle = "Yeşil: Gözler | Sarı: Dudaklar | Mor: Kaşlar" if lang == 'tr' else "Green: Eyes | Yellow: Lips | Purple: Brows"
-    draw.text((20, 50), subtitle, fill=(200, 200, 200), font=None)
+    _dt((20, 50), subtitle, fill=(200, 200, 200), font=None)
 
     return img_pil
 
@@ -152,18 +179,20 @@ def create_before_after_comparison(original, adjusted, lang='tr'):
 
     # Başlık
     draw = ImageDraw.Draw(comparison)
+    _dt = draw.text
     title = "Orijinal vs Golden Ratio Optimizasyonu" if lang == 'tr' else "Original vs Golden Ratio Optimization"
-    draw.text((20, 20), title, fill=(255, 255, 255), font=None)
+    _dt((20, 20), title, fill=(255, 255, 255), font=None)
 
+    _cp = comparison.paste
     # Orijinal fotoğrafı yapıştır
-    comparison.paste(original, (20, 80))
+    _cp(original, (20, 80))
 
     # Ayarlanmış fotoğrafı yapıştır
-    comparison.paste(adjusted, (w + 20, 80))
+    _cp(adjusted, (w + 20, 80))
 
     # Etiketler
-    draw.text((20, h + 85), "ORIJINAL" if lang == 'tr' else "ORIGINAL", fill=(200, 200, 200), font=None)
-    draw.text((w + 20, h + 85), "GOLDEN RATIO" if lang == 'tr' else "GOLDEN RATIO", fill=(76, 175, 80), font=None)
+    _dt((20, h + 85), "ORIJINAL" if lang == 'tr' else "ORIGINAL", fill=(200, 200, 200), font=None)
+    _dt((w + 20, h + 85), "GOLDEN RATIO" if lang == 'tr' else "GOLDEN RATIO", fill=(76, 175, 80), font=None)
 
     return comparison
 
@@ -230,6 +259,7 @@ def get_transformation_guide(lang='tr'):
         }
 
 
+@lru_cache(maxsize=4)
 def get_kvkk_disclaimer(lang='tr'):
     """
     KVKK uyumluluğu bildirişi
@@ -237,28 +267,14 @@ def get_kvkk_disclaimer(lang='tr'):
     if lang == 'tr':
         return {
             'title': 'KVKK Uyumluluğu Bildirişi',
-            'points': [
-                '✓ Orijinal Fotoğraf Korunmuş: Hiçbir biometrik veriye değişiklik yapılmamıştır',
-                '✓ Veri Depolanmıyor: Bu gösterim geçicidir, hiçbir yerde kaydedilmez',
-                '✓ Paylaşılmıyor: Üçüncü partiye hiçbir vergi aktarılmaz',
-                '✓ Sadece Cihazda: Görselleştirme yalnızca sizin cihazınızda görülür',
-                '✓ Siz Kontrol: İstediğiniz zaman silme/gizleme hakkına sahipsiniz',
-                '✓ Tamamen Seçmeli: Kullanmak istemiyor iseniz hiçbir etki yoktur'
-            ],
+            'points': _KVKK_POINTS_TR,
             'legal': 'Bu uygulama KVKK (6698 sayılı Kişisel Verilerin Korunması Kanunu) ve GDPR ile tam uyumludur.',
             'contact': 'Sorularınız için: privacy@facesyma.com'
         }
     else:
         return {
             'title': 'KVKK Compliance Notice',
-            'points': [
-                '✓ Original Photo Protected: No biometric data has been modified',
-                '✓ No Data Storage: This visualization is temporary and not stored',
-                '✓ Not Shared: No data is transferred to third parties',
-                '✓ Device Only: Visualization is only visible on your device',
-                '✓ Your Control: You have the right to delete/hide at any time',
-                '✓ Completely Optional: No impact if you choose not to use'
-            ],
+            'points': _KVKK_POINTS_EN,
             'legal': 'This application is fully compliant with KVKK (Personal Data Protection Law) and GDPR.',
             'contact': 'Questions: privacy@facesyma.com'
         }

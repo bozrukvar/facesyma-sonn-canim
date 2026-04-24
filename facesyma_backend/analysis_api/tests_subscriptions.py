@@ -43,10 +43,11 @@ class SubscriptionStatusTests(TestCase):
         response = self.view(request)
 
         data = json.loads(response.content)
-        self.assertEqual(response.status_code, 200)
+        _aeq = self.assertEqual
+        _aeq(response.status_code, 200)
         self.assertTrue(data['success'])
-        self.assertEqual(data['data']['tier'], 'free')
-        self.assertEqual(data['data']['status'], 'active')
+        _aeq(data['data']['tier'], 'free')
+        _aeq(data['data']['status'], 'active')
 
     @patch('compatibility_views._get_subscription_col')
     @patch('compatibility_views.get_user_subscription')
@@ -158,10 +159,11 @@ class SubscriptionCancelTests(TestCase):
         response = self.view(request)
 
         data = json.loads(response.content)
-        self.assertEqual(response.status_code, 200)
+        _aeq = self.assertEqual
+        _aeq(response.status_code, 200)
         self.assertTrue(data['success'])
-        self.assertEqual(data['data']['status'], 'cancelled')
-        self.assertEqual(data['data']['tier'], 'free')
+        _aeq(data['data']['status'], 'cancelled')
+        _aeq(data['data']['tier'], 'free')
 
     def test_cancel_missing_user_id(self):
         """user_id parametresi eksikse hata döner"""
@@ -302,9 +304,11 @@ class PricingTests(TestCase):
             }
         }
 
-        self.assertFalse(sub['features']['unlimited_messaging'])
-        self.assertFalse(sub['features']['unlimited_communities'])
-        self.assertFalse(sub['features']['file_sharing'])
+        _af = self.assertFalse
+        _sf = sub['features']
+        _af(_sf['unlimited_messaging'])
+        _af(_sf['unlimited_communities'])
+        _af(_sf['file_sharing'])
 
     def test_premium_tier_features(self):
         """Premium tier özellikleri kontrol et"""
@@ -318,9 +322,11 @@ class PricingTests(TestCase):
             }
         }
 
-        self.assertTrue(sub['features']['unlimited_messaging'])
-        self.assertTrue(sub['features']['unlimited_communities'])
-        self.assertTrue(sub['features']['file_sharing'])
+        _at = self.assertTrue
+        _sf = sub['features']
+        _at(_sf['unlimited_messaging'])
+        _at(_sf['unlimited_communities'])
+        _at(_sf['file_sharing'])
 
     def test_monthly_vs_yearly_pricing(self):
         """Ay ve yıllık fiyatlandırma"""

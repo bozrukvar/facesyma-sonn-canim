@@ -24,6 +24,11 @@ from facesyma_ai.core.redis_client import redis_delete, redis_clear_pattern, get
 
 log = logging.getLogger(__name__)
 
+try:
+    from gamification.websocket_events import on_leaderboard_invalidated as _ws_leaderboard_invalidated
+except Exception:
+    _ws_leaderboard_invalidated = None
+
 
 class CacheLayer(str, Enum):
     """Cache layer identifiers"""
@@ -255,10 +260,11 @@ class CacheInvalidationManager:
         Returns:
             Number of keys deleted
         """
+        _clv = cache_layer.value
         try:
             deleted = redis_clear_pattern(pattern)
             log.info(
-                f"✓ Cache invalidated: {cache_layer.value} "
+                f"✓ Cache invalidated: {_clv} "
                 f"(pattern: {pattern}, deleted: {deleted}, reason: {reason})"
             )
             return deleted
@@ -267,7 +273,7 @@ class CacheInvalidationManager:
             level = log.error if critical else log.warning
             level(
                 f"{'✗' if critical else '⚠'} Cache invalidation failed: "
-                f"{cache_layer.value} (pattern: {pattern}): {e}"
+                f"{_clv} (pattern: {pattern}): {e}"
             )
             return 0
 
@@ -285,26 +291,29 @@ class CacheInvalidationManager:
 
         try:
             info = r.info("memory")
-            dbsize = r.dbsize()
+            _rdbsize = r.dbsize
+            dbsize = _rdbsize()
+            _infoget = info.get
 
             stats = {
                 "total_keys": dbsize,
-                "memory_used_mb": round(info.get("used_memory", 0) / 1024 / 1024, 2),
-                "memory_max_mb": round(info.get("maxmemory", 512) / 1024 / 1024, 2),
+                "memory_used_mb": round(_infoget("used_memory", 0) / 1024 / 1024, 2),
+                "memory_max_mb": round(_infoget("maxmemory", 512) / 1024 / 1024, 2),
                 "memory_percent": round(
-                    (info.get("used_memory", 0) / max(info.get("maxmemory", 1), 1)) * 100, 1
+                    (_infoget("used_memory", 0) / max(_infoget("maxmemory", 1), 1)) * 100, 1
                 ),
-                "evicted_keys": info.get("evicted_keys", 0),
+                "evicted_keys": _infoget("evicted_keys", 0),
             }
 
             # Count keys by layer
             for layer in CacheLayer:
-                count = r.dbsize()  # Rough estimate
-                pattern = f"{layer.value}:v1:*"
+                _lv = layer.value
+                count = _rdbsize()  # Rough estimate
+                pattern = f"{_lv}:v1:*"
                 try:
                     # Count using SCAN to avoid blocking
                     count = sum(1 for _ in r.scan_iter(match=pattern))
-                    stats[f"{layer.value}_keys"] = count
+                    stats[f"{_lv}_keys"] = count
                 except Exception:
                     pass
 
@@ -312,7 +321,7 @@ class CacheInvalidationManager:
 
         except Exception as e:
             log.error(f"Failed to get cache stats: {e}")
-            return {"error": str(e)}
+            return {"error": "Failed to retrieve cache stats."}
 
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -331,11 +340,11 @@ def on_coin_awarded(user_id: int) -> None:
     log.info(f"Coin awarded to user {user_id} → Invalidated {deleted} leaderboard entries")
 
     # Broadcast WebSocket update
-    try:
-        from gamification.websocket_events import on_leaderboard_invalidated
-        on_leaderboard_invalidated(reason="coins_awarded")
-    except Exception as e:
-        log.debug(f"WebSocket broadcast failed (non-critical): {e}")
+    if _ws_leaderboard_invalidated:
+        try:
+            _ws_leaderboard_invalidated(reason="coins_awarded")
+        except Exception as e:
+            log.debug(f"WebSocket broadcast failed (non-critical): {e}")
 
 
 def on_badge_unlocked(user_id: int, badge_id: str) -> None:
@@ -352,11 +361,11 @@ def on_badge_unlocked(user_id: int, badge_id: str) -> None:
     )
 
     # Broadcast WebSocket update
-    try:
-        from gamification.websocket_events import on_leaderboard_invalidated
-        on_leaderboard_invalidated(reason="badge_unlocked")
-    except Exception as e:
-        log.debug(f"WebSocket broadcast failed (non-critical): {e}")
+    if _ws_leaderboard_invalidated:
+        try:
+            _ws_leaderboard_invalidated(reason="badge_unlocked")
+        except Exception as e:
+            log.debug(f"WebSocket broadcast failed (non-critical): {e}")
 
 
 def on_knowledge_base_update() -> None:
@@ -387,13 +396,11 @@ def on_mission_completed(community_id: Optional[int] = None) -> None:
     Invalidates community leaderboards.
     Broadcasts WebSocket update to all connected clients.
     """
+    _il = CacheInvalidationManager.invalidate_leaderboards
     if community_id:
-        deleted = CacheInvalidationManager.invalidate_leaderboards(
-            leaderboard_type="community",
-            community_id=community_id
-        )
+        deleted = _il(leaderboard_type="community", community_id=community_id)
     else:
-        deleted = CacheInvalidationManager.invalidate_leaderboards()
+        deleted = _il()
 
     log.info(
         f"Mission completed (community {community_id}) → "
@@ -401,12 +408,12 @@ def on_mission_completed(community_id: Optional[int] = None) -> None:
     )
 
     # Broadcast WebSocket update
-    try:
-        from gamification.websocket_events import on_leaderboard_invalidated
-        on_leaderboard_invalidated(
-            leaderboard_type="community" if community_id else None,
-            community_id=community_id,
-            reason="mission_completed"
-        )
-    except Exception as e:
-        log.debug(f"WebSocket broadcast failed (non-critical): {e}")
+    if _ws_leaderboard_invalidated:
+        try:
+            _ws_leaderboard_invalidated(
+                leaderboard_type="community" if community_id else None,
+                community_id=community_id,
+                reason="mission_completed"
+            )
+        except Exception as e:
+            log.debug(f"WebSocket broadcast failed (non-critical): {e}")

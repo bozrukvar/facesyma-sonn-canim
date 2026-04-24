@@ -66,9 +66,10 @@ def measure_jaw(img):
         }
     """
     jaw = jaw_input(img)
+    _j172 = jaw["172"]; _j397 = jaw["397"]
 
     # Jaw width: distance between left and right jaw corners
-    jaw_width = abs(jaw["172"][0] - jaw["397"][0])
+    jaw_width = abs(_j172[0] - _j397[0])
 
     # Face width reference: use landmarks from wider part of face
     # Approximate face width using standard proportions
@@ -87,7 +88,7 @@ def measure_jaw(img):
 
     # Jaw definition: vertical distance from chin to jaw corners
     chin_y = jaw["152"][1]
-    jaw_y = (jaw["172"][1] + jaw["397"][1]) / 2
+    jaw_y = (_j172[1] + _j397[1]) / 2
     jaw_definition = abs(chin_y - jaw_y)
 
     return {

@@ -18,7 +18,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from admin_api.utils.auth import _require_auth
+from admin_api.utils.auth import _require_admin
 from admin_api.services.metrics_service import MetricsService
 
 log = logging.getLogger(__name__)
@@ -45,16 +45,20 @@ class GamificationDashboardView(View):
     def get(self, request):
         try:
             # Require authentication
-            _require_auth(request)
+            _require_admin(request)
 
             # Get all metrics
             dashboard_data = MetricsService.get_dashboard_data()
 
             return JsonResponse(dashboard_data)
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"GamificationDashboardView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -72,7 +76,7 @@ class CacheStatisticsView(View):
 
     def get(self, request):
         try:
-            _require_auth(request)
+            _require_admin(request)
 
             cache_stats = MetricsService.get_cache_statistics()
 
@@ -81,9 +85,13 @@ class CacheStatisticsView(View):
                 "timestamp": cache_stats.get("timestamp"),
             })
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"CacheStatisticsView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -101,7 +109,7 @@ class LeaderboardPerformanceView(View):
 
     def get(self, request):
         try:
-            _require_auth(request)
+            _require_admin(request)
 
             performance = MetricsService.get_leaderboard_performance()
 
@@ -110,9 +118,13 @@ class LeaderboardPerformanceView(View):
                 "timestamp": performance.get("timestamp"),
             })
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"LeaderboardPerformanceView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -130,7 +142,7 @@ class WebSocketMetricsView(View):
 
     def get(self, request):
         try:
-            _require_auth(request)
+            _require_admin(request)
 
             websocket_metrics = MetricsService.get_websocket_metrics()
 
@@ -139,9 +151,13 @@ class WebSocketMetricsView(View):
                 "timestamp": websocket_metrics.get("timestamp"),
             })
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"WebSocketMetricsView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -159,7 +175,7 @@ class TrendMetricsView(View):
 
     def get(self, request):
         try:
-            _require_auth(request)
+            _require_admin(request)
 
             trend_metrics = MetricsService.get_trend_metrics()
 
@@ -168,9 +184,13 @@ class TrendMetricsView(View):
                 "timestamp": trend_metrics.get("timestamp"),
             })
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"TrendMetricsView error: {e}", exc_info=True)
-            return _json_error("Internal server error", status=500)
+            return _json_error("Internal server error.", status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -188,7 +208,7 @@ class SystemHealthView(View):
 
     def get(self, request):
         try:
-            _require_auth(request)
+            _require_admin(request)
 
             health = MetricsService.get_system_health()
 
@@ -197,9 +217,13 @@ class SystemHealthView(View):
 
             return JsonResponse(health, status=status_code)
 
+        except ValueError:
+            return _json_error("Unauthorized.", status=401)
+        except PermissionError:
+            return _json_error("Admin access required.", status=403)
         except Exception as e:
             log.error(f"SystemHealthView error: {e}", exc_info=True)
             return JsonResponse({
                 "status": "error",
-                "error": str(e),
+                "error": "System health check failed.",
             }, status=500)

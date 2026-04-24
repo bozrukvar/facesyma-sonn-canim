@@ -31,12 +31,13 @@ def generate(prompt, max_tokens=128):
         tokens = tokens[:, -max_prompt_length:]
 
     inputs = tokens.to("cuda")
+    _teid = tokenizer.eos_token_id
     with torch.no_grad():
         outputs = model.generate(
             inputs,
             max_new_tokens=max_tokens,  # Only new tokens
-            pad_token_id=tokenizer.eos_token_id,
-            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=_teid,
+            eos_token_id=_teid,
             attention_mask=torch.ones_like(inputs),
             do_sample=False,  # Greedy
             num_beams=1,

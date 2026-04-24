@@ -182,22 +182,25 @@ def prepare_data(cfg: Config, tokenizer) -> tuple:
 # ── Eğitim ────────────────────────────────────────────────────────────────────
 def train(cfg: Config):
     print("=" * 60)
+    _out_dir = cfg.output_dir
+    _hub_id  = cfg.hub_model_id
+    _bs      = cfg.batch_size
     print("Facesyma — Llama 3.1 8B Fine-Tuning")
     print("=" * 60)
     print(f"Model  : {cfg.base_model}")
     print(f"Veri   : {cfg.dataset_paths}")
-    print(f"Epoch  : {cfg.epochs}  |  Batch: {cfg.batch_size}  |  GradAccum: {cfg.grad_accum}")
+    print(f"Epoch  : {cfg.epochs}  |  Batch: {_bs}  |  GradAccum: {cfg.grad_accum}")
     print(f"LR     : {cfg.lr}  |  LoRA r: {cfg.lora_r}")
-    print(f"Push   : {cfg.push_to_hub}  →  {cfg.hub_model_id or '—'}\n")
+    print(f"Push   : {cfg.push_to_hub}  →  {_hub_id or '—'}\n")
 
     model, tokenizer = load_model(cfg)
     train_ds, val_ds = prepare_data(cfg, tokenizer)
 
     training_args = TrainingArguments(
-        output_dir                  = cfg.output_dir,
+        output_dir                  = _out_dir,
         num_train_epochs            = cfg.epochs,
-        per_device_train_batch_size = cfg.batch_size,
-        per_device_eval_batch_size  = cfg.batch_size,
+        per_device_train_batch_size = _bs,
+        per_device_eval_batch_size  = _bs,
         gradient_accumulation_steps = cfg.grad_accum,
         learning_rate               = cfg.lr,
         warmup_ratio                = cfg.warmup_ratio,
@@ -239,12 +242,12 @@ def train(cfg: Config):
     print(f"\nSon train loss: {final_loss:.4f}")
 
     # LoRA ağırlıklarını kaydet
-    print(f"\nLoRA ağırlıkları kaydediliyor: {cfg.output_dir}/")
-    model.save_pretrained(cfg.output_dir)
-    tokenizer.save_pretrained(cfg.output_dir)
+    print(f"\nLoRA ağırlıkları kaydediliyor: {_out_dir}/")
+    model.save_pretrained(_out_dir)
+    tokenizer.save_pretrained(_out_dir)
 
     # Merged (tam birleştirilmiş) model kaydet
-    merged_dir = cfg.output_dir + "_merged"
+    merged_dir = _out_dir + "_merged"
     print(f"Merged model kaydediliyor: {merged_dir}/")
     model.save_pretrained_merged(
         merged_dir, tokenizer,
@@ -252,7 +255,7 @@ def train(cfg: Config):
     )
 
     # GGUF kaydet (Ollama için)
-    gguf_dir = cfg.output_dir + "_gguf"
+    gguf_dir = _out_dir + "_gguf"
     print(f"GGUF kaydediliyor: {gguf_dir}/")
     model.save_pretrained_gguf(
         gguf_dir, tokenizer,
@@ -260,19 +263,19 @@ def train(cfg: Config):
     )
 
     # HuggingFace Hub'a push
-    if cfg.push_to_hub and cfg.hub_model_id:
+    if cfg.push_to_hub and _hub_id:
         hf_token = os.environ.get("HF_TOKEN")
         if not hf_token:
             print("\nUYARI: HF_TOKEN env değişkeni yok, Hub push atlanıyor.")
             print("  export HF_TOKEN=hf_xxx...")
         else:
-            print(f"\nHuggingFace Hub'a yükleniyor: {cfg.hub_model_id}")
-            model.push_to_hub(cfg.hub_model_id, token=hf_token)
-            tokenizer.push_to_hub(cfg.hub_model_id, token=hf_token)
+            print(f"\nHuggingFace Hub'a yükleniyor: {_hub_id}")
+            model.push_to_hub(_hub_id, token=hf_token)
+            tokenizer.push_to_hub(_hub_id, token=hf_token)
 
             # GGUF versiyonunu da push et
             model.push_to_hub_gguf(
-                cfg.hub_model_id + "-GGUF",
+                _hub_id + "-GGUF",
                 tokenizer,
                 quantization_method = "q4_k_m",
                 token = hf_token,
@@ -281,7 +284,7 @@ def train(cfg: Config):
 
     print("\n" + "=" * 60)
     print("Eğitim tamamlandı!")
-    print(f"  LoRA ağırlıkları : {cfg.output_dir}/")
+    print(f"  LoRA ağırlıkları : {_out_dir}/")
     print(f"  Merged model     : {merged_dir}/")
     print(f"  GGUF             : {gguf_dir}/")
     print("\nSonraki adımlar:")
@@ -295,18 +298,19 @@ def train(cfg: Config):
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def main():
+    _addarg = p.add_argument
     p = argparse.ArgumentParser(description="Facesyma Llama 3.1 8B fine-tuning")
-    p.add_argument("--dataset",    action="append", dest="datasets",
+    _addarg("--dataset",    action="append", dest="datasets",
                    help="JSONL veri seti (birden fazla kez kullanılabilir)")
-    p.add_argument("--base-model", default=BASE_MODEL)
-    p.add_argument("--output",     default=OUTPUT_DIR)
-    p.add_argument("--epochs",     type=int,   default=3)
-    p.add_argument("--batch",      type=int,   default=2)
-    p.add_argument("--grad-accum", type=int,   default=8)
-    p.add_argument("--lr",         type=float, default=2e-4)
-    p.add_argument("--lora-r",     type=int,   default=16)
-    p.add_argument("--push",       action="store_true")
-    p.add_argument("--hub-id",     default="",
+    _addarg("--base-model", default=BASE_MODEL)
+    _addarg("--output",     default=OUTPUT_DIR)
+    _addarg("--epochs",     type=int,   default=3)
+    _addarg("--batch",      type=int,   default=2)
+    _addarg("--grad-accum", type=int,   default=8)
+    _addarg("--lr",         type=float, default=2e-4)
+    _addarg("--lora-r",     type=int,   default=16)
+    _addarg("--push",       action="store_true")
+    _addarg("--hub-id",     default="",
                    help="Örn: kullaniciadı/facesyma-llama3.1-8b")
     args = p.parse_args()
 

@@ -12,7 +12,7 @@ import os
 from pymongo import MongoClient, ASCENDING
 
 # MongoDB bağlantısı
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE')
+MONGO_URI = os.environ.get('MONGO_URI', "")
 
 def migrate_subscriptions():
     """user_subscriptions koleksiyonunu oluştur"""
@@ -29,14 +29,16 @@ def migrate_subscriptions():
 
         # Existing indexes'i sil
         for idx in subscriptions_col.list_indexes():
-            if idx['name'] != '_id_':
-                subscriptions_col.drop_index(idx['name'])
+            _iname = idx['name']
+            if _iname != '_id_':
+                subscriptions_col.drop_index(_iname)
 
         # Yeni indexes oluştur
-        subscriptions_col.create_index('user_id', unique=True)
-        subscriptions_col.create_index('tier')
-        subscriptions_col.create_index('status')
-        subscriptions_col.create_index('renews_at')
+        _cidx = subscriptions_col.create_index
+        _cidx('user_id', unique=True)
+        _cidx('tier')
+        _cidx('status')
+        _cidx('renews_at')
 
         print("   ✅ Indexes created: user_id (unique), tier, status, renews_at")
 

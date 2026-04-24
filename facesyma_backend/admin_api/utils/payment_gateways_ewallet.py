@@ -60,11 +60,12 @@ class PaparaPaymentGateway(BaseEWalletGateway):
             response.raise_for_status()
 
             data = response.json()
-            if data.get('Success'):
-                return float(data.get('Data', {}).get('CurrentBalance', 0))
+            _dget = data.get
+            if _dget('Success'):
+                return float(_dget('Data', {}).get('CurrentBalance', 0))
             else:
                 raise PaymentGatewayException(
-                    f"Papara balance fetch failed: {data.get('ErrorMessage')}"
+                    f"Papara balance fetch failed: {_dget('ErrorMessage')}"
                 )
         except Exception as e:
             log.error(f'Papara balance error: {e}')
@@ -108,15 +109,18 @@ class PaparaPaymentGateway(BaseEWalletGateway):
             response.raise_for_status()
 
             data = response.json()
-            if data.get('Success'):
+            _dget = data.get
+            if _dget('Success'):
+                _dd = _dget('Data', {})
+                _ddget = _dd.get
                 return {
-                    'payment_id': str(data.get('Data', {}).get('CheckoutPageUrl')),
+                    'payment_id': str(_ddget('CheckoutPageUrl')),
                     'status': 'pending',
-                    'redirect_url': data.get('Data', {}).get('CheckoutPageUrl'),
+                    'redirect_url': _ddget('CheckoutPageUrl'),
                 }
             else:
                 raise PaymentGatewayException(
-                    f"Papara payment init failed: {data.get('ErrorMessage')}"
+                    f"Papara payment init failed: {_dget('ErrorMessage')}"
                 )
         except Exception as e:
             log.error(f'Papara payment init error: {e}')
@@ -262,10 +266,11 @@ class TuumPaymentGateway(BaseEWalletGateway):
             response.raise_for_status()
 
             data = response.json()
+            _dget = data.get
             return {
-                'payment_id': data.get('paymentId'),
+                'payment_id': _dget('paymentId'),
                 'status': 'pending',
-                'redirect_url': data.get('redirectUrl'),
+                'redirect_url': _dget('redirectUrl'),
             }
         except Exception as e:
             log.error(f'Tuum payment init error: {e}')

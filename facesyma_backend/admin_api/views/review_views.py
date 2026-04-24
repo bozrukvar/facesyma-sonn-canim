@@ -17,6 +17,17 @@ from admin_api.utils.auth import _require_admin
 from admin_api.utils.mongo import get_reviews_col, _next_id
 from admin_api.utils.sentiment import analyze_sentiment
 
+_REVIEW_CSV_HEADERS = ['id', 'user_id', 'user_email', 'text', 'rating', 'platform',
+                        'sentiment', 'sentiment_score', 'is_visible', 'created_at']
+
+
+_VALID_REVIEW_PERIODS = frozenset({'daily', 'weekly', 'monthly'})
+_VALID_SENTIMENTS     = frozenset({'positive', 'negative', 'neutral'})
+_VALID_PLATFORMS      = frozenset({'mobile', 'web', 'api'})
+_REVIEW_PROJECTION    = {'_id': 0, 'id': 1, 'user_id': 1, 'user_email': 1, 'text': 1,
+                         'rating': 1, 'platform': 1, 'sentiment': 1, 'sentiment_score': 1,
+                         'is_visible': 1, 'created_at': 1, 'tags': 1}
+
 
 def _json(request):
     """Request body JSON'ı parse et"""
@@ -28,18 +39,19 @@ def _json(request):
 
 def _review_dict(review: dict) -> dict:
     """Review dokümanını response formatına dönüştür"""
+    _rget = review.get
     return {
-        'id': review.get('id'),
-        'user_id': review.get('user_id'),
-        'user_email': review.get('user_email'),
-        'text': review.get('text'),
-        'rating': review.get('rating'),
-        'platform': review.get('platform'),
-        'sentiment': review.get('sentiment'),
-        'sentiment_score': review.get('sentiment_score'),
-        'is_visible': review.get('is_visible'),
-        'created_at': str(review.get('created_at', '')),
-        'tags': review.get('tags', []),
+        'id': _rget('id'),
+        'user_id': _rget('user_id'),
+        'user_email': _rget('user_email'),
+        'text': _rget('text'),
+        'rating': _rget('rating'),
+        'platform': _rget('platform'),
+        'sentiment': _rget('sentiment'),
+        'sentiment_score': _rget('sentiment_score'),
+        'is_visible': _rget('is_visible'),
+        'created_at': str(_rget('created_at', '')),
+        'tags': _rget('tags', []),
     }
 
 
@@ -71,25 +83,33 @@ class ReviewListView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 20)), 100)
-        sentiment = request.GET.get('sentiment', '')
-        platform = request.GET.get('platform', '')
-        visible = request.GET.get('visible', '')
-        user_id = request.GET.get('user_id', '')
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            page, limit = 1, 20
+        sentiment = _qpget('sentiment', '')
+        platform = _qpget('platform', '')
+        visible = _qpget('visible', '')
+        user_id = _qpget('user_id', '')
 
         col = get_reviews_col()
 
         # Query
         query = {}
-        if sentiment:
+        if sentiment and sentiment in _VALID_SENTIMENTS:
             query['sentiment'] = sentiment
-        if platform:
+        if platform and platform in _VALID_PLATFORMS:
             query['platform'] = platform
         if visible:
             query['is_visible'] = visible.lower() == 'true'
         if user_id:
-            query['user_id'] = int(user_id)
+            try:
+                query['user_id'] = int(user_id)
+            except (ValueError, TypeError):
+                pass
 
         # Total count
         total = col.count_documents(query)
@@ -144,8 +164,9 @@ class ReviewCreateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         data = _json(request)
-        text = data.get('text', '').strip()
-        platform = data.get('platform', 'web').strip()
+        _dget = data.get
+        text = _dget('text', '').strip()
+        platform = _dget('platform', 'web').strip()
 
         # Doğrulama
         if not text:
@@ -161,16 +182,16 @@ class ReviewCreateView(View):
 
         review = {
             'id': review_id,
-            'user_id': data.get('user_id'),
-            'user_email': data.get('user_email'),
+            'user_id': _dget('user_id'),
+            'user_email': _dget('user_email'),
             'text': text,
-            'rating': data.get('rating'),
+            'rating': _dget('rating'),
             'platform': platform,
             'sentiment': sentiment_analysis['sentiment'],
             'sentiment_score': sentiment_analysis['score'],
             'is_visible': True,
-            'created_at': datetime.now().isoformat(),
-            'tags': data.get('tags', []),
+            'created_at': datetime.utcnow().isoformat(),
+            'tags': _dget('tags', []),
         }
 
         col.insert_one(review)
@@ -182,7 +203,7 @@ class ReviewCreateView(View):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ── Yorum İstatistikleri ──────────────────────────────────────────────────────
+# ── Yorum Statleri ──────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -211,33 +232,25 @@ class ReviewStatsView(View):
 
         col = get_reviews_col()
 
-        # Toplam yorum
-        total = col.count_documents({})
-
-        # Sentiment dağılımı
-        sentiment_stats = col.aggregate([
-            {'$group': {'_id': '$sentiment', 'count': {'$sum': 1}}},
-        ])
-        sentiment_dict = {doc['_id']: doc['count'] for doc in sentiment_stats}
-
-        # Platform dağılımı
-        platform_stats = col.aggregate([
-            {'$group': {'_id': '$platform', 'count': {'$sum': 1}}},
-        ])
-        platform_dict = {doc['_id']: doc['count'] for doc in platform_stats}
-
-        # Ortalama rating
-        rating_stats = col.aggregate([
-            {'$match': {'rating': {'$ne': None}}},
-            {'$group': {'_id': None, 'avg_rating': {'$avg': '$rating'}}},
-        ])
-        avg_rating = 0
-        for doc in rating_stats:
-            avg_rating = round(doc['avg_rating'], 2)
-
-        # Görünürlük
-        visible = col.count_documents({'is_visible': True})
-        hidden = col.count_documents({'is_visible': False})
+        # Single $facet replaces 5 separate queries
+        _r = next(col.aggregate([{'$facet': {
+            'total':        [{'$count': 'n'}],
+            'visible':      [{'$match': {'is_visible': True}},  {'$count': 'n'}],
+            'hidden':       [{'$match': {'is_visible': False}}, {'$count': 'n'}],
+            'by_sentiment': [{'$group': {'_id': '$sentiment', 'count': {'$sum': 1}}}],
+            'by_platform':  [{'$group': {'_id': '$platform',  'count': {'$sum': 1}}}],
+            'avg_rating':   [
+                {'$match': {'rating': {'$ne': None}}},
+                {'$group': {'_id': None, 'avg': {'$avg': '$rating'}}},
+            ],
+        }}]), {})
+        _rget2 = _r.get
+        total   = (_rget2('total',   [{}])[0] or {}).get('n', 0)
+        visible = (_rget2('visible', [{}])[0] or {}).get('n', 0)
+        hidden  = (_rget2('hidden',  [{}])[0] or {}).get('n', 0)
+        sentiment_dict = {doc['_id']: doc['count'] for doc in _rget2('by_sentiment', [])}
+        platform_dict  = {doc['_id']: doc['count'] for doc in _rget2('by_platform',  [])}
+        avg_rating = round((_rget2('avg_rating', [{}])[0] or {}).get('avg', 0) or 0, 2)
 
         return JsonResponse({
             'total_reviews': total,
@@ -272,13 +285,15 @@ class ReviewUpdateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         data = _json(request)
+        _rid = int(rid)
         col = get_reviews_col()
+        _cfo = col.find_one
 
         # Yorum var mı?
-        review = col.find_one({'id': int(rid)})
+        review = _cfo({'id': _rid}, {'_id': 1})
         if not review:
             return JsonResponse(
-                {'detail': f'Yorum #{rid} bulunamadı.'},
+                {'detail': f'Review #{rid} not found.'},
                 status=404
             )
 
@@ -291,17 +306,19 @@ class ReviewUpdateView(View):
 
         if not update_data:
             return JsonResponse(
-                {'detail': 'Güncellenecek alan yok.'},
+                {'detail': 'No fields to update.'},
                 status=400
             )
 
         # Güncelle
-        col.update_one({'id': int(rid)}, {'$set': update_data})
+        col.update_one({'id': _rid}, {'$set': update_data})
 
         # Güncellenmiş review döner
-        updated = col.find_one({'id': int(rid)})
+        updated = _cfo({'id': _rid}, _REVIEW_PROJECTION)
+        if not updated:
+            return JsonResponse({'detail': 'Review not found after update.'}, status=404)
         return JsonResponse({
-            'message': 'Yorum güncellendi.',
+            'message': 'Review updated.',
             'review': _review_dict(updated)
         })
 
@@ -331,15 +348,20 @@ class ReviewExportView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         # Query params
-        format_type = request.GET.get('format', 'json').lower()
-        limit = min(int(request.GET.get('limit', 100)), 10000)
-        sentiment = request.GET.get('sentiment', '')
+        _qp = request.GET
+        _qpget = _qp.get
+        format_type = _qpget('format', 'json').lower()
+        try:
+            limit = min(max(1, int(_qpget('limit', 100))), 10000)
+        except (ValueError, TypeError):
+            limit = 100
+        sentiment = _qpget('sentiment', '')
 
         col = get_reviews_col()
 
         # Query
         query = {}
-        if sentiment:
+        if sentiment and sentiment in _VALID_SENTIMENTS:
             query['sentiment'] = sentiment
 
         # Reviewları al
@@ -353,25 +375,25 @@ class ReviewExportView(View):
             # CSV format
             output = io.StringIO()
             writer = csv.writer(output)
+            _wrw = writer.writerow
 
             # Header
-            headers = ['id', 'user_id', 'user_email', 'text', 'rating', 'platform',
-                      'sentiment', 'sentiment_score', 'is_visible', 'created_at']
-            writer.writerow(headers)
+            _wrw(_REVIEW_CSV_HEADERS)
 
             # Rows
             for review in reviews:
-                writer.writerow([
-                    review.get('id'),
-                    review.get('user_id'),
-                    review.get('user_email'),
-                    review.get('text', '').replace('\n', ' '),  # Yeni satırları kaldır
-                    review.get('rating'),
-                    review.get('platform'),
-                    review.get('sentiment'),
-                    review.get('sentiment_score'),
-                    review.get('is_visible'),
-                    review.get('created_at'),
+                _rget = review.get
+                _wrw([
+                    _rget('id'),
+                    _rget('user_id'),
+                    _rget('user_email'),
+                    _rget('text', '').replace('\n', ' '),  # Yeni satırları kaldır
+                    _rget('rating'),
+                    _rget('platform'),
+                    _rget('sentiment'),
+                    _rget('sentiment_score'),
+                    _rget('is_visible'),
+                    _rget('created_at'),
                 ])
 
             # Response
@@ -386,7 +408,7 @@ class ReviewExportView(View):
             # JSON format (default)
             response = JsonResponse({
                 'reviews': [_review_dict(r) for r in reviews],
-                'export_date': datetime.now().isoformat(),
+                'export_date': datetime.utcnow().isoformat(),
                 'count': len(reviews),
                 'format': 'json'
             })
@@ -418,14 +440,22 @@ class ReviewTrendView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        period = request.GET.get('period', 'daily').lower()
-        days = min(int(request.GET.get('days', 30)), 365)
+        _qp = request.GET
+        _qpget = _qp.get
+        period = _qpget('period', 'daily').lower()
+        try:
+            days = min(max(1, int(_qpget('days', 30))), 365)
+        except (ValueError, TypeError):
+            days = 30
 
-        if period not in ['daily', 'weekly', 'monthly']:
-            return JsonResponse({'detail': 'period daily/weekly/monthly olmalı'}, status=400)
+        if period not in _VALID_REVIEW_PERIODS:
+            return JsonResponse({'detail': 'period must be daily/weekly/monthly'}, status=400)
 
+        _now = datetime.utcnow()
+        _now_iso = _now.isoformat()
         col = get_reviews_col()
-        start_date = datetime.utcnow() - timedelta(days=days)
+        start_date = _now - timedelta(days=days)
+        _start_iso = start_date.isoformat()
 
         # Group by date format
         if period == 'daily':
@@ -439,8 +469,8 @@ class ReviewTrendView(View):
             {
                 '$match': {
                     'created_at': {
-                        '$gte': start_date.isoformat(),
-                        '$lte': datetime.utcnow().isoformat()
+                        '$gte': _start_iso,
+                        '$lte': _now_iso,
                     }
                 }
             },
@@ -472,15 +502,16 @@ class ReviewTrendView(View):
             results = []
             all_reviews = list(col.find({
                 'created_at': {
-                    '$gte': start_date.isoformat(),
-                    '$lte': datetime.utcnow().isoformat()
+                    '$gte': _start_iso,
+                    '$lte': _now_iso,
                 }
-            }, {'created_at': 1, 'rating': 1}).sort('created_at', 1))
+            }, {'created_at': 1, 'rating': 1}).sort('created_at', 1).limit(10000))
 
             # Group manually
             grouped = {}
             for review in all_reviews:
-                created = review.get('created_at', '')
+                _rvget = review.get
+                created = _rvget('created_at', '')
                 if period == 'daily':
                     key = created[:10]  # YYYY-MM-DD
                 elif period == 'weekly':
@@ -489,16 +520,17 @@ class ReviewTrendView(View):
                 else:  # monthly
                     key = created[:7]  # YYYY-MM
 
-                if key not in grouped:
-                    grouped[key] = {'count': 0, 'ratings': []}
-                grouped[key]['count'] += 1
-                if review.get('rating'):
-                    grouped[key]['ratings'].append(review.get('rating'))
+                entry = grouped.setdefault(key, {'count': 0, 'ratings': []})
+                entry['count'] += 1
+                _rating = _rvget('rating')
+                if _rating:
+                    entry['ratings'].append(_rating)
 
             results = []
             for key in sorted(grouped.keys()):
                 group = grouped[key]
-                avg_rating = sum(group['ratings']) / len(group['ratings']) if group['ratings'] else 0
+                _ratings = group['ratings']
+                avg_rating = sum(_ratings) / len(_ratings) if _ratings else 0
                 results.append({
                     '_id': key,
                     'count': group['count'],
@@ -545,7 +577,12 @@ class ReviewTagsView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        limit = min(int(request.GET.get('limit', 20)), 100)
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            limit = 20
 
         col = get_reviews_col()
 

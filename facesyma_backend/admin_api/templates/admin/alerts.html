@@ -308,14 +308,14 @@
 
             tbody.innerHTML = data.rules.map(rule => `
                 <tr>
-                    <td>${rule.name}</td>
-                    <td>${rule.metric}</td>
-                    <td>${rule.condition}</td>
-                    <td>${rule.threshold}</td>
+                    <td>${escapeHtml(rule.name)}</td>
+                    <td>${escapeHtml(rule.metric)}</td>
+                    <td>${escapeHtml(rule.condition)}</td>
+                    <td>${escapeHtml(rule.threshold)}</td>
                     <td><span class="status-badge ${rule.enabled ? 'status-enabled' : 'status-disabled'}">${rule.enabled ? 'AÇIK' : 'KAPALI'}</span></td>
                     <td>
-                        <button onclick="toggleRule(${rule.id}, ${!rule.enabled})" style="margin-right: 5px; padding: 4px 8px; background: #666; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Aç/Kapat</button>
-                        <button onclick="deleteRule(${rule.id})" style="padding: 4px 8px; background: #F44336; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Sil</button>
+                        <button onclick="toggleRule(${parseInt(rule.id)}, ${!rule.enabled})" style="margin-right: 5px; padding: 4px 8px; background: #666; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Aç/Kapat</button>
+                        <button onclick="deleteRule(${parseInt(rule.id)})" style="padding: 4px 8px; background: #F44336; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Sil</button>
                     </td>
                 </tr>
             `).join('');
@@ -342,9 +342,9 @@
 
             tbody.innerHTML = data.items.map(item => `
                 <tr>
-                    <td>${new Date(item.triggered_at).toLocaleString('tr-TR')}</td>
-                    <td>${item.rule_name}</td>
-                    <td>${item.metric_value} / ${item.threshold}</td>
+                    <td>${escapeHtml(new Date(item.triggered_at).toLocaleString('tr-TR'))}</td>
+                    <td>${escapeHtml(item.rule_name)}</td>
+                    <td>${escapeHtml(item.metric_value)} / ${escapeHtml(item.threshold)}</td>
                     <td><span class="${item.email_sent ? 'email-sent' : 'email-not-sent'}">${item.email_sent ? '✓ Gönderildi' : '✗ Gönderilmedi'}</span></td>
                     <td><span class="${item.slack_sent ? 'email-sent' : 'email-not-sent'}">${item.slack_sent ? '🔔 Gönderildi' : '—'}</span></td>
                 </tr>

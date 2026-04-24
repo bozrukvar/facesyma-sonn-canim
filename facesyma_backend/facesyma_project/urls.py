@@ -1,7 +1,14 @@
 """facesyma_project/urls.py"""
 from django.urls import path, include
+from django.http import HttpResponse
+
+
+def health(request):
+    return HttpResponse("ok", content_type="text/plain")
+
 
 urlpatterns = [
+    path('health/', health),
     path('api/v1/analysis/', include('analysis_api.urls')),
     path('api/v1/auth/',     include('auth_api.urls')),
     path('api/v1/config/',   include('auth_api.config_urls')),

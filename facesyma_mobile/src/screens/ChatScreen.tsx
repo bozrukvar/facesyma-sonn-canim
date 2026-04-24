@@ -5,17 +5,18 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
   Dimensions, Animated,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ChatAPI } from '../services/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius, shadow } = theme;
+const AnimatedView = Animated.View;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { ScreenProps } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
-
-// API çağrıları: ChatAPI (src/services/api.ts)
 
 interface Message {
   id: string;
@@ -23,6 +24,8 @@ interface Message {
   content: string;
   timestamp: number;
 }
+
+const keyExtractor = (m: Message) => m.id;
 
 const getQuickQuestions = (lang: string) => [
   t('chat.quick_question_1', lang),
@@ -50,13 +53,13 @@ const TypingIndicator = () => {
 
   return (
     <View style={styles.msgRowAI}>
-      <View style={styles.aiAvatar}><Text style={{ fontSize: 14 }}>✨</Text></View>
+      <View style={styles.aiAvatar}><Text style={styles.aiAvatarIcon}>✨</Text></View>
       <View style={styles.bubbleAI}>
-        <View style={{ flexDirection: 'row', gap: 5, paddingVertical: 2, paddingHorizontal: 4 }}>
+        <View style={styles.typingDots}>
           {[a1, a2, a3].map((a, i) => (
-            <Animated.View key={i} style={{
+            <AnimatedView key={i} style={{
               width: 7, height: 7, borderRadius: 4,
-              backgroundColor: theme.colors.gold,
+              backgroundColor: colors.gold,
               opacity: a,
             }} />
           ))}
@@ -80,29 +83,30 @@ const MessageBubble = ({ item }: { item: Message }) => {
   }, []);
 
   return (
-    <Animated.View style={{
+    <AnimatedView style={{
       opacity: fadeAnim,
       transform: [{ translateY: slideAnim }],
     }}>
       <View style={isUser ? styles.msgRowUser : styles.msgRowAI}>
         {!isUser && (
-          <View style={styles.aiAvatar}><Text style={{ fontSize: 14 }}>✨</Text></View>
+          <View style={styles.aiAvatar}><Text style={styles.aiAvatarIcon}>✨</Text></View>
         )}
         <View style={[
           isUser ? styles.bubbleUser : styles.bubbleAI,
-          isUser && theme.shadow.gold,
+          isUser && shadow.gold,
         ]}>
           <Text style={isUser ? styles.bubbleUserText : styles.bubbleAIText}>
             {item.content}
           </Text>
         </View>
       </View>
-    </Animated.View>
+    </AnimatedView>
   );
 };
 
 // ── Ana ekran ────────────────────────────────────────────────────────────────
-const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, route }) => {
+const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
+  const insets = useSafeAreaInsets();
   const user           = useSelector((s: RootState) => s.auth.user);
   const analysisResult = route.params?.analysisResult ?? {};
   const { lang }       = useLanguage();
@@ -177,17 +181,17 @@ const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, rou
       setLoading(false);
       scrollToEnd();
     }
-  }, [input, loading, convId, lang, QUICK_QUESTIONS]);
+  }, [input, loading, convId, lang]);
 
   // ── Yükleniyor ──────────────────────────────────────────────────────────────
   if (initializing) {
     return (
-      <View style={[styles.container, { alignItems:'center', justifyContent:'center', gap:16 }]}>
+      <View style={styles.containerCenter}>
         <View style={styles.loadingOrb}>
-          <Text style={{ fontSize: 32 }}>✨</Text>
+          <Text style={styles.loadingOrbIcon}>✨</Text>
         </View>
         <Text style={styles.loadingText}>{t('chat.initializing', lang)}</Text>
-        <ActivityIndicator color={theme.colors.warmAmber} />
+        <ActivityIndicator color={colors.warmAmber} />
       </View>
     );
   }
@@ -199,13 +203,13 @@ const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, rou
       keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
     >
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <View style={styles.headerAvatar}><Text style={{ fontSize: 18 }}>✨</Text></View>
+          <View style={styles.headerAvatar}><Text style={styles.headerAvatarIcon}>✨</Text></View>
           <View>
             <Text style={styles.headerTitle}>{t('chat.assistant', lang)}</Text>
             <View style={styles.onlinePill}>
@@ -227,7 +231,7 @@ const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, rou
       <FlatList
         ref={listRef}
         data={messages}
-        keyExtractor={m => m.id}
+        keyExtractor={keyExtractor}
         renderItem={({ item }) => <MessageBubble item={item} />}
         contentContainerStyle={styles.msgList}
         onLayout={scrollToEnd}
@@ -267,7 +271,7 @@ const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, rou
           value={input}
           onChangeText={setInput}
           placeholder={t('chat.input_placeholder', lang)}
-          placeholderTextColor={theme.colors.textMuted}
+          placeholderTextColor={colors.textMuted}
           multiline
           maxLength={500}
         />
@@ -290,157 +294,161 @@ const ChatScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, rou
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor: theme.colors.background },
+  container: { flex:1, backgroundColor: colors.background },
+  containerCenter: { flex:1, backgroundColor: colors.background, alignItems:'center' as const, justifyContent:'center' as const, gap:16 },
 
   // Header
   header: {
     flexDirection: 'row', alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.lg + 44,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: colors.border,
   },
   backBtn:  { padding:4, width:44 },
-  backText: { ...theme.typography.h2, color: theme.colors.gold, fontSize:22 },
+  backText: { ...typography.h2, color: colors.gold, fontSize:22 },
   headerCenter: { flexDirection:'row', alignItems:'center', gap:10 },
   headerAvatar: {
     width:38, height:38, borderRadius:19,
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderWidth:1.5, borderColor:`${theme.colors.warmAmber}40`,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth:1.5, borderColor:`${colors.warmAmber}40`,
     alignItems:'center', justifyContent:'center',
   },
-  headerTitle: { ...theme.typography.h3, fontSize:14 },
+  headerTitle: { ...typography.h3, fontSize:14 },
   onlinePill:  { flexDirection:'row', alignItems:'center', gap:4, marginTop:2 },
-  onlineDot:   { width:6, height:6, borderRadius:3, backgroundColor: theme.colors.success },
-  onlineText:  { ...theme.typography.caption, color: theme.colors.success, fontSize:10 },
+  onlineDot:   { width:6, height:6, borderRadius:3, backgroundColor: colors.success },
+  onlineText:  { ...typography.caption, color: colors.success, fontSize:10 },
   newBtn: {
     paddingHorizontal:12, paddingVertical:6,
-    borderRadius: theme.radius.full,
-    borderWidth:1, borderColor: theme.colors.border,
+    borderRadius: radius.full,
+    borderWidth:1, borderColor: colors.border,
     width:44, alignItems:'center',
   },
-  newBtnText: { ...theme.typography.caption, color: theme.colors.textMuted, fontSize:11 },
+  newBtnText: { ...typography.caption, color: colors.textMuted, fontSize:11 },
 
   // Mesajlar
   msgList: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical:   theme.spacing.md,
-    gap: theme.spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical:   spacing.md,
+    gap: spacing.sm,
   },
   msgRowUser: { flexDirection:'row-reverse', marginBottom:8 },
   msgRowAI:   { flexDirection:'row', alignItems:'flex-end', gap:8, marginBottom:8 },
 
   aiAvatar: {
     width:30, height:30, borderRadius:15,
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderWidth:1, borderColor:`${theme.colors.warmAmber}30`,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth:1, borderColor:`${colors.warmAmber}30`,
     alignItems:'center', justifyContent:'center',
     marginBottom:2,
   },
 
   bubbleUser: {
     maxWidth:      width * 0.70,
-    backgroundColor: theme.colors.userBubble,
-    borderRadius:  theme.radius.lg,
-    borderBottomRightRadius: theme.radius.xs,
+    backgroundColor: colors.userBubble,
+    borderRadius:  radius.lg,
+    borderBottomRightRadius: radius.xs,
     paddingHorizontal: 14,
     paddingVertical:   10,
   },
   bubbleUserText: {
-    ...theme.typography.chat,
-    color: theme.colors.userBubbleText,
+    ...typography.chat,
+    color: colors.userBubbleText,
     fontWeight: '500',
   },
 
   bubbleAI: {
     maxWidth:      width * 0.75,
-    backgroundColor: theme.colors.aiBubble,
+    backgroundColor: colors.aiBubble,
     borderWidth:   1,
-    borderColor:   theme.colors.aiBubbleBorder,
-    borderRadius:  theme.radius.lg,
-    borderBottomLeftRadius: theme.radius.xs,
+    borderColor:   colors.aiBubbleBorder,
+    borderRadius:  radius.lg,
+    borderBottomLeftRadius: radius.xs,
     paddingHorizontal: 14,
     paddingVertical:   10,
   },
   bubbleAIText: {
-    ...theme.typography.chat,
-    color: theme.colors.aiBubbleText,
+    ...typography.chat,
+    color: colors.aiBubbleText,
     lineHeight: 22,
   },
 
   // Yükleniyor
   loadingOrb: {
     width:80, height:80, borderRadius:40,
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderWidth:1.5, borderColor:`${theme.colors.warmAmber}40`,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth:1.5, borderColor:`${colors.warmAmber}40`,
     alignItems:'center', justifyContent:'center',
-    ...theme.shadow.warm,
+    ...shadow.warm,
   },
-  loadingText: { ...theme.typography.body, color: theme.colors.textWarm },
+  loadingText: { ...typography.body, color: colors.textWarm },
 
   // Hızlı sorular
   quickWrap: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical:   theme.spacing.sm,
-    borderTopWidth:1, borderTopColor: theme.colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical:   spacing.sm,
+    borderTopWidth:1, borderTopColor: colors.border,
   },
-  quickLabel: { ...theme.typography.goldLabel, fontSize:9, marginBottom:8 },
+  quickLabel: { ...typography.goldLabel, fontSize:9, marginBottom:8 },
   quickRow:   { flexDirection:'row', flexWrap:'wrap', gap:6 },
   quickChip: {
     paddingHorizontal:12, paddingVertical:6,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.surfaceWarm,
-    borderWidth:1, borderColor: theme.colors.borderWarm,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceWarm,
+    borderWidth:1, borderColor: colors.borderWarm,
   },
   quickChipText: {
-    ...theme.typography.caption,
-    color: theme.colors.textWarm,
+    ...typography.caption,
+    color: colors.textWarm,
     fontSize:11,
   },
 
   // Hata
   errorBar: {
-    marginHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-    padding: theme.spacing.sm,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    padding: spacing.sm,
     backgroundColor: 'rgba(217,95,95,0.1)',
-    borderRadius: theme.radius.sm,
-    borderWidth:1, borderColor: theme.colors.error,
+    borderRadius: radius.sm,
+    borderWidth:1, borderColor: colors.error,
   },
-  errorText: { ...theme.typography.caption, color: theme.colors.error, fontSize:12 },
+  errorText: { ...typography.caption, color: colors.error, fontSize:12 },
 
   // Input
   inputRow: {
     flexDirection: 'row', alignItems: 'flex-end',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical:   theme.spacing.md,
-    borderTopWidth:1, borderTopColor: theme.colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical:   spacing.md,
+    borderTopWidth:1, borderTopColor: colors.border,
     gap:8,
   },
   input: {
     flex:1,
     minHeight:44, maxHeight:110,
-    backgroundColor: theme.colors.surfaceWarm,
-    borderRadius:    theme.radius.xl,
-    borderWidth:1, borderColor: theme.colors.borderWarm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical:   theme.spacing.sm,
-    color: theme.colors.textPrimary,
+    backgroundColor: colors.surfaceWarm,
+    borderRadius:    radius.xl,
+    borderWidth:1, borderColor: colors.borderWarm,
+    paddingHorizontal: spacing.md,
+    paddingVertical:   spacing.sm,
+    color: colors.textPrimary,
     fontSize:14, fontFamily:'System',
   },
   sendBtn: {
     width:44, height:44, borderRadius:22,
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     alignItems:'center', justifyContent:'center',
-    ...theme.shadow.gold,
+    ...shadow.gold,
   },
   sendBtnDisabled: {
-    backgroundColor: theme.colors.border,
+    backgroundColor: colors.border,
     shadowOpacity:0, elevation:0,
   },
   sendIcon: { fontSize:18, color:'#000', fontWeight:'700' },
+  aiAvatarIcon: { fontSize: 14 },
+  loadingOrbIcon: { fontSize: 32 },
+  headerAvatarIcon: { fontSize: 18 },
+  typingDots: { flexDirection: 'row' as const, gap: 5, paddingVertical: 2, paddingHorizontal: 4 },
 });
 
 export default ChatScreen;

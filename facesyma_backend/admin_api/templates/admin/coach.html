@@ -284,16 +284,17 @@ async function loadCoachUsers(page = 1) {
         if (data.data && data.data.length > 0) {
             data.data.forEach(user => {
                 const row = document.createElement('tr');
+                const uid = parseInt(user.user_id, 10);
                 row.innerHTML = `
-                    <td>${user.user_id}</td>
-                    <td>${user.lang}</td>
-                    <td>${user.sun_sign || '-'}</td>
-                    <td>${user.coach_session_count || 0}</td>
-                    <td>${(user.aktif_hedefler || []).length}</td>
-                    <td>${new Date(user.created_at).toLocaleDateString('tr-TR')}</td>
+                    <td>${escapeHtml(user.user_id)}</td>
+                    <td>${escapeHtml(user.lang)}</td>
+                    <td>${escapeHtml(user.sun_sign || '-')}</td>
+                    <td>${escapeHtml(user.coach_session_count || 0)}</td>
+                    <td>${escapeHtml((user.aktif_hedefler || []).length)}</td>
+                    <td>${escapeHtml(new Date(user.created_at).toLocaleDateString('tr-TR'))}</td>
                     <td>
-                        <button onclick="viewCoachUser(${user.user_id})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button> |
-                        <button onclick="if(confirm('Kullanıcıyı silmek istediğinize emin misiniz?')) deleteCoachUser(${user.user_id})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
+                        <button onclick="viewCoachUser(${uid})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button> |
+                        <button onclick="if(confirm('Kullanıcıyı silmek istediğinize emin misiniz?')) deleteCoachUser(${uid})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -309,7 +310,10 @@ async function loadCoachUsers(page = 1) {
             for (let i = 1; i <= data.pagination.pages; i++) {
                 const link = document.createElement('a');
                 if (i === currentCoachUsersPage) {
-                    link.innerHTML = `<span class="active">${i}</span>`;
+                    const span = document.createElement('span');
+                    span.className = 'active';
+                    span.textContent = i;
+                    link.appendChild(span);
                 } else {
                     link.textContent = i;
                     link.href = '#';
@@ -322,7 +326,7 @@ async function loadCoachUsers(page = 1) {
         console.error('Kullanıcı yükleme hatası:', error);
         document.getElementById('coachUsersTable').innerHTML = `
             <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
-                Hata: ${error.message}
+                Hata: ${escapeHtml(error.message)}
             </td></tr>
         `;
     }
@@ -344,9 +348,9 @@ async function viewCoachUser(userId) {
             goals.forEach(g => {
                 const statusColor = g.status === 'aktif' ? '#4CAF50' : g.status === 'tamamlandı' ? '#2196F3' : '#707070';
                 goalsHtml += `<li style="margin-bottom: 8px;">
-                    <strong>${g.title}</strong> (${g.module})
+                    <strong>${escapeHtml(g.title)}</strong> (${escapeHtml(g.module)})
                     <span style="background: ${statusColor}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">
-                        ${g.status}
+                        ${escapeHtml(g.status)}
                     </span>
                 </li>`;
             });
@@ -358,23 +362,23 @@ async function viewCoachUser(userId) {
         contentDiv.innerHTML = `
             <div class="form-group">
                 <label>User ID</label>
-                <input type="text" value="${user.user_id}" readonly style="background: #3a3632; cursor: not-allowed;">
+                <input type="text" value="${escapeHtml(String(user.user_id))}" readonly style="background: #3a3632; cursor: not-allowed;">
             </div>
             <div class="form-group">
                 <label>Dil</label>
-                <input type="text" value="${user.lang || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+                <input type="text" value="${escapeHtml(user.lang || '-')}" readonly style="background: #3a3632; cursor: not-allowed;">
             </div>
             <div class="form-group">
                 <label>Burç (Sun Sign)</label>
-                <input type="text" value="${user.sun_sign || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+                <input type="text" value="${escapeHtml(user.sun_sign || '-')}" readonly style="background: #3a3632; cursor: not-allowed;">
             </div>
             <div class="form-group">
                 <label>Doğum Tarihi</label>
-                <input type="text" value="${birthData.birth_date || '-'}" readonly style="background: #3a3632; cursor: not-allowed;">
+                <input type="text" value="${escapeHtml(birthData.birth_date || '-')}" readonly style="background: #3a3632; cursor: not-allowed;">
             </div>
             <div class="form-group">
                 <label>Seanslar</label>
-                <input type="text" value="${user.coach_session_count || 0}" readonly style="background: #3a3632; cursor: not-allowed;">
+                <input type="text" value="${escapeHtml(String(user.coach_session_count || 0))}" readonly style="background: #3a3632; cursor: not-allowed;">
             </div>
             ${goalsHtml}
         `;
@@ -426,16 +430,18 @@ async function loadCoachGoals(page = 1) {
                 const priorityColor = goal.priority === 'yüksek' ? '#F44336' : goal.priority === 'orta' ? '#FF9800' : '#9E9E9E';
                 const statusColor = goal.status === 'aktif' ? '#4CAF50' : goal.status === 'tamamlandı' ? '#2196F3' : '#707070';
 
+                const safeId = /^[a-f0-9]{24}$/i.test(goal._id) ? goal._id : '';
+                const toggleStatus = goal.status === 'aktif' ? 'tamamlandı' : 'aktif';
                 row.innerHTML = `
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${goal.title}">${goal.title}</td>
-                    <td>${goal.user_id}</td>
-                    <td>${goal.module}</td>
-                    <td><span style="background: ${priorityColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${goal.priority || '-'}</span></td>
-                    <td><span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${goal.status}</span></td>
-                    <td>${goal.target_date ? new Date(goal.target_date).toLocaleDateString('tr-TR') : '-'}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(goal.title)}">${escapeHtml(goal.title)}</td>
+                    <td>${escapeHtml(goal.user_id)}</td>
+                    <td>${escapeHtml(goal.module)}</td>
+                    <td><span style="background: ${priorityColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${escapeHtml(goal.priority || '-')}</span></td>
+                    <td><span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${escapeHtml(goal.status)}</span></td>
+                    <td>${escapeHtml(goal.target_date ? new Date(goal.target_date).toLocaleDateString('tr-TR') : '-')}</td>
                     <td>
-                        <button onclick="updateGoalStatus('${goal._id}', '${goal.status === 'aktif' ? 'tamamlandı' : 'aktif'}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Değiştir</button> |
-                        <button onclick="deleteCoachGoal('${goal._id}')" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Sil</button>
+                        <button onclick="updateGoalStatus('${safeId}', '${toggleStatus}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Değiştir</button> |
+                        <button onclick="deleteCoachGoal('${safeId}')" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 11px; text-decoration: underline;">Sil</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -451,7 +457,10 @@ async function loadCoachGoals(page = 1) {
             for (let i = 1; i <= data.pagination.pages; i++) {
                 const link = document.createElement('a');
                 if (i === currentCoachGoalsPage) {
-                    link.innerHTML = `<span class="active">${i}</span>`;
+                    const span = document.createElement('span');
+                    span.className = 'active';
+                    span.textContent = i;
+                    link.appendChild(span);
                 } else {
                     link.textContent = i;
                     link.href = '#';
@@ -464,7 +473,7 @@ async function loadCoachGoals(page = 1) {
         console.error('Hedef yükleme hatası:', error);
         document.getElementById('coachGoalsTable').innerHTML = `
             <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
-                Hata: ${error.message}
+                Hata: ${escapeHtml(error.message)}
             </td></tr>
         `;
     }
@@ -544,13 +553,15 @@ async function loadCoachAttributes(page = 1) {
         if (data.data && data.data.length > 0) {
             data.data.forEach(sifat => {
                 const row = document.createElement('tr');
+                const safeSifatId = /^[a-z0-9_-]+$/i.test(sifat._id) ? sifat._id : '';
+                const safeLang = /^[a-z]{2,5}$/i.test(currentCoachAttributesLang) ? currentCoachAttributesLang : '';
                 row.innerHTML = `
-                    <td><strong>${sifat._id}</strong></td>
-                    <td>${sifat.version || 1}</td>
-                    <td>${sifat.module_count || 27}</td>
-                    <td>${new Date(sifat.updated_at).toLocaleDateString('tr-TR')}</td>
+                    <td><strong>${escapeHtml(sifat._id)}</strong></td>
+                    <td>${escapeHtml(sifat.version || 1)}</td>
+                    <td>${escapeHtml(sifat.module_count || 27)}</td>
+                    <td>${escapeHtml(new Date(sifat.updated_at).toLocaleDateString('tr-TR'))}</td>
                     <td>
-                        <button onclick="viewCoachSifat('${currentCoachAttributesLang}', '${sifat._id}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
+                        <button onclick="viewCoachSifat('${safeLang}', '${safeSifatId}')" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -566,7 +577,10 @@ async function loadCoachAttributes(page = 1) {
             for (let i = 1; i <= data.pagination.pages; i++) {
                 const link = document.createElement('a');
                 if (i === currentCoachAttributesPage) {
-                    link.innerHTML = `<span class="active">${i}</span>`;
+                    const span = document.createElement('span');
+                    span.className = 'active';
+                    span.textContent = i;
+                    link.appendChild(span);
                 } else {
                     link.textContent = i;
                     link.href = '#';
@@ -579,7 +593,7 @@ async function loadCoachAttributes(page = 1) {
         console.error('Sıfat yükleme hatası:', error);
         document.getElementById('coachAttributesTable').innerHTML = `
             <tr><td colspan="5" style="text-align: center; padding: 20px; color: #F44336;">
-                Hata: ${error.message}
+                Hata: ${escapeHtml(error.message)}
             </td></tr>
         `;
     }

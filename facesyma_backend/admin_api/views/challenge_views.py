@@ -148,19 +148,20 @@ class ChallengeCreateView(View):
 
             # Parse request
             body = _json(request)
+            _bget = body.get
 
             try:
                 req = CreateChallengeRequest(
-                    type_id=body.get("type_id", ""),
-                    title=body.get("title", ""),
-                    description=body.get("description", ""),
-                    visibility=body.get("visibility", "public"),
-                    leaderboard_mode=body.get("leaderboard_mode", "mixed"),
-                    is_handicapped=body.get("is_handicapped", False),
-                    duration_minutes=body.get("duration_minutes", 1440),
+                    type_id=_bget("type_id", ""),
+                    title=_bget("title", ""),
+                    description=_bget("description", ""),
+                    visibility=_bget("visibility", "public"),
+                    leaderboard_mode=_bget("leaderboard_mode", "mixed"),
+                    is_handicapped=_bget("is_handicapped", False),
+                    duration_minutes=_bget("duration_minutes", 1440),
                 )
             except Exception as e:
-                return _json_error(f"Invalid request: {str(e)}", status=400)
+                return _json_error("Invalid request.", status=400)
 
             # Create challenge
             challenge_id, start_time, end_time = ChallengeService.create_challenge(
@@ -180,9 +181,9 @@ class ChallengeCreateView(View):
             })
 
         except InvalidChallengeTypeError as e:
-            return _json_error(f"Invalid challenge type: {str(e)}", status=400)
+            return _json_error("Invalid challenge type.", status=400)
         except ChallengeError as e:
-            return _json_error(f"Challenge error: {str(e)}", status=400)
+            return _json_error("Challenge error.", status=400)
         except Exception as e:
             log.error(f"ChallengeCreateView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -227,8 +228,9 @@ class ChallengeJoinView(View):
 
             # Parse request
             body = _json(request)
-            challenge_id = body.get("challenge_id", "").strip()
-            handicap_level = body.get("handicap_level")
+            _bget = body.get
+            challenge_id = _bget("challenge_id", "").strip()
+            handicap_level = _bget("handicap_level")
 
             if not challenge_id:
                 return _json_error("Missing challenge_id", status=400)
@@ -244,8 +246,9 @@ class ChallengeJoinView(View):
 
             # Get updated challenge for response
             challenges_col = ChallengeService._get_db()["social_challenges"]
-            challenge = challenges_col.find_one({"challenge_id": challenge_id})
-            participants_count = len(challenge.get("participants", []))
+            challenge = challenges_col.find_one({"challenge_id": challenge_id},
+                                                {"_id": 0, "participants": 1})
+            participants_count = len(challenge.get("participants", [])) if challenge else 0
 
             return JsonResponse({
                 "success": True,
@@ -255,11 +258,11 @@ class ChallengeJoinView(View):
             })
 
         except ChallengeNotFoundError as e:
-            return _json_error(f"Challenge not found: {str(e)}", status=404)
+            return _json_error("Challenge not found.", status=404)
         except UserAlreadyJoinedError as e:
-            return _json_error(f"Already joined: {str(e)}", status=400)
+            return _json_error("Already joined.", status=400)
         except ChallengeError as e:
-            return _json_error(f"Challenge error: {str(e)}", status=400)
+            return _json_error("Challenge error.", status=400)
         except Exception as e:
             log.error(f"ChallengeJoinView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -301,15 +304,18 @@ class ChallengeUpdateScoreView(View):
 
             # Parse request
             body = _json(request)
-            challenge_id = body.get("challenge_id", "").strip()
-            score_delta = body.get("score_delta", 0)
-            metadata = body.get("metadata", {})
+            _bget = body.get
+            challenge_id = _bget("challenge_id", "").strip()
+            score_delta = _bget("score_delta", 0)
+            metadata = _bget("metadata", {})
 
             if not challenge_id:
                 return _json_error("Missing challenge_id", status=400)
 
             if not isinstance(score_delta, int) or score_delta == 0:
                 return _json_error("score_delta must be a non-zero integer", status=400)
+            if not (-10000 <= score_delta <= 10000):
+                return _json_error("score_delta out of range [-10000, 10000]", status=400)
 
             # Update score
             new_score, current_rank = ChallengeService.update_score(
@@ -327,9 +333,9 @@ class ChallengeUpdateScoreView(View):
             })
 
         except ChallengeNotFoundError as e:
-            return _json_error(f"Challenge not found: {str(e)}", status=404)
+            return _json_error("Challenge not found.", status=404)
         except ChallengeError as e:
-            return _json_error(f"Challenge error: {str(e)}", status=400)
+            return _json_error("Challenge error.", status=400)
         except Exception as e:
             log.error(f"ChallengeUpdateScoreView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -370,14 +376,15 @@ class ChallengeLeaderboardView(View):
     def get(self, request):
         try:
             # Get challenge_id from query params
-            challenge_id = request.GET.get("challenge_id", "").strip()
+            _qget = request.GET.get
+            challenge_id = _qget("challenge_id", "").strip()
             if not challenge_id:
                 return _json_error("Missing challenge_id query parameter", status=400)
 
             # Get optional user_id and limit
             user_id = _require_auth(request)
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qget("limit", 100))
                 limit = min(max(limit, 1), 1000)
             except ValueError:
                 limit = 100
@@ -408,9 +415,9 @@ class ChallengeLeaderboardView(View):
             })
 
         except ChallengeNotFoundError as e:
-            return _json_error(f"Challenge not found: {str(e)}", status=404)
+            return _json_error("Challenge not found.", status=404)
         except ChallengeError as e:
-            return _json_error(f"Challenge error: {str(e)}", status=400)
+            return _json_error("Challenge error.", status=400)
         except Exception as e:
             log.error(f"ChallengeLeaderboardView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -450,8 +457,9 @@ class ChallengeCancelView(View):
 
             # Parse request
             body = _json(request)
-            challenge_id = body.get("challenge_id", "").strip()
-            reason = body.get("reason")
+            _bget = body.get
+            challenge_id = _bget("challenge_id", "").strip()
+            reason = _bget("reason")
 
             if not challenge_id:
                 return _json_error("Missing challenge_id", status=400)
@@ -470,9 +478,9 @@ class ChallengeCancelView(View):
             })
 
         except ChallengeNotFoundError as e:
-            return _json_error(f"Challenge not found: {str(e)}", status=404)
+            return _json_error("Challenge not found.", status=404)
         except ChallengeError as e:
-            return _json_error(f"Challenge error: {str(e)}", status=400)
+            return _json_error("Challenge error.", status=400)
         except Exception as e:
             log.error(f"ChallengeCancelView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -535,16 +543,17 @@ class ChallengeActiveView(View):
             challenges_data = []
             for doc in docs:
                 # Find user's participation data
+                all_participants = doc.get("participants", [])
                 user_part = next(
-                    (p for p in doc.get("participants", []) if p["user_id"] == user_id),
+                    (p for p in all_participants if p["user_id"] == user_id),
                     None
                 )
 
                 # Calculate rank
-                participants = [p for p in doc.get("participants", []) if p["is_active"]]
+                participants = [p for p in all_participants if p["is_active"]]
                 sorted_parts = sorted(
                     participants,
-                    key=lambda p: (-p["score"], doc["participants"].index(p))
+                    key=lambda p: (-p["score"], all_participants.index(p))
                 )
                 user_rank = next(
                     (i + 1 for i, p in enumerate(sorted_parts) if p["user_id"] == user_id),

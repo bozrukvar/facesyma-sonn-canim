@@ -38,11 +38,12 @@ from gcs_storage import get_gcs_manager
 
 # ── Configuration ──────────────────────────────────────────────────────────
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://host.docker.internal:11434")
-MONGO_URI = os.environ.get(
-    "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-)
-JWT_SECRET = os.environ.get("JWT_SECRET", "facesyma-jwt-secret-change-in-production")
+MONGO_URI = os.environ.get("MONGO_URI", "")
+JWT_SECRET = os.environ.get("JWT_SECRET", "")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET environment variable must be set.")
 MODEL = "orca-mini"
 QUESTIONS_DIR = Path(__file__).parent.parent / "questions"
 
@@ -67,9 +68,13 @@ def load_questions():
 load_questions()
 
 # ── Database Helper ────────────────────────────────────────────────────────
+_mongo_client = None
+
 def get_db():
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client["facesyma-test-backup"]
+    global _mongo_client
+    if _mongo_client is None:
+        _mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    return _mongo_client["facesyma-test-backup"]
 
 # ── Ollama Integration ────────────────────────────────────────────────────
 def get_ai_interpretation(test_type: str, scores: Dict, lang: str) -> str:
@@ -167,22 +172,25 @@ def calculate_domain_scores(test_type: str, answers: List[AnswerItem]) -> Dict[s
     domains = {}
     domain_counts = {}
     for q in qbank["questions"]:
-        domain = q.get("domain") or q.get("subscale")
+        _qget = q.get
+        domain = _qget("domain") or _qget("subscale")
         if domain not in domains:
             domains[domain] = 0
             domain_counts[domain] = 0
 
     # Calculate scores
     for answer in answers:
-        if answer.q_id not in questions:
+        _aqid = answer.q_id
+        if _aqid not in questions:
             continue
 
-        q = questions[answer.q_id]
-        domain = q.get("domain") or q.get("subscale")
+        q = questions[_aqid]
+        _qget = q.get
+        domain = _qget("domain") or _qget("subscale")
 
         # Handle reverse-scored items
         score = answer.score
-        if q.get("reverse_scored"):
+        if _qget("reverse_scored"):
             score = 6 - score
 
         domains[domain] += score
@@ -191,8 +199,9 @@ def calculate_domain_scores(test_type: str, answers: List[AnswerItem]) -> Dict[s
     # Convert to 0-100 scale
     domain_scores = {}
     for domain in domains:
-        if domain_counts[domain] > 0:
-            avg = domains[domain] / domain_counts[domain]  # 1-5 scale
+        _dcd = domain_counts[domain]
+        if _dcd > 0:
+            avg = domains[domain] / _dcd  # 1-5 scale
             percentage = ((avg - 1) / 4) * 100  # Convert to 0-100
             domain_scores[domain] = max(0, min(100, percentage))
 
@@ -253,23 +262,28 @@ async def start_test(
     authorization: Optional[str] = Header(default=None)
 ):
     """Create a new test session and return 20 questions"""
-    if body.test_type not in QUESTION_BANKS:
-        raise HTTPException(400, f"Unknown test type: {body.test_type}")
+    _ttype = body.test_type
+    if _ttype not in QUESTION_BANKS:
+        raise HTTPException(400, f"Unknown test type: {_ttype}")
 
     user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Authentication required.")
     session_id = str(uuid.uuid4())
 
-    qbank = QUESTION_BANKS[body.test_type]
+    _lang = body.lang
+    qbank = QUESTION_BANKS[_ttype]
     questions = qbank["questions"]
-    scale_labels = qbank["scale_labels"].get(body.lang, qbank["scale_labels"]["en"])
+    scale_labels = qbank["scale_labels"].get(_lang, qbank["scale_labels"]["en"])
 
     # Build response questions with translations
     response_questions = []
     for q in questions:
+        _qt = q["translations"]
         response_questions.append({
             "q_id": q["q_id"],
             "order": q["order"],
-            "text": q["translations"].get(body.lang, q["translations"]["en"]),
+            "text": _qt.get(_lang, _qt["en"]),
             "scale": {
                 "min": 1,
                 "max": 5,
@@ -282,16 +296,16 @@ async def start_test(
     db["test_sessions"].insert_one({
         "_id": session_id,
         "user_id": user_id,
-        "test_type": body.test_type,
-        "lang": body.lang,
+        "test_type": _ttype,
+        "lang": _lang,
         "status": "in_progress",
         "created_at": datetime.now().isoformat(),
     })
 
     return StartTestResponse(
         session_id=session_id,
-        test_type=body.test_type,
-        lang=body.lang,
+        test_type=_ttype,
+        lang=_lang,
         questions=response_questions
     )
 
@@ -301,16 +315,19 @@ async def submit_test(
     authorization: Optional[str] = Header(default=None)
 ):
     """Submit test answers and get scored results"""
+    _ttype = body.test_type
     user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Authentication required.")
 
     # Calculate domain scores
-    domain_scores = calculate_domain_scores(body.test_type, body.answers)
+    domain_scores = calculate_domain_scores(_ttype, body.answers)
 
     # Get AI interpretation
     ai_interpretation = get_ai_interpretation(
-        body.test_type,
+        _ttype,
         domain_scores,
-        body.lang
+        _lang
     )
 
     # Create result ID
@@ -319,7 +336,7 @@ async def submit_test(
     # Generate PDF and upload to GCS
     pdf_url = None
     try:
-        generator = PDFReportGenerator(test_type=body.test_type, lang=body.lang)
+        generator = PDFReportGenerator(test_type=_ttype, lang=_lang)
         pdf_buffer = generator.generate_pdf(
             result_id=result_id,
             domain_scores=domain_scores,
@@ -344,8 +361,8 @@ async def submit_test(
         "_id": result_id,
         "user_id": user_id,
         "session_id": body.session_id,
-        "test_type": body.test_type,
-        "lang": body.lang,
+        "test_type": _ttype,
+        "lang": _lang,
         "answers": [{"q_id": a.q_id, "score": a.score} for a in body.answers],
         "domain_scores": domain_scores,
         "ai_interpretation": ai_interpretation,
@@ -361,7 +378,7 @@ async def submit_test(
 
     return SubmitTestResponse(
         result_id=result_id,
-        test_type=body.test_type,
+        test_type=_ttype,
         domain_scores=domain_scores,
         ai_interpretation=ai_interpretation,
         pdf_url=pdf_url
@@ -391,22 +408,30 @@ async def get_user_results(
     return {"results": results}
 
 @app.get("/test/pdf/{result_id}")
-async def get_pdf(result_id: str):
+async def get_pdf(result_id: str, authorization: Optional[str] = Header(default=None)):
     """Get PDF download URL (GCS signed URL)"""
+    user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Unauthorized")
+
     db = get_db()
     result = db["test_results"].find_one({"_id": result_id})
     if not result:
         raise HTTPException(404, "Result not found")
 
-    pdf_url = result.get("pdf_url")
+    _rget = result.get
+    if _rget("user_id") != user_id:
+        raise HTTPException(403, "Access denied")
+
+    pdf_url = _rget("pdf_url")
     status = "ready" if pdf_url else "unavailable"
 
     return {
         "result_id": result_id,
         "pdf_url": pdf_url,
         "status": status,
-        "test_type": result.get("test_type"),
-        "created_at": result.get("created_at")
+        "test_type": _rget("test_type"),
+        "created_at": _rget("created_at")
     }
 
 @app.get("/test/languages")

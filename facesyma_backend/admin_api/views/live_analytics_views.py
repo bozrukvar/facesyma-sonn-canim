@@ -26,6 +26,9 @@ from admin_api.utils.mongo import (
 
 log = logging.getLogger(__name__)
 
+_PROJ_HISTORY_FEED = {'_id': 0, 'user_id': 1, 'created_at': 1, 'mode': 1}
+_PROJ_USERS_FEED   = {'_id': 0, 'id': 1, 'date_joined': 1, 'plan': 1}
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LiveStatsView(View):
@@ -56,44 +59,32 @@ class LiveStatsView(View):
             today_start_ts = today_start.timestamp()
             one_hour_ago_ts = (now - timedelta(hours=1)).timestamp()
 
-            # ── KPIs ───────────────────────────────────────────────────────────
-
-            # Active users (last 5 minutes)
-            active_users_5min = users_col.count_documents({
-                'last_active': {'$gte': now_ts - 300}
-            })
-
-            # New registrations today
-            new_registrations_today = users_col.count_documents({
-                'date_joined': {'$gte': today_start_iso}
-            })
-
-            # Analyses today
-            analyses_today = history_col.count_documents({
-                'created_at': {'$gte': today_start_ts}
-            })
-
-            # MRR (Monthly Recurring Revenue) — premium users * 9.99
-            premium_users = users_col.count_documents({'plan': 'premium'})
+            # ── KPIs — single $facet per collection ───────────────────────────
+            _u = next(users_col.aggregate([{'$facet': {
+                'active5m':     [{'$match': {'last_active': {'$gte': now_ts - 300}}},            {'$count': 'n'}],
+                'reg_today':    [{'$match': {'date_joined': {'$gte': today_start_iso}}},          {'$count': 'n'}],
+                'premium':      [{'$match': {'plan': 'premium'}},                                 {'$count': 'n'}],
+                'web_today':    [{'$match': {'app_source': 'web', 'date_joined': {'$gte': today_start_iso}}}, {'$count': 'n'}],
+                'mobile_today': [{'$match': {'$or': [{'app_source': 'mobile'}, {'app_source': {'$exists': False}}],
+                                             'date_joined': {'$gte': today_start_iso}}},          {'$count': 'n'}],
+            }}]), {})
+            _luget = _u.get
+            active_users_5min       = (_luget('active5m',     [{}])[0] or {}).get('n', 0)
+            new_registrations_today = (_luget('reg_today',    [{}])[0] or {}).get('n', 0)
+            premium_users           = (_luget('premium',      [{}])[0] or {}).get('n', 0)
+            web_users_today         = (_luget('web_today',    [{}])[0] or {}).get('n', 0)
+            mobile_users_today      = (_luget('mobile_today', [{}])[0] or {}).get('n', 0)
             mrr = premium_users * 9.99
 
-            # App source breakdown
-            web_users_today = users_col.count_documents({
-                'app_source': 'web',
-                'date_joined': {'$gte': today_start_iso}
-            })
-            mobile_users_today = users_col.count_documents({
-                '$or': [{'app_source': 'mobile'}, {'app_source': {'$exists': False}}],
-                'date_joined': {'$gte': today_start_iso}
-            })
-            web_analyses_today = history_col.count_documents({
-                'app_source': 'web',
-                'created_at': {'$gte': today_start_ts}
-            })
-            mobile_analyses_today = history_col.count_documents({
-                '$or': [{'app_source': {'$exists': False}}, {'app_source': {'$ne': 'web'}}],
-                'created_at': {'$gte': today_start_ts}
-            })
+            _h = next(history_col.aggregate([{'$facet': {
+                'analyses_today':   [{'$match': {'created_at': {'$gte': today_start_ts}}},        {'$count': 'n'}],
+                'web_analyses':     [{'$match': {'app_source': 'web', 'created_at': {'$gte': today_start_ts}}}, {'$count': 'n'}],
+                'mobile_analyses':  [{'$match': {'app_source': {'$ne': 'web'}, 'created_at': {'$gte': today_start_ts}}}, {'$count': 'n'}],
+            }}]), {})
+            _hget = _h.get
+            analyses_today       = (_hget('analyses_today',  [{}])[0] or {}).get('n', 0)
+            web_analyses_today   = (_hget('web_analyses',    [{}])[0] or {}).get('n', 0)
+            mobile_analyses_today= (_hget('mobile_analyses', [{}])[0] or {}).get('n', 0)
 
             kpis = {
                 'active_users_5min': active_users_5min,
@@ -103,7 +94,7 @@ class LiveStatsView(View):
             }
 
             # App sources breakdown
-            app_sources = {  # YENİ
+            app_sources = {
                 'web_users_today': web_users_today,
                 'mobile_users_today': mobile_users_today,
                 'web_analyses_today': web_analyses_today,
@@ -125,7 +116,7 @@ class LiveStatsView(View):
 
             return JsonResponse({
                 'kpis': kpis,
-                'app_sources': app_sources,  # YENİ
+                'app_sources': app_sources,
                 'error_rate_1h': error_rate,
                 'hourly_chart': hourly_chart,
                 'activity_feed': activity_feed,
@@ -135,97 +126,115 @@ class LiveStatsView(View):
 
         except Exception as e:
             log.exception(f'Live stats error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def _get_error_rate(self, db, one_hour_ago_ts):
         """Calculate error rate from admin_activity_log (1 hour)."""
         try:
             audit_col = db['admin_activity_log']
+            one_hour_ago_dt = datetime.utcfromtimestamp(one_hour_ago_ts)
 
-            # Assume errors are logged with 'error' or 'delete' in action
-            total_requests = audit_col.count_documents({
-                'timestamp': {'$gte': datetime.utcfromtimestamp(one_hour_ago_ts).isoformat()}
-            })
+            _er = next(audit_col.aggregate([
+                {'$match': {'timestamp': {'$gte': one_hour_ago_dt}}},
+                {'$facet': {
+                    'total':  [{'$count': 'n'}],
+                    'errors': [
+                        {'$match': {'action': {'$regex': 'delete|error', '$options': 'i'}}},
+                        {'$count': 'n'},
+                    ],
+                }}
+            ]), {})
+            _erget = _er.get
+            total_requests = (_erget('total',  [{}])[0] or {}).get('n', 0)
+            error_requests = (_erget('errors', [{}])[0] or {}).get('n', 0)
+            rate_pct = round((error_requests / total_requests) * 100, 2) if total_requests else 0.0
 
-            error_requests = audit_col.count_documents({
-                'timestamp': {'$gte': datetime.utcfromtimestamp(one_hour_ago_ts).isoformat()},
-                'action': {'$regex': 'delete|error', '$options': 'i'}
-            })
-
-            if total_requests == 0:
-                rate_pct = 0.0
-            else:
-                rate_pct = round((error_requests / total_requests) * 100, 2)
-
-            return {
-                'total_requests': total_requests,
-                'errors': error_requests,
-                'rate_pct': rate_pct,
-            }
+            return {'total_requests': total_requests, 'errors': error_requests, 'rate_pct': rate_pct}
         except Exception:
-            # Collection doesn't exist yet (Feature 2 not implemented)
             return {'total_requests': 0, 'errors': 0, 'rate_pct': 0.0}
 
     def _get_hourly_chart(self, history_col, users_col, today_start_ts):
         """Return 24 hours of analyses and registrations by hour."""
-        chart = []
         now = datetime.utcnow()
+        today_start_dt = datetime(now.year, now.month, now.day)
+        today_end_ts = today_start_ts + 86400
 
-        for hour in range(24):
-            hour_start = (datetime(now.year, now.month, now.day) + timedelta(hours=hour)).timestamp()
-            hour_end = hour_start + 3600
+        # Single aggregation per collection for all 24 hours
+        analyses_agg = {
+            _id: doc['count']
+            for doc in history_col.aggregate([
+                {'$match': {'created_at': {'$gte': today_start_ts, '$lt': today_end_ts}}},
+                {'$group': {'_id': {'$floor': {'$divide': [{'$subtract': ['$created_at', today_start_ts]}, 3600]}},
+                            'count': {'$sum': 1}}},
+            ])
+            if isinstance((_id := doc['_id']), (int, float))
+        }
 
-            analyses_count = history_col.count_documents({
-                'created_at': {'$gte': hour_start, '$lt': hour_end}
-            })
+        reg_agg = {
+            doc['_id']: doc['count']
+            for doc in users_col.aggregate([
+                {'$match': {'date_joined': {
+                    '$gte': today_start_dt.isoformat(),
+                    '$lt': (today_start_dt + timedelta(hours=24)).isoformat()
+                }}},
+                {'$group': {'_id': {'$hour': {'$dateFromString': {'dateString': '$date_joined'}}},
+                            'count': {'$sum': 1}}},
+            ])
+        }
 
-            registrations_count = users_col.count_documents({
-                'date_joined': {
-                    '$gte': datetime.utcfromtimestamp(hour_start).isoformat(),
-                    '$lt': datetime.utcfromtimestamp(hour_end).isoformat(),
-                }
-            })
-
-            chart.append({
-                'hour': hour,
-                'analyses': analyses_count,
-                'registrations': registrations_count,
-            })
-
-        return chart
+        _aaget = analyses_agg.get
+        _raget = reg_agg.get
+        return [
+            {'hour': h, 'analyses': _aaget(h, 0), 'registrations': _raget(h, 0)}
+            for h in range(24)
+        ]
 
     def _get_activity_feed(self, history_col, users_col):
         """Return last 10 activities (analyses + registrations)."""
         feed = []
+        _fappend = feed.append
 
-        # Last 10 analyses
+        _one_day_ago = datetime.utcnow() - timedelta(days=1)
+        one_day_ago_ts = _one_day_ago.timestamp()
+        one_day_ago_iso = _one_day_ago.isoformat()
+
+        # Last 10 analyses (created_at stored as Unix timestamp float)
         for doc in history_col.find(
-            {'created_at': {'$gte': (datetime.utcnow() - timedelta(days=1)).timestamp()}},
+            {'created_at': {'$gte': one_day_ago_ts}},
+            _PROJ_HISTORY_FEED,
             sort=[('created_at', -1)],
             limit=10
         ):
-            feed.append({
+            try:
+                ts = doc['created_at']
+                time_iso = datetime.utcfromtimestamp(float(ts)).isoformat() if ts else None
+            except (TypeError, ValueError, OSError):
+                time_iso = None
+            _dget = doc.get
+            _fappend({
                 'type': 'analysis',
-                'user_id': doc.get('user_id'),
-                'time': datetime.utcfromtimestamp(doc['created_at']).isoformat(),
-                'detail': f"Mode: {doc.get('mode', 'unknown')}",
+                'user_id': _dget('user_id'),
+                'time': time_iso,
+                'detail': f"Mode: {_dget('mode', 'unknown')}",
             })
 
-        # Last 5 registrations
+        # Last 5 registrations (date_joined stored as ISO string)
         for doc in users_col.find(
-            {'date_joined': {'$gte': (datetime.utcnow() - timedelta(days=1)).isoformat()}},
+            {'date_joined': {'$gte': one_day_ago_iso}},
+            _PROJ_USERS_FEED,
             sort=[('date_joined', -1)],
             limit=5
         ):
-            feed.append({
+            _dget = doc.get
+            _fappend({
                 'type': 'registration',
                 'user_id': doc['id'],
-                'time': doc.get('date_joined'),
-                'detail': f"Plan: {doc.get('plan', 'free')}",
+                'time': _dget('date_joined'),
+                'detail': f"Plan: {_dget('plan', 'free')}",
             })
 
-        # Sort by time descending, return first 10
-        feed.sort(key=lambda x: x['time'], reverse=True)
+        # Sort by time descending (both are ISO strings or None), return first 10
+        feed.sort(key=lambda x: x['time'] or '', reverse=True)
         return feed[:10]
 
     def _get_system_health(self, db):
@@ -243,8 +252,9 @@ class LiveStatsView(View):
         try:
             from admin_api.scheduler import get_scheduler_status
             status = get_scheduler_status()
-            health['scheduler_running'] = status.get('running', False)
-            health['scheduler_jobs'] = len(status.get('jobs', []))
+            _stget = status.get
+            health['scheduler_running'] = _stget('running', False)
+            health['scheduler_jobs'] = len(_stget('jobs', []))
         except Exception:
             health['scheduler_running'] = False
             health['scheduler_jobs'] = 0

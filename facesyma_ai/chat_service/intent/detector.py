@@ -18,6 +18,9 @@ from ..modules import get_registry
 log = logging.getLogger(__name__)
 
 OLLAMA_URL = "http://ollama:11434"
+_RE_JSON_BLOCK = re.compile(r'\{.*\}', re.DOTALL)
+_RE_DATE_YMD = re.compile(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})')
+_RE_DATE_DMY = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})')
 
 
 def quick_intent(message: str, lang: str) -> Optional[Dict]:
@@ -37,13 +40,14 @@ def quick_intent(message: str, lang: str) -> Optional[Dict]:
 
     # Check each module's keywords
     for module in registry.get_all():
-        keywords = module.get("trigger_keywords", {}).get(lang, [])
+        _mget = module.get
+        keywords = _mget("trigger_keywords", {}).get(lang, [])
         for keyword in keywords:
             if keyword.lower() in message_lower:
                 return {
                     "intent": module["name"],
                     "confidence": 0.95,
-                    "needs_input": module.get("requires_input") != "none",
+                    "needs_input": _mget("requires_input") != "none",
                     "missing_fields": [],
                 }
 
@@ -52,21 +56,18 @@ def quick_intent(message: str, lang: str) -> Optional[Dict]:
 
 def extract_birth_date(message: str) -> Optional[str]:
     """Extract birth date from message (YYYY-MM-DD format)."""
-    # Match YYYY-MM-DD or similar date formats
-    patterns = [
-        r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})',  # YYYY-MM-DD or YYYY/MM/DD
-        r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})',  # DD-MM-YYYY or MM/DD/YYYY
-    ]
-
-    for pattern in patterns:
-        match = re.search(pattern, message)
+    for pattern in (_RE_DATE_YMD, _RE_DATE_DMY):
+        match = pattern.search(message)
         if match:
             # Normalize to YYYY-MM-DD
             parts = match.groups()
-            if len(parts[0]) == 4:  # YYYY first
-                return f"{parts[0]}-{parts[1]:0>2}-{parts[2]:0>2}"
+            _p0 = parts[0]
+            _p1 = parts[1]
+            _p2 = parts[2]
+            if len(_p0) == 4:  # YYYY first
+                return f"{_p0}-{_p1:0>2}-{_p2:0>2}"
             else:  # Try to guess
-                return f"{parts[2]}-{parts[1]:0>2}-{parts[0]:0>2}"
+                return f"{_p2}-{_p1:0>2}-{_p0:0>2}"
 
     return None
 
@@ -91,6 +92,7 @@ def llm_intent(
         }
     """
     registry = get_registry()
+    _warn = log.warning
 
     # Language codes for LLM prompts
     LLM_PROMPTS = {
@@ -136,22 +138,24 @@ Return ONLY JSON, nothing else.""",
                 timeout=30,
             )
 
-            if response.status_code != 200:
-                log.warning(f"Ollama returned status {response.status_code}")
+            _rsc = response.status_code
+            if _rsc != 200:
+                _warn(f"Ollama returned status {_rsc}")
                 continue
 
             result = response.json()
             text = result.get("response", "").strip()
 
             # Extract JSON
-            json_match = re.search(r'\{.*\}', text, re.DOTALL)
+            json_match = _RE_JSON_BLOCK.search(text)
             if not json_match:
-                log.warning(f"No JSON in LLM response: {text[:100]}")
+                _warn(f"No JSON in LLM response: {text[:100]}")
                 continue
 
             classification = json.loads(json_match.group())
-            intent = classification.get("intent", "chat")
-            confidence = classification.get("confidence", 0.5)
+            _cget = classification.get
+            intent = _cget("intent", "chat")
+            confidence = _cget("confidence", 0.5)
 
             # Validate intent
             valid_intents = [m["name"] for m in available_modules] + ["chat"]
@@ -168,14 +172,14 @@ Return ONLY JSON, nothing else.""",
             }
 
         except json.JSONDecodeError as e:
-            log.warning(f"JSON decode error in LLM response: {e}")
+            _warn(f"JSON decode error in LLM response: {e}")
             if attempt == max_retries - 1:
                 return {
                     "intent": "chat",
                     "confidence": 0.3,
                     "needs_input": False,
                     "params": {},
-                    "error": str(e),
+                    "error": "Intent parse error.",
                 }
         except requests.RequestException as e:
             log.error(f"Ollama request failed (attempt {attempt + 1}): {e}")
@@ -185,7 +189,7 @@ Return ONLY JSON, nothing else.""",
                     "confidence": 0.2,
                     "needs_input": False,
                     "params": {},
-                    "error": str(e),
+                    "error": "LLM unavailable.",
                 }
 
     return {
