@@ -55,8 +55,9 @@ def format_chat_prompt(messages: list) -> str:
     """TinyLlama chat formatı"""
     prompt = ""
     for msg in messages:
-        role = msg.get("role", "user")
-        content = msg.get("content", "")
+        _mget = msg.get
+        role = _mget("role", "user")
+        content = _mget("content", "")
 
         if role == "system":
             prompt += f"<|im_start|>system\n{content}<|im_end|>\n"
@@ -69,33 +70,37 @@ def format_chat_prompt(messages: list) -> str:
 
 
 def main():
+    _addarg = parser.add_argument
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", required=True, help="JSONL dataset path")
-    parser.add_argument("--epochs", type=int, default=2)
-    parser.add_argument("--batch-size", type=int, default=1)
-    parser.add_argument("--grad-accum", type=int, default=8)
-    parser.add_argument("--lr", type=float, default=2e-4)
-    parser.add_argument("--output-dir", default=OUTPUT_DIR)
+    _addarg("--dataset", required=True, help="JSONL dataset path")
+    _addarg("--epochs", type=int, default=2)
+    _addarg("--batch-size", type=int, default=1)
+    _addarg("--grad-accum", type=int, default=8)
+    _addarg("--lr", type=float, default=2e-4)
+    _addarg("--output-dir", default=OUTPUT_DIR)
     args = parser.parse_args()
+    _out_dir = _out_dir
+    _dataset = args.dataset
 
     print("=" * 60)
     print("TinyLlama 1.1B LoRA Fine-tuning für Facesyma")
     print("=" * 60)
 
     # Dataset yükle
-    print(f"\n📚 Dataset yükleniyor: {args.dataset}")
-    dataset = load_dataset(args.dataset)
+    print(f"\n📚 Dataset yükleniyor: {_dataset}")
+    dataset = load_dataset(_dataset)
     dataset = dataset.train_test_split(test_size=0.02)
 
     # Model + Tokenizer yükle
     print(f"\n🤖 Base model yükleniyor: {BASE_MODEL}")
+    _cuda = torch.cuda.is_available()
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
     tokenizer.pad_token = tokenizer.eos_token
 
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None,
+        torch_dtype=torch.float16 if _cuda else torch.float32,
+        device_map="auto" if _cuda else None,
     )
 
     # LoRA config
@@ -113,14 +118,14 @@ def main():
 
     # Training args
     training_args = TrainingArguments(
-        output_dir=args.output_dir,
+        output_dir=_out_dir,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.batch_size,
         gradient_accumulation_steps=args.grad_accum,
         warmup_steps=100,
         num_train_epochs=args.epochs,
         learning_rate=args.lr,
-        fp16=True if torch.cuda.is_available() else False,
+        fp16=_cuda,
         logging_steps=50,
         save_steps=200,
         eval_steps=200,
@@ -148,11 +153,11 @@ def main():
     trainer.train()
 
     print("\n✅ Eğitim tamamlandı!")
-    print(f"Model kaydedildi: {args.output_dir}/")
+    print(f"Model kaydedildi: {_out_dir}/")
 
     # Final model
-    model.save_pretrained(f"{args.output_dir}/final")
-    print(f"Final model: {args.output_dir}/final/")
+    model.save_pretrained(f"{_out_dir}/final")
+    print(f"Final model: {_out_dir}/final/")
 
 
 if __name__ == "__main__":

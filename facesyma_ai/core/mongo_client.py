@@ -24,11 +24,9 @@ from pymongo import MongoClient
 
 log = logging.getLogger(__name__)
 
-MONGO_URI = os.environ.get(
-    "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-    "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-)
+MONGO_URI = os.environ.get("MONGO_URI", "")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
 
 _mongo_client: MongoClient | None = None
 

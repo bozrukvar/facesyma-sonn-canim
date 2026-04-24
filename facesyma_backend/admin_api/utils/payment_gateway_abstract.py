@@ -2,7 +2,11 @@
 admin_api/utils/payment_gateway_abstract.py
 ============================================
 Abstract base classes for payment gateway integration.
-Supports: Stripe, iyzico, RevenueCat, E-wallets, Cryptocurrency, etc.
+
+Active providers:
+  - GOOGLE_PAY  (client-side)
+  - APPLE_PAY   (client-side)
+  - VAKIFBANK_VPP (TODO: ileriki versiyon)
 """
 
 from abc import ABC, abstractmethod
@@ -16,18 +20,10 @@ log = logging.getLogger(__name__)
 
 class PaymentProviderType(Enum):
     """Supported payment providers"""
-    REVENUECAT = 'revenuecat'      # Mobile In-App Purchase
-    STRIPE = 'stripe'               # Card/Wallet (Web)
-    IYZICO = 'iyzico'               # Turkish Payment
-    PAPARA = 'papara'               # Turkish E-wallet
-    TUUM = 'tuum'                   # Multi-gateway aggregator
-    CRYPTO = 'crypto'               # Cryptocurrency (Bitcoin, Ethereum, USDC)
-    IDEAL = 'ideal'                 # Dutch Bank Transfer
-    SEPA = 'sepa'                   # SEPA Transfer
-    ALIPAY = 'alipay'               # Alibaba Payments (China)
-    WECHAT_PAY = 'wechat_pay'       # WeChat Pay
-    PAYPAL = 'paypal'               # PayPal
-    RAZORPAY = 'razorpay'           # India/SE Asia payments
+    REVENUECAT   = 'revenuecat'    # Mobile In-App Purchase
+    GOOGLE_PAY   = 'google_pay'    # Google Pay (client-side)
+    APPLE_PAY    = 'apple_pay'     # Apple Pay (client-side)
+    VAKIFBANK_VPP = 'vakifbank_vpp' # Vakıfbank Sanal Pos (TODO: ileriki versiyon)
 
 
 class PaymentStatus(Enum):
@@ -77,7 +73,7 @@ class PaymentTransaction:
         self.transaction_id = transaction_id
         self.reference_id = reference_id
         self.metadata = metadata or {}
-        self.created_at = datetime.now().isoformat()
+        self.created_at = datetime.utcnow().isoformat()
 
     def to_dict(self) -> Dict:
         return {
@@ -96,7 +92,7 @@ class PaymentTransaction:
 class BasePaymentGateway(ABC):
     """
     Abstract base class for all payment gateway implementations.
-    Each concrete provider (Stripe, iyzico, etc.) must implement these methods.
+    Each concrete provider must implement these methods.
     """
 
     def __init__(self, api_key: str, api_secret: Optional[str] = None):
@@ -258,11 +254,12 @@ class PaymentGatewayFactory:
     @classmethod
     def get_gateway(cls, provider: PaymentProviderType) -> BasePaymentGateway:
         """Get a registered gateway by provider type"""
-        if provider not in cls._gateways:
+        _cg = cls._gateways
+        if provider not in _cg:
             raise PaymentGatewayException(
                 f'Payment gateway not registered: {provider.value}'
             )
-        return cls._gateways[provider]
+        return _cg[provider]
 
     @classmethod
     def list_available_gateways(cls) -> Dict[str, bool]:

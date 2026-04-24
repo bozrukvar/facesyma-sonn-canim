@@ -13,8 +13,13 @@ Score Breakdown:
 Sonuç: 0-100 score + category (UYUMLU, UYUMSUZ, SAME_CATEGORY, DIFFERENT_CATEGORY)
 """
 
+import heapq
 import json
+from functools import lru_cache
+from operator import itemgetter
 from typing import Dict, List, Tuple
+
+_KEY_SCORE = itemgetter('score')
 
 # ── Conflict Pairs (Karşıt Sıfatlar) ──────────────────────────────────────
 
@@ -65,6 +70,7 @@ SIFAT_CATEGORIES = {
 }
 
 
+@lru_cache(maxsize=256)
 def get_sifat_category(sifat: str) -> str:
     """Sıfatın kategorisini bulur"""
     for category, sifats in SIFAT_CATEGORIES.items():
@@ -96,27 +102,30 @@ def calculate_compatibility(user1_data: Dict, user2_data: Dict) -> Dict:
 
     score = 0
     reasons = []
+    _rapp = reasons.append
+    _u1get = user1_data.get
+    _u2get = user2_data.get
 
     # ── 1. Golden Ratio Match (20 pts) ──────────────────────────────────
-    ratio1 = user1_data.get('golden_ratio', 0)
-    ratio2 = user2_data.get('golden_ratio', 0)
+    ratio1 = _u1get('golden_ratio', 0)
+    ratio2 = _u2get('golden_ratio', 0)
     ratio_diff = abs(ratio1 - ratio2)
 
     if ratio_diff <= 0.05:  # ±5%
         score += 20
-        reasons.append(f"✓ Golden ratio match: {ratio_diff:.1%} difference (Perfect)")
+        _rapp(f"✓ Golden ratio match: {ratio_diff:.1%} difference (Perfect)")
     elif ratio_diff <= 0.10:  # ±10%
         score += 15
-        reasons.append(f"✓ Golden ratio match: {ratio_diff:.1%} difference (Very good)")
+        _rapp(f"✓ Golden ratio match: {ratio_diff:.1%} difference (Very good)")
     elif ratio_diff <= 0.15:  # ±15%
         score += 10
-        reasons.append(f"△ Golden ratio match: {ratio_diff:.1%} difference (Good)")
+        _rapp(f"△ Golden ratio match: {ratio_diff:.1%} difference (Good)")
     else:
-        reasons.append(f"✗ Golden ratio difference: {ratio_diff:.1%} (Large gap)")
+        _rapp(f"✗ Golden ratio difference: {ratio_diff:.1%} (Large gap)")
 
     # ── 2. Sıfat Overlap (40 pts) ──────────────────────────────────────
-    sifats1 = set(user1_data.get('top_sifats', []))
-    sifats2 = set(user2_data.get('top_sifats', []))
+    sifats1 = set(_u1get('top_sifats', []))
+    sifats2 = set(_u2get('top_sifats', []))
 
     shared_sifats = len(sifats1 & sifats2)
     total_sifats = max(len(sifats1), len(sifats2), 1)
@@ -125,11 +134,11 @@ def calculate_compatibility(user1_data: Dict, user2_data: Dict) -> Dict:
     sifat_score = (shared_sifats / total_sifats) * 40
     score += sifat_score
 
-    reasons.append(f"✓ Shared sıfats: {shared_sifats}/{total_sifats} ({sifat_overlap_percent:.0f}%)")
+    _rapp(f"✓ Shared sıfats: {shared_sifats}/{total_sifats} ({sifat_overlap_percent:.0f}%)")
 
     # ── 3. Module Overlap (20 pts) ──────────────────────────────────────
-    modules1 = set(user1_data.get('modules', []))
-    modules2 = set(user2_data.get('modules', []))
+    modules1 = set(_u1get('modules', []))
+    modules2 = set(_u2get('modules', []))
 
     shared_modules = len(modules1 & modules2)
     total_modules = max(len(modules1), len(modules2), 1)
@@ -137,9 +146,9 @@ def calculate_compatibility(user1_data: Dict, user2_data: Dict) -> Dict:
     if total_modules > 0:
         module_score = (shared_modules / total_modules) * 20
         score += module_score
-        reasons.append(f"✓ Shared modules: {shared_modules}/{total_modules}")
+        _rapp(f"✓ Shared modules: {shared_modules}/{total_modules}")
     else:
-        reasons.append("⚠ No modules data")
+        _rapp("⚠ No modules data")
 
     # ── 4. Conflict Check (Subtract) ────────────────────────────────────
     conflict_count = 0
@@ -156,7 +165,7 @@ def calculate_compatibility(user1_data: Dict, user2_data: Dict) -> Dict:
     score -= (conflict_count * 5)
 
     if conflict_count > 0:
-        reasons.append(f"✗ Conflicts: {', '.join(conflicting_sifats[:2])}")
+        _rapp(f"✗ Conflicts: {', '.join(conflicting_sifats[:2])}")
 
     # ── Normalize score to 0-100 ──────────────────────────────────────
     final_score = max(0, min(100, score))
@@ -238,29 +247,29 @@ def find_compatible_users(
     results = []
 
     for other_user in all_users:
-        if other_user['id'] == user_id:
+        _ouid = other_user['id']
+        if _ouid == user_id:
             continue
 
         compatibility = calculate_compatibility(user_data, other_user)
+        _ccat = compatibility['category']
 
         # Apply filter if specified
-        if category_filter and compatibility['category'] != category_filter:
+        if category_filter and _ccat != category_filter:
             continue
 
+        _ouget = other_user.get
         results.append({
-            'user_id': other_user['id'],
-            'username': other_user.get('username', 'User'),
+            'user_id': _ouid,
+            'username': _ouget('username', 'User'),
             'score': compatibility['score'],
-            'category': compatibility['category'],
+            'category': _ccat,
             'can_message': compatibility['can_message'],
-            'golden_ratio': other_user.get('golden_ratio', 0),
-            'top_sifats': other_user.get('top_sifats', [])[:3]  # Top 3 only
+            'golden_ratio': _ouget('golden_ratio', 0),
+            'top_sifats': _ouget('top_sifats', [])[:3]
         })
 
-    # Sort by score descending
-    results.sort(key=lambda x: x['score'], reverse=True)
-
-    return results[:limit]
+    return heapq.nlargest(limit, results, key=_KEY_SCORE)
 
 
 def batch_calculate_compatibility(user_pairs: List[Tuple[int, int]], users_data: Dict) -> List[Dict]:
@@ -277,9 +286,10 @@ def batch_calculate_compatibility(user_pairs: List[Tuple[int, int]], users_data:
 
     results = []
 
+    _udget = users_data.get
     for user1_id, user2_id in user_pairs:
-        user1 = users_data.get(user1_id)
-        user2 = users_data.get(user2_id)
+        user1 = _udget(user1_id)
+        user2 = _udget(user2_id)
 
         if not user1 or not user2:
             continue
@@ -315,10 +325,11 @@ def get_conflict_analysis(sifats: List[str]) -> Dict:
                 if other_sifat in conflicting:
                     conflicts.append((sifat, other_sifat))
 
+    _n_conflicts = len(conflicts)
     risk_level = 'low'
-    if len(conflicts) >= 2:
+    if _n_conflicts >= 2:
         risk_level = 'high'
-    elif len(conflicts) >= 1:
+    elif _n_conflicts >= 1:
         risk_level = 'medium'
 
     recommendations = []

@@ -174,9 +174,10 @@ def train(model, tokenizer, dataset, output_dir, epochs=3):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", required=True, help="Path to JSONL dataset")
-    parser.add_argument("--epochs", type=int, default=3, help="Number of epochs")
-    parser.add_argument("--output", default=OUTPUT_DIR, help="Output directory")
+    _addarg = parser.add_argument
+    _addarg("--dataset", required=True, help="Path to JSONL dataset")
+    _addarg("--epochs", type=int, default=3, help="Number of epochs")
+    _addarg("--output", default=OUTPUT_DIR, help="Output directory")
 
     args = parser.parse_args()
 

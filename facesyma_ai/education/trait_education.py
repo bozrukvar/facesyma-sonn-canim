@@ -37,8 +37,9 @@ class TraitEducator:
             try:
                 with open(self.education_db_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    self.trait_database = data.get("traits", {})
-                    self.recommendations = data.get("recommendations", {})
+                    _dget = data.get
+                    self.trait_database = _dget("traits", {})
+                    self.recommendations = _dget("recommendations", {})
                 log.info(f"Loaded education content for {len(self.trait_database)} traits")
             except Exception as e:
                 log.error(f"Error loading education content: {e}")
@@ -73,17 +74,21 @@ class TraitEducator:
             "work_environment": []
         }
 
+        _ric = recommendations["ideal_careers"]
+        _rcs = recommendations["career_strengths"]
+        _rsd = recommendations["skill_development"]
         for sifat in sifatlar:
             trait = self.get_trait_explanation(sifat, lang)
             if trait:
-                recommendations["ideal_careers"].extend(trait.get("career_matches", [])[:2])
-                recommendations["career_strengths"].extend(trait.get("strengths", [])[:2])
-                recommendations["skill_development"].extend(trait.get("development_tips", [])[:1])
+                _trget = trait.get
+                _ric.extend(_trget("career_matches", [])[:2])
+                _rcs.extend(_trget("strengths", [])[:2])
+                _rsd.extend(_trget("development_tips", [])[:1])
 
         # Remove duplicates
-        recommendations["ideal_careers"] = list(set(recommendations["ideal_careers"]))[:5]
-        recommendations["career_strengths"] = list(set(recommendations["career_strengths"]))[:5]
-        recommendations["skill_development"] = list(set(recommendations["skill_development"]))[:5]
+        recommendations["ideal_careers"] = list(set(_ric))[:5]
+        recommendations["career_strengths"] = list(set(_rcs))[:5]
+        recommendations["skill_development"] = list(set(_rsd))[:5]
 
         return recommendations
 
@@ -117,9 +122,10 @@ class TraitEducator:
             learning_path["focus_areas"].extend(growth_areas[:2])
             learning_path["learning_resources"].extend(dev_tips[:2])
 
+        _s0 = sifatlar[0]
         learning_path["milestones"] = [
-            f"Week 1-2: Understand {sifatlar[0]} strengths",
-            f"Week 3-4: Address growth areas in {sifatlar[0]}",
+            f"Week 1-2: Understand {_s0} strengths",
+            f"Week 3-4: Address growth areas in {_s0}",
             f"Week 5-8: Integrate {', '.join(sifatlar[1:])} development",
             "Week 9-12: Create action plan and track progress"
         ]
@@ -149,16 +155,18 @@ class TraitEducator:
         if not t1 or not t2:
             return {"error": "Trait not found"}
 
+        _t1get = t1.get
+        _t2get = t2.get
         return {
             "trait1": {
                 "name": trait1,
-                "strengths": t1.get("strengths", [])[:3],
-                "growth_areas": t1.get("growth_areas", [])[:2]
+                "strengths": _t1get("strengths", [])[:3],
+                "growth_areas": _t1get("growth_areas", [])[:2]
             },
             "trait2": {
                 "name": trait2,
-                "strengths": t2.get("strengths", [])[:3],
-                "growth_areas": t2.get("growth_areas", [])[:2]
+                "strengths": _t2get("strengths", [])[:3],
+                "growth_areas": _t2get("growth_areas", [])[:2]
             },
             "complementary": trait2 in self.get_compatible_traits(trait1)
         }

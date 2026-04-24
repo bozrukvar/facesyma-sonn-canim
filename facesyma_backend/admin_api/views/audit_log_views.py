@@ -6,7 +6,8 @@ Admin activity audit log API endpoints.
 
 import json
 import logging
-from datetime import datetime
+import re as _re
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -16,6 +17,10 @@ from admin_api.utils.auth import _require_admin
 from admin_api.utils.mongo import _get_db
 
 log = logging.getLogger(__name__)
+
+_RE_EMAIL_FILTER  = _re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+_RE_ACTION_FILTER = _re.compile(r'^[a-zA-Z0-9_.]{1,100}$')
+_RE_TARGET_FILTER = _re.compile(r'^[a-zA-Z0-9_]{1,50}$')
 
 
 def _json(request):
@@ -66,39 +71,47 @@ class AuditLogListView(View):
             # Build filter query
             query = {}
 
-            admin_id = request.GET.get('admin_id')
+            _qp = request.GET
+            _qpget = _qp.get
+            admin_id = _qpget('admin_id')
             if admin_id:
                 try:
                     query['admin_id'] = int(admin_id)
                 except ValueError:
                     pass
 
-            admin_email = request.GET.get('admin_email')
-            if admin_email:
+            admin_email = _qpget('admin_email', '')[:254]
+            if admin_email and _RE_EMAIL_FILTER.match(admin_email):
                 query['admin_email'] = admin_email
 
-            action = request.GET.get('action')
-            if action:
+            action = _qpget('action', '')
+            if action and _RE_ACTION_FILTER.match(action):
                 query['action'] = action
 
-            target_type = request.GET.get('target_type')
-            if target_type:
+            target_type = _qpget('target_type', '')
+            if target_type and _RE_TARGET_FILTER.match(target_type):
                 query['target_type'] = target_type
 
-            from_date = request.GET.get('from_date')
-            to_date = request.GET.get('to_date')
+            from_date = _qpget('from_date')
+            to_date = _qpget('to_date')
             if from_date or to_date:
                 date_query = {}
-                if from_date:
-                    date_query['$gte'] = from_date
-                if to_date:
-                    date_query['$lt'] = to_date
+                try:
+                    if from_date:
+                        date_query['$gte'] = datetime.fromisoformat(from_date.replace('Z', '+00:00'))
+                    if to_date:
+                        date_query['$lt'] = datetime.fromisoformat(to_date.replace('Z', '+00:00'))
+                except (ValueError, AttributeError):
+                    return JsonResponse({'detail': 'Invalid date format. Use ISO 8601 (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS).'}, status=400)
                 if date_query:
                     query['timestamp'] = date_query
 
             # Pagination
-            page = int(request.GET.get('page', 1))
-            limit = min(int(request.GET.get('limit', 20)), 100)
+            try:
+                page = max(1, int(_qpget('page', 1)))
+                limit = min(max(1, int(_qpget('limit', 20))), 100)
+            except (ValueError, TypeError):
+                page, limit = 1, 20
             skip = (page - 1) * limit
 
             # Count total
@@ -122,7 +135,7 @@ class AuditLogListView(View):
 
         except Exception as e:
             log.exception(f'Audit log list error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -162,46 +175,25 @@ class AuditLogStatsView(View):
 
             now = datetime.utcnow()
             today_iso = datetime(now.year, now.month, now.day).isoformat()
-            week_ago_iso = (now - __import__('datetime').timedelta(days=7)).isoformat()
+            week_ago_iso = (now - timedelta(days=7)).isoformat()
 
-            # Total actions
-            total_actions = audit_col.count_documents({})
-
-            # Today actions
-            today_actions = audit_col.count_documents({
-                'timestamp': {'$gte': today_iso}
-            })
-
-            # This week actions
-            week_actions = audit_col.count_documents({
-                'timestamp': {'$gte': week_ago_iso}
-            })
-
-            # Unique admins
-            unique_admins = len(audit_col.distinct('admin_id', {}))
-
-            # Action breakdown
-            action_pipeline = [
-                {'$group': {'_id': '$action', 'count': {'$sum': 1}}},
-                {'$sort': {'count': -1}}
-            ]
-            action_breakdown = {
-                doc['_id']: doc['count']
-                for doc in audit_col.aggregate(action_pipeline)
-            }
-
-            # Top admins
-            top_admins_pipeline = [
-                {'$group': {
-                    '_id': '$admin_email',
-                    'actions': {'$sum': 1}
-                }},
-                {'$sort': {'actions': -1}},
-                {'$limit': 10}
-            ]
+            _af = next(audit_col.aggregate([{'$facet': {
+                'total':      [{'$count': 'n'}],
+                'today':      [{'$match': {'timestamp': {'$gte': today_iso}}},    {'$count': 'n'}],
+                'week':       [{'$match': {'timestamp': {'$gte': week_ago_iso}}}, {'$count': 'n'}],
+                'by_action':  [{'$group': {'_id': '$action',     'count': {'$sum': 1}}}, {'$sort': {'count': -1}}],
+                'top_admins': [{'$group': {'_id': '$admin_email', 'actions': {'$sum': 1}}}, {'$sort': {'actions': -1}}, {'$limit': 10}],
+                'unique_adm': [{'$group': {'_id': '$admin_id'}}],
+            }}]), {})
+            _afget = _af.get
+            total_actions  = (_afget('total', [{}])[0] or {}).get('n', 0)
+            today_actions  = (_afget('today', [{}])[0] or {}).get('n', 0)
+            week_actions   = (_afget('week',  [{}])[0] or {}).get('n', 0)
+            unique_admins  = len(_afget('unique_adm', []))
+            action_breakdown = {doc['_id']: doc['count'] for doc in _afget('by_action', [])}
             top_admins = [
                 {'admin_email': doc['_id'], 'actions': doc['actions']}
-                for doc in audit_col.aggregate(top_admins_pipeline)
+                for doc in _afget('top_admins', [])
             ]
 
             return JsonResponse({
@@ -215,4 +207,4 @@ class AuditLogStatsView(View):
 
         except Exception as e:
             log.exception(f'Audit stats error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

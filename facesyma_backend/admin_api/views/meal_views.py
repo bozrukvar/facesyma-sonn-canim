@@ -14,7 +14,6 @@ Endpoints:
 import json
 import logging
 from datetime import datetime
-from typing import Dict, Any
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -22,13 +21,16 @@ from django.utils.decorators import method_decorator
 
 from admin_api.utils.auth import _require_auth
 from diet_coaching.models.meal import (
-    Meal, MealSelectionRequest, MealSifatGuessRequest, MealLeaderboardEntry
+    Meal, MealSelectionRequest, MealSifatGuessRequest, MealLeaderboardEntry, COUNTRY_CODES
 )
 from diet_coaching.services.meal_service import (
     MealService, MealError, MealNotFoundError, InvalidCountryError
 )
+from core.services.coin_service import CoinService
 
 log = logging.getLogger(__name__)
+
+_VALID_MEAL_GUESSES = frozenset({'yes', 'no', 'unsure'})
 
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
@@ -95,17 +97,17 @@ class MealDailyView(View):
                     "name_tr": meal.name_tr,
                     "description": meal.description,
                     "nutrition": {
-                        "calories": meal.nutrition.calories,
-                        "protein": meal.nutrition.protein,
-                        "carbs": meal.nutrition.carbs,
-                        "fat": meal.nutrition.fat,
+                        "calories": (_mn := meal.nutrition).calories,
+                        "protein": _mn.protein,
+                        "carbs": _mn.carbs,
+                        "fat": _mn.fat,
                     },
                     "prep_time_min": meal.prep_time_min,
                     "dietary": {
-                        "omnivore": meal.dietary.omnivore,
-                        "vegetarian": meal.dietary.vegetarian,
-                        "vegan": meal.dietary.vegan,
-                        "gluten_free": meal.dietary.gluten_free,
+                        "omnivore": (_md := meal.dietary).omnivore,
+                        "vegetarian": _md.vegetarian,
+                        "vegan": _md.vegan,
+                        "gluten_free": _md.gluten_free,
                     },
                     "sifat_appeal": meal.sifat_appeal,
                     "season": meal.season,
@@ -121,9 +123,9 @@ class MealDailyView(View):
             })
 
         except InvalidCountryError as e:
-            return _json_error(f"Country error: {str(e)}", status=404)
+            return _json_error("Country error.", status=404)
         except MealError as e:
-            return _json_error(f"Meal error: {str(e)}", status=400)
+            return _json_error("Meal error.", status=400)
         except Exception as e:
             log.error(f"MealDailyView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -165,8 +167,9 @@ class MealSelectView(View):
 
             # Parse request
             body = _json(request)
-            meal_id = body.get("meal_id", "").strip()
-            country = body.get("country", "").strip()
+            _bget = body.get
+            meal_id = _bget("meal_id", "").strip()
+            country = _bget("country", "").strip()
 
             if not meal_id or not country:
                 return _json_error("Missing meal_id or country", status=400)
@@ -192,11 +195,11 @@ class MealSelectView(View):
             })
 
         except MealNotFoundError as e:
-            return _json_error(f"Meal not found: {str(e)}", status=404)
+            return _json_error("Meal not found.", status=404)
         except InvalidCountryError as e:
-            return _json_error(f"Country error: {str(e)}", status=404)
+            return _json_error("Country error.", status=404)
         except MealError as e:
-            return _json_error(f"Meal error: {str(e)}", status=400)
+            return _json_error("Meal error.", status=400)
         except Exception as e:
             log.error(f"MealSelectView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -238,14 +241,15 @@ class MealSifatGuessView(View):
 
             # Parse request
             body = _json(request)
-            meal_id = body.get("meal_id", "").strip()
-            country = body.get("country", "").strip()
-            guess = body.get("guess", "").strip().lower()
+            _bget = body.get
+            meal_id = _bget("meal_id", "").strip()
+            country = _bget("country", "").strip()
+            guess = _bget("guess", "").strip().lower()
 
             if not meal_id or not country:
                 return _json_error("Missing meal_id or country", status=400)
 
-            if guess not in ["yes", "no", "unsure"]:
+            if guess not in _VALID_MEAL_GUESSES:
                 return _json_error("Invalid guess; must be 'yes', 'no', or 'unsure'", status=400)
 
             # Record guess
@@ -257,7 +261,6 @@ class MealSifatGuessView(View):
             )
 
             # Get new balance
-            from core.services.coin_service import CoinService
             new_balance = CoinService.get_balance(user_id)
 
             return JsonResponse({
@@ -268,11 +271,11 @@ class MealSifatGuessView(View):
             })
 
         except MealNotFoundError as e:
-            return _json_error(f"Meal not found: {str(e)}", status=404)
+            return _json_error("Meal not found.", status=404)
         except InvalidCountryError as e:
-            return _json_error(f"Country error: {str(e)}", status=404)
+            return _json_error("Country error.", status=404)
         except MealError as e:
-            return _json_error(f"Meal error: {str(e)}", status=400)
+            return _json_error("Meal error.", status=400)
         except Exception as e:
             log.error(f"MealSifatGuessView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -315,12 +318,12 @@ class MealLeaderboardView(View):
     def get(self, request):
         try:
             # Get country from query params, default to current week
-            country = request.GET.get("country", "").strip()
+            _qget = request.GET.get
+            country = _qget("country", "").strip()
             if not country:
                 country = MealService.get_current_week_country()
 
             # Validate country
-            from diet_coaching.models.meal import COUNTRY_CODES
             if country not in COUNTRY_CODES:
                 return _json_error(
                     f"Invalid country: {country}. Valid countries: {list(COUNTRY_CODES.keys())}",
@@ -329,7 +332,7 @@ class MealLeaderboardView(View):
 
             # Get limit from query params
             try:
-                limit = int(request.GET.get("limit", 100))
+                limit = int(_qget("limit", 100))
                 limit = min(max(limit, 1), 1000)  # Clamp to 1-1000
             except ValueError:
                 limit = 100
@@ -361,9 +364,9 @@ class MealLeaderboardView(View):
             })
 
         except InvalidCountryError as e:
-            return _json_error(f"Country error: {str(e)}", status=404)
+            return _json_error("Country error.", status=404)
         except MealError as e:
-            return _json_error(f"Meal error: {str(e)}", status=400)
+            return _json_error("Meal error.", status=400)
         except Exception as e:
             log.error(f"MealLeaderboardView error: {e}", exc_info=True)
             return _json_error("Internal server error", status=500)
@@ -414,8 +417,9 @@ class MealHistoryView(View):
 
             # Get pagination params
             try:
-                limit = int(request.GET.get("limit", 50))
-                offset = int(request.GET.get("offset", 0))
+                _qget = request.GET.get
+                limit = int(_qget("limit", 50))
+                offset = int(_qget("offset", 0))
                 limit = min(max(limit, 1), 500)  # Clamp to 1-500
                 offset = max(offset, 0)
             except ValueError:

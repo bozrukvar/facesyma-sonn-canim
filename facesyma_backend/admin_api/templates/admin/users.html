@@ -121,21 +121,21 @@
                 data.users.forEach(user => {
                     const row = document.createElement('tr');
                     const statusBadge = user.is_active ? '<span style="background: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Aktif</span>' : '<span style="background: #F44336; padding: 4px 8px; border-radius: 4px; font-size: 12px;">İnaktif</span>';
-                    const planBadge = `<span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${user.plan || 'free'}</span>`;
+                    const planBadge = `<span style="background: ${user.plan === 'premium' ? '#4CAF50' : '#707070'}; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(user.plan || 'free')}</span>`;
                     const appSourceBadge = user.app_source === 'web' ? '<span style="background: #2196F3; padding: 4px 8px; border-radius: 4px; font-size: 12px;">🌐 Web</span>' : '<span style="background: #FF9800; padding: 4px 8px; border-radius: 4px; font-size: 12px;">📱 Mobil</span>';
 
                     row.innerHTML = `
-                        <td><input type="checkbox" class="userCheckbox" value="${user.id}" onchange="updateSelectedCount()"></td>
-                        <td>${user.id}</td>
-                        <td>${user.email}</td>
-                        <td>${user.username || '-'}</td>
+                        <td><input type="checkbox" class="userCheckbox" value="${parseInt(user.id)}" onchange="updateSelectedCount()"></td>
+                        <td>${escapeHtml(user.id)}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td>${escapeHtml(user.username || '-')}</td>
                         <td>${planBadge}</td>
                         <td>${statusBadge}</td>
                         <td>${appSourceBadge}</td>
-                        <td>${new Date(user.date_joined).toLocaleDateString('tr-TR')}</td>
+                        <td>${escapeHtml(new Date(user.date_joined).toLocaleDateString('tr-TR'))}</td>
                         <td>
-                            <button onclick="editUser(${user.id}, '${user.email}', '${user.plan}', ${user.is_active})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Düzenle</button> |
-                            <button onclick="deleteUser(${user.id})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
+                            <button onclick="editUser(${parseInt(user.id)}, this.dataset.email, this.dataset.plan, ${!!user.is_active})" data-email="${escapeHtml(user.email)}" data-plan="${escapeHtml(user.plan || 'free')}" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Düzenle</button> |
+                            <button onclick="deleteUser(${parseInt(user.id)})" style="color: #F44336; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Sil</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -152,7 +152,10 @@
                 for (let i = 1; i <= data.pagination.pages; i++) {
                     const link = document.createElement('a');
                     if (i === currentPage) {
-                        link.innerHTML = `<span class="active">${i}</span>`;
+                        const span = document.createElement('span');
+                        span.className = 'active';
+                        span.textContent = i;
+                        link.appendChild(span);
                     } else {
                         link.textContent = i;
                         link.href = '#';
@@ -165,7 +168,7 @@
             console.error('Kullanıcı yükleme hatası:', error);
             document.getElementById('usersTable').innerHTML = `
                 <tr><td colspan="7" style="text-align: center; padding: 20px; color: #F44336;">
-                    Hata: ${error.message}
+                    Hata: ${escapeHtml(error.message)}
                 </td></tr>
             `;
         }

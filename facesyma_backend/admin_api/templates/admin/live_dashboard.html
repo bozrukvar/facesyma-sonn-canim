@@ -219,7 +219,8 @@
     function connectWS() {
         try {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin/live/`);
+            const adminToken = localStorage.getItem('adminToken') || '';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin/live/?token=${encodeURIComponent(adminToken)}`);
 
             ws.onopen = function() {
                 console.log('Admin WS connected');
@@ -236,7 +237,6 @@
 
             ws.onmessage = function(event) {
                 const msg = JSON.parse(event.data);
-                console.log('WS message:', msg.type, msg.data);
 
                 // Handle different event types
                 if (msg.type === 'new_user') {
@@ -281,8 +281,8 @@
         const html = `
             <div class="activity-item">
                 <span class="activity-type ${typeClass}">${typeLabel}</span>
-                <span style="color: #ddd;">User ${activity.user_id}</span>
-                <span class="activity-time">${time}</span>
+                <span style="color: #ddd;">User ${escapeHtml(activity.user_id)}</span>
+                <span class="activity-time">${escapeHtml(time)}</span>
             </div>
         `;
 
@@ -311,7 +311,7 @@
             z-index: 2000;
             animation: slideDown 0.3s ease-out;
         `;
-        banner.innerHTML = `⚠️ <strong>${alert.rule_name}</strong> - Değer: ${alert.value}, Eşik: ${alert.threshold}`;
+        banner.innerHTML = `⚠️ <strong>${escapeHtml(alert.rule_name)}</strong> - Değer: ${escapeHtml(alert.value)}, Eşik: ${escapeHtml(alert.threshold)}`;
         document.body.appendChild(banner);
 
         setTimeout(() => banner.remove(), 5000);
@@ -445,12 +445,12 @@
         feedContainer.innerHTML = activities.map(activity => `
             <div class="activity-item">
                 <div>
-                    <span class="activity-type ${activity.type}">
+                    <span class="activity-type ${activity.type === 'analysis' ? 'analysis' : 'registration'}">
                         ${activity.type === 'analysis' ? '📊 Analiz' : '📝 Kayıt'}
                     </span>
-                    <span style="color: #d4af37;">${activity.detail}</span>
+                    <span style="color: #d4af37;">${escapeHtml(activity.detail)}</span>
                 </div>
-                <span class="activity-time">${new Date(activity.time).toLocaleTimeString('tr-TR')}</span>
+                <span class="activity-time">${escapeHtml(new Date(activity.time).toLocaleTimeString('tr-TR'))}</span>
             </div>
         `).join('');
     }
@@ -472,7 +472,7 @@
             </div>
             <div class="health-item">
                 <span class="health-label">Aktif İşler</span>
-                <span class="status-value">${health.scheduler_jobs}</span>
+                <span class="status-value">${escapeHtml(health.scheduler_jobs)}</span>
             </div>
         `;
     }

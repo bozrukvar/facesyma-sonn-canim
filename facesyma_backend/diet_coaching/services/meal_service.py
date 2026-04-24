@@ -36,7 +36,7 @@ class MealService:
         return {
             'user_id': user_id,
             'meal_id': meal_id,
-            'selected_at': datetime.now().isoformat(),
+            'selected_at': datetime.utcnow().isoformat(),
             'score': 0
         }
 

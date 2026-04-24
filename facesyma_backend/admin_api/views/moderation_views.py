@@ -18,16 +18,15 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
+from bson import ObjectId
+from admin_api.utils.mongo import _get_db
+from admin_api.utils.auth import _require_admin
 
 log = logging.getLogger(__name__)
 
-
-def _get_db():
-    """MongoDB bağlantısı"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
+_VALID_REPORT_STATUSES    = frozenset({'pending', 'resolved', 'dismissed'})
+_VALID_MOD_ACTIONS        = frozenset({'dismiss', 'warn', 'suspend', 'ban'})
+_INAPPROPRIATE_KEYWORDS   = ['spam', 'abuse', 'hate', 'violence', 'porn']
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -35,24 +34,34 @@ class UserReportsView(View):
     """Kullanıcı şikayet yönetimi"""
 
     def get(self, request):
-        """Şikayetleri listele"""
+        """Şikayetleri listele (admin only)"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             db = _get_db()
             report_col = db['user_reports']
 
-            status = request.GET.get('status', None)  # pending, reviewed, resolved, dismissed
-            limit = int(request.GET.get('limit', 50))
+            _qget = request.GET.get
+            status = _qget('status', None)
+            try:
+                limit = min(max(1, int(_qget('limit', 50))), 200)
+            except (ValueError, TypeError):
+                limit = 50
+
 
             query = {}
-            if status:
+            if status and status in _VALID_REPORT_STATUSES:
                 query['status'] = status
 
-            reports = list(report_col.find(query)
-                          .sort('created_at', -1)
-                          .limit(limit))
-
+            reports = list(report_col.find(query).sort('created_at', -1).limit(limit))
             for r in reports:
-                r['_id'] = str(r['_id'])
+                _oid = r['_id']
+                r['_id'] = str(_oid)
 
             return JsonResponse({
                 'success': True,
@@ -64,25 +73,32 @@ class UserReportsView(View):
             })
 
         except Exception as e:
-            log.exception(f'Reports list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Reports list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def post(self, request):
-        """Yeni şikayet oluştur"""
+        """Yeni şikayet oluştur (admin only)"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
         try:
             data = json.loads(request.body)
-
+            _dget = data.get
             db = _get_db()
             report_col = db['user_reports']
 
             report = {
-                'reporter_id': data.get('reporter_id'),
-                'reported_user_id': data.get('reported_user_id'),
-                'report_type': data.get('report_type'),  # harassment, spam, inappropriate, other
-                'content_type': data.get('content_type'),  # message, profile, comment
-                'content_id': data.get('content_id'),
-                'reason': data.get('reason'),
-                'description': data.get('description'),
+                'reporter_id': _dget('reporter_id'),
+                'reported_user_id': _dget('reported_user_id'),
+                'report_type': str(_dget('report_type', ''))[:50],
+                'content_type': str(_dget('content_type', ''))[:50],
+                'content_id': _dget('content_id'),
+                'reason': str(_dget('reason', ''))[:200],
+                'description': str(_dget('description', ''))[:1000],
                 'status': 'pending',
                 'severity': 'medium',
                 'created_at': datetime.utcnow(),
@@ -92,20 +108,17 @@ class UserReportsView(View):
             }
 
             result = report_col.insert_one(report)
-
-            log.info(f"User report created: {result.inserted_id}")
+            _rid = result.inserted_id
+            log.info(f"User report created: {_rid}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'report_id': str(result.inserted_id),
-                    'status': 'pending'
-                }
+                'data': {'report_id': str(_rid), 'status': 'pending'}
             })
 
         except Exception as e:
-            log.exception(f'Report creation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Report creation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -115,126 +128,135 @@ class ReportReviewView(View):
     def post(self, request):
         """Şikayeti gözden geçir ve karar ver"""
         try:
-            data = json.loads(request.body)
-            report_id = data.get('report_id')
-            action = data.get('action')  # dismiss, warn, suspend, ban
-            notes = data.get('notes')
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            report_id_raw = _dget('report_id')
+            action = _dget('action')
+
+            if action not in _VALID_MOD_ACTIONS:
+                return JsonResponse({'detail': f'Invalid action. Allowed: {", ".join(sorted(_VALID_MOD_ACTIONS))}'}, status=400)
+            notes = str(_dget('notes', ''))[:500]
+
+            try:
+                report_id = ObjectId(report_id_raw)
+            except Exception:
+                return JsonResponse({'detail': 'Invalid report_id format.'}, status=400)
+
+            _now = datetime.utcnow()
             db = _get_db()
             report_col = db['user_reports']
-            user_col = db['users']
+            user_col = db['appfaceapi_myuser']
             action_col = db['moderation_actions']
 
-            # Report'u güncelle
+            admin_email = admin_payload.get('email', 'admin')
+
             report_col.update_one(
                 {'_id': report_id},
                 {'$set': {
                     'status': 'resolved' if action != 'dismiss' else 'dismissed',
-                    'reviewed_at': datetime.utcnow(),
-                    'reviewed_by': request.user.id if hasattr(request, 'user') else 'system',
+                    'reviewed_at': _now,
+                    'reviewed_by': admin_email,
                     'action_taken': action,
                     'notes': notes
                 }}
             )
 
-            # Eğer action varsa, user'a işlem uygula
-            report = report_col.find_one({'_id': report_id})
+            report = report_col.find_one({'_id': report_id},
+                {'_id': 0, 'reported_user_id': 1, 'reason': 1})
+            if report:
+                _upd = user_col.update_one
+                _rruid = report['reported_user_id']
+                if action == 'warn':
+                    _upd(
+                        {'id': _rruid},
+                        {'$inc': {'moderation_warnings': 1}}
+                    )
+                elif action == 'suspend':
+                    _upd(
+                        {'id': _rruid},
+                        {'$set': {
+                            'account_status': 'suspended',
+                            'suspended_until': _now + timedelta(days=7)
+                        }}
+                    )
+                elif action == 'ban':
+                    _upd(
+                        {'id': _rruid},
+                        {'$set': {'account_status': 'banned', 'banned_at': _now}}
+                    )
 
-            if action == 'warn':
-                user_col.update_one(
-                    {'user_id': report['reported_user_id']},
-                    {'$inc': {'moderation_warnings': 1}}
-                )
+                _rget = report.get
+                action_col.insert_one({
+                    'report_id': report_id,
+                    'user_id': _rget('reported_user_id'),
+                    'action': action,
+                    'reason': _rget('reason'),
+                    'taken_by': admin_email,
+                    'created_at': _now
+                })
 
-            elif action == 'suspend':
-                user_col.update_one(
-                    {'user_id': report['reported_user_id']},
-                    {'$set': {
-                        'account_status': 'suspended',
-                        'suspended_until': datetime.utcnow() + timedelta(days=7)
-                    }}
-                )
-
-            elif action == 'ban':
-                user_col.update_one(
-                    {'user_id': report['reported_user_id']},
-                    {'$set': {
-                        'account_status': 'banned',
-                        'banned_at': datetime.utcnow()
-                    }}
-                )
-
-            # Log the action
-            action_col.insert_one({
-                'report_id': report_id,
-                'user_id': report['reported_user_id'],
-                'action': action,
-                'reason': report.get('reason'),
-                'taken_by': request.user.id if hasattr(request, 'user') else 'system',
-                'created_at': datetime.utcnow()
-            })
-
-            log.info(f"Report {report_id} reviewed: action={action}")
+            log.info(f"Report {report_id} reviewed: action={action} by {admin_email}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'report_id': report_id,
-                    'action': action,
-                    'message': f'Action taken: {action}'
-                }
+                'data': {'report_id': str(report_id), 'action': action, 'message': f'Action taken: {action}'}
             })
 
         except Exception as e:
-            log.exception(f'Review hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Review error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ContentModerationView(View):
-    """İçerik moderasyonu (AI-powered)"""
+    """İçerik moderasyonu"""
 
     def post(self, request):
         """İçeriği modere et"""
         try:
-            data = json.loads(request.body)
-            content = data.get('content')
-            content_type = data.get('content_type')  # message, post, profile_bio
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
-            # Basit keyword-based filtering (production'da ML model kullan)
-            inappropriate_keywords = [
-                'spam', 'abuse', 'hate', 'violence', 'porn'
-            ]
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            content = str(_dget('content', ''))[:5000]
+            content_type = str(_dget('content_type', ''))[:50]
+
+            if not content:
+                return JsonResponse({'detail': 'content is required'}, status=400)
 
             content_lower = content.lower()
-
-            flags = []
-            for keyword in inappropriate_keywords:
-                if keyword in content_lower:
-                    flags.append(keyword)
-
-            risk_score = len(flags) * 25  # 0-100
+            flags = [kw for kw in _INAPPROPRIATE_KEYWORDS if kw in content_lower]
+            risk_score = min(100, len(flags) * 25)
             is_approved = risk_score < 50
-
-            moderation_result = {
-                'content': content,
-                'content_type': content_type,
-                'risk_score': risk_score,
-                'flags': flags,
-                'is_approved': is_approved,
-                'confidence': 0.85,
-                'recommendation': 'approve' if is_approved else 'review',
-                'timestamp': datetime.utcnow().isoformat()
-            }
 
             return JsonResponse({
                 'success': True,
-                'data': moderation_result
+                'data': {
+                    'content_type': content_type,
+                    'risk_score': risk_score,
+                    'flags': flags,
+                    'is_approved': is_approved,
+                    'confidence': 0.85,
+                    'recommendation': 'approve' if is_approved else 'review',
+                    'timestamp': datetime.utcnow().isoformat()
+                }
             })
 
         except Exception as e:
-            log.exception(f'Moderation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Moderation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -244,83 +266,111 @@ class BanManagementView(View):
     def get(self, request):
         """Aktif banları listele"""
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
-            user_col = db['users']
+            user_col = db['appfaceapi_myuser']
 
-            # Suspended users
-            suspended = list(user_col.find({
-                'account_status': 'suspended',
-                'suspended_until': {'$gt': datetime.utcnow()}
-            }).limit(50))
-
-            # Banned users
-            banned = list(user_col.find({
-                'account_status': 'banned'
-            }).limit(50))
+            _remove = {'_id': 0, 'password': 0}
+            _bf = next(user_col.aggregate([{'$facet': {
+                'suspended': [
+                    {'$match': {'account_status': 'suspended', 'suspended_until': {'$gt': datetime.utcnow().isoformat()}}},
+                    {'$project': _remove}, {'$limit': 50},
+                ],
+                'banned': [
+                    {'$match': {'account_status': 'banned'}},
+                    {'$project': _remove}, {'$limit': 50},
+                ],
+            }}]), {})
+            _bfget = _bf.get
+            suspended = _bfget('suspended', [])
+            banned    = _bfget('banned', [])
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'suspended_users': len(suspended),
-                    'banned_users': len(banned),
+                    'suspended_count': len(suspended),
+                    'banned_count': len(banned),
                     'suspended': suspended[:10],
                     'banned': banned[:10]
                 }
             })
 
         except Exception as e:
-            log.exception(f'Ban list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Ban list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def post(self, request):
         """Kullanıcıyı ban et"""
         try:
-            data = json.loads(request.body)
-            user_id = data.get('user_id')
-            ban_type = data.get('ban_type')  # temporary, permanent
-            duration_days = data.get('duration_days', 7)
-            reason = data.get('reason')
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget2 = data.get
+            user_id = _dget2('user_id')
+            ban_type = _dget2('ban_type')
+            if ban_type not in ('temporary', 'permanent'):
+                return JsonResponse({'detail': 'ban_type must be temporary or permanent'}, status=400)
+            try:
+                duration_days = max(1, int(_dget2('duration_days', 7)))
+            except (TypeError, ValueError):
+                duration_days = 7
+            reason = str(_dget2('reason', ''))[:500]
+
+            if not user_id:
+                return JsonResponse({'detail': 'user_id is required'}, status=400)
+
+            _now = datetime.utcnow()
             db = _get_db()
-            user_col = db['users']
+            user_col = db['appfaceapi_myuser']
             ban_col = db['ban_records']
 
-            # Ban kaydı oluştur
-            ban_record = {
+            expires_at = (_now + timedelta(days=duration_days)) if ban_type == 'temporary' else None
+
+            _admin_email = admin_payload.get('email', 'admin')
+            ban_col.insert_one({
                 'user_id': user_id,
                 'ban_type': ban_type,
                 'reason': reason,
                 'duration_days': duration_days,
-                'created_at': datetime.utcnow(),
-                'created_by': request.user.id if hasattr(request, 'user') else 'system',
-                'expires_at': datetime.utcnow() + timedelta(days=duration_days) if ban_type == 'temporary' else None
-            }
+                'created_at': _now,
+                'created_by': _admin_email,
+                'expires_at': expires_at,
+            })
 
-            ban_col.insert_one(ban_record)
-
-            # User'ı ban et
+            _expires_iso = expires_at.isoformat() if expires_at else None
             user_col.update_one(
-                {'user_id': user_id},
+                {'id': user_id},
                 {'$set': {
                     'account_status': 'banned' if ban_type == 'permanent' else 'suspended',
-                    'suspended_until': ban_record['expires_at']
+                    'suspended_until': _expires_iso,
                 }}
             )
 
-            log.info(f"User {user_id} banned: {ban_type}")
+            log.info(f"User {user_id} {ban_type}-banned by {_admin_email}")
 
             return JsonResponse({
                 'success': True,
                 'data': {
                     'user_id': user_id,
                     'ban_type': ban_type,
-                    'expires_at': ban_record['expires_at'].isoformat() if ban_record['expires_at'] else None
+                    'expires_at': _expires_iso,
                 }
             })
 
         except Exception as e:
-            log.exception(f'Ban hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Ban error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -329,75 +379,51 @@ class ModerationStatsView(View):
 
     def get(self, request):
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             report_col = db['user_reports']
             action_col = db['moderation_actions']
 
-            period = request.GET.get('period', '30')
-            period_days = int(period)
+            try:
+                period_days = min(max(1, int(request.GET.get('period', 30))), 365)
+            except (ValueError, TypeError):
+                period_days = 30
 
             start_date = datetime.utcnow() - timedelta(days=period_days)
 
-            # Reports by status
-            total_reports = report_col.count_documents({
-                'created_at': {'$gte': start_date}
-            })
-            pending_reports = report_col.count_documents({
-                'created_at': {'$gte': start_date},
-                'status': 'pending'
-            })
-            resolved_reports = report_col.count_documents({
-                'created_at': {'$gte': start_date},
-                'status': 'resolved'
-            })
+            _rf = next(report_col.aggregate([{'$facet': {
+                'total':    [{'$match': {'created_at': {'$gte': start_date}}},                               {'$count': 'n'}],
+                'pending':  [{'$match': {'created_at': {'$gte': start_date}, 'status': 'pending'}},  {'$count': 'n'}],
+                'resolved': [{'$match': {'created_at': {'$gte': start_date}, 'status': 'resolved'}}, {'$count': 'n'}],
+            }}]), {})
+            _rfget = _rf.get
+            total_reports    = (_rfget('total',    [{}])[0] or {}).get('n', 0)
+            pending_reports  = (_rfget('pending',  [{}])[0] or {}).get('n', 0)
+            resolved_reports = (_rfget('resolved', [{}])[0] or {}).get('n', 0)
 
-            # Actions taken
-            actions = {}
-            for action_type in ['warn', 'suspend', 'ban', 'dismiss']:
-                count = action_col.count_documents({
-                    'created_at': {'$gte': start_date},
-                    'action': action_type
-                })
-                actions[action_type] = count
-
-            # Average response time
-            avg_response_time = 0
-            responses = list(report_col.aggregate([
-                {'$match': {
-                    'created_at': {'$gte': start_date},
-                    'reviewed_at': {'$exists': True}
-                }},
-                {'$project': {
-                    'response_time_hours': {
-                        '$divide': [
-                            {'$subtract': ['$reviewed_at', '$created_at']},
-                            3600000
-                        ]
-                    }
-                }},
-                {'$group': {
-                    '_id': None,
-                    'avg': {'$avg': '$response_time_hours'}
-                }}
-            ]))
-
-            if responses:
-                avg_response_time = responses[0]['avg']
-
-            stats = {
-                'period_days': period_days,
-                'total_reports': total_reports,
-                'pending_reports': pending_reports,
-                'resolved_reports': resolved_reports,
-                'avg_response_time_hours': round(avg_response_time, 2),
-                'actions_taken': actions
-            }
+            _af = next(action_col.aggregate([{'$facet': {
+                action_type: [{'$match': {'created_at': {'$gte': start_date}, 'action': action_type}}, {'$count': 'n'}]
+                for action_type in _VALID_MOD_ACTIONS
+            }}]), {})
+            actions = {at: (_af.get(at, [{}])[0] or {}).get('n', 0) for at in _VALID_MOD_ACTIONS}
 
             return JsonResponse({
                 'success': True,
-                'data': stats
+                'data': {
+                    'period_days': period_days,
+                    'total_reports': total_reports,
+                    'pending_reports': pending_reports,
+                    'resolved_reports': resolved_reports,
+                    'actions_taken': actions
+                }
             })
 
         except Exception as e:
-            log.exception(f'Stats hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Stats error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

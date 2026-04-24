@@ -69,9 +69,11 @@ def create_po_file(language_code, language_name, strings):
     # Group strings by text (deduplicate)
     unique_strings = {}
     for s in strings:
-        if s['text'] not in unique_strings:
-            unique_strings[s['text']] = []
-        unique_strings[s['text']].append(s['location'])
+        _st = s['text']
+        if _st not in unique_strings:
+            unique_strings[_st] = []
+        _ust = unique_strings[_st]
+        _ust.append(s['location'])
 
     # Create .po file content
     header = f'''# {language_name} translations for Gamification Phase 2
@@ -116,9 +118,11 @@ def create_pot_file(strings):
     # Group strings by text (deduplicate)
     unique_strings = {}
     for s in strings:
-        if s['text'] not in unique_strings:
-            unique_strings[s['text']] = []
-        unique_strings[s['text']].append(s['location'])
+        _st = s['text']
+        if _st not in unique_strings:
+            unique_strings[_st] = []
+        _ust = unique_strings[_st]
+        _ust.append(s['location'])
 
     # Create .pot file content
     creation_date = datetime.now().isoformat()

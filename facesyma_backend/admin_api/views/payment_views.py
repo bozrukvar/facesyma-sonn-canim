@@ -3,12 +3,12 @@ admin_api/views/payment_views.py
 ================================
 Payment Integration & Management
 
-Features:
-  - Stripe integration
-  - iyzico integration (Turkey)
-  - Payment webhook handling
-  - Transaction logs
-  - Refund management
+Providers:
+  - Google Pay  (client-side, no server webhook needed)
+  - Apple Pay   (client-side, no server webhook needed)
+  - Vakıfbank Sanal Pos (TODO: ileriki güncelleme ile entegre edilecek)
+
+Transaction logs, refund management, and stats are provider-agnostic.
 """
 
 import json
@@ -18,23 +18,20 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
+from bson import ObjectId
+from admin_api.utils.mongo import _get_db
 from admin_api.utils.auth import _require_admin
 
 log = logging.getLogger(__name__)
 
-# Stripe & iyzico API keys (from environment)
-STRIPE_API_KEY = getattr(settings, 'STRIPE_API_KEY', 'sk_test_xxxxx')
-STRIPE_WEBHOOK_SECRET = getattr(settings, 'STRIPE_WEBHOOK_SECRET', 'whsec_xxxxx')
-IYZICO_API_KEY = getattr(settings, 'IYZICO_API_KEY', 'your-key')
-IYZICO_SECRET_KEY = getattr(settings, 'IYZICO_SECRET_KEY', 'your-secret')
+_TX_STATUS_PROJ = {'_id': 0, 'status': 1, 'provider': 1, 'amount': 1, 'currency': 1}
+
+# Active payment providers
+ACTIVE_PROVIDERS = ('google_pay', 'apple_pay')
+# VAKIFBANK_VPP_MERCHANT_ID = getattr(settings, 'VAKIFBANK_VPP_MERCHANT_ID', '')  # TODO: ileriki versiyon
 
 
-def _get_db():
-    """MongoDB bağlantısı"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -48,8 +45,12 @@ class PaymentTransactionsView(View):
             trans_col = db['payment_transactions']
 
             # Filter by status
-            status = request.GET.get('status', None)  # success, failed, pending
-            limit = int(request.GET.get('limit', 50))
+            _qget = request.GET.get
+            status = _qget('status', None)  # success, failed, pending
+            try:
+                limit = min(max(1, int(_qget('limit', 50))), 200)
+            except (ValueError, TypeError):
+                limit = 50
 
             query = {}
             if status:
@@ -62,7 +63,8 @@ class PaymentTransactionsView(View):
 
             # ID field'ini string'e çevir
             for t in transactions:
-                t['_id'] = str(t['_id'])
+                _oid = t['_id']
+                t['_id'] = str(_oid)
 
             return JsonResponse({
                 'success': True,
@@ -73,107 +75,13 @@ class PaymentTransactionsView(View):
                 }
             })
 
+        except ValueError:
+            return JsonResponse({'detail': 'Unauthorized.'}, status=401)
+        except PermissionError:
+            return JsonResponse({'detail': 'Admin access required.'}, status=403)
         except Exception as e:
-            log.exception(f'Transactions list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class PaymentWebhookStripeView(View):
-    """Stripe webhook handler"""
-
-    def post(self, request):
-        try:
-            payload = request.body.decode('utf-8')
-            event = json.loads(payload)
-
-            db = _get_db()
-            trans_col = db['payment_transactions']
-
-            if event['type'] == 'payment_intent.succeeded':
-                payment_intent = event['data']['object']
-
-                # MongoDB'ye kaydet
-                trans_col.insert_one({
-                    'provider': 'stripe',
-                    'payment_intent_id': payment_intent['id'],
-                    'user_id': payment_intent['metadata'].get('user_id'),
-                    'amount': payment_intent['amount'] / 100,  # Cents to dollars
-                    'currency': payment_intent['currency'].upper(),
-                    'status': 'success',
-                    'created_at': datetime.utcnow(),
-                    'metadata': payment_intent['metadata']
-                })
-
-                log.info(f"✓ Stripe payment succeeded: {payment_intent['id']}")
-
-                return JsonResponse({'success': True})
-
-            elif event['type'] == 'charge.failed':
-                charge = event['data']['object']
-
-                trans_col.insert_one({
-                    'provider': 'stripe',
-                    'charge_id': charge['id'],
-                    'user_id': charge['metadata'].get('user_id'),
-                    'amount': charge['amount'] / 100,
-                    'currency': charge['currency'].upper(),
-                    'status': 'failed',
-                    'failure_reason': charge['failure_message'],
-                    'created_at': datetime.utcnow(),
-                    'metadata': charge['metadata']
-                })
-
-                log.warning(f"⚠️  Stripe payment failed: {charge['id']}")
-
-                return JsonResponse({'success': True})
-
-            else:
-                log.info(f"Unhandled Stripe event: {event['type']}")
-                return JsonResponse({'success': True})
-
-        except Exception as e:
-            log.exception(f'Stripe webhook hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class PaymentWebhookIyzicoView(View):
-    """iyzico webhook handler"""
-
-    def post(self, request):
-        try:
-            payload = request.body.decode('utf-8')
-            event = json.loads(payload)
-
-            db = _get_db()
-            trans_col = db['payment_transactions']
-
-            if event.get('eventType') == 'ThreeDsAuthentication.AuthenticationCompleted':
-                result = event.get('resource', {})
-
-                trans_col.insert_one({
-                    'provider': 'iyzico',
-                    'payment_id': result.get('paymentId'),
-                    'conversation_id': result.get('conversationId'),
-                    'user_id': result.get('metadata', {}).get('user_id'),
-                    'amount': result.get('paidPrice'),
-                    'currency': 'TRY',
-                    'status': 'success' if result.get('status') == 'success' else 'failed',
-                    'created_at': datetime.utcnow(),
-                    'metadata': result.get('metadata', {})
-                })
-
-                log.info(f"✓ iyzico payment: {result.get('paymentId')}")
-                return JsonResponse({'success': True})
-
-            else:
-                log.info(f"Unhandled iyzico event: {event.get('eventType')}")
-                return JsonResponse({'success': True})
-
-        except Exception as e:
-            log.exception(f'iyzico webhook hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Transactions list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -185,21 +93,26 @@ class RefundView(View):
         try:
             _require_admin(request)
             data = json.loads(request.body)
-            transaction_id = data.get('transaction_id')
-            reason = data.get('reason')
+            _dget = data.get
+            transaction_id = _dget('transaction_id')
+            reason = _dget('reason')
 
             db = _get_db()
             trans_col = db['payment_transactions']
             refund_col = db['payment_refunds']
 
             # Transaction'ı bul
-            transaction = trans_col.find_one({'_id': transaction_id})
+            try:
+                _tx_oid = ObjectId(transaction_id)
+            except Exception:
+                return JsonResponse({'detail': 'Invalid transaction_id'}, status=400)
+            transaction = trans_col.find_one({'_id': _tx_oid}, _TX_STATUS_PROJ)
 
             if not transaction:
-                return JsonResponse({'detail': 'Transaction bulunamadı'}, status=404)
+                return JsonResponse({'detail': 'Transaction not found'}, status=404)
 
             if transaction['status'] != 'success':
-                return JsonResponse({'detail': 'Sadece başarılı işlemler refund edilebilir'}, status=400)
+                return JsonResponse({'detail': 'Only successful transactions can be refunded'}, status=400)
 
             # Refund request kaydet
             refund = {
@@ -214,21 +127,25 @@ class RefundView(View):
             }
 
             result = refund_col.insert_one(refund)
+            _rid = result.inserted_id
 
-            log.info(f"Refund request created: {result.inserted_id}")
+            log.info(f"Refund request created: {_rid}")
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'refund_id': str(result.inserted_id),
+                    'refund_id': str(_rid),
                     'status': 'pending',
-                    'message': 'Refund talebiniz alındı. Admin tarafından işlenecektir.'
+                    'message': 'Refund request received. It will be processed by an admin.'
                 }
             })
 
+        except (ValueError, PermissionError) as e:
+            status = 401 if isinstance(e, ValueError) else 403
+            return JsonResponse({'detail': str(e)}, status=status)
         except Exception as e:
-            log.exception(f'Refund hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Refund error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -241,51 +158,32 @@ class PaymentStatsView(View):
             db = _get_db()
             trans_col = db['payment_transactions']
 
-            period = request.GET.get('period', '30')  # days
-            period_days = int(period)
+            try:
+                period_days = min(max(1, int(request.GET.get('period', '30'))), 365)
+            except (ValueError, TypeError):
+                period_days = 30
 
             start_date = datetime.utcnow() - timedelta(days=period_days)
 
-            # Total transactions
-            total_trans = trans_col.count_documents({
-                'created_at': {'$gte': start_date}
-            })
-
-            # Successful transactions
-            successful = trans_col.count_documents({
-                'created_at': {'$gte': start_date},
-                'status': 'success'
-            })
-
-            # Failed transactions
-            failed = trans_col.count_documents({
-                'created_at': {'$gte': start_date},
-                'status': 'failed'
-            })
-
-            # Total revenue
-            revenue_result = list(trans_col.aggregate([
-                {'$match': {
-                    'created_at': {'$gte': start_date},
-                    'status': 'success'
-                }},
-                {'$group': {
-                    '_id': None,
-                    'total': {'$sum': '$amount'}
-                }}
-            ]))
-
-            total_revenue = revenue_result[0]['total'] if revenue_result else 0
-
-            # By provider
-            provider_stats = {}
-            for provider in ['stripe', 'iyzico']:
-                count = trans_col.count_documents({
-                    'created_at': {'$gte': start_date},
-                    'provider': provider,
-                    'status': 'success'
-                })
-                provider_stats[provider] = count
+            _tf = next(trans_col.aggregate([{'$facet': {
+                'total':      [{'$match': {'created_at': {'$gte': start_date}}},                                        {'$count': 'n'}],
+                'successful': [{'$match': {'created_at': {'$gte': start_date}, 'status': 'success'}},          {'$count': 'n'}],
+                'failed':     [{'$match': {'created_at': {'$gte': start_date}, 'status': 'failed'}},           {'$count': 'n'}],
+                'revenue':    [{'$match': {'created_at': {'$gte': start_date}, 'status': 'success'}},
+                               {'$group': {'_id': None, 'total': {'$sum': '$amount'}}}],
+                'google_pay': [{'$match': {'created_at': {'$gte': start_date}, 'status': 'success', 'provider': 'google_pay'}}, {'$count': 'n'}],
+                'apple_pay':  [{'$match': {'created_at': {'$gte': start_date}, 'status': 'success', 'provider': 'apple_pay'}},  {'$count': 'n'}],
+            }}]), {})
+            _tfget = _tf.get
+            total_trans   = (_tfget('total',      [{}])[0] or {}).get('n', 0)
+            successful    = (_tfget('successful', [{}])[0] or {}).get('n', 0)
+            failed        = (_tfget('failed',     [{}])[0] or {}).get('n', 0)
+            total_revenue = (_tfget('revenue',    [{}])[0] or {}).get('total', 0) or 0
+            provider_stats = {
+                'google_pay': (_tfget('google_pay', [{}])[0] or {}).get('n', 0),
+                'apple_pay':  (_tfget('apple_pay',  [{}])[0] or {}).get('n', 0),
+                # vakifbank_vpp: TODO — ileriki versiyon
+            }
 
             stats = {
                 'period_days': period_days,
@@ -294,7 +192,7 @@ class PaymentStatsView(View):
                 'failed_transactions': failed,
                 'success_rate': round((successful / max(total_trans, 1)) * 100, 2),
                 'total_revenue': round(total_revenue, 2),
-                'currency': 'USD+TRY',
+                'currency': 'TRY',
                 'by_provider': provider_stats
             }
 
@@ -303,9 +201,12 @@ class PaymentStatsView(View):
                 'data': stats
             })
 
+        except (ValueError, PermissionError) as e:
+            status = 401 if isinstance(e, ValueError) else 403
+            return JsonResponse({'detail': str(e)}, status=status)
         except Exception as e:
-            log.exception(f'Payment stats hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Payment stats error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -315,21 +216,29 @@ class PaymentSettingsView(View):
     def get(self, request):
         """Mevcut ödeme ayarlarını al"""
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             settings_data = {
-                'stripe': {
-                    'enabled': bool(STRIPE_API_KEY and STRIPE_API_KEY != 'sk_test_xxxxx'),
-                    'test_mode': 'sk_test' in STRIPE_API_KEY,
-                    'webhook_configured': bool(STRIPE_WEBHOOK_SECRET)
+                'google_pay': {
+                    'enabled': True,
+                    'note': 'Client-side — no server webhook required'
                 },
-                'iyzico': {
-                    'enabled': bool(IYZICO_API_KEY and IYZICO_API_KEY != 'your-key'),
-                    'region': 'Turkey',
-                    'currency': 'TRY'
+                'apple_pay': {
+                    'enabled': True,
+                    'note': 'Client-side — no server webhook required'
+                },
+                'vakifbank_vpp': {
+                    'enabled': False,
+                    'note': 'TODO: ileriki versiyon güncellemesi ile entegre edilecek'
                 },
                 'general': {
-                    'premium_price_usd': 9.99,
                     'premium_price_try': 199.99,
-                    'currency_auto_detect': True,
+                    'currency': 'TRY',
                     'auto_upgrade_on_payment': True
                 }
             }
@@ -340,5 +249,5 @@ class PaymentSettingsView(View):
             })
 
         except Exception as e:
-            log.exception(f'Settings hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Settings error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

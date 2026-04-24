@@ -16,7 +16,6 @@ Fonksiyonlar:
 import cv2
 import numpy as np
 import logging
-from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +50,7 @@ class ImageQualityValidator:
         }
         """
         errors = []
+        _eappend = errors.append
         scores = {}
 
         try:
@@ -68,35 +68,40 @@ class ImageQualityValidator:
                 }
 
             # Check image size
+            _msize = ImageQualityValidator.MIN_IMAGE_SIZE
             height, width = image.shape[:2]
-            if width < ImageQualityValidator.MIN_IMAGE_SIZE or height < ImageQualityValidator.MIN_IMAGE_SIZE:
-                errors.append(f'Image too small: {width}x{height}')
+            if width < _msize or height < _msize:
+                _eappend(f'Image too small: {width}x{height}')
 
             # ── Brightness ────────────────────────────────────────────────────
             brightness = ImageQualityValidator.calculate_brightness(image)
             brightness_score = ImageQualityValidator.score_brightness(brightness)
+            _brightness_int = int(brightness)
             scores['brightness'] = {
-                'value': int(brightness),
+                'value': _brightness_int,
                 'score': brightness_score,
                 'status': 'good' if brightness_score >= 70 else 'poor'
             }
+            _sb = scores['brightness']
 
             if brightness < ImageQualityValidator.MIN_BRIGHTNESS:
-                errors.append(f'Image too dark: {int(brightness)}/255')
+                _eappend(f'Image too dark: {_brightness_int}/255')
             if brightness > ImageQualityValidator.MAX_BRIGHTNESS:
-                errors.append(f'Image too bright: {int(brightness)}/255')
+                _eappend(f'Image too bright: {_brightness_int}/255')
 
             # ── Contrast ───────────────────────────────────────────────────────
             contrast = ImageQualityValidator.calculate_contrast(image)
             contrast_score = ImageQualityValidator.score_contrast(contrast)
+            _contrast_int = int(contrast)
             scores['contrast'] = {
-                'value': int(contrast),
+                'value': _contrast_int,
                 'score': contrast_score,
                 'status': 'good' if contrast_score >= 60 else 'poor'
             }
+            _sc = scores['contrast']
 
             if contrast < ImageQualityValidator.MIN_CONTRAST:
-                errors.append(f'Low contrast: {int(contrast)}/100')
+                _eappend(f'Low contrast: {_contrast_int}/100')
 
             # ── Face Detection & Position ──────────────────────────────────────
             face_offset, face_score = ImageQualityValidator.check_face_position(image)
@@ -105,9 +110,10 @@ class ImageQualityValidator:
                 'score': face_score,
                 'status': 'centered' if face_score >= 80 else 'off_center'
             }
+            _sfp = scores['face_position']
 
             if face_offset > ImageQualityValidator.MAX_FACE_OFFSET:
-                errors.append(f'Face off-center: {face_offset}% offset')
+                _eappend(f'Face off-center: {face_offset}% offset')
 
             # ── Calculate Overall Score ────────────────────────────────────────
             overall_score = int(
@@ -131,9 +137,9 @@ class ImageQualityValidator:
 
             return {
                 'overall_score': overall_score,
-                'brightness': scores['brightness'],
-                'contrast': scores['contrast'],
-                'face_position': scores['face_position'],
+                'brightness': _sb,
+                'contrast': _sc,
+                'face_position': _sfp,
                 'recommendation': recommendation,
                 'can_upload': can_upload,
                 'errors': errors
@@ -146,9 +152,9 @@ class ImageQualityValidator:
                 'brightness': {'value': 0, 'score': 0},
                 'contrast': {'value': 0, 'score': 0},
                 'face_position': {'offset': 0, 'score': 0},
-                'recommendation': f'Validation error: {str(e)}',
+                'recommendation': 'Image validation failed. Please try a different photo.',
                 'can_upload': False,
-                'errors': [str(e)]
+                'errors': ['Validation error.']
             }
 
     @staticmethod
@@ -228,6 +234,7 @@ class ImageQualityValidator:
         - offset_percent: Max offset from center (0-50)
         - score: Quality score (0-100)
         """
+        _warn = log.warning
         try:
             # Import face detector from mediapipe
             import mediapipe as mp
@@ -241,17 +248,18 @@ class ImageQualityValidator:
             # Detect faces
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             results = face_detector.process(image_rgb)
+            _rdet = results.detections
 
             height, width = image.shape[:2]
             image_area = width * height
 
-            if not results.detections:
+            if not _rdet:
                 # No face detected
-                log.warning('No face detected in image')
+                _warn('No face detected in image')
                 return (50, 0)  # Worst score
 
             # Get first face (largest)
-            detection = results.detections[0]
+            detection = _rdet[0]
             bbox = detection.location_data.relative_bounding_box
 
             # Calculate face center
@@ -277,10 +285,10 @@ class ImageQualityValidator:
             return (max_offset, int(score))
 
         except ImportError:
-            log.warning('MediaPipe not available for face position check')
+            _warn('MediaPipe not available for face position check')
             return (0, 100)  # Assume centered
         except Exception as e:
-            log.warning(f'Face position check failed: {e}')
+            _warn(f'Face position check failed: {e}')
             return (0, 100)  # Assume centered
 
 

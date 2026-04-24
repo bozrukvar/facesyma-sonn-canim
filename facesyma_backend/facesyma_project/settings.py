@@ -7,9 +7,19 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ── Güvenlik ───────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-change-in-production-xxx')
-DEBUG      = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+_SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not _SECRET_KEY:
+    if DEBUG:
+        _SECRET_KEY = 'django-insecure-dev-only-not-for-production'
+    else:
+        raise RuntimeError('DJANGO_SECRET_KEY environment variable must be set in production.')
+SECRET_KEY = _SECRET_KEY
+
+# Production'da ALLOWED_HOSTS env variable ile set edilmeli (örn: 'api.facesyma.com')
+_raw_hosts = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = _raw_hosts.split(',')
 
 # ── Uygulamalar ────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -29,7 +39,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # Language detection
+    # 'django.middleware.locale.LocaleMiddleware',  # Disabled: .mo files compiled separately
 ]
 
 ROOT_URLCONF = 'facesyma_project.urls'
@@ -46,29 +56,43 @@ DATABASES = {
 # ── MongoDB ────────────────────────────────────────────────────────────────────
 MONGO_URI = os.environ.get(
     'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/'
-    'facesyma-backend?serverSelectionTimeoutMS=30000&connectTimeoutMS=30000&retryWrites=true'
+    'mongodb://localhost:27017/facesyma-backend'  # Override with MONGO_URI env var in production
 )
 
 # ── JWT ────────────────────────────────────────────────────────────────────────
-JWT_SECRET  = os.environ.get('JWT_SECRET', 'facesyma-jwt-secret-change-in-production')
+_JWT_SECRET = os.environ.get('JWT_SECRET', '')
+if not _JWT_SECRET:
+    if DEBUG:
+        _JWT_SECRET = 'dev-jwt-secret-not-for-production'
+    else:
+        raise RuntimeError('JWT_SECRET environment variable must be set in production.')
+JWT_SECRET = _JWT_SECRET
+
 JWT_ACCESS_EXP_HOURS   = int(os.environ.get('JWT_ACCESS_EXP_HOURS', '1'))
 JWT_REFRESH_EXP_DAYS   = int(os.environ.get('JWT_REFRESH_EXP_DAYS', '30'))
 
 # ── Admin JWT ──────────────────────────────────────────────────────────────────
-ADMIN_JWT_SECRET = os.environ.get('ADMIN_JWT_SECRET', 'facesyma-admin-jwt-secret-change-in-production')
+_ADMIN_JWT_SECRET = os.environ.get('ADMIN_JWT_SECRET', '')
+if not _ADMIN_JWT_SECRET:
+    if DEBUG:
+        _ADMIN_JWT_SECRET = 'dev-admin-jwt-secret-not-for-production'
+    else:
+        raise RuntimeError('ADMIN_JWT_SECRET environment variable must be set in production.')
+ADMIN_JWT_SECRET = _ADMIN_JWT_SECRET
 ADMIN_JWT_EXP_HOURS = int(os.environ.get('ADMIN_JWT_EXP_HOURS', '8'))
 
 # ── Google OAuth ───────────────────────────────────────────────────────────────
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 
-# ── Payment Processing (Stripe & iyzico) ────────────────────────────────────────
-STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_xxxxx')
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'whsec_xxxxx')
-STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_xxxxx')
-IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-key-xxx')
-IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-secret-xxx')
-IYZICO_BASE_URL = 'https://sandbox-api.iyzipay.com'
+# ── Payment Processing ──────────────────────────────────────────────────────────
+# Google Pay ve Apple Pay client-side işlenir — server key gerektirmez.
+GOOGLE_PAY_MERCHANT_ID = os.environ.get('GOOGLE_PAY_MERCHANT_ID', '')
+APPLE_PAY_MERCHANT_ID  = os.environ.get('APPLE_PAY_MERCHANT_ID', '')
+# Vakıfbank Sanal Pos — ileriki versiyon güncellemesi ile aktif edilecek:
+# VAKIFBANK_VPP_MERCHANT_ID  = os.environ.get('VAKIFBANK_VPP_MERCHANT_ID', '')
+# VAKIFBANK_VPP_TERMINAL_ID  = os.environ.get('VAKIFBANK_VPP_TERMINAL_ID', '')
+# VAKIFBANK_VPP_PASSWORD      = os.environ.get('VAKIFBANK_VPP_PASSWORD', '')
+# VAKIFBANK_VPP_BASE_URL      = os.environ.get('VAKIFBANK_VPP_BASE_URL', '')
 
 # ── E-posta (SMTP) ─────────────────────────────────────────────────────────────
 # Graceful degradation: if not configured, falls back to console email backend
@@ -103,6 +127,18 @@ CORS_ALLOW_HEADERS = [
     'x-app-source',  # Multi-app: web/mobile ayrımı
 ]
 
+# ── Security Headers ──────────────────────────────────────────────────────────
+X_FRAME_OPTIONS = 'DENY'
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True') == 'True'
+    SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 # ── DRF ───────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
@@ -115,6 +151,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/minute',   # Anonim kullanıcılar
+        'user': '120/minute',  # Authenticated kullanıcılar
+    },
 }
 
 # ── Templates ──────────────────────────────────────────────────────────────────
@@ -131,6 +175,27 @@ TEMPLATES = [
         },
     },
 ]
+
+# ── Cache (Redis öncelikli, fallback in-memory) ────────────────────────────────
+_redis_host = os.environ.get('REDIS_HOST', 'redis')
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f"redis://{_redis_host}:{os.environ.get('REDIS_PORT', '6379')}/4",
+        'TIMEOUT': 300,
+        'OPTIONS': {
+            'socket_connect_timeout': 3,
+            'socket_timeout': 3,
+            'CONNECTION_POOL_KWARGS': {'max_connections': 20},
+        },
+        'KEY_PREFIX': 'facesyma',
+    }
+} if _redis_host else {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 300,
+    }
+}
 
 # ── Static ─────────────────────────────────────────────────────────────────────
 STATIC_URL  = '/static/'
@@ -209,10 +274,10 @@ LOGGING = {
     'root': {'handlers': ['console'], 'level': 'INFO'},
     'loggers': {
         'django':       {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
-        'analysis_api': {'handlers': ['console'], 'level': 'DEBUG',   'propagate': False},
-        'auth_api':     {'handlers': ['console'], 'level': 'DEBUG',   'propagate': False},
-        'admin_api':    {'handlers': ['console'], 'level': 'DEBUG',   'propagate': False},
-        'gamification': {'handlers': ['console'], 'level': 'DEBUG',   'propagate': False},
+        'analysis_api': {'handlers': ['console'], 'level': 'DEBUG' if DEBUG else 'INFO', 'propagate': False},
+        'auth_api':     {'handlers': ['console'], 'level': 'DEBUG' if DEBUG else 'INFO', 'propagate': False},
+        'admin_api':    {'handlers': ['console'], 'level': 'DEBUG' if DEBUG else 'INFO', 'propagate': False},
+        'gamification': {'handlers': ['console'], 'level': 'DEBUG' if DEBUG else 'INFO', 'propagate': False},
     },
 }
 

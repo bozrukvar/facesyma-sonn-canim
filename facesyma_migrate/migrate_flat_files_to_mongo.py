@@ -46,17 +46,21 @@ if not MONGO_URI:
 def migrate_flat_files():
     """Migrate all flat-file JSON databases to MongoDB"""
 
+    _info = log.info
+    _warn = log.warning
+    _err = log.error
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 
     try:
         # Test connection
         client.admin.command('ping')
-        log.info(f"✓ Connected to MongoDB")
+        _info(f"✓ Connected to MongoDB")
     except Exception as e:
-        log.error(f"✗ Failed to connect to MongoDB: {e}")
+        _err(f"✗ Failed to connect to MongoDB: {e}")
         sys.exit(1)
 
     db = client["facesyma-backend"]
+    _jload = json.load
 
     # ──────────────────────────────────────────────────────────────────────────
     # MIGRATION 1: users_db.json → ai_users
@@ -65,12 +69,12 @@ def migrate_flat_files():
     users_col = db["ai_users"]
     users_db_path = Path("./users_db.json")
 
-    log.info("📍 Migrating users_db.json → ai_users...")
+    _info("📍 Migrating users_db.json → ai_users...")
 
     if users_db_path.exists():
         try:
             with open(users_db_path, 'r', encoding='utf-8') as f:
-                users_data = json.load(f)
+                users_data = _jload(f)
 
             inserted = 0
             updated = 0
@@ -87,25 +91,25 @@ def migrate_flat_files():
                 elif result.modified_count:
                     updated += 1
 
-            log.info(f"  ✓ {inserted} inserted, {updated} updated ({len(users_data)} total)")
+            _info(f"  ✓ {inserted} inserted, {updated} updated ({len(users_data)} total)")
 
             # Create indexes
             try:
                 users_col.create_index([("user_id", ASCENDING)], unique=True, name="idx_user_id_unique")
-                log.info("  ✓ Created index on user_id")
+                _info("  ✓ Created index on user_id")
             except Exception as e:
-                log.warning(f"  ⚠ Index creation: {e}")
+                _warn(f"  ⚠ Index creation: {e}")
 
             try:
                 users_col.create_index([("email", ASCENDING)], unique=True, sparse=True, name="idx_email_unique")
-                log.info("  ✓ Created unique index on email")
+                _info("  ✓ Created unique index on email")
             except Exception as e:
-                log.warning(f"  ⚠ Email index: {e}")
+                _warn(f"  ⚠ Email index: {e}")
 
         except Exception as e:
-            log.error(f"  ✗ Migration failed: {e}")
+            _err(f"  ✗ Migration failed: {e}")
     else:
-        log.warning(f"  ⚠ File not found: {users_db_path}")
+        _warn(f"  ⚠ File not found: {users_db_path}")
 
     # ──────────────────────────────────────────────────────────────────────────
     # MIGRATION 2: analytics_db.json → ai_insights + ai_metrics
@@ -114,12 +118,12 @@ def migrate_flat_files():
     insights_col = db["ai_insights"]
     analytics_db_path = Path("./analytics_db.json")
 
-    log.info("📍 Migrating analytics_db.json → ai_insights...")
+    _info("📍 Migrating analytics_db.json → ai_insights...")
 
     if analytics_db_path.exists():
         try:
             with open(analytics_db_path, 'r', encoding='utf-8') as f:
-                analytics_data = json.load(f)
+                analytics_data = _jload(f)
 
             inserted = 0
             updated = 0
@@ -136,19 +140,19 @@ def migrate_flat_files():
                 elif result.modified_count:
                     updated += 1
 
-            log.info(f"  ✓ {inserted} inserted, {updated} updated ({len(analytics_data)} total)")
+            _info(f"  ✓ {inserted} inserted, {updated} updated ({len(analytics_data)} total)")
 
             # Create indexes
             try:
                 insights_col.create_index([("user_id", ASCENDING)], unique=True, name="idx_user_id_unique")
-                log.info("  ✓ Created index on user_id")
+                _info("  ✓ Created index on user_id")
             except Exception as e:
-                log.warning(f"  ⚠ Index creation: {e}")
+                _warn(f"  ⚠ Index creation: {e}")
 
         except Exception as e:
-            log.error(f"  ✗ Migration failed: {e}")
+            _err(f"  ✗ Migration failed: {e}")
     else:
-        log.warning(f"  ⚠ File not found: {analytics_db_path}")
+        _warn(f"  ⚠ File not found: {analytics_db_path}")
 
     # ──────────────────────────────────────────────────────────────────────────
     # MIGRATION 3: conversations_db.json → ai_conv_memory
@@ -157,12 +161,12 @@ def migrate_flat_files():
     conv_col = db["ai_conv_memory"]
     conversations_db_path = Path("./conversations_db.json")
 
-    log.info("📍 Migrating conversations_db.json → ai_conv_memory...")
+    _info("📍 Migrating conversations_db.json → ai_conv_memory...")
 
     if conversations_db_path.exists():
         try:
             with open(conversations_db_path, 'r', encoding='utf-8') as f:
-                conversations_data = json.load(f)
+                conversations_data = _jload(f)
 
             inserted = 0
             updated = 0
@@ -178,7 +182,7 @@ def migrate_flat_files():
                 elif result.modified_count:
                     updated += 1
 
-            log.info(f"  ✓ {inserted} inserted, {updated} updated ({len(conversations_data)} total)")
+            _info(f"  ✓ {inserted} inserted, {updated} updated ({len(conversations_data)} total)")
 
             # Create indexes
             try:
@@ -187,31 +191,31 @@ def migrate_flat_files():
                     unique=True,
                     name="idx_conversation_id_unique"
                 )
-                log.info("  ✓ Created index on conversation_id")
+                _info("  ✓ Created index on conversation_id")
             except Exception as e:
-                log.warning(f"  ⚠ Index creation: {e}")
+                _warn(f"  ⚠ Index creation: {e}")
 
             try:
                 conv_col.create_index(
                     [("user_id", ASCENDING)],
                     name="idx_user_id"
                 )
-                log.info("  ✓ Created index on user_id")
+                _info("  ✓ Created index on user_id")
             except Exception as e:
-                log.warning(f"  ⚠ Index creation: {e}")
+                _warn(f"  ⚠ Index creation: {e}")
 
         except Exception as e:
-            log.error(f"  ✗ Migration failed: {e}")
+            _err(f"  ✗ Migration failed: {e}")
     else:
-        log.warning(f"  ⚠ File not found: {conversations_db_path}")
+        _warn(f"  ⚠ File not found: {conversations_db_path}")
 
     # ──────────────────────────────────────────────────────────────────────────
     # RESULT SUMMARY
     # ──────────────────────────────────────────────────────────────────────────
 
-    log.info("\n" + "="*60)
-    log.info("MIGRATION COMPLETE")
-    log.info("="*60)
+    _info("\n" + "="*60)
+    _info("MIGRATION COMPLETE")
+    _info("="*60)
 
     collections_to_check = [
         "ai_users",
@@ -223,16 +227,16 @@ def migrate_flat_files():
         col = db[col_name]
         count = col.count_documents({})
         indexes = list(col.list_indexes())
-        log.info(f"\n{col_name}:")
-        log.info(f"  • Documents: {count}")
-        log.info(f"  • Indexes: {len(indexes)}")
+        _info(f"\n{col_name}:")
+        _info(f"  • Documents: {count}")
+        _info(f"  • Indexes: {len(indexes)}")
         for idx in indexes:
-            log.info(f"    - {idx['name']}")
+            _info(f"    - {idx['name']}")
 
     client.close()
-    log.info("\n✓ All migrations completed successfully!")
-    log.info("  Flat files remain untouched for backup purposes.")
-    log.info("  You can delete them manually after verifying data integrity.")
+    _info("\n✓ All migrations completed successfully!")
+    _info("  Flat files remain untouched for backup purposes.")
+    _info("  You can delete them manually after verifying data integrity.")
 
 
 if __name__ == "__main__":

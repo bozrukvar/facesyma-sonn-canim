@@ -2,9 +2,10 @@
 import React from 'react';
 import {
   View, Text, TouchableOpacity, ActivityIndicator,
-  TextInput, StyleSheet, ViewStyle,
+  TextInput, StyleSheet, ViewStyle, StyleProp,
 } from 'react-native';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius, shadow } = theme;
 
 // ── GoldButton ─────────────────────────────────────────────────────────────
 interface ButtonProps {
@@ -20,23 +21,23 @@ export const GoldButton: React.FC<ButtonProps> = ({
   title, onPress, loading, disabled, variant = 'gold', style, icon,
 }) => {
   const bg =
-    variant === 'gold'    ? theme.colors.gold :
-    variant === 'warm'    ? theme.colors.warmAmber :
-    variant === 'ghost'   ? theme.colors.goldGlow :
+    variant === 'gold'    ? colors.gold :
+    variant === 'warm'    ? colors.warmAmber :
+    variant === 'ghost'   ? colors.goldGlow :
     'transparent';
 
   const tc =
-    variant === 'gold' || variant === 'warm' ? '#000' : theme.colors.gold;
+    variant === 'gold' || variant === 'warm' ? '#000' : colors.gold;
 
   const bc =
-    variant === 'outline' ? theme.colors.gold :
-    variant === 'ghost'   ? theme.colors.goldDark : 'transparent';
+    variant === 'outline' ? colors.gold :
+    variant === 'ghost'   ? colors.goldDark : 'transparent';
 
   return (
     <TouchableOpacity
       style={[{
         height:          54,
-        borderRadius:    theme.radius.lg,
+        borderRadius:    radius.lg,
         alignItems:      'center',
         justifyContent:  'center',
         flexDirection:   'row',
@@ -45,7 +46,7 @@ export const GoldButton: React.FC<ButtonProps> = ({
         borderWidth:     variant === 'outline' || variant === 'ghost' ? 1 : 0,
         borderColor:     bc,
         opacity:         disabled || loading ? 0.55 : 1,
-        ...(variant === 'gold' || variant === 'warm' ? theme.shadow.gold : {}),
+        ...(variant === 'gold' || variant === 'warm' ? shadow.gold : {}),
       }, style]}
       onPress={onPress}
       disabled={disabled || loading}
@@ -55,9 +56,9 @@ export const GoldButton: React.FC<ButtonProps> = ({
         <ActivityIndicator color={tc} size="small" />
       ) : (
         <>
-          {icon && <Text style={{ fontSize: 16 }}>{icon}</Text>}
+          {icon && <Text style={styles.btnIcon}>{icon}</Text>}
           <Text style={{
-            ...theme.typography.label,
+            ...typography.label,
             color: tc,
             letterSpacing: 1.2,
           }}>{title}</Text>
@@ -87,33 +88,30 @@ export const InputField: React.FC<InputProps> = ({
 }) => {
   const [focused, setFocused] = React.useState(false);
   return (
-    <View style={[{ marginBottom: theme.spacing.md }, style]}>
+    <View style={[styles.inputWrapOuter, style]}>
       {label && (
-        <Text style={{ ...theme.typography.goldLabel, marginBottom: 6 }}>{label}</Text>
+        <Text style={styles.inputLabel}>{label}</Text>
       )}
-      <View style={{ position: 'relative' }}>
+      <View style={styles.inputRelative}>
         {icon && (
-          <Text style={{
-            position: 'absolute', left: 14, top: 14,
-            fontSize: 16, zIndex: 1,
-          }}>{icon}</Text>
+          <Text style={styles.inputIconText}>{icon}</Text>
         )}
         <TextInput
           style={{
             height:            52,
-            backgroundColor:   focused ? theme.colors.surfaceAlt : theme.colors.surface,
-            borderRadius:      theme.radius.md,
+            backgroundColor:   focused ? colors.surfaceAlt : colors.surface,
+            borderRadius:      radius.md,
             borderWidth:       1,
             borderColor:       error
-              ? theme.colors.error
-              : focused ? theme.colors.gold : theme.colors.border,
-            paddingHorizontal: icon ? 44 : theme.spacing.md,
-            color:             theme.colors.textPrimary,
+              ? colors.error
+              : focused ? colors.gold : colors.border,
+            paddingHorizontal: icon ? 44 : spacing.md,
+            color:             colors.textPrimary,
             fontSize:          15,
             fontFamily:        'System',
           }}
           placeholder={placeholder}
-          placeholderTextColor={theme.colors.textMuted}
+          placeholderTextColor={colors.textMuted}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry}
@@ -124,7 +122,7 @@ export const InputField: React.FC<InputProps> = ({
         />
       </View>
       {error && (
-        <Text style={{ ...theme.typography.caption, color: theme.colors.error, marginTop: 4 }}>
+        <Text style={styles.inputError}>
           {error}
         </Text>
       )}
@@ -135,26 +133,26 @@ export const InputField: React.FC<InputProps> = ({
 // ── Card ────────────────────────────────────────────────────────────────────
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   variant?: 'default' | 'gold' | 'warm';
   onPress?: () => void;
 }
 export const Card: React.FC<CardProps> = ({ children, style, variant = 'default', onPress }) => {
   const bc =
-    variant === 'gold' ? theme.colors.goldDark :
-    variant === 'warm' ? theme.colors.borderWarm : theme.colors.border;
+    variant === 'gold' ? colors.goldDark :
+    variant === 'warm' ? colors.borderWarm : colors.border;
   const bg =
-    variant === 'gold' ? theme.colors.goldGlow :
-    variant === 'warm' ? theme.colors.surfaceWarm : theme.colors.surface;
-  const sh = variant === 'gold' ? theme.shadow.gold : variant === 'warm' ? theme.shadow.warm : {};
+    variant === 'gold' ? colors.goldGlow :
+    variant === 'warm' ? colors.surfaceWarm : colors.surface;
+  const sh = variant === 'gold' ? shadow.gold : variant === 'warm' ? shadow.warm : {};
 
   const content = (
     <View style={[{
       backgroundColor: bg,
-      borderRadius: theme.radius.lg,
+      borderRadius: radius.lg,
       borderWidth: 1,
       borderColor: bc,
-      padding: theme.spacing.md,
+      padding: spacing.md,
       ...sh,
     }, style]}>
       {children}
@@ -173,32 +171,22 @@ export const Card: React.FC<CardProps> = ({ children, style, variant = 'default'
 
 // ── Divider ─────────────────────────────────────────────────────────────────
 export const Divider: React.FC<{ label?: string }> = ({ label }) => (
-  <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: theme.spacing.md }}>
-    <View style={{ flex: 1, height: 1, backgroundColor: theme.colors.border }} />
+  <View style={styles.dividerRow}>
+    <View style={styles.dividerLine} />
     {label && (
-      <Text style={{ ...theme.typography.caption, marginHorizontal: 14, color: theme.colors.textMuted }}>
+      <Text style={styles.dividerLabel}>
         {label}
       </Text>
     )}
-    <View style={{ flex: 1, height: 1, backgroundColor: theme.colors.border }} />
+    <View style={styles.dividerLine} />
   </View>
 );
 
 // ── ErrorBanner ─────────────────────────────────────────────────────────────
 export const ErrorBanner: React.FC<{ message: string }> = ({ message }) => (
-  <View style={{
-    backgroundColor: 'rgba(217,95,95,0.1)',
-    borderRadius:    theme.radius.sm,
-    borderWidth:     1,
-    borderColor:     theme.colors.error,
-    padding:         theme.spacing.md,
-    marginBottom:    theme.spacing.md,
-    flexDirection:   'row',
-    alignItems:      'center',
-    gap:             8,
-  }}>
-    <Text style={{ fontSize: 14 }}>⚠</Text>
-    <Text style={{ ...theme.typography.caption, color: theme.colors.error, fontSize: 13, flex: 1 }}>
+  <View style={styles.errorBannerWrap}>
+    <Text style={styles.errorBannerIcon}>⚠</Text>
+    <Text style={styles.errorBannerText}>
       {message}
     </Text>
   </View>
@@ -206,18 +194,18 @@ export const ErrorBanner: React.FC<{ message: string }> = ({ message }) => (
 
 // ── Badge ────────────────────────────────────────────────────────────────────
 export const Badge: React.FC<{ label: string; color?: string }> = ({
-  label, color = theme.colors.gold,
+  label, color = colors.gold,
 }) => (
   <View style={{
     backgroundColor:   `${color}18`,
-    borderRadius:      theme.radius.full,
+    borderRadius:      radius.full,
     borderWidth:       1,
     borderColor:       `${color}40`,
     paddingHorizontal: 10,
     paddingVertical:    4,
     alignSelf:        'flex-start',
   }}>
-    <Text style={{ ...theme.typography.goldLabel, color, fontSize: 9 }}>{label}</Text>
+    <Text style={{ ...typography.goldLabel, color, fontSize: 9 }}>{label}</Text>
   </View>
 );
 
@@ -226,11 +214,11 @@ export const ScoreRing: React.FC<{
   score: number; label: string; size?: number;
 }> = ({ score, label, size = 80 }) => {
   const color =
-    score >= 80 ? theme.colors.gold :
-    score >= 60 ? theme.colors.success :
-    score >= 40 ? theme.colors.warning : theme.colors.error;
+    score >= 80 ? colors.gold :
+    score >= 60 ? colors.success :
+    score >= 40 ? colors.warning : colors.error;
   return (
-    <View style={{ alignItems: 'center' }}>
+    <View style={styles.scoreRingOuter}>
       <View style={{
         width: size, height: size, borderRadius: size / 2,
         borderWidth: 3, borderColor: color,
@@ -243,7 +231,7 @@ export const ScoreRing: React.FC<{
         }}>{score}</Text>
       </View>
       {label ? (
-        <Text style={{ ...theme.typography.caption, marginTop: 5, textAlign: 'center' }}>
+        <Text style={styles.scoreRingLabel}>
           {label}
         </Text>
       ) : null}
@@ -257,15 +245,15 @@ export const WarmAvatar: React.FC<{
 }> = ({ letter, size = 44, emoji }) => (
   <View style={{
     width: size, height: size, borderRadius: size / 2,
-    backgroundColor: theme.colors.goldGlow,
-    borderWidth: 1.5, borderColor: theme.colors.goldDark,
+    backgroundColor: colors.goldGlow,
+    borderWidth: 1.5, borderColor: colors.goldDark,
     alignItems: 'center', justifyContent: 'center',
   }}>
     {emoji
       ? <Text style={{ fontSize: size * 0.44 }}>{emoji}</Text>
       : <Text style={{
           fontFamily: 'Georgia', fontSize: size * 0.40,
-          color: theme.colors.gold, fontWeight: '700',
+          color: colors.gold, fontWeight: '700',
         }}>{letter}</Text>
     }
   </View>
@@ -273,9 +261,33 @@ export const WarmAvatar: React.FC<{
 
 // ── SectionLabel ─────────────────────────────────────────────────────────────
 export const SectionLabel: React.FC<{ children: string }> = ({ children }) => (
-  <Text style={{
-    ...theme.typography.goldLabel,
-    marginBottom: theme.spacing.sm,
-    marginTop:    theme.spacing.sm,
-  }}>{children}</Text>
+  <Text style={styles.sectionLabel}>{children}</Text>
 );
+
+const styles = StyleSheet.create({
+  btnIcon:         { fontSize: 16 },
+  inputWrapOuter:  { marginBottom: spacing.md },
+  inputLabel:      { ...typography.goldLabel, marginBottom: 6 },
+  inputRelative:   { position: 'relative' as const },
+  inputIconText:   { position: 'absolute' as const, left: 14, top: 14, fontSize: 16, zIndex: 1 },
+  inputError:      { ...typography.caption, color: colors.error, marginTop: 4 },
+  dividerRow:      { flexDirection: 'row' as const, alignItems: 'center' as const, marginVertical: spacing.md },
+  dividerLine:     { flex: 1, height: 1, backgroundColor: colors.border },
+  dividerLabel:    { ...typography.caption, marginHorizontal: 14, color: colors.textMuted },
+  errorBannerWrap: {
+    backgroundColor: 'rgba(217,95,95,0.1)',
+    borderRadius:    radius.sm,
+    borderWidth:     1,
+    borderColor:     colors.error,
+    padding:         spacing.md,
+    marginBottom:    spacing.md,
+    flexDirection:   'row' as const,
+    alignItems:      'center' as const,
+    gap:             8,
+  },
+  errorBannerIcon: { fontSize: 14 },
+  errorBannerText: { ...typography.caption, color: colors.error, fontSize: 13, flex: 1 },
+  sectionLabel:    { ...typography.goldLabel, marginBottom: spacing.sm, marginTop: spacing.sm },
+  scoreRingOuter:  { alignItems: 'center' as const },
+  scoreRingLabel:  { ...typography.caption, marginTop: 5, textAlign: 'center' as const },
+});

@@ -5,6 +5,7 @@ Coach DB yönetimi endpoint'leri.
 """
 
 import json
+import re
 from datetime import datetime
 from bson import ObjectId
 from django.http import JsonResponse
@@ -20,6 +21,14 @@ from admin_api.utils.mongo import (
 )
 
 
+_VALID_SUN_SIGNS     = frozenset({'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+                                   'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'})
+_VALID_GOAL_STATUSES = frozenset({'active', 'completed', 'paused', 'failed', 'cancelled'})
+_GOAL_PROJECTION      = {'_id': 1, 'title': 1, 'module': 1, 'status': 1, 'priority': 1, 'target_date': 1}
+_GOAL_FULL_PROJECTION = {'_id': 1, 'user_id': 1, 'title': 1, 'module': 1, 'priority': 1, 'status': 1, 'target_date': 1}
+_SIFAT_META_PROJ      = {'_id': 1, 'version': 1, 'updated_at': 1}
+
+
 def _json(request):
     """Request body JSON'ı parse et"""
     try:
@@ -31,12 +40,13 @@ def _json(request):
 def _oid(doc: dict) -> dict:
     """BSON ObjectId'yi string'e çevir (coach_goals için)"""
     if doc and '_id' in doc:
-        doc['_id'] = str(doc['_id'])
+        _id_val = doc['_id']
+        doc['_id'] = str(_id_val)
     return doc
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ── Coach İstatistikleri ──────────────────────────────────────────────────────
+# ── Coach Statleri ──────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -58,14 +68,14 @@ class CoachOverallStatsView(View):
 
         db = _get_coach_db()
 
-        total_users    = db['coach_users'].count_documents({})
-        total_goals    = db['coach_goals'].count_documents({})
-        total_sessions = db['coach_sessions'].count_documents({})
+        total_users    = db['coach_users'].estimated_document_count()
+        total_goals    = db['coach_goals'].estimated_document_count()
+        total_sessions = db['coach_sessions'].estimated_document_count()
 
         attrs_by_lang = {}
         for lang in ALL_COACH_LANGS:
             col_name = f'coach_attributes_{lang}'
-            attrs_by_lang[lang] = db[col_name].count_documents({})
+            attrs_by_lang[lang] = db[col_name].estimated_document_count()
 
         return JsonResponse({
             'total_users':    total_users,
@@ -100,19 +110,24 @@ class CoachUserListView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 20)), 100)
-        lang = request.GET.get('lang', '')
-        sun_sign = request.GET.get('sun_sign', '')
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            page, limit = 1, 20
+        lang = _qpget('lang', '')
+        sun_sign = _qpget('sun_sign', '')
+
 
         col = get_coach_users_col()
 
         # Query
         query = {}
-        if lang:
+        if lang and lang in ALL_COACH_LANGS:
             query['lang'] = lang
-        if sun_sign:
+        if sun_sign and sun_sign in _VALID_SUN_SIGNS:
             query['sun_sign'] = sun_sign
 
         # Total count
@@ -156,41 +171,25 @@ class CoachUserStatsView(View):
 
         col = get_coach_users_col()
 
-        # Toplam
-        total = col.count_documents({})
-
-        # Dil dağılımı
-        lang_stats = col.aggregate([
-            {'$group': {'_id': '$lang', 'count': {'$sum': 1}}},
-        ])
-        lang_dict = {doc['_id']: doc['count'] for doc in lang_stats if doc['_id']}
-
-        # Sun sign dağılımı (top 5)
-        sun_sign_stats = list(col.aggregate([
-            {'$group': {'_id': '$sun_sign', 'count': {'$sum': 1}}},
-            {'$sort': {'count': -1}},
-            {'$limit': 5},
-        ]))
-        sun_sign_dict = {doc['_id']: doc['count'] for doc in sun_sign_stats if doc['_id']}
-
-        # Ortalama skor alanları
-        avg_scores = list(col.aggregate([
-            {'$group': {
-                '_id': None,
-                'avg_saglik': {'$avg': '$saglik_skoru'},
-                'avg_ozguven': {'$avg': '$ozguven_skoru'},
-                'avg_iletisim': {'$avg': '$iletisim_tipi'},
-            }},
-        ]))
-
-        avg_data = avg_scores[0] if avg_scores else {'avg_saglik': 0, 'avg_ozguven': 0, 'avg_iletisim': 0}
+        _cs = next(col.aggregate([{'$facet': {
+            'by_lang':    [{'$group': {'_id': '$lang',     'count': {'$sum': 1}}}],
+            'by_sign':    [{'$group': {'_id': '$sun_sign', 'count': {'$sum': 1}}}, {'$sort': {'count': -1}}, {'$limit': 5}],
+            'avgs':       [{'$group': {'_id': None, 'avg_saglik': {'$avg': '$saglik_skoru'}, 'avg_ozguven': {'$avg': '$ozguven_skoru'}, 'avg_iletisim': {'$avg': '$iletisim_tipi'}}}],
+            'total':      [{'$count': 'n'}],
+        }}]), {})
+        _csget = _cs.get
+        total         = (_csget('total', [{}])[0] or {}).get('n', 0)
+        lang_dict     = {_id: doc['count'] for doc in _csget('by_lang', []) if (_id := doc['_id'])}
+        sun_sign_dict = {_id: doc['count'] for doc in _csget('by_sign', []) if (_id := doc['_id'])}
+        avg_data      = (_csget('avgs', [{}])[0] or {'avg_saglik': 0, 'avg_ozguven': 0, 'avg_iletisim': 0})
+        _adget = avg_data.get
 
         return JsonResponse({
             'total_users': total,
             'by_lang': lang_dict,
             'top_sun_signs': sun_sign_dict,
-            'avg_saglik_skoru': round(avg_data.get('avg_saglik') or 0, 2),
-            'avg_ozguven_skoru': round(avg_data.get('avg_ozguven') or 0, 2),
+            'avg_saglik_skoru': round(_adget('avg_saglik') or 0, 2),
+            'avg_ozguven_skoru': round(_adget('avg_ozguven') or 0, 2),
         })
 
 
@@ -211,21 +210,21 @@ class CoachUserDetailView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
+        _uid = int(user_id)
         col = get_coach_users_col()
-        user = col.find_one({'user_id': int(user_id)}, {'_id': 0})
+        user = col.find_one({'user_id': _uid}, {'_id': 0})
 
         if not user:
-            return JsonResponse({'detail': f'Kullanıcı #{user_id} bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'User #{user_id} not found.'}, status=404)
 
         # Birth data
         birth_col = get_coach_birth_col()
-        birth_data = birth_col.find_one({'user_id': int(user_id)}, {'_id': 0})
+        birth_data = birth_col.find_one({'user_id': _uid}, {'_id': 0})
 
         # Son 10 hedef
         goal_col = get_coach_goals_col()
         goals = list(goal_col.find(
-            {'user_id': int(user_id)},
-            {'_id': 1, 'title': 1, 'module': 1, 'status': 1, 'priority': 1, 'target_date': 1}
+            {'user_id': _uid}, _GOAL_PROJECTION
         ).sort([('updated_at', -1)]).limit(10))
         goals = [_oid(g) for g in goals]
 
@@ -243,23 +242,24 @@ class CoachUserDetailView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
+        _uid = int(user_id)
         col = get_coach_users_col()
-        user = col.find_one({'user_id': int(user_id)})
+        user = col.find_one({'user_id': _uid}, {'_id': 1})
 
         if not user:
-            return JsonResponse({'detail': f'Kullanıcı #{user_id} bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'User #{user_id} not found.'}, status=404)
 
         # Cascade delete
         birth_col = get_coach_birth_col()
-        birth_col.delete_one({'user_id': int(user_id)})
+        birth_col.delete_one({'user_id': _uid})
 
         goal_col = get_coach_goals_col()
-        goal_result = goal_col.delete_many({'user_id': int(user_id)})
+        goal_result = goal_col.delete_many({'user_id': _uid})
 
-        col.delete_one({'user_id': int(user_id)})
+        col.delete_one({'user_id': _uid})
 
         return JsonResponse({
-            'message': f'Kullanıcı ve {goal_result.deleted_count} hedefi silindi.',
+            'message': f'User and {goal_result.deleted_count} goals deleted.',
         })
 
 
@@ -283,23 +283,31 @@ class CoachGoalListView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 20)), 100)
-        status = request.GET.get('status', '')
-        module = request.GET.get('module', '')
-        user_id = request.GET.get('user_id', '')
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            page, limit = 1, 20
+        status = _qpget('status', '')
+        module = _qpget('module', '')
+        user_id = _qpget('user_id', '')
+
 
         col = get_coach_goals_col()
 
         # Query
         query = {}
-        if status:
+        if status and status in _VALID_GOAL_STATUSES:
             query['status'] = status
-        if module:
+        if module and module in ALL_COACH_MODULES:
             query['module'] = module
         if user_id:
-            query['user_id'] = int(user_id)
+            try:
+                query['user_id'] = int(user_id)
+            except (ValueError, TypeError):
+                return JsonResponse({'detail': 'Invalid user_id.'}, status=400)
 
         # Total count
         total = col.count_documents(query)
@@ -307,7 +315,7 @@ class CoachGoalListView(View):
         # Sayfalanmış sorgu
         skip = (page - 1) * limit
         goals = list(
-            col.find(query, {'_id': 1, 'user_id': 1, 'title': 1, 'module': 1, 'priority': 1, 'status': 1, 'target_date': 1})
+            col.find(query, _GOAL_FULL_PROJECTION)
             .sort([('updated_at', -1)])
             .skip(skip)
             .limit(limit)
@@ -343,26 +351,17 @@ class CoachGoalStatsView(View):
 
         col = get_coach_goals_col()
 
-        # Toplam
-        total = col.count_documents({})
-
-        # Durum dağılımı
-        status_stats = col.aggregate([
-            {'$group': {'_id': '$status', 'count': {'$sum': 1}}},
-        ])
-        status_dict = {doc['_id']: doc['count'] for doc in status_stats if doc['_id']}
-
-        # Modül dağılımı
-        module_stats = col.aggregate([
-            {'$group': {'_id': '$module', 'count': {'$sum': 1}}},
-        ])
-        module_dict = {doc['_id']: doc['count'] for doc in module_stats if doc['_id']}
-
-        # Öncelik dağılımı
-        priority_stats = col.aggregate([
-            {'$group': {'_id': '$priority', 'count': {'$sum': 1}}},
-        ])
-        priority_dict = {doc['_id']: doc['count'] for doc in priority_stats if doc['_id']}
+        _gs = next(col.aggregate([{'$facet': {
+            'total':    [{'$count': 'n'}],
+            'by_status':   [{'$group': {'_id': '$status',   'count': {'$sum': 1}}}],
+            'by_module':   [{'$group': {'_id': '$module',   'count': {'$sum': 1}}}],
+            'by_priority': [{'$group': {'_id': '$priority', 'count': {'$sum': 1}}}],
+        }}]), {})
+        _gsget = _gs.get
+        total        = (_gsget('total', [{}])[0] or {}).get('n', 0)
+        status_dict  = {_id: doc['count'] for doc in _gsget('by_status',   []) if (_id := doc['_id'])}
+        module_dict  = {_id: doc['count'] for doc in _gsget('by_module',   []) if (_id := doc['_id'])}
+        priority_dict = {_id: doc['count'] for doc in _gsget('by_priority', []) if (_id := doc['_id'])}
 
         return JsonResponse({
             'total_goals': total,
@@ -392,15 +391,16 @@ class CoachGoalDetailView(View):
         try:
             oid = ObjectId(goal_id)
         except Exception:
-            return JsonResponse({'detail': 'Geçersiz goal_id.'}, status=400)
+            return JsonResponse({'detail': 'Invalid goal_id.'}, status=400)
 
         data = _json(request)
         col = get_coach_goals_col()
+        _cfo = col.find_one
 
         # Hedef var mı?
-        goal = col.find_one({'_id': oid})
+        goal = _cfo({'_id': oid}, {'_id': 1})
         if not goal:
-            return JsonResponse({'detail': f'Hedef #{goal_id} bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'Goal #{goal_id} not found.'}, status=404)
 
         # Güncellenebilir alanlar
         update_data = {}
@@ -410,17 +410,17 @@ class CoachGoalDetailView(View):
             update_data['priority'] = data['priority']
 
         if not update_data:
-            return JsonResponse({'detail': 'Güncellenecek alan yok.'}, status=400)
+            return JsonResponse({'detail': 'No fields to update.'}, status=400)
 
-        update_data['updated_at'] = datetime.now().isoformat()
+        update_data['updated_at'] = datetime.utcnow().isoformat()
 
         # Güncelle
         col.update_one({'_id': oid}, {'$set': update_data})
 
         # Güncellenmiş goal döner
-        updated = col.find_one({'_id': oid})
+        updated = _cfo({'_id': oid})
         return JsonResponse({
-            'message': 'Hedef güncellendi.',
+            'message': 'Goal updated.',
             'goal': _oid(updated),
         })
 
@@ -435,16 +435,16 @@ class CoachGoalDetailView(View):
         try:
             oid = ObjectId(goal_id)
         except Exception:
-            return JsonResponse({'detail': 'Geçersiz goal_id.'}, status=400)
+            return JsonResponse({'detail': 'Invalid goal_id.'}, status=400)
 
         col = get_coach_goals_col()
 
         result = col.delete_one({'_id': oid})
 
         if result.deleted_count == 0:
-            return JsonResponse({'detail': f'Hedef #{goal_id} bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'Goal #{goal_id} not found.'}, status=404)
 
-        return JsonResponse({'message': 'Hedef silindi.'})
+        return JsonResponse({'message': 'Hedef deleted.'})
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -471,7 +471,7 @@ class CoachAttributeListView(View):
         result = []
         for lang in ALL_COACH_LANGS:
             col = get_coach_attributes_col(lang)
-            count = col.count_documents({})
+            count = col.estimated_document_count()
             result.append({'lang': lang, 'sifat_count': count})
 
         return JsonResponse({'data': result})
@@ -494,19 +494,23 @@ class CoachAttributeLangView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         if lang not in ALL_COACH_LANGS:
-            return JsonResponse({'detail': f'Geçersiz dil: {lang}'}, status=400)
+            return JsonResponse({'detail': f'Invalid language: {lang}'}, status=400)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 20)), 100)
-        search = request.GET.get('search', '').strip()
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            page, limit = 1, 20
+        search = _qpget('search', '').strip()[:100]
 
         col = get_coach_attributes_col(lang)
 
         # Query
         query = {}
         if search:
-            query['_id'] = {'$regex': search, '$options': 'i'}
+            query['_id'] = {'$regex': re.escape(search), '$options': 'i'}
 
         # Total count
         total = col.count_documents(query)
@@ -514,7 +518,7 @@ class CoachAttributeLangView(View):
         # Sayfalanmış sorgu — sadece metadata al
         skip = (page - 1) * limit
         sifatlar = list(
-            col.find(query, {'_id': 1, 'version': 1, 'updated_at': 1})
+            col.find(query, _SIFAT_META_PROJ)
             .sort([('_id', 1)])
             .skip(skip)
             .limit(limit)
@@ -554,25 +558,26 @@ class CoachAttributeDetailView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         if lang not in ALL_COACH_LANGS:
-            return JsonResponse({'detail': f'Geçersiz dil: {lang}'}, status=400)
+            return JsonResponse({'detail': f'Invalid language: {lang}'}, status=400)
 
         col = get_coach_attributes_col(lang)
         sifat = col.find_one({'_id': sifat_name})
 
         if not sifat:
-            return JsonResponse({'detail': f'Sıfat "{sifat_name}" bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'Adjective "{sifat_name}" not found.'}, status=404)
 
         # Metadata
+        _sget = sifat.get
         result = {
             'sifat_name': sifat_name,
             'lang': lang,
-            'version': sifat.get('version'),
-            'updated_at': str(sifat.get('updated_at', '')),
+            'version': _sget('version'),
+            'updated_at': str(_sget('updated_at', '')),
         }
 
         # 27 modülü ekle
         for module in ALL_COACH_MODULES:
-            result[module] = sifat.get(module, {})
+            result[module] = _sget(module, {})
 
         return JsonResponse(result)
 
@@ -585,15 +590,15 @@ class CoachAttributeDetailView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         if lang not in ALL_COACH_LANGS:
-            return JsonResponse({'detail': f'Geçersiz dil: {lang}'}, status=400)
+            return JsonResponse({'detail': f'Invalid language: {lang}'}, status=400)
 
         data = _json(request)
         col = get_coach_attributes_col(lang)
 
         # Sıfat var mı?
-        sifat = col.find_one({'_id': sifat_name})
+        sifat = col.find_one({'_id': sifat_name}, {'_id': 1})
         if not sifat:
-            return JsonResponse({'detail': f'Sıfat "{sifat_name}" bulunamadı.'}, status=404)
+            return JsonResponse({'detail': f'Adjective "{sifat_name}" not found.'}, status=404)
 
         # Sadece ALL_COACH_MODULES anahtar'ları kabul et (whitelist)
         update_data = {}
@@ -602,11 +607,11 @@ class CoachAttributeDetailView(View):
                 update_data[module] = data[module]
 
         if not update_data:
-            return JsonResponse({'detail': 'Güncellenecek modül yok.'}, status=400)
+            return JsonResponse({'detail': 'No module to update.'}, status=400)
 
-        update_data['updated_at'] = datetime.now().isoformat()
+        update_data['updated_at'] = datetime.utcnow().isoformat()
 
         # Güncelle
         col.update_one({'_id': sifat_name}, {'$set': update_data})
 
-        return JsonResponse({'message': 'Sıfat güncellendi.'})
+        return JsonResponse({'message': 'Adjective updated.'})

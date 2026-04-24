@@ -181,41 +181,49 @@ def populate_po_file(po_file_path, target_lang):
 
     # Find all msgid/msgstr pairs
     lines = content.split('\n')
+    _n_lines = len(lines)
     result_lines = []
+    _rla = result_lines.append
     i = 0
     translation_count = 0
 
-    while i < len(lines):
+    while i < _n_lines:
         line = lines[i]
-        result_lines.append(line)
+        _lsw = line.startswith
+        _rla(line)
 
         # Look for msgid lines (not header)
-        if line.startswith('msgid "') and not line.startswith('msgid ""'):
+        if _lsw('msgid "') and not _lsw('msgid ""'):
             # Extract the English string
             msgid_match = line[7:-1]  # Remove 'msgid "' and closing '"'
 
             # Handle multiline msgid
             msgid_content = msgid_match
             i += 1
-            while i < len(lines) and lines[i].startswith('"'):
-                msgid_content += lines[i][1:-1]  # Remove quotes
-                result_lines.append(lines[i])
+            while i < _n_lines:
+                _li = lines[i]
+                if not _li.startswith('"'):
+                    break
+                msgid_content += _li[1:-1]  # Remove quotes
+                _rla(_li)
                 i += 1
 
             # Now handle msgstr
-            if i < len(lines) and lines[i].startswith('msgstr'):
-                translated = translate_text(msgid_content, target_lang)
+            if i < _n_lines:
+                _li = lines[i]
+                if _li.startswith('msgstr'):
+                    translated = translate_text(msgid_content, target_lang)
 
-                # Build translated msgstr line
-                if translated and translated != msgid_content:
-                    translated_line = f'msgstr "{translated}"'
-                    result_lines.append(translated_line)
-                    translation_count += 1
-                else:
-                    # Keep empty or original
-                    result_lines.append(lines[i])
+                    # Build translated msgstr line
+                    if translated and translated != msgid_content:
+                        translated_line = f'msgstr "{translated}"'
+                        _rla(translated_line)
+                        translation_count += 1
+                    else:
+                        # Keep empty or original
+                        _rla(_li)
 
-                i += 1
+                    i += 1
 
             continue
 

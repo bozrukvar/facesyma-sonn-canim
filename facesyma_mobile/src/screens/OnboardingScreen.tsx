@@ -4,9 +4,12 @@ import {
   View, Text, StyleSheet, Dimensions, FlatList,
   TouchableOpacity, Animated,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import type { ScreenProps } from '../navigation/types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,32 +19,33 @@ const getSlides = (lang: string) => [
     emoji:    '👁',
     title:    t('onboarding.slide1_title', lang),
     subtitle: t('onboarding.slide1_desc', lang),
-    accent:   theme.colors.gold,
+    accent:   colors.gold,
   },
   {
     id: '2',
     emoji:    '✨',
     title:    t('onboarding.slide2_title', lang),
     subtitle: t('onboarding.slide2_desc', lang),
-    accent:   theme.colors.warmAmber,
+    accent:   colors.warmAmber,
   },
   {
     id: '3',
     emoji:    '🎭',
     title:    t('onboarding.slide3_title', lang),
     subtitle: t('onboarding.slide3_desc', lang),
-    accent:   theme.colors.gold,
+    accent:   colors.gold,
   },
   {
     id: '4',
     emoji:    '💬',
     title:    t('onboarding.slide4_title', lang),
     subtitle: t('onboarding.slide4_desc', lang),
-    accent:   theme.colors.warmAmber,
+    accent:   colors.warmAmber,
   },
 ];
 
-const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const OnboardingScreen = ({ navigation }: ScreenProps<'Onboarding'>) => {
+  const insets = useSafeAreaInsets();
   const { lang } = useLanguage();
   const SLIDES = useMemo(() => getSlides(lang), [lang]);
   const [index, setIndex] = useState(0);
@@ -65,12 +69,14 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     });
   };
 
-  const slide = SLIDES[index];
+  const slide      = SLIDES[index];
+  const slideAccent = slide.accent;
+  const slidesLen  = SLIDES.length;
 
   return (
     <View style={styles.container}>
       {/* Arka plan sıcak ışıma */}
-      <View style={[styles.glow, { backgroundColor: `${slide.accent}08` }]} />
+      <View style={[styles.glow, { backgroundColor: `${slideAccent}08` }]} />
 
       <FlatList
         ref={flatRef}
@@ -80,24 +86,24 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         scrollEnabled={false}
         showsHorizontalScrollIndicator={false}
         keyExtractor={i => i.id}
-        renderItem={({ item }) => (
+        renderItem={({ item: { accent: iAccent, emoji: iEmoji, title: iTitle, subtitle: iSub } }) => (
           <Animated.View style={[
             styles.slide,
             { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
           ]}>
             {/* Emoji halka */}
             <View style={[styles.emojiRing, {
-              borderColor:     `${item.accent}60`,
-              backgroundColor: `${item.accent}10`,
-              shadowColor:     item.accent,
+              borderColor:     `${iAccent}60`,
+              backgroundColor: `${iAccent}10`,
+              shadowColor:     iAccent,
             }]}>
-              <Text style={styles.emoji}>{item.emoji}</Text>
+              <Text style={styles.emoji}>{iEmoji}</Text>
             </View>
 
-            <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
-              {item.title}
+            <Text style={styles.title}>
+              {iTitle}
             </Text>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
+            <Text style={styles.subtitle}>{iSub}</Text>
           </Animated.View>
         )}
       />
@@ -109,10 +115,10 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             styles.progressDot,
             i === index && {
               width: 28,
-              backgroundColor: slide.accent,
+              backgroundColor: slideAccent,
             },
             i < index && {
-              backgroundColor: `${theme.colors.gold}40`,
+              backgroundColor: `${colors.gold}40`,
             },
           ]} />
         ))}
@@ -120,18 +126,21 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
       {/* Devam butonu */}
       <TouchableOpacity
-        style={[styles.nextBtn, { backgroundColor: slide.accent }]}
+        style={[styles.nextBtn, { backgroundColor: slideAccent }]}
         onPress={goNext}
         activeOpacity={0.85}
       >
         <Text style={styles.nextText}>
-          {index === SLIDES.length - 1 ? t('onboarding.start', lang) : t('onboarding.next', lang)}
+          {index === slidesLen - 1 ? t('onboarding.start', lang) : t('onboarding.next', lang)}
         </Text>
       </TouchableOpacity>
 
       {/* Atla */}
-      {index < SLIDES.length - 1 && (
-        <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.replace('Auth')}>
+      {index < slidesLen - 1 && (
+        <TouchableOpacity
+          style={[styles.skipBtn, { marginBottom: insets.bottom + spacing.sm }]}
+          onPress={() => navigation.replace('Auth')}
+        >
           <Text style={styles.skipText}>{t('onboarding.skip', lang)}</Text>
         </TouchableOpacity>
       )}
@@ -142,7 +151,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
   },
   glow: {
@@ -150,7 +159,7 @@ const styles = StyleSheet.create({
   },
   slide: {
     width,
-    paddingHorizontal: theme.spacing.xxxl,
+    paddingHorizontal: spacing.xxxl,
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: height * 0.12,
@@ -163,24 +172,24 @@ const styles = StyleSheet.create({
     borderWidth:      1.5,
     alignItems:       'center',
     justifyContent:   'center',
-    marginBottom:     theme.spacing.xl,
+    marginBottom:     spacing.xl,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
     elevation: 8,
   },
   emoji:    { fontSize: 52 },
-  title:    { ...theme.typography.display, textAlign: 'center', marginBottom: theme.spacing.lg },
+  title:    { ...typography.display, textAlign: 'center', marginBottom: spacing.lg, color: colors.textPrimary },
   subtitle: {
-    ...theme.typography.body,
+    ...typography.body,
     textAlign: 'center',
     lineHeight: 25,
-    paddingHorizontal: theme.spacing.md,
-    color: theme.colors.textWarm,
+    paddingHorizontal: spacing.md,
+    color: colors.textWarm,
   },
   progressWrap: {
     flexDirection: 'row',
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
     gap: 8,
     alignItems: 'center',
   },
@@ -188,24 +197,24 @@ const styles = StyleSheet.create({
     width:         8,
     height:        8,
     borderRadius:  4,
-    backgroundColor: theme.colors.border,
+    backgroundColor: colors.border,
   },
   nextBtn: {
-    width:           width - theme.spacing.xxxl * 2,
+    width:           width - spacing.xxxl * 2,
     height:          56,
-    borderRadius:    theme.radius.xl,
+    borderRadius:    radius.xl,
     alignItems:      'center',
     justifyContent:  'center',
-    marginBottom:    theme.spacing.md,
-    shadowColor:     theme.colors.gold,
+    marginBottom:    spacing.md,
+    shadowColor:     colors.gold,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 8,
   },
-  nextText: { ...theme.typography.label, color: '#000', letterSpacing: 2 },
-  skipBtn:  { padding: theme.spacing.md, marginBottom: theme.spacing.md },
-  skipText: { ...theme.typography.caption, color: theme.colors.textMuted, fontSize: 13 },
+  nextText: { ...typography.label, color: '#000', letterSpacing: 2 },
+  skipBtn:  { padding: spacing.md, marginBottom: spacing.md },
+  skipText: { ...typography.caption, color: colors.textMuted, fontSize: 13 },
 });
 
 export default OnboardingScreen;

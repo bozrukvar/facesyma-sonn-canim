@@ -13,24 +13,28 @@ Features:
 
 import json
 import logging
+import re
 from datetime import datetime, timedelta
+
+_RE_MODULE = re.compile(r'^[a-zA-Z0-9_]{1,50}$')
+_RE_LANG   = re.compile(r'^[a-z]{2,5}$')
+_RE_UUID   = re.compile(r'^[a-f0-9\-]{1,36}$')
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
-from django.conf import settings
+from admin_api.utils.mongo import _get_db
+from admin_api.utils.auth import _require_admin
 import uuid
 
 log = logging.getLogger(__name__)
 
-SUPPORTED_LANGUAGES = ['tr', 'en', 'de', 'ru', 'ar', 'es', 'ko', 'ja']
+SUPPORTED_LANGUAGES  = ['tr', 'en', 'de', 'ru', 'ar', 'es', 'ko', 'ja']
+_CONTENT_STATS_PROJ  = {'content_id': 1, 'title': 1, 'module': 1, 'views': 1, 'engagement_rate': 1, 'created_at': 1}
 
-
-def _get_db():
-    """MongoDB bağlantısı"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
-    return client['facesyma-backend']
+_VALID_CONTENT_STATUSES = frozenset({'draft', 'published', 'archived'})
+_VALID_CONTENT_ACTIONS  = frozenset({'publish', 'schedule', 'unpublish'})
+_VALID_AB_STATUSES      = frozenset({'draft', 'active', 'paused', 'completed', 'archived'})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -40,28 +44,39 @@ class CoachingContentView(View):
     def get(self, request):
         """İçeriği listele"""
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             content_col = db['coaching_content']
 
-            module = request.GET.get('module')  # kariyer, liderlik, daily
-            lang = request.GET.get('lang', 'tr')
-            status = request.GET.get('status')  # draft, published, scheduled
-            limit = int(request.GET.get('limit', 50))
+            _qp = request.GET
+            _qpget = _qp.get
+            module = _qpget('module')
+            lang = _qpget('lang', 'tr')
+            status = _qpget('status')
+            try:
+                limit = min(max(1, int(_qpget('limit', 50))), 200)
+            except (ValueError, TypeError):
+                limit = 50
+
 
             query = {}
-            if module:
+            if module and _RE_MODULE.match(module):
                 query['module'] = module
-            if lang:
+            if lang and _RE_LANG.match(lang):
                 query['languages'] = lang
-            if status:
+            if status and status in _VALID_CONTENT_STATUSES:
                 query['status'] = status
 
-            contents = list(content_col.find(query)
-                           .sort('created_at', -1)
-                           .limit(limit))
-
+            contents = list(content_col.find(query).sort('created_at', -1).limit(limit))
             for c in contents:
-                c['_id'] = str(c['_id'])
+                _oid = c['_id']
+                c['_id'] = str(_oid)
 
             return JsonResponse({
                 'success': True,
@@ -73,52 +88,57 @@ class CoachingContentView(View):
             })
 
         except Exception as e:
-            log.exception(f'Content list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Content list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def post(self, request):
         """Yeni içerik oluştur"""
         try:
-            data = json.loads(request.body)
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            _now = datetime.utcnow()
             db = _get_db()
             content_col = db['coaching_content']
 
             content = {
                 'content_id': str(uuid.uuid4()),
-                'module': data.get('module'),  # kariyer, liderlik, daily
-                'title': data.get('title'),
-                'description': data.get('description'),
-                'body': data.get('body'),
-                'languages': data.get('languages', ['tr']),
-                'translations': data.get('translations', {}),  # {lang: {title, body}}
-                'tags': data.get('tags', []),
+                'module': str(_dget('module', ''))[:50],
+                'title': str(_dget('title', ''))[:200],
+                'description': str(_dget('description', ''))[:500],
+                'body': str(_dget('body', ''))[:10000],
+                'languages': [l for l in _dget('languages', ['tr']) if isinstance(l, str) and _RE_LANG.match(l)][:20],
+                'translations': _dget('translations', {}),
+                'tags': [str(t)[:50] for t in _dget('tags', []) if isinstance(t, str)][:20],
                 'status': 'draft',
-                'visibility': data.get('visibility', 'public'),  # public, premium, members_only
+                'visibility': str(_dget('visibility', 'public'))[:20],
                 'publish_date': None,
                 'schedule_date': None,
-                'created_at': datetime.utcnow(),
-                'updated_at': datetime.utcnow(),
-                'created_by': request.user.id if hasattr(request, 'user') else 'system',
+                'created_at': _now,
+                'updated_at': _now,
+                'created_by': admin_payload.get('email', 'admin'),
                 'views': 0,
                 'engagement_rate': 0
             }
 
-            result = content_col.insert_one(content)
-
-            log.info(f"Content created: {content['content_id']}")
+            content_col.insert_one(content)
+            _ccid = content['content_id']
+            log.info(f"Content created: {_ccid}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'content_id': content['content_id'],
-                    'status': 'draft'
-                }
+                'data': {'content_id': _ccid, 'status': 'draft'}
             })
 
         except Exception as e:
-            log.exception(f'Content creation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Content creation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -127,57 +147,63 @@ class ContentPublishView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            content_id = data.get('content_id')
-            action = data.get('action')  # publish, schedule, unpublish
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            content_id = _dget('content_id')
+            action = _dget('action')
+
+            if action not in _VALID_CONTENT_ACTIONS:
+                return JsonResponse({'detail': f'Invalid action. Allowed: {", ".join(sorted(_VALID_CONTENT_ACTIONS))}'}, status=400)
+            if not content_id:
+                return JsonResponse({'detail': 'content_id is required'}, status=400)
+
+            _now = datetime.utcnow()
             db = _get_db()
             content_col = db['coaching_content']
+            _upd = content_col.update_one
+            _li = log.info
 
             if action == 'publish':
-                content_col.update_one(
+                _upd(
                     {'content_id': content_id},
-                    {'$set': {
-                        'status': 'published',
-                        'publish_date': datetime.utcnow(),
-                        'updated_at': datetime.utcnow()
-                    }}
+                    {'$set': {'status': 'published', 'publish_date': _now, 'updated_at': _now}}
                 )
-                log.info(f"Content published: {content_id}")
+                _li(f"Content published: {content_id}")
 
             elif action == 'schedule':
-                schedule_date = data.get('schedule_date')
-                content_col.update_one(
+                schedule_date_str = _dget('schedule_date', '')
+                try:
+                    schedule_date = datetime.fromisoformat(schedule_date_str)
+                except (ValueError, TypeError):
+                    return JsonResponse({'detail': 'Invalid schedule_date format. Use ISO 8601.'}, status=400)
+                _upd(
                     {'content_id': content_id},
-                    {'$set': {
-                        'status': 'scheduled',
-                        'schedule_date': datetime.fromisoformat(schedule_date),
-                        'updated_at': datetime.utcnow()
-                    }}
+                    {'$set': {'status': 'scheduled', 'schedule_date': schedule_date, 'updated_at': _now}}
                 )
-                log.info(f"Content scheduled: {content_id}")
+                _li(f"Content scheduled: {content_id}")
 
             elif action == 'unpublish':
-                content_col.update_one(
+                _upd(
                     {'content_id': content_id},
-                    {'$set': {
-                        'status': 'draft',
-                        'updated_at': datetime.utcnow()
-                    }}
+                    {'$set': {'status': 'draft', 'updated_at': _now}}
                 )
-                log.info(f"Content unpublished: {content_id}")
+                _li(f"Content unpublished: {content_id}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'content_id': content_id,
-                    'action': action
-                }
+                'data': {'content_id': content_id, 'action': action}
             })
 
         except Exception as e:
-            log.exception(f'Publish hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Publish error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -187,43 +213,48 @@ class ContentTranslationView(View):
     def post(self, request):
         """Dil tercümesi ekle"""
         try:
-            data = json.loads(request.body)
-            content_id = data.get('content_id')
-            lang = data.get('language')
-            translation = data.get('translation')  # {title, description, body}
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            content_id = _dget('content_id')
+            lang = str(_dget('language', ''))[:10]
+            translation = _dget('translation')
+
+            if not content_id or not lang:
+                return JsonResponse({'detail': 'content_id and language are required'}, status=400)
+            if lang not in SUPPORTED_LANGUAGES:
+                return JsonResponse({'detail': f'Unsupported language. Allowed: {", ".join(SUPPORTED_LANGUAGES)}'}, status=400)
+
+            _now = datetime.utcnow()
             db = _get_db()
             content_col = db['coaching_content']
+            _ccuo = content_col.update_one
 
-            # Add language to languages list if not exists
-            content_col.update_one(
+            _ccuo(
                 {'content_id': content_id},
                 {'$addToSet': {'languages': lang}}
             )
-
-            # Add translation
-            content_col.update_one(
+            _ccuo(
                 {'content_id': content_id},
-                {'$set': {
-                    f'translations.{lang}': translation,
-                    'updated_at': datetime.utcnow()
-                }}
+                {'$set': {f'translations.{lang}': translation, 'updated_at': _now}}
             )
 
             log.info(f"Translation added: {content_id} -> {lang}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'content_id': content_id,
-                    'language': lang,
-                    'message': 'Translation added'
-                }
+                'data': {'content_id': content_id, 'language': lang, 'message': 'Translation added'}
             })
 
         except Exception as e:
-            log.exception(f'Translation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Translation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -233,73 +264,88 @@ class ABTestingView(View):
     def get(self, request):
         """A/B testleri listele"""
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             test_col = db['ab_tests']
 
-            status = request.GET.get('status')  # active, completed, archived
 
+            _qp = request.GET
+            _qpget = _qp.get
+            status = _qpget('status')
             query = {}
-            if status:
+            if status and status in _VALID_AB_STATUSES:
                 query['status'] = status
 
-            tests = list(test_col.find(query)
-                        .sort('created_at', -1)
-                        .limit(50))
-
+            tests = list(test_col.find(query).sort('created_at', -1).limit(50))
             for t in tests:
-                t['_id'] = str(t['_id'])
+                _oid = t['_id']
+                t['_id'] = str(_oid)
 
-            return JsonResponse({
-                'success': True,
-                'data': {
-                    'tests': tests
-                }
-            })
+            return JsonResponse({'success': True, 'data': {'tests': tests}})
 
         except Exception as e:
-            log.exception(f'Tests list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Tests list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def post(self, request):
         """Yeni A/B test oluştur"""
         try:
-            data = json.loads(request.body)
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _dget = data.get
+            _now = datetime.utcnow()
             db = _get_db()
             test_col = db['ab_tests']
 
+            try:
+                duration_days = max(1, int(_dget('duration_days', 7)))
+                sample_size = max(1, int(_dget('sample_size', 1000)))
+            except (TypeError, ValueError):
+                duration_days = 7
+                sample_size = 1000
+
             test = {
                 'test_id': str(uuid.uuid4()),
-                'name': data.get('name'),
-                'content_id': data.get('content_id'),
-                'variant_a': data.get('variant_a'),  # {title, body}
-                'variant_b': data.get('variant_b'),  # {title, body}
+                'name': str(_dget('name', ''))[:100],
+                'content_id': _dget('content_id'),
+                'variant_a': _dget('variant_a'),
+                'variant_b': _dget('variant_b'),
                 'status': 'active',
-                'sample_size': data.get('sample_size', 1000),
-                'duration_days': data.get('duration_days', 7),
-                'metric': data.get('metric', 'engagement_rate'),  # engagement_rate, ctr
-                'created_at': datetime.utcnow(),
-                'end_date': datetime.utcnow() + timedelta(days=data.get('duration_days', 7)),
+                'sample_size': sample_size,
+                'duration_days': duration_days,
+                'metric': str(_dget('metric', 'engagement_rate'))[:50],
+                'created_at': _now,
+                'end_date': _now + timedelta(days=duration_days),
                 'variant_a_results': {'views': 0, 'engagements': 0},
                 'variant_b_results': {'views': 0, 'engagements': 0},
+                'created_by': admin_payload.get('email', 'admin'),
                 'winner': None
             }
 
-            result = test_col.insert_one(test)
-
-            log.info(f"A/B test created: {test['test_id']}")
+            test_col.insert_one(test)
+            _ttid = test['test_id']
+            log.info(f"A/B test created: {_ttid}")
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'test_id': test['test_id'],
-                    'status': 'active'
-                }
+                'data': {'test_id': _ttid, 'status': 'active'}
             })
 
         except Exception as e:
-            log.exception(f'Test creation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Test creation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -308,47 +354,53 @@ class ContentAnalyticsView(View):
 
     def get(self, request):
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             content_col = db['coaching_content']
 
-            content_id = request.GET.get('content_id')
-            module = request.GET.get('module')
+            _qp = request.GET
+            _qpget = _qp.get
+            content_id = _qpget('content_id', '')
+            module = _qpget('module', '')
 
             query = {}
-            if content_id:
+            if content_id and _RE_UUID.match(content_id):
                 query['content_id'] = content_id
-            if module:
+            if module and _RE_MODULE.match(module):
                 query['module'] = module
 
-            # Get analytics
-            contents = list(content_col.find(query, {
-                'content_id': 1,
-                'title': 1,
-                'module': 1,
-                'views': 1,
-                'engagement_rate': 1,
-                'created_at': 1
-            }).sort('views', -1).limit(20))
+            contents = list(content_col.find(query, _CONTENT_STATS_PROJ).sort('views', -1).limit(20))
 
-            # Calculate totals
-            total_views = sum(c.get('views', 0) for c in contents)
-            avg_engagement = sum(c.get('engagement_rate', 0) for c in contents) / max(len(contents), 1)
+            for c in contents:
+                _oid = c['_id']
+                c['_id'] = str(_oid)
 
-            analytics = {
-                'contents_analyzed': len(contents),
-                'total_views': total_views,
-                'avg_engagement_rate': round(avg_engagement, 2),
-                'top_contents': contents
-            }
+            _n_contents = len(contents)
+            total_views = total_eng = 0
+            for c in contents:
+                total_views += c.get('views', 0)
+                total_eng   += c.get('engagement_rate', 0)
+            avg_engagement = total_eng / max(_n_contents, 1)
 
             return JsonResponse({
                 'success': True,
-                'data': analytics
+                'data': {
+                    'contents_analyzed': _n_contents,
+                    'total_views': total_views,
+                    'avg_engagement_rate': round(avg_engagement, 2),
+                    'top_contents': contents
+                }
             })
 
         except Exception as e:
-            log.exception(f'Analytics hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Analytics error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -358,54 +410,59 @@ class ContentTemplateView(View):
     def get(self, request):
         """Şablonları listele"""
         try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
             db = _get_db()
             template_col = db['content_templates']
 
-            templates = list(template_col.find().sort('created_at', -1))
+            templates = list(template_col.find({}, {'_id': 0}).sort('created_at', -1).limit(100))
 
-            for t in templates:
-                t['_id'] = str(t['_id'])
-
-            return JsonResponse({
-                'success': True,
-                'data': {
-                    'templates': templates
-                }
-            })
+            return JsonResponse({'success': True, 'data': {'templates': templates}})
 
         except Exception as e:
-            log.exception(f'Templates list hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Templates list error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
     def post(self, request):
         """Yeni şablon oluştur"""
         try:
-            data = json.loads(request.body)
+            admin_payload = _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
 
+        try:
+            data = json.loads(request.body)
+            _now = datetime.utcnow()
             db = _get_db()
             template_col = db['content_templates']
 
+            _dget = data.get
             template = {
                 'template_id': str(uuid.uuid4()),
-                'name': data.get('name'),
-                'module': data.get('module'),
-                'description': data.get('description'),
-                'structure': data.get('structure'),  # JSON schema
-                'fields': data.get('fields'),  # List of field definitions
-                'created_at': datetime.utcnow(),
-                'created_by': request.user.id if hasattr(request, 'user') else 'system',
+                'name': str(_dget('name', ''))[:100],
+                'module': str(_dget('module', ''))[:50],
+                'description': str(_dget('description', ''))[:500],
+                'structure': _dget('structure'),
+                'fields': _dget('fields'),
+                'created_at': _now,
+                'created_by': admin_payload.get('email', 'admin'),
                 'usage_count': 0
             }
 
-            result = template_col.insert_one(template)
+            template_col.insert_one(template)
 
             return JsonResponse({
                 'success': True,
-                'data': {
-                    'template_id': template['template_id']
-                }
+                'data': {'template_id': template['template_id']}
             })
 
         except Exception as e:
-            log.exception(f'Template creation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Template creation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

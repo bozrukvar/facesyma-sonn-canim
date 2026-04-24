@@ -1,197 +1,108 @@
+import os
 import random
-import pymongo
-import numpy as np
-from pymongo.database import Database
 from calculator import *
-import pandas as pd
-from pandas import DataFrame
 from pymongo import MongoClient
 
+# ── Module-level cache ────────────────────────────────────────────────────────
+_mongo_client = None
+_static_data_cache = {}
+
+_LANG_DB_MAP = {
+    "tr": "database_attribute_tr", "tr-TR": "database_attribute_tr",
+    "de": "database_attribute_de", "de-DE": "database_attribute_de",
+    "ru": "database_attribute_ru", "ru-RU": "database_attribute_ru",
+    "ar": "database_attribute_ar", "ar-AR": "database_attribute_ar",
+    "en": "database_attribute_en", "en-US": "database_attribute_en",
+    "es": "database_attribute_sp", "es-ES": "database_attribute_sp",
+    "ja": "database_attribute_jp", "ja-JP": "database_attribute_jp",
+    "ko": "database_attribute_ko", "ko-KR": "database_attribute_ko",
+}
+
+_STATIC_DOCS = [
+    ("eye",      "eyes_distance"),
+    ("eye",      "eyes_size"),
+    ("eye",      "eyes_compare"),
+    ("eyebrow",  "eyebrows_eyes_distance"),
+    ("lip",      "lips_width"),
+    ("lip",      "lips_thickness"),
+    ("lip",      "lips_height_compare"),
+    ("nose",     "nose_size"),
+    ("nose",     "nose_length"),
+    ("nose",     "nose_width"),
+    ("forehead", "forehead_distance"),
+]
+
+_FIELD_MAP = {
+    "tr": "cumle_tr", "tr-TR": "cumle_tr",
+    "en": "cumle_en", "en-US": "cumle_en",
+    "ko": "cumle_ko", "ko-KR": "cumle_ko",
+    "es": "cumle_sp", "es-ES": "cumle_sp",
+    "ar": "cumle_ar", "ar-AR": "cumle_ar",
+    "ja": "cumle_jp", "ja-JP": "cumle_jp",
+    "de": "cumle_de", "de-DE": "cumle_de",
+    "ru": "cumle_ru", "ru-RU": "cumle_ru",
+}
 
 
-def motivate(img,lang):
+def _get_client():
+    global _mongo_client
+    if _mongo_client is None:
+        _mongo_client = MongoClient(os.environ.get('MONGO_URI', ""))
+    return _mongo_client
 
-    total_att = {}
+
+def _load_static_data(db_name: str) -> dict:
+    global _static_data_cache
+    if db_name in _static_data_cache:
+        return _static_data_cache[db_name]
+    dbref = _get_client()[db_name]
+    cache = {}
+    for col_name, doc_id in _STATIC_DOCS:
+        doc = dbref[col_name].find_one({"_id": doc_id})
+        cache[doc_id] = dict(doc) if doc else {}
+    _static_data_cache[db_name] = cache
+    return cache
+
+
+def motivate(img, lang):
+
     result = Cal(img)
-                        
-    CONNECTION_STRING = "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-    client = MongoClient(CONNECTION_STRING)
+    _r0 = _r0; _r1 = _r1; _r2 = _r2; _r3 = _r3; _r4 = _r4
 
+    _base_lang = lang.split('-')[0] if lang else ''
+    _lmget = _LANG_DB_MAP.get
+    db_name = _lmget(lang, _lmget(_base_lang, "database_attribute_en"))
+    static = _load_static_data(db_name)
 
-    # print(lang)
-
-    if lang == "tr-TR" or lang == "tr" :
-        dbname = client['database_attribute_tr']
-    elif lang == "de-DE" or lang == "de" :
-        dbname = client['database_attribute_de']
-    elif lang == "ru-RU" or lang == "ru" :
-        dbname = client['database_attribute_ru']
-    elif lang == "ar-AR" or lang == "ar" :
-        dbname = client['database_attribute_ar']
-    elif lang == "en-US" or lang == "en" :
-        dbname = client['database_attribute_en']
-    elif lang == "es-ES" or lang == "es" :
-        dbname = client['database_attribute_sp']
-    elif lang == "ja-JP" or lang == "ja" :
-        dbname = client['database_attribute_jp']
-    elif lang == "ko-KR" or lang == "ko" :
-        dbname = client['database_attribute_ko']
-    elif lang in ("zh", "zh-CN", "zh-TW"):
-        dbname = client['database_attribute_en']
-    elif lang in ("hi", "hi-IN"):
-        dbname = client['database_attribute_en']
-    elif lang in ("fr", "fr-FR"):
-        dbname = client['database_attribute_en']
-    elif lang in ("pt", "pt-BR"):
-        dbname = client['database_attribute_en']
-    elif lang in ("bn", "bn-BD"):
-        dbname = client['database_attribute_en']
-    elif lang in ("id", "id-ID"):
-        dbname = client['database_attribute_en']
-    elif lang in ("ur", "ur-PK"):
-        dbname = client['database_attribute_en']
-    elif lang in ("it", "it-IT"):
-        dbname = client['database_attribute_en']
-    elif lang in ("vi", "vi-VN"):
-        dbname = client['database_attribute_en']
-    elif lang in ("pl", "pl-PL"):
-        dbname = client['database_attribute_en']
-    else :
-        dbname = client['database_attribute_en']
-
-    # dbname = client['database_attribute_tr']
-
-    eye = dbname["eye"]
-    eyebrow = dbname["eyebrow"]
-    lip = dbname["lip"]
-    nose = dbname["nose"]
-    forehead = dbname["forehead"]
-    
     sifatlar = []
-    
+    for doc_id, category_key in [
+        ("eyes_distance",          _r0["eyes_distance"]),
+        ("eyes_size",              _r0["eyes_size"]),
+        ("eyes_compare",           _r0["eyes_compare"]),
+        ("eyebrows_eyes_distance", _r1["eyebrows_eyes_distance"]),
+        ("lips_width",             _r2["lips_width"]),
+        ("lips_thickness",         _r2["lips_thickness"]),
+        ("lips_height_compare",    _r2["lips_height_compare"]),
+        ("nose_size",              _r3["nose_size"]),
+        ("nose_length",            _r3["nose_length"]),
+        ("nose_width",             _r3["nose_width"]),
+        ("forehead_distance",      _r4["forehead_distance"]),
+    ]:
+        sifatlar += list(static.get(doc_id, {}).get(category_key, {}).keys())
 
-############################# eyes_distance ###########################################################################
-    eye_series0 = dict(eye.find_one({"_id": "eyes_distance"}))
-    eye_dict0 = eye_series0[result[0]["eyes_distance"]]
-    eye_list0 = list(eye_dict0.keys())
-    sifatlar +=  eye_list0
-    
-    ############################# eyes_size ###########################################################################
-    eye_series1 = dict(eye.find_one({"_id": "eyes_size"}))
-    eye_dict1 = eye_series1[result[0]["eyes_size"]]
-    eye_list1 = list(eye_dict1.keys())
-    sifatlar += eye_list1
-    ############################# eyes_compare ###########################################################################
-    eye_series2 = dict(eye.find_one({"_id": "eyes_compare"}))
-    eye_dict2 = eye_series2[result[0]["eyes_compare"]]
-    eye_list2 = list(eye_dict2.keys())
-    sifatlar += eye_list2
-    ############################# eyebrows_eyes_distance ###########################################################################
-    eyebrow_series = dict(eyebrow.find_one({"_id": "eyebrows_eyes_distance"}))
-    eyebrow_dict = eyebrow_series[result[1]["eyebrows_eyes_distance"]]
-    eyebrow_list = list(eyebrow_dict.keys())
-    sifatlar += eyebrow_list
-    ############################### lips_width ################################################################################
-    lip_series = dict(lip.find_one({"_id": "lips_width"}))
-    lip_dict0 = lip_series[result[2]["lips_width"]]
-    lip_list0 = list(lip_dict0.keys())
-    sifatlar += lip_list0
-    ############################### lips_thickness ################################################################################
-    lip_series1 = dict(lip.find_one({"_id": "lips_thickness"}))
-    lip_dict1 = lip_series1[result[2]["lips_thickness"]]
-    lip_list1 = list(lip_dict1.keys())
-    sifatlar += lip_list1
-    ############################### lips_height_compare ################################################################################
-    lip_series2 = dict(lip.find_one({"_id": "lips_height_compare"}))
-    lip_dict2 = lip_series2[result[2]["lips_height_compare"]]
-    lip_list2 = list(lip_dict2.keys())
-    sifatlar += lip_list2
-    ############################### nose_size ################################################################################
-    nose_series = dict(nose.find_one({"_id": "nose_size"}))
-    nose_dict0 = nose_series[result[3]["nose_size"]]
-    nose_list0 = list(nose_dict0.keys())
-    sifatlar += nose_list0
-    ############################### nose_length ################################################################################
-    nose_series1 = dict(nose.find_one({"_id": "nose_length"}))
-    nose_dict1 = nose_series1[result[3]["nose_length"]]
-    nose_list1 = list(nose_dict1.keys())
-    sifatlar += nose_list1
-    ############################### nose_width ################################################################################
-    nose_series2 = dict(nose.find_one({"_id": "nose_width"}))
-    nose_dict2 = nose_series2[result[3]["nose_width"]]
-    nose_list2 = list(nose_dict2.keys())
-    sifatlar += nose_list2
-    ############################### forehead_distance ###########################################################################
-    forehead_series = dict(forehead.find_one({"_id": "forehead_distance"}))
-    forehead_dict = forehead_series[result[4]["forehead_distance"]]
-    forehead_list = list(forehead_dict.keys())
-    sifatlar += forehead_list
-    
-    # temizleme att1 ve att2
-    sifatlar = list(filter(('att1').__ne__, sifatlar))
-    sifatlar = list(filter(('att2').__ne__, sifatlar))
-    #rasgele bir sıfat seçme    
-    sifat = random.sample(sifatlar, k=1)
-    sifat = sifat[0]
-    # print("Seçilen sıfat  ------------->", sifat)
-    
-    
-    # db baglantisi kurup tavsiye cümlesi alıyoruz    
+    sifatlar = [s for s in sifatlar if s not in ('att1', 'att2')]
+    if not sifatlar:
+        return ''
+    _rc = random.choice
+    sifat = _rc(sifatlar)
 
-    mydb = client["facesyma-backend"]
-    mycol = mydb["appfaceapi_motivate"]
+    client = _get_client()
+    mycol = client["facesyma-backend"]["appfaceapi_motivate"]
+    _fmget = _FIELD_MAP.get
+    field_name = _fmget(lang, _fmget(_base_lang, "cumle_en"))
 
-    myquery = { "sifat": sifat }
+    sifat_list = [x[field_name] for x in mycol.find({"sifat": sifat}, {"_id": 0, field_name: 1}) if field_name in x]
 
-    mydoc = mycol.find(myquery)
-
-    if lang == "tr-TR" or lang == "tr" :
-        field_name = "cumle_tr"
-    elif lang == "en-US" or lang == "en" :
-        field_name = "cumle_en"
-    elif lang == "ko-KR" or lang == "ko" :
-        field_name = "cumle_ko"
-    elif lang == "es-ES" or lang == "es" :
-        field_name = "cumle_sp"
-    elif lang == "ar-AR" or lang == "ar" :
-        field_name = "cumle_ar"
-    elif lang == "ja-JP" or lang == "ja" :
-        field_name = "cumle_jp"
-    elif lang == "de-DE" or lang == "de" :
-        field_name = "cumle_de"
-    elif lang == "ru-RU" or lang == "ru" :
-        field_name = "cumle_ru"
-    elif lang in ("zh", "zh-CN", "zh-TW"):
-        field_name = "cumle_en"
-    elif lang in ("hi", "hi-IN"):
-        field_name = "cumle_en"
-    elif lang in ("fr", "fr-FR"):
-        field_name = "cumle_en"
-    elif lang in ("pt", "pt-BR"):
-        field_name = "cumle_en"
-    elif lang in ("bn", "bn-BD"):
-        field_name = "cumle_en"
-    elif lang in ("id", "id-ID"):
-        field_name = "cumle_en"
-    elif lang in ("ur", "ur-PK"):
-        field_name = "cumle_en"
-    elif lang in ("it", "it-IT"):
-        field_name = "cumle_en"
-    elif lang in ("vi", "vi-VN"):
-        field_name = "cumle_en"
-    elif lang in ("pl", "pl-PL"):
-        field_name = "cumle_en"
-    else :
-        field_name = "cumle_en"
-
-
-    sifat_list = []
-    for x in mydoc:
-        # print("\n            ", x["cumle"])
-        sifat_list.append(x[field_name])
-    
-    secilen_cumle = sifat_list[random.randrange(0,len(sifat_list))]
-    # print( "secilen_cumle ---> ", secilen_cumle )
-    
-    return secilen_cumle
-
+    if not sifat_list:
+        return ''
+    return _rc(sifat_list)

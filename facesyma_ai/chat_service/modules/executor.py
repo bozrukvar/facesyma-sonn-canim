@@ -46,8 +46,10 @@ def execute_module(
         }
 
     try:
-        endpoint = module.get("endpoint")
-        method = module.get("method", "POST")
+        _lerr = log.error
+        _mget = module.get
+        endpoint = _mget("endpoint")
+        method = _mget("method", "POST")
 
         # Build request headers
         headers = {"Content-Type": "application/json"}
@@ -79,20 +81,20 @@ def execute_module(
         }
 
     except requests.RequestException as e:
-        log.error(f"Module execution failed: {e}")
+        _lerr(f"Module execution failed: {e}")
         return {
             "status": "error",
             "module": module_name,
             "result": None,
-            "error": f"Module request failed: {str(e)}",
+            "error": "Module request failed.",
         }
     except Exception as e:
-        log.error(f"Unexpected error executing module: {e}")
+        _lerr(f"Unexpected error executing module: {e}")
         return {
             "status": "error",
             "module": module_name,
             "result": None,
-            "error": f"Unexpected error: {str(e)}",
+            "error": "Unexpected error.",
         }
 
 
@@ -122,13 +124,14 @@ def _execute_test_module(module_name: str, params: Dict, lang: str, headers: Dic
         response = requests.post(endpoint, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         result = response.json()
+        _rget2 = result.get
 
         return {
             "status": "pending",
             "module": module_name,
             "test_type": test_type,
-            "session_id": result.get("session_id"),
-            "questions": result.get("questions", []),
+            "session_id": _rget2("session_id"),
+            "questions": _rget2("questions", []),
             "error": None,
         }
 
@@ -138,28 +141,29 @@ def _execute_test_module(module_name: str, params: Dict, lang: str, headers: Dic
             "status": "error",
             "module": module_name,
             "result": None,
-            "error": f"Failed to start test: {str(e)}",
+            "error": "Failed to start test.",
         }
 
 
 def _build_payload(module: Dict, params: Dict, lang: str) -> Dict:
     """Build request payload for module based on its type."""
     payload = {"lang": lang}
+    _mname = module["name"]
 
     # Astrology
-    if module["name"] == "astrology":
+    if _mname == "astrology":
         if "birth_date" in params:
             payload["birth_date"] = params["birth_date"]
         if "birth_time" in params:
             payload["birth_time"] = params["birth_time"]
 
     # Coaching
-    elif module["name"] == "coaching":
+    elif _mname == "coaching":
         # Coaching expects analysis_result
         payload["analysis_result"] = params.get("analysis_result", {})
 
     # Goals
-    elif module["name"] == "goals":
+    elif _mname == "goals":
         if "title" in params:
             payload["title"] = params["title"]
         if "description" in params:
@@ -182,25 +186,26 @@ def format_module_result(module_name: str, result: Dict, lang: str = "en") -> Di
     Returns:
         Formatted result suitable for AI presentation
     """
+    _rget = result.get
     # Face Analysis result formatting — preserve full rich structure
     if module_name == "face_analysis":
         return {
             "type": "face_analysis",
-            "character_summary": result.get("character_summary", ""),
-            "key_attributes": result.get("key_attributes", {}),
-            "attribute_descriptions": result.get("attribute_descriptions", {}),
-            "measurements": result.get("measurements", {}),
+            "character_summary": _rget("character_summary", ""),
+            "key_attributes": _rget("key_attributes", {}),
+            "attribute_descriptions": _rget("attribute_descriptions", {}),
+            "measurements": _rget("measurements", {}),
         }
 
     # Astrology result formatting
     elif module_name == "astrology":
         return {
             "type": "astrology",
-            "zodiac_sign": result.get("zodiac_sign"),
-            "element": result.get("element"),
-            "quality": result.get("quality"),
-            "summary": result.get("summary", ""),
-            "recommendations": result.get("recommendations", []),
+            "zodiac_sign": _rget("zodiac_sign"),
+            "element": _rget("element"),
+            "quality": _rget("quality"),
+            "summary": _rget("summary", ""),
+            "recommendations": _rget("recommendations", []),
         }
 
     # Test results formatting
@@ -209,17 +214,17 @@ def format_module_result(module_name: str, result: Dict, lang: str = "en") -> Di
         return {
             "type": "test_result",
             "test_type": test_type,
-            "domain_scores": result.get("domain_scores", {}),
-            "ai_interpretation": result.get("ai_interpretation", ""),
-            "recommendations": _extract_recommendations(result.get("ai_interpretation", "")),
+            "domain_scores": _rget("domain_scores", {}),
+            "ai_interpretation": _rget("ai_interpretation", ""),
+            "recommendations": _extract_recommendations(_rget("ai_interpretation", "")),
         }
 
     # Coaching result formatting
     elif module_name == "coaching":
         return {
             "type": "coaching",
-            "dominant_attributes": result.get("dominant_sifatlar", []),
-            "modules": result.get("coach_modules", {}),
+            "dominant_attributes": _rget("dominant_sifatlar", []),
+            "modules": _rget("coach_modules", {}),
             "suggestions": _extract_coaching_suggestions(result),
         }
 
@@ -227,10 +232,10 @@ def format_module_result(module_name: str, result: Dict, lang: str = "en") -> Di
     elif module_name == "goals":
         return {
             "type": "goal",
-            "goal_id": result.get("_id"),
-            "title": result.get("title"),
-            "description": result.get("description"),
-            "status": result.get("status", "active"),
+            "goal_id": _rget("_id"),
+            "title": _rget("title"),
+            "description": _rget("description"),
+            "status": _rget("status", "active"),
         }
 
     # Default: return as-is
@@ -245,7 +250,7 @@ def _extract_recommendations(interpretation: str) -> list:
     # Simple extraction: split by periods and take meaningful lines
     lines = interpretation.split(".")
     recommendations = [
-        line.strip() for line in lines if line.strip() and len(line.strip()) > 10
+        _s for line in lines for _s in (line.strip(),) if _s and len(_s) > 10
     ]
     return recommendations[:3]  # Top 3 recommendations
 
@@ -253,7 +258,7 @@ def _extract_recommendations(interpretation: str) -> list:
 def _extract_coaching_suggestions(result: Dict) -> list:
     """Extract coaching suggestions from result."""
     suggestions = []
-    modules = result.get("coach_modules", {})
+    modules = _rget("coach_modules", {})
 
     for module_name, module_data in modules.items():
         if isinstance(module_data, list) and module_data:

@@ -9,28 +9,15 @@ Functions:
 """
 import time
 import logging
-from pymongo import MongoClient
-from django.conf import settings
+from admin_api.utils.mongo import (
+    get_communities_col       as _get_communities_col,
+    get_community_members_col as _get_community_members_col,
+    get_users_col             as _get_users_col,
+)
 
 log = logging.getLogger(__name__)
 
-
-def _get_db():
-    """MongoDB'ye bağlan"""
-    client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=30000)
-    return client['facesyma-backend']
-
-
-def _get_communities_col():
-    return _get_db()['communities']
-
-
-def _get_community_members_col():
-    return _get_db()['community_members']
-
-
-def _get_users_col():
-    return _get_db()['appfaceapi_myuser']
+_COMPAT_USER_PROJ = {'_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1, 'top_sifats': 1, 'modules': 1}
 
 
 def auto_add_to_communities(user_id: int, analysis_result: dict):
@@ -44,7 +31,7 @@ def auto_add_to_communities(user_id: int, analysis_result: dict):
         user_id: Kullanıcı ID
         analysis_result: Analiz sonucu {
             'top_sifats': ['Lider', 'Disiplinli', ...],
-            'modules': ['Liderlik', 'Duygusal Zeka', ...],
+            'modules': ['Leaderboard', 'Duygusal Zeka', ...],
             'sifat_scores': {...}
         }
 
@@ -61,131 +48,128 @@ def auto_add_to_communities(user_id: int, analysis_result: dict):
         communities_col = _get_communities_col()
         members_col = _get_community_members_col()
 
-        top_sifats = analysis_result.get('top_sifats', [])
-        modules = analysis_result.get('modules', [])
+        _arget = analysis_result.get
+        top_sifats = _arget('top_sifats', [])
+        modules = _arget('modules', [])
 
         invitations_count = 0
 
-        # 1. Sıfat tabanlı topluluklara davet gönder
-        for sifat in top_sifats:
-            try:
-                # Sıfat için topluluk var mı?
-                community = communities_col.find_one({
-                    'type': 'TRAIT',
-                    'trait_name': sifat
-                })
+        def _process_communities(items, type_label, name_fn, desc_fn):
+            """Batch-fetch existing communities, create missing ones, then invite."""
+            nonlocal invitations_count
+            if not items:
+                return
 
+            # Batch fetch all existing communities in one query
+            existing_map = {
+                doc['trait_name']: doc
+                for doc in communities_col.find(
+                    {'type': type_label, 'trait_name': {'$in': list(items)}},
+                    {'_id': 1, 'trait_name': 1},
+                )
+            }
+
+            # Build list of (item, community) pairs — create missing ones in bulk
+            resolved = []
+            _rappend = resolved.append
+            _linfo = log.info
+            now_ts = time.time()
+            new_docs = []
+            new_items = []
+            for item in items:
+                community = existing_map.get(item)
                 if not community:
-                    # Eğer yok, oluştur
-                    community = {
-                        'name': f'{sifat} Topluluğu',
-                        'type': 'TRAIT',
-                        'trait_name': sifat,
-                        'description': f'{sifat} özelliklerine sahip kişilerin toplandığı topluluk.',
-                        'founder_id': 0,  # System
+                    doc = {
+                        'name': name_fn(item),
+                        'type': type_label,
+                        'trait_name': item,
+                        'description': desc_fn(item),
+                        'founder_id': 0,
                         'member_count': 0,
                         'is_active': True,
-                        'created_at': time.time(),
-                        'updated_at': time.time(),
+                        'created_at': now_ts,
+                        'updated_at': now_ts,
                         'rules': '',
                         'moderation_policy': 'automated'
                     }
-                    result = communities_col.insert_one(community)
-                    community['_id'] = result.inserted_id
-                    log.info(f'Yeni topluluk oluşturuldu: {sifat}')
+                    new_docs.append(doc)
+                    new_items.append(item)
+                else:
+                    _rappend((item, community))
+            if new_docs:
+                result = communities_col.insert_many(new_docs, ordered=True)
+                for doc, oid, item in zip(new_docs, result.inserted_ids, new_items):
+                    doc['_id'] = oid
+                    _rappend((item, doc))
+                    _linfo(f'New {type_label} community created: {item}')
+            # Re-sort resolved to preserve original items order
+            item_order = {item: idx for idx, item in enumerate(items)}
+            resolved.sort(key=lambda x: item_order.get(x[0], 0))
 
-                # Üyelik var mı kontrol et
-                existing = members_col.find_one({
-                    'community_id': str(community['_id']),
-                    'user_id': user_id
-                })
+            # Batch fetch existing memberships in one query
+            community_ids = [str(c['_id']) for _, c in resolved]
+            already_member = {
+                doc['community_id']
+                for doc in members_col.find(
+                    {'community_id': {'$in': community_ids}, 'user_id': user_id},
+                    {'community_id': 1},
+                )
+            }
 
-                if not existing:
-                    # ✅ PENDING durumunda davet gönder (onay bekleme)
-                    members_col.insert_one({
-                        'community_id': str(community['_id']),
+            # Batch insert missing memberships
+            new_memberships = []
+            invited_items = []
+            for item, community in resolved:
+                cid = str(community['_id'])
+                if cid not in already_member:
+                    new_memberships.append({
+                        'community_id': cid,
                         'user_id': user_id,
-                        'status': 'pending',  # 🔐 Onay bekleme durumu
-                        'joined_at': None,  # Henüz katılmadı
-                        'approved_at': None,  # Onay tarihi boş
-                        'harmony_level': 75,  # Default uyum seviyesi
-                        'is_mod': False,
-                        'invited_at': time.time()  # Davet tarihi
-                    })
-
-                    invitations_count += 1
-                    log.info(f'Kullanıcı {user_id} "{sifat}" topluluğuna DAVET gönderildi (onay bekleme).')
-
-            except Exception as e:
-                log.warning(f'Sıfat topluluğu davetiyle hata ({sifat}): {e}')
-
-        # 2. Modül tabanlı topluluklara davet gönder
-        for module in modules:
-            try:
-                # Modül için topluluk var mı?
-                community = communities_col.find_one({
-                    'type': 'MODULE',
-                    'trait_name': module
-                })
-
-                if not community:
-                    # Eğer yok, oluştur
-                    community = {
-                        'name': f'{module} Modülü',
-                        'type': 'MODULE',
-                        'trait_name': module,
-                        'description': f'{module} modülüne abone olan kişilerin toplandığı topluluk.',
-                        'founder_id': 0,  # System
-                        'member_count': 0,
-                        'is_active': True,
-                        'created_at': time.time(),
-                        'updated_at': time.time(),
-                        'rules': '',
-                        'moderation_policy': 'automated'
-                    }
-                    result = communities_col.insert_one(community)
-                    community['_id'] = result.inserted_id
-                    log.info(f'Yeni modül topluluğu oluşturuldu: {module}')
-
-                # Üyelik var mı kontrol et
-                existing = members_col.find_one({
-                    'community_id': str(community['_id']),
-                    'user_id': user_id
-                })
-
-                if not existing:
-                    # ✅ PENDING durumunda davet gönder (onay bekleme)
-                    members_col.insert_one({
-                        'community_id': str(community['_id']),
-                        'user_id': user_id,
-                        'status': 'pending',  # 🔐 Onay bekleme durumu
+                        'status': 'pending',
                         'joined_at': None,
                         'approved_at': None,
                         'harmony_level': 75,
                         'is_mod': False,
-                        'invited_at': time.time()
+                        'invited_at': now_ts,
                     })
+                    invited_items.append(item)
+            if new_memberships:
+                try:
+                    members_col.insert_many(new_memberships, ordered=False)
+                    invitations_count += len(new_memberships)
+                    for item in invited_items:
+                        _linfo(f'User {user_id} INVITED to "{item}" {type_label} community (awaiting approval).')
+                except Exception as e:
+                    log.warning(f'{type_label} community batch invite error: {e}')
 
-                    invitations_count += 1
-                    log.info(f'Kullanıcı {user_id} "{module}" modül topluluğuna DAVET gönderildi (onay bekleme).')
+        # 1. Sıfat tabanlı topluluklara davet gönder
+        _process_communities(
+            top_sifats, 'TRAIT',
+            lambda s: f'{s} Topluluğu',
+            lambda s: f'{s} özelliklerine sahip kişilerin toplandığı topluluk.',
+        )
 
-            except Exception as e:
-                log.warning(f'Modül topluluğu davetiyle hata ({module}): {e}')
+        # 2. Modül tabanlı topluluklara davet gönder
+        _process_communities(
+            modules, 'MODULE',
+            lambda m: f'{m} Modülü',
+            lambda m: f'{m} modülüne abone olan kişilerin toplandığı topluluk.',
+        )
 
         return {
             'success': True,
             'invitations_sent': invitations_count,
             'pending_approvals': invitations_count,
-            'message': f'Kullanıcıya {invitations_count} topluluk davetiyeleri gönderildi. Lütfen onayı beklemektedir.'
+            'message': f'{invitations_count} community invitations sent. Awaiting approval.'
         }
 
     except Exception as e:
-        log.exception(f'auto_add_to_communities hatası: {e}')
+        log.exception(f'auto_add_to_communities error: {e}')
         return {
             'success': False,
             'invitations_sent': 0,
             'pending_approvals': 0,
-            'message': f'Hata: {str(e)}'
+            'message': 'Community assignment failed.'
         }
 
 
@@ -213,7 +197,7 @@ def find_and_notify_compatible_users(user_id: int, limit: int = 10):
             return {
                 'success': False,
                 'compatible_users': 0,
-                'message': 'Kullanıcı bulunamadı.'
+                'message': 'User not found.'
             }
 
         _, find_compat = _load_compatibility_module()
@@ -221,32 +205,30 @@ def find_and_notify_compatible_users(user_id: int, limit: int = 10):
             return {
                 'success': False,
                 'compatible_users': 0,
-                'message': 'Compatibility modülü yüklenemedı.'
+                'message': 'Compatibility module could not be loaded.'
             }
 
         users_col = _get_users_col()
-        all_users = list(users_col.find({'id': {'$ne': user_id}}, {
-            '_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1,
-            'top_sifats': 1, 'modules': 1
-        }).limit(100))
+        all_users = list(users_col.find({'id': {'$ne': user_id}}, _COMPAT_USER_PROJ).limit(100))
 
         # Uyumlu kullanıcıları bul
         compatible_users = find_compat(user_id, [user] + all_users, 'UYUMLU', limit)
 
-        log.info(f'Kullanıcı {user_id} için {len(compatible_users)} uyumlu kullanıcı bulundu.')
+        n_compat = len(compatible_users)
+        log.info(f'Found {n_compat} compatible users for user {user_id}.')
 
         # TODO: Notification gönder (future phase)
 
         return {
             'success': True,
-            'compatible_users': len(compatible_users),
-            'message': f'{len(compatible_users)} uyumlu kullanıcı bulundu.'
+            'compatible_users': n_compat,
+            'message': f'{n_compat} compatible users found.',
         }
 
     except Exception as e:
-        log.exception(f'find_and_notify_compatible_users hatası: {e}')
+        log.exception(f'find_and_notify_compatible_users error: {e}')
         return {
             'success': False,
             'compatible_users': 0,
-            'message': f'Hata: {str(e)}'
+            'message': 'Compatible user search failed.'
         }

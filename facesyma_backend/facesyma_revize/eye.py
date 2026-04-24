@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 from iris import iris_input
 
 eye = ([7,157,398,249])

@@ -6,6 +6,7 @@ Beslenme tavsiye motoru - Ana algoritma
 
 import logging
 from datetime import datetime
+from operator import itemgetter, attrgetter
 from typing import List, Tuple, Optional, Dict, Any
 from .models import (
     UserProfile,
@@ -72,26 +73,27 @@ class RecommendationEngine:
         Gluten-free istenirse: Sadece gluten-free döndür.
         """
         filtered = []
+        _dp_gf   = dietary_pref.gluten_free
+        _dp_veg  = dietary_pref.vegan
+        _dp_vegr = dietary_pref.vegetarian
+        _dp_omni = dietary_pref.omnivore
 
         for meal in meals:
+            _md = meal.dietary
             # Gluten-free kontrol
-            if dietary_pref.gluten_free and not meal.dietary.gluten_free:
+            if _dp_gf and not _md.gluten_free:
                 continue
 
             # Vegan kontrol
-            if dietary_pref.vegan and not meal.dietary.vegan:
+            if _dp_veg and not _md.vegan:
                 continue
 
             # Vegetarian kontrol
-            if dietary_pref.vegetarian and not meal.dietary.vegetarian:
+            if _dp_vegr and not _md.vegetarian:
                 continue
 
             # Omnivore kontrol (her şey)
-            if (
-                not dietary_pref.omnivore
-                and not dietary_pref.vegetarian
-                and not dietary_pref.vegan
-            ):
+            if not _dp_omni and not _dp_vegr and not _dp_veg:
                 # Hiçbir tercih belirtilmemişse omnivore yemeklere izin ver
                 pass
 
@@ -128,7 +130,7 @@ class RecommendationEngine:
         ]
 
         # Skora göre sırala
-        scored_meals.sort(key=lambda x: x[1], reverse=True)
+        scored_meals.sort(key=itemgetter(1), reverse=True)
 
         return scored_meals[:count]
 
@@ -144,6 +146,10 @@ class RecommendationEngine:
         2. Son 7 gündeki yemekleri hariç tut
         3. Her öğün için en iyi yemekleri seç
         """
+        _filter  = self._filter_meals_by_dietary
+        _exclude = self._exclude_recent_meals
+        _top     = self._get_top_meals
+        _reason  = self._generate_reason
         lang_code = user_profile.language_code
         country = self.db.get_country_meals(lang_code)
 
@@ -157,20 +163,22 @@ class RecommendationEngine:
         dietary_pref = user_profile.dietary_preference
 
         # Sabah, öğlen, akşam için tavsiye yap
-        breakfast_meals = country.meals.breakfast
-        breakfast_meals = self._filter_meals_by_dietary(breakfast_meals, dietary_pref)
-        breakfast_meals = self._exclude_recent_meals(breakfast_meals, recent_meal_ids)
-        breakfast_top = self._get_top_meals(breakfast_meals, user_profile.sifats, "breakfast", count=1)
+        _sifats = user_profile.sifats
+        _cm = country.meals
+        breakfast_meals = _cm.breakfast
+        breakfast_meals = _filter(breakfast_meals, dietary_pref)
+        breakfast_meals = _exclude(breakfast_meals, recent_meal_ids)
+        breakfast_top = _top(breakfast_meals, _sifats, "breakfast", count=1)
 
-        lunch_meals = country.meals.lunch
-        lunch_meals = self._filter_meals_by_dietary(lunch_meals, dietary_pref)
-        lunch_meals = self._exclude_recent_meals(lunch_meals, recent_meal_ids)
-        lunch_top = self._get_top_meals(lunch_meals, user_profile.sifats, "lunch", count=1)
+        lunch_meals = _cm.lunch
+        lunch_meals = _filter(lunch_meals, dietary_pref)
+        lunch_meals = _exclude(lunch_meals, recent_meal_ids)
+        lunch_top = _top(lunch_meals, _sifats, "lunch", count=1)
 
-        dinner_meals = country.meals.dinner
-        dinner_meals = self._filter_meals_by_dietary(dinner_meals, dietary_pref)
-        dinner_meals = self._exclude_recent_meals(dinner_meals, recent_meal_ids)
-        dinner_top = self._get_top_meals(dinner_meals, user_profile.sifats, "dinner", count=1)
+        dinner_meals = _cm.dinner
+        dinner_meals = _filter(dinner_meals, dietary_pref)
+        dinner_meals = _exclude(dinner_meals, recent_meal_ids)
+        dinner_top = _top(dinner_meals, _sifats, "dinner", count=1)
 
         # Fallback: Eğer yemek bulunamadısa default seç
         if not breakfast_top:
@@ -184,11 +192,14 @@ class RecommendationEngine:
         lunch_meal = lunch_top[0][0]
         dinner_meal = dinner_top[0][0]
 
+        if not breakfast_meal or not lunch_meal or not dinner_meal:
+            raise ValueError("No meals available for recommendation.")
+
         # MealRecommendation oluştur
         breakfast_rec = MealRecommendation(
             name=breakfast_meal.name_tr,
             description=breakfast_meal.description,
-            reason=self._generate_reason(breakfast_meal, user_profile.sifats),
+            reason=_reason(breakfast_meal, _sifats),
             nutrition=breakfast_meal.nutrition,
             prep_time_min=breakfast_meal.prep_time_min,
             vegan_substitute=breakfast_meal.vegan_substitute,
@@ -197,7 +208,7 @@ class RecommendationEngine:
         lunch_rec = MealRecommendation(
             name=lunch_meal.name_tr,
             description=lunch_meal.description,
-            reason=self._generate_reason(lunch_meal, user_profile.sifats),
+            reason=_reason(lunch_meal, _sifats),
             nutrition=lunch_meal.nutrition,
             prep_time_min=lunch_meal.prep_time_min,
             vegan_substitute=lunch_meal.vegan_substitute,
@@ -206,14 +217,14 @@ class RecommendationEngine:
         dinner_rec = MealRecommendation(
             name=dinner_meal.name_tr,
             description=dinner_meal.description,
-            reason=self._generate_reason(dinner_meal, user_profile.sifats),
+            reason=_reason(dinner_meal, _sifats),
             nutrition=dinner_meal.nutrition,
             prep_time_min=dinner_meal.prep_time_min,
             vegan_substitute=dinner_meal.vegan_substitute,
         )
 
         # Top sıfatları bul
-        top_sifats = sorted(user_profile.sifats, key=lambda x: x.score, reverse=True)[:3]
+        top_sifats = sorted(_sifats, key=attrgetter('score'), reverse=True)[:3]
         top_sifat_names = [s.sifat for s in top_sifats]
 
         return DailyRecommendation(
@@ -234,8 +245,9 @@ class RecommendationEngine:
         """
         matching_sifats = []
         for user_sifat in user_sifats:
-            if user_sifat.sifat in meal.sifat_appeal:
-                matching_sifats.append(user_sifat.sifat)
+            _uss = user_sifat.sifat
+            if _uss in meal.sifat_appeal:
+                matching_sifats.append(_uss)
 
         if matching_sifats:
             sifat_str = ", ".join(matching_sifats[:2])
@@ -262,19 +274,21 @@ class RecommendationEngine:
         recent_meal_ids = [meal.meal_id for meal in user_profile.last_7_meals]
 
         # Öğün tipine göre yemekleri al
+        _cm = country.meals
         if meal_type == "breakfast":
-            meals = country.meals.breakfast
+            meals = _cm.breakfast
         elif meal_type == "lunch":
-            meals = country.meals.lunch
+            meals = _cm.lunch
         else:
-            meals = country.meals.dinner
+            meals = _cm.dinner
 
         # Filtrele ve tekrarlama engelle
-        meals = self._filter_meals_by_dietary(meals, dietary_pref)
-        meals = self._exclude_recent_meals(meals, recent_meal_ids)
+        meals = _filter(meals, dietary_pref)
+        meals = _exclude(meals, recent_meal_ids)
 
         # Top yemekleri al
-        top_meals = self._get_top_meals(meals, user_profile.sifats, meal_type, count=count)
+        _sifats = user_profile.sifats
+        top_meals = _top(meals, _sifats, meal_type, count=count)
 
         # Dict olarak döndür
         alternatives = []
@@ -282,7 +296,7 @@ class RecommendationEngine:
             alternatives.append({
                 "name": meal.name_tr,
                 "description": meal.description,
-                "reason": self._generate_reason(meal, user_profile.sifats),
+                "reason": self._generate_reason(meal, _sifats),
                 "score": round(score, 2),
             })
 

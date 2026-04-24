@@ -27,12 +27,13 @@ def setup_collections():
     print("\n1️⃣  Creating analysis_cache collection...")
     try:
         col = db['analysis_cache']
+        _cidx = col.create_index
 
         # Indexes
-        col.create_index([('user_id', ASCENDING), ('lang', ASCENDING)])
-        col.create_index([('user_id', ASCENDING), ('lang', ASCENDING), ('photo_hash', ASCENDING)])
-        col.create_index([('created_at', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
-        col.create_index([('accessed_at', DESCENDING)])
+        _cidx([('user_id', ASCENDING), ('lang', ASCENDING)])
+        _cidx([('user_id', ASCENDING), ('lang', ASCENDING), ('photo_hash', ASCENDING)])
+        _cidx([('created_at', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
+        _cidx([('accessed_at', DESCENDING)])
 
         print("   ✅ analysis_cache OK")
         print("   - Index 1: (user_id, lang)")
@@ -47,13 +48,14 @@ def setup_collections():
     print("\n2️⃣  Creating compatibility_cache collection...")
     try:
         col = db['compatibility_cache']
+        _cidx = col.create_index
 
         # Indexes
-        col.create_index([('user1_id', ASCENDING), ('user2_id', ASCENDING)], unique=True)
-        col.create_index([('user1_id', ASCENDING)])
-        col.create_index([('user2_id', ASCENDING)])
-        col.create_index([('created_at', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
-        col.create_index([('score', DESCENDING)])
+        _cidx([('user1_id', ASCENDING), ('user2_id', ASCENDING)], unique=True)
+        _cidx([('user1_id', ASCENDING)])
+        _cidx([('user2_id', ASCENDING)])
+        _cidx([('created_at', ASCENDING)], expireAfterSeconds=2592000)  # 30 days
+        _cidx([('score', DESCENDING)])
 
         print("   ✅ compatibility_cache OK")
         print("   - Index 1: (user1_id, user2_id) UNIQUE")
@@ -69,11 +71,12 @@ def setup_collections():
     print("\n3️⃣  Creating user_profiles collection...")
     try:
         col = db['user_profiles']
+        _cidx = col.create_index
 
         # Indexes
-        col.create_index([('user_id', ASCENDING)], unique=True)
-        col.create_index([('partner_id', ASCENDING)])
-        col.create_index([('updated_at', DESCENDING)])
+        _cidx([('user_id', ASCENDING)], unique=True)
+        _cidx([('partner_id', ASCENDING)])
+        _cidx([('updated_at', DESCENDING)])
 
         print("   ✅ user_profiles OK")
         print("   - Index 1: (user_id) UNIQUE")
@@ -87,10 +90,11 @@ def setup_collections():
     print("\n4️⃣  Creating chat_context_stats collection...")
     try:
         col = db['chat_context_stats']
+        _cidx = col.create_index
 
         # Indexes (monitoring için)
-        col.create_index([('timestamp', DESCENDING)])
-        col.create_index([('user_id', ASCENDING)])
+        _cidx([('timestamp', DESCENDING)])
+        _cidx([('user_id', ASCENDING)])
 
         print("   ✅ chat_context_stats OK")
         print("   - Index 1: timestamp DESC (for monitoring)")
@@ -105,10 +109,14 @@ def setup_collections():
 
     # İstatistikler
     print("\n📊 Collection Statistics:")
-    print(f"   - analysis_cache: {db['analysis_cache'].count_documents({})}")
-    print(f"   - compatibility_cache: {db['compatibility_cache'].count_documents({})}")
-    print(f"   - user_profiles: {db['user_profiles'].count_documents({})}")
-    print(f"   - chat_context_stats: {db['chat_context_stats'].count_documents({})}")
+    _ac_col = db['analysis_cache']
+    _cc_col = db['compatibility_cache']
+    _up_col = db['user_profiles']
+    _cs_col = db['chat_context_stats']
+    print(f"   - analysis_cache: {_ac_col.count_documents({})}")
+    print(f"   - compatibility_cache: {_cc_col.count_documents({})}")
+    print(f"   - user_profiles: {_up_col.count_documents({})}")
+    print(f"   - chat_context_stats: {_cs_col.count_documents({})}")
 
     client.close()
     print("\n✨ Setup complete!")

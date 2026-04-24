@@ -494,11 +494,11 @@
             for (const [type, metrics] of Object.entries(byType)) {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td>${type}</td>
-                    <td>${metrics.count}</td>
-                    <td>${metrics.average_ms.toFixed(2)}ms</td>
-                    <td>${metrics.min_ms.toFixed(2)}ms</td>
-                    <td>${metrics.max_ms.toFixed(2)}ms</td>
+                    <td>${escapeHtml(type)}</td>
+                    <td>${escapeHtml(String(metrics.count))}</td>
+                    <td>${escapeHtml(metrics.average_ms.toFixed(2))}ms</td>
+                    <td>${escapeHtml(metrics.min_ms.toFixed(2))}ms</td>
+                    <td>${escapeHtml(metrics.max_ms.toFixed(2))}ms</td>
                 `;
             }
             if (Object.keys(byType).length === 0) {
@@ -527,8 +527,8 @@
             for (const [type, count] of Object.entries(byType)) {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td>${type}</td>
-                    <td>${count}</td>
+                    <td>${escapeHtml(type)}</td>
+                    <td>${escapeHtml(String(count))}</td>
                 `;
             }
             if (Object.keys(byType).length === 0) {
@@ -553,8 +553,8 @@
                 const div = document.createElement('div');
                 div.className = 'health-component';
                 div.innerHTML = `
-                    <span class="component-name">${name}</span>
-                    <span class="component-status ${status.toLowerCase()}">${status}</span>
+                    <span class="component-name">${escapeHtml(name)}</span>
+                    <span class="component-status ${escapeHtml(status.toLowerCase())}">${escapeHtml(status)}</span>
                 `;
                 componentContainer.appendChild(div);
             }
@@ -638,6 +638,12 @@
             }
         }
 
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(String(str ?? '')));
+            return d.innerHTML;
+        }
+
         function formatTimestamp(ts) {
             if (!ts) return '';
             const date = new Date(ts);
@@ -646,7 +652,11 @@
 
         function showError(msg) {
             const container = document.getElementById('error-container');
-            container.innerHTML = `<div class="error-message">${msg}</div>`;
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = String(msg ?? '');
+            container.innerHTML = '';
+            container.appendChild(div);
         }
 
         function clearError() {

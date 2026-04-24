@@ -186,9 +186,9 @@
                         const percentage = ((count / statsData.total_users) * 100).toFixed(2);
                         planHtml += `
                             <tr>
-                                <td style="text-transform: capitalize;">${plan}</td>
-                                <td>${count}</td>
-                                <td>${percentage}%</td>
+                                <td style="text-transform: capitalize;">${escapeHtml(plan)}</td>
+                                <td>${escapeHtml(String(count))}</td>
+                                <td>${escapeHtml(percentage)}%</td>
                             </tr>
                         `;
                     }
@@ -202,9 +202,9 @@
                         const percentage = ((count / statsData.total_users) * 100).toFixed(2);
                         authHtml += `
                             <tr>
-                                <td style="text-transform: capitalize;">${method}</td>
-                                <td>${count}</td>
-                                <td>${percentage}%</td>
+                                <td style="text-transform: capitalize;">${escapeHtml(method)}</td>
+                                <td>${escapeHtml(String(count))}</td>
+                                <td>${escapeHtml(percentage)}%</td>
                             </tr>
                         `;
                     }
@@ -314,7 +314,7 @@
                     const colors = ['#4CAF50', '#2196F3', '#FF9800', '#d4af37'];
                     funnelHtml += `
                         <div class="funnel-step" style="width: ${width}%; background: ${colors[idx]};">
-                            <span>${step.name} (${step.count})</span>
+                            <span>${escapeHtml(step.name)} (${escapeHtml(String(step.count))})</span>
                         </div>
                     `;
                 });
@@ -337,10 +337,10 @@
                     if (risk) {
                         churnHtml += `
                             <tr>
-                                <td>${riskLabel}</td>
-                                <td>${risk.count}</td>
-                                <td>${risk.percentage}%</td>
-                                <td>${risk.recommendation}</td>
+                                <td>${escapeHtml(riskLabel)}</td>
+                                <td>${escapeHtml(String(risk.count))}</td>
+                                <td>${escapeHtml(String(risk.percentage))}%</td>
+                                <td>${escapeHtml(risk.recommendation)}</td>
                             </tr>
                         `;
                     }

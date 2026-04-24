@@ -1,5 +1,4 @@
 """Community mission service"""
-from typing import Optional, Dict, Any, List
 
 
 class CommunityMissionService:

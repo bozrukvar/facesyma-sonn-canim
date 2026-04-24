@@ -1,6 +1,4 @@
 """Challenge service"""
-from typing import Optional, Dict, Any, List
-
 class ChallengeService:
     """Service for managing challenges"""
     def get_active_challenges(self, user_id, challenge_type=None):

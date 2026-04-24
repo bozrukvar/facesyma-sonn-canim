@@ -27,6 +27,7 @@ if __name__ == '__main__':
     if result:
         print("✓ Admin kullanıcısı başarıyla oluşturuldu!")
         print("  E-posta: admin@facesyma.com")
-        print("  Şifre: admin123")
+        print("  Şifre: Yukarıdaki '[create_default_admin] Temporary password:' satırına bakın.")
+        print("  UYARI: Giriş yaptıktan sonra şifrenizi mutlaka değiştirin!")
     else:
         print("✓ Admin kullanıcısı zaten mevcut.")

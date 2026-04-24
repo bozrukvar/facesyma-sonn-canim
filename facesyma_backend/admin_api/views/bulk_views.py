@@ -18,10 +18,15 @@ from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+
+_USER_EXPORT_FIELDS = ['id', 'email', 'username', 'plan', 'is_active', 'date_joined']
 from admin_api.utils.auth import _require_admin
 from admin_api.utils.mongo import get_users_col, get_plan_log_col, _get_db, _next_id
 
 log = logging.getLogger(__name__)
+
+_BULK_UPDATE_PLANS = frozenset({'free', 'premium'})
+_BULK_EXPORT_PLANS = frozenset({'free', 'premium', 'tier_a', 'tier_b', 'tier_c', 'tier_d'})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -33,15 +38,22 @@ class BulkUserUpdateView(View):
         try:
             _require_admin(request)
             data = json.loads(request.body)
-            user_ids = data.get('user_ids', [])
-            plan = data.get('plan')
-            is_active = data.get('is_active')
+            _dget = data.get
+            user_ids = _dget('user_ids', [])
+            plan = _dget('plan')
+            is_active = _dget('is_active')
 
             if not user_ids:
-                return JsonResponse({'detail': 'user_ids boş olamaz'}, status=400)
+                return JsonResponse({'detail': 'user_ids cannot be empty'}, status=400)
 
             if not isinstance(user_ids, list):
-                return JsonResponse({'detail': 'user_ids bir liste olmalı'}, status=400)
+                return JsonResponse({'detail': 'user_ids must be a list'}, status=400)
+
+            if len(user_ids) > 100:
+                return JsonResponse({'detail': 'Maximum 100 users per bulk operation.'}, status=400)
+
+            if plan is not None and plan not in _BULK_UPDATE_PLANS:
+                return JsonResponse({'detail': f'Invalid plan. Allowed: {", ".join(sorted(_BULK_UPDATE_PLANS))}'}, status=400)
 
             # MongoDB update
             users_col = get_users_col()
@@ -49,40 +61,51 @@ class BulkUserUpdateView(View):
             if plan is not None:
                 update_data['plan'] = plan
             if is_active is not None:
-                update_data['is_active'] = is_active
+                update_data['is_active'] = bool(is_active)
 
             if not update_data:
-                return JsonResponse({'detail': 'Güncellenecek alan seçin'}, status=400)
+                return JsonResponse({'detail': 'Select a field to update'}, status=400)
+
+            # Snapshot old plans BEFORE the bulk update (for accurate change log)
+            old_plan_map = {}
+            if plan is not None:
+                for user in users_col.find({'id': {'$in': user_ids}}, {'id': 1, 'email': 1, 'plan': 1}):
+                    _uget = user.get
+                    old_plan_map[user['id']] = {'email': _uget('email'), 'old_plan': _uget('plan')}
 
             result = users_col.update_many(
                 {'id': {'$in': user_ids}},
                 {'$set': update_data}
             )
 
-            # Log plan changes
+            # Log plan changes using pre-update snapshot
             if plan is not None:
                 plan_log_col = get_plan_log_col()
+                _now_iso = datetime.utcnow().isoformat()
+                log_entries = []
                 for uid in user_ids:
-                    user = users_col.find_one({'id': uid})
-                    if user:
-                        log_entry = {
+                    snap = old_plan_map.get(uid)
+                    if snap:
+                        log_entries.append({
                             'id': _next_id(plan_log_col),
                             'user_id': uid,
-                            'user_email': user.get('email'),
-                            'old_plan': user.get('plan'),
+                            'user_email': snap['email'],
+                            'old_plan': snap['old_plan'],
                             'new_plan': plan,
                             'changed_by': 'bulk_update',
-                            'changed_at': datetime.utcnow().isoformat()
-                        }
-                        plan_log_col.insert_one(log_entry)
+                            'changed_at': _now_iso
+                        })
+                if log_entries:
+                    plan_log_col.insert_many(log_entries, ordered=False)
 
-            log.info(f"Bulk update: {result.modified_count} kullanıcı güncellendi")
+            _mod_count = result.modified_count
+            log.info(f"Bulk update: {_mod_count} users updated")
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'message': f'{result.modified_count} kullanıcı güncellendi',
-                    'updated': result.modified_count,
+                    'message': f'{_mod_count} users updated',
+                    'updated': _mod_count,
                     'user_ids': user_ids
                 }
             })
@@ -92,8 +115,8 @@ class BulkUserUpdateView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
         except Exception as e:
-            log.exception(f'Bulk update hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Bulk update error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -103,15 +126,21 @@ class BulkUserDeleteView(View):
     def delete(self, request):
         """Birden fazla kullanıcıyı sil"""
         try:
-            _require_admin(request)
+            payload = _require_admin(request)
+            if payload.get('role') != 'superadmin':
+                return JsonResponse({'detail': 'Bulk delete requires superadmin role.'}, status=403)
+
             data = json.loads(request.body)
             user_ids = data.get('user_ids', [])
 
             if not user_ids:
-                return JsonResponse({'detail': 'user_ids boş olamaz'}, status=400)
+                return JsonResponse({'detail': 'user_ids cannot be empty'}, status=400)
 
             if not isinstance(user_ids, list):
-                return JsonResponse({'detail': 'user_ids bir liste olmalı'}, status=400)
+                return JsonResponse({'detail': 'user_ids must be a list'}, status=400)
+
+            if len(user_ids) > 50:
+                return JsonResponse({'detail': 'Maximum 50 users per bulk delete.'}, status=400)
 
             # MongoDB delete
             db = _get_db()
@@ -124,15 +153,16 @@ class BulkUserDeleteView(View):
             # Delete related analysis
             analysis_result = analysis_col.delete_many({'user_id': {'$in': user_ids}})
 
-            log.info(f"Bulk delete: {user_result.deleted_count} kullanıcı silindi, "
-                     f"{analysis_result.deleted_count} analiz silindi")
+            _del_users = user_result.deleted_count
+            _del_analyses = analysis_result.deleted_count
+            log.info(f"Bulk delete: {_del_users} users deleted, {_del_analyses} analyses deleted")
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'message': f'{user_result.deleted_count} kullanıcı silindi',
-                    'deleted': user_result.deleted_count,
-                    'analyses_deleted': analysis_result.deleted_count
+                    'message': f'{_del_users} users deleted',
+                    'deleted': _del_users,
+                    'analyses_deleted': _del_analyses
                 }
             })
 
@@ -141,8 +171,8 @@ class BulkUserDeleteView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
         except Exception as e:
-            log.exception(f'Bulk delete hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Bulk delete error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -155,14 +185,19 @@ class BulkUserExportView(View):
             _require_admin(request)
 
             # Filters
-            plan = request.GET.get('plan')  # free, premium
-            is_active = request.GET.get('is_active')  # true, false
-            export_format = request.GET.get('format', 'csv')  # csv, json
-            limit = int(request.GET.get('limit', 10000))
+            _qp = request.GET
+            _qpget = _qp.get
+            plan = _qpget('plan')  # free, premium
+            is_active = _qpget('is_active')  # true, false
+            export_format = _qpget('format', 'csv')  # csv, json
+            try:
+                limit = min(max(1, int(_qpget('limit', 10000))), 50000)
+            except (ValueError, TypeError):
+                limit = 10000
 
             # Build query
             query = {}
-            if plan:
+            if plan and plan in _BULK_EXPORT_PLANS:
                 query['plan'] = plan
             if is_active is not None:
                 query['is_active'] = is_active.lower() == 'true'
@@ -172,12 +207,13 @@ class BulkUserExportView(View):
             users = list(users_col.find(query).limit(limit))
 
             if not users:
-                return JsonResponse({'detail': 'Hiçbir kullanıcı bulunamadı'}, status=404)
+                return JsonResponse({'detail': 'No users found'}, status=404)
 
             if export_format == 'json':
                 # JSON export
                 for u in users:
-                    u['_id'] = str(u['_id'])
+                    _oid = u['_id']
+                    u['_id'] = str(_oid)
                 response = HttpResponse(
                     json.dumps(users, indent=2, ensure_ascii=False),
                     content_type='application/json'
@@ -189,18 +225,18 @@ class BulkUserExportView(View):
                 # CSV export
                 output = io.StringIO()
                 if users:
-                    fieldnames = ['id', 'email', 'username', 'plan', 'is_active', 'date_joined']
-                    writer = csv.DictWriter(output, fieldnames=fieldnames)
+                    writer = csv.DictWriter(output, fieldnames=_USER_EXPORT_FIELDS)
                     writer.writeheader()
 
                     for user in users:
+                        _uget = user.get
                         row = {
-                            'id': user.get('id'),
-                            'email': user.get('email'),
-                            'username': user.get('username'),
-                            'plan': user.get('plan'),
-                            'is_active': user.get('is_active'),
-                            'date_joined': user.get('date_joined')
+                            'id': _uget('id'),
+                            'email': _uget('email'),
+                            'username': _uget('username'),
+                            'plan': _uget('plan'),
+                            'is_active': _uget('is_active'),
+                            'date_joined': _uget('date_joined')
                         }
                         writer.writerow(row)
 
@@ -209,12 +245,12 @@ class BulkUserExportView(View):
                 return response
 
             else:
-                return JsonResponse({'detail': 'Geçersiz format. csv veya json seçin'}, status=400)
+                return JsonResponse({'detail': 'Invalid format. Choose csv or json'}, status=400)
 
         except ValueError as e:
             return JsonResponse({'detail': str(e)}, status=401)
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
         except Exception as e:
-            log.exception(f'Bulk export hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'Bulk export error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

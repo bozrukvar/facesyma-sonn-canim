@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 
-from admin_api.utils.auth import _require_auth
+from admin_api.utils.auth import _require_admin
 
 log = logging.getLogger(__name__)
 
@@ -26,18 +26,24 @@ class GamificationDashboardHTMLView(View):
 
     def get(self, request):
         try:
-            # Require authentication
-            _require_auth(request)
+            # Require admin authentication
+            _require_admin(request)
 
             # Render HTML template
             html = render_to_string('gamification_dashboard.html', {})
 
             return HttpResponse(html, content_type='text/html')
 
+        except (ValueError, PermissionError):
+            return HttpResponse(
+                '<h1>Unauthorized</h1><p>Admin access required.</p>',
+                content_type='text/html',
+                status=401
+            )
         except Exception as e:
             log.error(f"GamificationDashboardHTMLView error: {e}", exc_info=True)
             return HttpResponse(
-                f"<h1>Error</h1><p>{str(e)}</p>",
+                '<h1>Error</h1><p>Internal server error.</p>',
                 content_type='text/html',
                 status=500
             )

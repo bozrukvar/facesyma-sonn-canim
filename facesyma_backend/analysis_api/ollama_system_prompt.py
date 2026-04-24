@@ -17,8 +17,6 @@ Kullanım:
     )
 """
 
-import json
-
 # Cultural personas for 18 languages
 CULTURAL_PERSONAS = {
     'tr': {'tone': 'samimi, sıcak, abi/abla gibi', 'emoji': '2-3/mesaj', 'honorific': 'sen'},
@@ -66,56 +64,39 @@ def get_system_prompt(lang: str = 'tr', context: dict = None) -> str:
     if not context:
         context = {}
 
-    # Dil eşlemesi
-    lang_map = {
-        'tr': _get_turkish_prompt,
-        'en': _get_english_prompt,
-        'de': _get_german_prompt,
-        'ru': _get_russian_prompt,
-        'ar': _get_arabic_prompt,
-        'es': _get_spanish_prompt,
-        'ko': _get_korean_prompt,
-        'ja': _get_japanese_prompt,
-        'zh': _get_chinese_prompt,
-        'hi': _get_hindi_prompt,
-        'fr': _get_french_prompt,
-        'pt': _get_portuguese_prompt,
-        'bn': _get_bengali_prompt,
-        'id': _get_indonesian_prompt,
-        'ur': _get_urdu_prompt,
-        'it': _get_italian_prompt,
-        'vi': _get_vietnamese_prompt,
-        'pl': _get_polish_prompt,
-    }
-
     # Normalize lang (remove region suffix)
     base_lang = lang.split('-')[0].lower()
-    prompt_func = lang_map.get(base_lang, _get_english_prompt)
+    prompt_func = _LANG_MAP.get(base_lang, _get_english_prompt)
     return prompt_func(context)
 
 
 def _get_turkish_prompt(context: dict) -> str:
     """Türkçe sistem prompt"""
 
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
     # Temel bilgi
-    user_name = user_data.get('name', 'Arkadaş')
+    user_name = _udget('name', 'Arkadaş')
     top_sifats = ', '.join(
-        [s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]
+        [s.get('name', s) for s in _udget('top_sifatlar', [])][:5]
     ) or 'Bilinmiyor'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
+    golden_ratio = _udget('golden_ratio', 1.618)
 
     # Benzeşmeler
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
 
     # Kalite metrikleri
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     # Golden ratio interpretation
     ratio_interpretation = ""
@@ -155,12 +136,14 @@ KİŞİNİN BENZEŞMELERI (5 Benzeriniz)
     if celebrities:
         prompt += "\n🌟 ÜNLÜLER:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Bilinmiyor')} (Uyum: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Bilinmiyor')} (Uyum: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 TARİHİ FİGÜRLER:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Bilinmiyor')} (Uyum: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Bilinmiyor')} (Uyum: %{_hget('score', 0)})\n"
 
     # Kalite bilgisi
     prompt += f"""
@@ -170,21 +153,24 @@ Genel Skor: %{quality_score}
 """
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
 
-        prompt += f"""  • Parlaklık: {brightness.get('value', 0)}/255 (Puan: %{brightness.get('score', 0)})
-  • Kontrast: {contrast.get('value', 0)}/100 (Puan: %{contrast.get('score', 0)})
-  • Yüz Konumu: %{centering.get('offset', 0)} sapma (Puan: %{centering.get('score', 0)})
-  Tavsiye: {image_quality.get('recommendation', 'İyi')}
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Parlaklık: {_bget('value', 0)}/255 (Puan: %{_bget('score', 0)})
+  • Kontrast: {_cget('value', 0)}/100 (Puan: %{_cget('score', 0)})
+  • Yüz Konumu: %{_cenget('offset', 0)} sapma (Puan: %{_cenget('score', 0)})
+  Tavsiye: {_iqget('recommendation', 'İyi')}
 """
 
     # Uyumluluğu (eğer partner varsa)
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partner')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'UNKNOWN')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'UNKNOWN')
 
         prompt += f"""
 UYUMLULUĞU ANALIZ - {user_name} ↔ {partner_name}
@@ -193,11 +179,11 @@ Uyum Skoru: %{compat_score}
 Kategori: {compat_category}
 """
 
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Ortak Sifatlar: {compatibility['sifat_overlap']} adet\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Ortak Modüller: {compatibility['module_overlap']} adet\n"
-        if compatibility.get('golden_ratio_diff'):
+        if _cmpget('golden_ratio_diff'):
             prompt += f"Altın Oran Farkı: {compatibility['golden_ratio_diff']:.4f}\n"
 
     # Tavsiyeler
@@ -225,25 +211,30 @@ istiyorum. Ne öğrenmek istersin?"
 def _get_english_prompt(context: dict) -> str:
     """English system prompt"""
 
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
     # Basic info
-    user_name = user_data.get('name', 'Friend')
+    user_name = _udget('name', 'Friend')
     top_sifats = ', '.join(
-        [s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]
+        [s.get('name', s) for s in _udget('top_sifatlar', [])][:5]
     ) or 'Unknown'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
+    golden_ratio = _udget('golden_ratio', 1.618)
 
     # Similarities
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
 
     # Quality
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     # Golden ratio interpretation
     ratio_interpretation = ""
@@ -291,12 +282,14 @@ THEIR SIMILARITIES (5 Matches)
     if celebrities:
         prompt += "\n⭐ CELEBRITIES:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Unknown')} (Match: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Unknown')} (Match: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 HISTORICAL FIGURES:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Unknown')} (Match: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Unknown')} (Match: %{_hget('score', 0)})\n"
 
     # Quality
     prompt += f"""
@@ -306,21 +299,24 @@ Overall Score: %{quality_score}
 """
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
 
-        prompt += f"""  • Brightness: {brightness.get('value', 0)}/255 (Score: %{brightness.get('score', 0)})
-  • Contrast: {contrast.get('value', 0)}/100 (Score: %{contrast.get('score', 0)})
-  • Face Position: %{centering.get('offset', 0)} offset (Score: %{centering.get('score', 0)})
-  Recommendation: {image_quality.get('recommendation', 'Good')}
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Brightness: {_bget('value', 0)}/255 (Score: %{_bget('score', 0)})
+  • Contrast: {_cget('value', 0)}/100 (Score: %{_cget('score', 0)})
+  • Face Position: %{_cenget('offset', 0)} offset (Score: %{_cenget('score', 0)})
+  Recommendation: {_iqget('recommendation', 'Good')}
 """
 
     # Compatibility (if partner exists)
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partner')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'UNKNOWN')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'UNKNOWN')
 
         prompt += f"""
 COMPATIBILITY ANALYSIS - {user_name} ↔ {partner_name}
@@ -329,9 +325,9 @@ Compatibility Score: %{compat_score}
 Category: {compat_category}
 """
 
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Shared Traits: {compatibility['sifat_overlap']} traits\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Shared Modules: {compatibility['module_overlap']} modules\n"
 
     # Advice
@@ -358,17 +354,22 @@ growth. What would you like to explore?"
 
 def _get_german_prompt(context: dict) -> str:
     """German system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', 'Freund')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Unbekannt'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', 'Freund')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Unbekannt'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
     prompt = f"""DU BIST EIN KI-BERATER FÜR PERSÖNLICHKEITSANALYSE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -391,22 +392,27 @@ IHRE ÄHNLICHKEITEN (5 Matches)
     if celebrities:
         prompt += "\n⭐ PROMINENTE:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Unbekannt')} (Match: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Unbekannt')} (Match: %{_cget('score', 0)})\n"
     if historical:
         prompt += "\n📚 HISTORISCHE FIGUREN:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Unbekannt')} (Match: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Unbekannt')} (Match: %{_hget('score', 0)})\n"
 
     prompt += f"\nFOTOKWALITÄTSANALYSE\n──────────────────────────────────────────\nGesamtscore: %{quality_score}\n"
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"  • Helligkeit: {brightness.get('value', 0)}/255 (Score: %{brightness.get('score', 0)})\n  • Kontrast: {contrast.get('value', 0)}/100 (Score: %{contrast.get('score', 0)})\n  • Gesichtsposition: %{centering.get('offset', 0)} Abweichung (Score: %{centering.get('score', 0)})\n  Empfehlung: {image_quality.get('recommendation', 'Gut')}\n"
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"  • Helligkeit: {_bget('value', 0)}/255 (Score: %{_bget('score', 0)})\n  • Kontrast: {_cget('value', 0)}/100 (Score: %{_cget('score', 0)})\n  • Gesichtsposition: %{_cenget('offset', 0)} Abweichung (Score: %{_cenget('score', 0)})\n  Empfehlung: {_iqget('recommendation', 'Gut')}\n"
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partner')
-        compat_score = compatibility.get('score', 0)
+        compat_score = _cmpget('score', 0)
         prompt += f"\nKOMPATIBILITÄTSANALYSE - {user_name} ↔ {partner_name}\n──────────────────────────────────────────\nKompatibilitätsscore: %{compat_score}\n"
 
     prompt += """
@@ -429,15 +435,19 @@ Beispiel: "Hallo! Ich bin dein Facesyma Assistent. Ich helfe dir, deine Persönl
 
 def _get_russian_prompt(context: dict) -> str:
     """Russian system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', 'Друг')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Неизвестно'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', 'Друг')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Неизвестно'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""ТЫ ИИ-ПОМОЩНИК ДЛЯ АНАЛИЗА ЛИЧНОСТИ
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -460,16 +470,18 @@ def _get_russian_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ ЗНАМЕНИТОСТИ:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Неизвестно')} (Совпадение: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Неизвестно')} (Совпадение: %{_cget('score', 0)})\n"
     if historical:
         prompt += "\n📚 ИСТОРИЧЕСКИЕ ФИГУРЫ:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Неизвестно')} (Совпадение: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Неизвестно')} (Совпадение: %{_hget('score', 0)})\n"
 
     prompt += f"\nАНАЛИЗ КАЧЕСТВА ФОТО\n──────────────────────────────────────────\nОбщий балл: %{quality_score}\n"
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
         prompt += f"  • Яркость: {brightness.get('value', 0)}/255\n  • Контраст: {contrast.get('value', 0)}/100\n"
 
     prompt += """
@@ -490,14 +502,17 @@ def _get_russian_prompt(context: dict) -> str:
 
 def _get_arabic_prompt(context: dict) -> str:
     """Arabic system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', 'صديق')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'غير معروف'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', 'صديق')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'غير معروف'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
     celebrities = similarity.get('celebrities', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""أنت مستشار ذكاء اصطناعي لتحليل الشخصية
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -520,11 +535,12 @@ def _get_arabic_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ المشاهير:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'غير معروف')} (التطابق: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'غير معروف')} (التطابق: %{_cget('score', 0)})\n"
 
     prompt += f"\nتحليل جودة الصورة\n──────────────────────────────────────────\nالنقاط الإجمالية: %{quality_score}\n"
     if image_quality:
-        prompt += f"  • الإضاءة: {image_quality.get('brightness', {}).get('value', 0)}/255\n  • التباين: {image_quality.get('contrast', {}).get('value', 0)}/100\n"
+        prompt += f"  • الإضاءة: {_iqget('brightness', {}).get('value', 0)}/255\n  • التباين: {_iqget('contrast', {}).get('value', 0)}/100\n"
 
     prompt += """
 نصائح التطور الشخصي
@@ -540,14 +556,17 @@ def _get_arabic_prompt(context: dict) -> str:
 
 def _get_spanish_prompt(context: dict) -> str:
     """Spanish system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', 'Amigo')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Desconocido'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', 'Amigo')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Desconocido'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
     celebrities = similarity.get('celebrities', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""ERES UN ASESOR DE IA PARA ANÁLISIS DE PERSONALIDAD
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -570,7 +589,8 @@ SUS SIMILITUDES (5 coincidencias)
     if celebrities:
         prompt += "\n⭐ CELEBRIDADES:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Desconocido')} (Coincidencia: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Desconocido')} (Coincidencia: %{_cget('score', 0)})\n"
 
     prompt += f"\nANÁLISIS DE CALIDAD DE FOTO\n──────────────────────────────────────────\nPuntuación total: %{quality_score}\n"
 
@@ -588,14 +608,17 @@ Al responder preguntas:
 
 def _get_korean_prompt(context: dict) -> str:
     """Korean system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', '친구')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or '미확인'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', '친구')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or '미확인'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
     celebrities = similarity.get('celebrities', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""당신은 성격 분석을 위한 AI 상담사입니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -618,7 +641,8 @@ def _get_korean_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ 유명인:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', '미확인')} (일치도: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', '미확인')} (일치도: %{_cget('score', 0)})\n"
 
     prompt += f"\n사진 품질 분석\n──────────────────────────────────────────\n전체 점수: %{quality_score}\n"
 
@@ -636,14 +660,17 @@ def _get_korean_prompt(context: dict) -> str:
 
 def _get_japanese_prompt(context: dict) -> str:
     """Japanese system prompt"""
-    user_data = context.get('user', {})
-    user_name = user_data.get('name', '友人')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or '不明'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    user_name = _udget('name', '友人')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or '不明'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
     celebrities = similarity.get('celebrities', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""あなたはFacesymaのAI性格分析アドバイザーです
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -666,7 +693,8 @@ def _get_japanese_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ 有名人:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', '不明')} (一致度: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', '不明')} (一致度: %{_cget('score', 0)})\n"
 
     prompt += f"\n写真品質分析\n──────────────────────────────────────────\n総合スコア: %{quality_score}\n"
 
@@ -684,18 +712,23 @@ def _get_japanese_prompt(context: dict) -> str:
 
 def _get_chinese_prompt(context: dict) -> str:
     """Chinese system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', '朋友')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or '未知'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', '朋友')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or '未知'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""你是Facesyma的性格分析AI顾问
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -726,29 +759,34 @@ def _get_chinese_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ 名人:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', '未知')} (匹配度: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', '未知')} (匹配度: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚  历史人物:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', '未知')} (匹配度: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', '未知')} (匹配度: %{_hget('score', 0)})\n"
 
     prompt += f"\n照片质量分析\n──────────────────────────────────────────\n总体分数: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • 亮度: {brightness.get('value', 0)}/255 (评分: %{brightness.get('score', 0)})
-  • 对比度: {contrast.get('value', 0)}/100 (评分: %{contrast.get('score', 0)})
-  • 脸部位置: %{centering.get('offset', 0)} 偏移 (评分: %{centering.get('score', 0)})
-  建议: {image_quality.get('recommendation', '好')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • 亮度: {_bget('value', 0)}/255 (评分: %{_bget('score', 0)})
+  • 对比度: {_cget('value', 0)}/100 (评分: %{_cget('score', 0)})
+  • 脸部位置: %{_cenget('offset', 0)} 偏移 (评分: %{_cenget('score', 0)})
+  建议: {_iqget('recommendation', '好')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', '伴侣')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', '未知')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', '未知')
 
         prompt += f"""
 兼容性分析 - {user_name} ↔ {partner_name}
@@ -756,9 +794,9 @@ def _get_chinese_prompt(context: dict) -> str:
 兼容性评分: %{compat_score}
 分类: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"共享特征: {compatibility['sifat_overlap']}个\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"共享模块: {compatibility['module_overlap']}个\n"
 
     prompt += """
@@ -775,18 +813,23 @@ def _get_chinese_prompt(context: dict) -> str:
 
 def _get_hindi_prompt(context: dict) -> str:
     """Hindi system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'मित्र')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'अज्ञात'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'मित्र')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'अज्ञात'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""आप Facesyma के AI व्यक्तित्व विश्लेषण सलाहकार हैं
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -817,29 +860,34 @@ def _get_hindi_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ सेलिब्रिटीज:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'अज्ञात')} (मिलान: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'अज्ञात')} (मिलान: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 ऐतिहासिक व्यक्तित्व:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'अज्ञात')} (मिलान: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'अज्ञात')} (मिलान: %{_hget('score', 0)})\n"
 
     prompt += f"\nफोटो गुणवत्ता विश्लेषण\n──────────────────────────────────────────\nकुल स्कोर: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • चमक: {brightness.get('value', 0)}/255 (स्कोर: %{brightness.get('score', 0)})
-  • कंट्रास्ट: {contrast.get('value', 0)}/100 (स्कोर: %{contrast.get('score', 0)})
-  • चेहरे की स्थिति: %{centering.get('offset', 0)} ऑफसेट (स्कोर: %{centering.get('score', 0)})
-  सिफारिश: {image_quality.get('recommendation', 'अच्छा')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • चमक: {_bget('value', 0)}/255 (स्कोर: %{_bget('score', 0)})
+  • कंट्रास्ट: {_cget('value', 0)}/100 (स्कोर: %{_cget('score', 0)})
+  • चेहरे की स्थिति: %{_cenget('offset', 0)} ऑफसेट (स्कोर: %{_cenget('score', 0)})
+  सिफारिश: {_iqget('recommendation', 'अच्छा')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'साथी')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'अज्ञात')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'अज्ञात')
 
         prompt += f"""
 संगतता विश्लेषण - {user_name} ↔ {partner_name}
@@ -847,9 +895,9 @@ def _get_hindi_prompt(context: dict) -> str:
 संगतता स्कोर: %{compat_score}
 श्रेणी: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"साझा विशेषताएं: {compatibility['sifat_overlap']}個\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"साझा मॉड्यूल: {compatibility['module_overlap']}個\n"
 
     prompt += """
@@ -866,18 +914,23 @@ def _get_hindi_prompt(context: dict) -> str:
 
 def _get_french_prompt(context: dict) -> str:
     """French system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Ami')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Inconnu'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Ami')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Inconnu'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Vous etes le conseiller IA de Facesyma pour l'analyse de personnalite
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -908,29 +961,34 @@ Similarites (5 correspondances)
     if celebrities:
         prompt += "\n⭐ CELEBRITES:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Inconnu')} (Correspondance: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Inconnu')} (Correspondance: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 FIGURES HISTORIQUES:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Inconnu')} (Correspondance: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Inconnu')} (Correspondance: %{_hget('score', 0)})\n"
 
     prompt += f"\nAnalyse de la qualite des photos\n──────────────────────────────────────────\nScore total: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Luminosite: {brightness.get('value', 0)}/255 (Score: %{brightness.get('score', 0)})
-  • Contraste: {contrast.get('value', 0)}/100 (Score: %{contrast.get('score', 0)})
-  • Position du visage: %{centering.get('offset', 0)} decalage (Score: %{centering.get('score', 0)})
-  Recommandation: {image_quality.get('recommendation', 'Bonne')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Luminosite: {_bget('value', 0)}/255 (Score: %{_bget('score', 0)})
+  • Contraste: {_cget('value', 0)}/100 (Score: %{_cget('score', 0)})
+  • Position du visage: %{_cenget('offset', 0)} decalage (Score: %{_cenget('score', 0)})
+  Recommandation: {_iqget('recommendation', 'Bonne')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partenaire')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'INCONNU')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'INCONNU')
 
         prompt += f"""
 Analyse de compatibilite - {user_name} ↔ {partner_name}
@@ -938,9 +996,9 @@ Analyse de compatibilite - {user_name} ↔ {partner_name}
 Score de compatibilite: %{compat_score}
 Categorie: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Traits partages: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Modules partages: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -957,18 +1015,23 @@ Lors de la reponse aux questions:
 
 def _get_portuguese_prompt(context: dict) -> str:
     """Portuguese system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Amigo')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Desconhecido'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Amigo')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Desconhecido'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Voce e o consultor de IA da Facesyma para analise de personalidade
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -999,29 +1062,34 @@ Similitudes (5 correspondencias)
     if celebrities:
         prompt += "\n⭐ CELEBRIDADES:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Desconhecido')} (Correspondencia: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Desconhecido')} (Correspondencia: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 FIGURAS HISTORICAS:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Desconhecido')} (Correspondencia: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Desconhecido')} (Correspondencia: %{_hget('score', 0)})\n"
 
     prompt += f"\nAnalise de qualidade da foto\n──────────────────────────────────────────\nPontuacao total: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Luminosidade: {brightness.get('value', 0)}/255 (Pontuacao: %{brightness.get('score', 0)})
-  • Contraste: {contrast.get('value', 0)}/100 (Pontuacao: %{contrast.get('score', 0)})
-  • Posicao do rosto: %{centering.get('offset', 0)} deslocamento (Pontuacao: %{centering.get('score', 0)})
-  Recomendacao: {image_quality.get('recommendation', 'Boa')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Luminosidade: {_bget('value', 0)}/255 (Pontuacao: %{_bget('score', 0)})
+  • Contraste: {_cget('value', 0)}/100 (Pontuacao: %{_cget('score', 0)})
+  • Posicao do rosto: %{_cenget('offset', 0)} deslocamento (Pontuacao: %{_cenget('score', 0)})
+  Recomendacao: {_iqget('recommendation', 'Boa')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Parceiro')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'DESCONHECIDO')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'DESCONHECIDO')
 
         prompt += f"""
 Analise de compatibilidade - {user_name} ↔ {partner_name}
@@ -1029,9 +1097,9 @@ Analise de compatibilidade - {user_name} ↔ {partner_name}
 Pontuacao de compatibilidade: %{compat_score}
 Categoria: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Tracos compartilhados: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Modulos compartilhados: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1048,18 +1116,23 @@ Ao responder perguntas:
 
 def _get_bengali_prompt(context: dict) -> str:
     """Bengali system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'বন্ধু')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'অজানা'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'বন্ধু')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'অজানা'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""আপনি Facesyma-র AI ব্যক্তিত্ব বিশ্লেষণ পরামর্শদাতা
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1090,29 +1163,34 @@ def _get_bengali_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ সেলিব্রিটি:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'অজানা')} (ম্যাচ: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'অজানা')} (ম্যাচ: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 ঐতিহাসিক ব্যক্তিত্ব:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'অজানা')} (ম্যাচ: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'অজানা')} (ম্যাচ: %{_hget('score', 0)})\n"
 
     prompt += f"\nছবির গুণমান বিশ্লেষণ\n──────────────────────────────────────────\nমোট স্কোর: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • উজ্জ্বলতা: {brightness.get('value', 0)}/255 (স্কোর: %{brightness.get('score', 0)})
-  • বৈপরীত্য: {contrast.get('value', 0)}/100 (স্কোর: %{contrast.get('score', 0)})
-  • মুখের অবস্থান: %{centering.get('offset', 0)} অফসেট (স্কোর: %{centering.get('score', 0)})
-  সুপারিশ: {image_quality.get('recommendation', 'ভাল')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • উজ্জ্বলতা: {_bget('value', 0)}/255 (স্কোর: %{_bget('score', 0)})
+  • বৈপরীত্য: {_cget('value', 0)}/100 (স্কোর: %{_cget('score', 0)})
+  • মুখের অবস্থান: %{_cenget('offset', 0)} অফসেট (স্কোর: %{_cenget('score', 0)})
+  সুপারিশ: {_iqget('recommendation', 'ভাল')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'সঙ্গী')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'অজানা')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'অজানা')
 
         prompt += f"""
 সামঞ্জস্য বিশ্লেষণ - {user_name} ↔ {partner_name}
@@ -1120,9 +1198,9 @@ def _get_bengali_prompt(context: dict) -> str:
 সামঞ্জস্য স্কোর: %{compat_score}
 বিভাগ: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"ভাগ করা বৈশিষ্ট্য: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"ভাগ করা মডিউল: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1139,18 +1217,23 @@ def _get_bengali_prompt(context: dict) -> str:
 
 def _get_indonesian_prompt(context: dict) -> str:
     """Indonesian system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Teman')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Tidak diketahui'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Teman')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Tidak diketahui'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Anda adalah penasihat AI analisis kepribadian Facesyma
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1181,29 +1264,34 @@ Kesamaan (5 kecocokan)
     if celebrities:
         prompt += "\n⭐ SELEBRITI:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Tidak diketahui')} (Kecocokan: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Tidak diketahui')} (Kecocokan: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 TOKOH SEJARAH:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Tidak diketahui')} (Kecocokan: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Tidak diketahui')} (Kecocokan: %{_hget('score', 0)})\n"
 
     prompt += f"\nAnalisis Kualitas Foto\n──────────────────────────────────────────\nSkor Total: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Kecerahan: {brightness.get('value', 0)}/255 (Skor: %{brightness.get('score', 0)})
-  • Kontras: {contrast.get('value', 0)}/100 (Skor: %{contrast.get('score', 0)})
-  • Posisi Wajah: %{centering.get('offset', 0)} offset (Skor: %{centering.get('score', 0)})
-  Rekomendasi: {image_quality.get('recommendation', 'Bagus')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Kecerahan: {_bget('value', 0)}/255 (Skor: %{_bget('score', 0)})
+  • Kontras: {_cget('value', 0)}/100 (Skor: %{_cget('score', 0)})
+  • Posisi Wajah: %{_cenget('offset', 0)} offset (Skor: %{_cenget('score', 0)})
+  Rekomendasi: {_iqget('recommendation', 'Bagus')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Pasangan')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'TIDAK DIKETAHUI')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'TIDAK DIKETAHUI')
 
         prompt += f"""
 Analisis Kompatibilitas - {user_name} ↔ {partner_name}
@@ -1211,9 +1299,9 @@ Analisis Kompatibilitas - {user_name} ↔ {partner_name}
 Skor Kompatibilitas: %{compat_score}
 Kategori: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Ciri-ciri Bersama: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Modul Bersama: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1230,18 +1318,23 @@ Saat menjawab pertanyaan:
 
 def _get_urdu_prompt(context: dict) -> str:
     """Urdu system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'دوست')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'نامعلوم'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'دوست')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'نامعلوم'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""آپ Facesyma کے شخصیت تجزیہ کار AI ہیں
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1272,29 +1365,34 @@ def _get_urdu_prompt(context: dict) -> str:
     if celebrities:
         prompt += "\n⭐ مشہور لوگ:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'نامعلوم')} (ملاپ: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'نامعلوم')} (ملاپ: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 تاریخی شخصیات:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'نامعلوم')} (ملاپ: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'نامعلوم')} (ملاپ: %{_hget('score', 0)})\n"
 
     prompt += f"\nتصویر کے معیار کا تجزیہ\n──────────────────────────────────────────\nکل اسکور: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • روشنی: {brightness.get('value', 0)}/255 (اسکور: %{brightness.get('score', 0)})
-  • کنٹراسٹ: {contrast.get('value', 0)}/100 (اسکور: %{contrast.get('score', 0)})
-  • چہرے کی جگہ: %{centering.get('offset', 0)} آف سیٹ (اسکور: %{centering.get('score', 0)})
-  سفارش: {image_quality.get('recommendation', 'اچھا')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • روشنی: {_bget('value', 0)}/255 (اسکور: %{_bget('score', 0)})
+  • کنٹراسٹ: {_cget('value', 0)}/100 (اسکور: %{_cget('score', 0)})
+  • چہرے کی جگہ: %{_cenget('offset', 0)} آف سیٹ (اسکور: %{_cenget('score', 0)})
+  سفارش: {_iqget('recommendation', 'اچھا')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'ساتھی')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'نامعلوم')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'نامعلوم')
 
         prompt += f"""
 موافقت کا تجزیہ - {user_name} ↔ {partner_name}
@@ -1302,9 +1400,9 @@ def _get_urdu_prompt(context: dict) -> str:
 موافقت کا اسکور: %{compat_score}
 زمرہ: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"مشترکہ خصوصیات: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"مشترکہ ماڈیولز: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1321,18 +1419,23 @@ def _get_urdu_prompt(context: dict) -> str:
 
 def _get_italian_prompt(context: dict) -> str:
     """Italian system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Amico')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Sconosciuto'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Amico')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Sconosciuto'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Sei il consulente IA di Facesyma per l'analisi della personalita
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1363,29 +1466,34 @@ Similitudini (5 corrispondenze)
     if celebrities:
         prompt += "\n⭐ CELEBRITY:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Sconosciuto')} (Corrispondenza: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Sconosciuto')} (Corrispondenza: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 FIGURE STORICHE:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Sconosciuto')} (Corrispondenza: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Sconosciuto')} (Corrispondenza: %{_hget('score', 0)})\n"
 
     prompt += f"\nAnalisi della Qualita della Foto\n──────────────────────────────────────────\nPunteggio Totale: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Luminosita: {brightness.get('value', 0)}/255 (Punteggio: %{brightness.get('score', 0)})
-  • Contrasto: {contrast.get('value', 0)}/100 (Punteggio: %{contrast.get('score', 0)})
-  • Posizione del viso: %{centering.get('offset', 0)} offset (Punteggio: %{centering.get('score', 0)})
-  Raccomandazione: {image_quality.get('recommendation', 'Buona')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Luminosita: {_bget('value', 0)}/255 (Punteggio: %{_bget('score', 0)})
+  • Contrasto: {_cget('value', 0)}/100 (Punteggio: %{_cget('score', 0)})
+  • Posizione del viso: %{_cenget('offset', 0)} offset (Punteggio: %{_cenget('score', 0)})
+  Raccomandazione: {_iqget('recommendation', 'Buona')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partner')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'SCONOSCIUTO')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'SCONOSCIUTO')
 
         prompt += f"""
 Analisi di Compatibilita - {user_name} ↔ {partner_name}
@@ -1393,9 +1501,9 @@ Analisi di Compatibilita - {user_name} ↔ {partner_name}
 Punteggio di Compatibilita: %{compat_score}
 Categoria: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Caratteristiche Condivise: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Moduli Condivisi: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1412,18 +1520,23 @@ Nel rispondere alle domande:
 
 def _get_vietnamese_prompt(context: dict) -> str:
     """Vietnamese system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Ban')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Không rõ'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Ban')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Không rõ'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Ban la co van AI cua Facesyma de phan tich tinh cach
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1454,29 +1567,34 @@ Diem tuong dong (5 phu hop)
     if celebrities:
         prompt += "\n⭐ NGOI SAO:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Không rõ')} (Phu hop: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Không rõ')} (Phu hop: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 NHAN VAT LICH SU:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Không rõ')} (Phu hop: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Không rõ')} (Phu hop: %{_hget('score', 0)})\n"
 
     prompt += f"\nPhan tich Chat luong Anh\n──────────────────────────────────────────\nDiem tong cong: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Sang suot: {brightness.get('value', 0)}/255 (Diem: %{brightness.get('score', 0)})
-  • Tuong phan: {contrast.get('value', 0)}/100 (Diem: %{contrast.get('score', 0)})
-  • Vi tri khuon mat: %{centering.get('offset', 0)} sai lech (Diem: %{centering.get('score', 0)})
-  Khuyen nghi: {image_quality.get('recommendation', 'Tot')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Sang suot: {_bget('value', 0)}/255 (Diem: %{_bget('score', 0)})
+  • Tuong phan: {_cget('value', 0)}/100 (Diem: %{_cget('score', 0)})
+  • Vi tri khuon mat: %{_cenget('offset', 0)} sai lech (Diem: %{_cenget('score', 0)})
+  Khuyen nghi: {_iqget('recommendation', 'Tot')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Doi tac')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'KHONG RO')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'KHONG RO')
 
         prompt += f"""
 Phan tich Khong tuong hoa - {user_name} ↔ {partner_name}
@@ -1484,9 +1602,9 @@ Phan tich Khong tuong hoa - {user_name} ↔ {partner_name}
 Diem khong tuong hoa: %{compat_score}
 Danh muc: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Dac diem Chung: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Cac module Chung: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1503,18 +1621,23 @@ Khi tra loi cau hoi:
 
 def _get_polish_prompt(context: dict) -> str:
     """Polish system prompt"""
-    user_data = context.get('user', {})
-    partner_data = context.get('partner', {})
-    compatibility = context.get('compatibility', {})
+    _ctxget = context.get
+    user_data = _ctxget('user', {})
+    _udget = user_data.get
+    partner_data = _ctxget('partner', {})
+    compatibility = _ctxget('compatibility', {})
+    _cmpget = compatibility.get
 
-    user_name = user_data.get('name', 'Przyjacielu')
-    top_sifats = ', '.join([s.get('name', s) for s in user_data.get('top_sifatlar', [])][:5]) or 'Nieznany'
-    golden_ratio = user_data.get('golden_ratio', 1.618)
-    similarity = user_data.get('similarity', {})
-    celebrities = similarity.get('celebrities', [])[:3]
-    historical = similarity.get('historical', [])[:3]
-    image_quality = user_data.get('image_quality', {})
-    quality_score = image_quality.get('overall_score', 0)
+    user_name = _udget('name', 'Przyjacielu')
+    top_sifats = ', '.join([s.get('name', s) for s in _udget('top_sifatlar', [])][:5]) or 'Nieznany'
+    golden_ratio = _udget('golden_ratio', 1.618)
+    similarity = _udget('similarity', {})
+    _sget = similarity.get
+    celebrities = _sget('celebrities', [])[:3]
+    historical = _sget('historical', [])[:3]
+    image_quality = _udget('image_quality', {})
+    _iqget = image_quality.get
+    quality_score = _iqget('overall_score', 0)
 
     prompt = f"""Jestes doradca AI Facesyma do analizy osobowosci
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1545,29 +1668,34 @@ Podobienstwa (5 dopasowań)
     if celebrities:
         prompt += "\n⭐ CELEBRYCI:\n"
         for c in celebrities:
-            prompt += f"  • {c.get('name', 'Nieznany')} (Dopasowanie: %{c.get('score', 0)})\n"
+            _cget = c.get
+            prompt += f"  • {_cget('name', 'Nieznany')} (Dopasowanie: %{_cget('score', 0)})\n"
 
     if historical:
         prompt += "\n📚 POSTACIE HISTORYCZNE:\n"
         for h in historical:
-            prompt += f"  • {h.get('name', 'Nieznany')} (Dopasowanie: %{h.get('score', 0)})\n"
+            _hget = h.get
+            prompt += f"  • {_hget('name', 'Nieznany')} (Dopasowanie: %{_hget('score', 0)})\n"
 
     prompt += f"\nAnaliza Jakosci Zdjecia\n──────────────────────────────────────────\nWynik Calkowity: %{quality_score}\n"
 
     if image_quality:
-        brightness = image_quality.get('brightness', {})
-        contrast = image_quality.get('contrast', {})
-        centering = image_quality.get('face_centering', {})
-        prompt += f"""  • Jasnosc: {brightness.get('value', 0)}/255 (Wynik: %{brightness.get('score', 0)})
-  • Kontrast: {contrast.get('value', 0)}/100 (Wynik: %{contrast.get('score', 0)})
-  • Pozycja twarzy: %{centering.get('offset', 0)} odchylenie (Wynik: %{centering.get('score', 0)})
-  Rekomendacja: {image_quality.get('recommendation', 'Dobra')}
+        brightness = _iqget('brightness', {})
+        contrast = _iqget('contrast', {})
+        centering = _iqget('face_centering', {})
+        _bget = brightness.get
+        _cget = contrast.get
+        _cenget = centering.get
+        prompt += f"""  • Jasnosc: {_bget('value', 0)}/255 (Wynik: %{_bget('score', 0)})
+  • Kontrast: {_cget('value', 0)}/100 (Wynik: %{_cget('score', 0)})
+  • Pozycja twarzy: %{_cenget('offset', 0)} odchylenie (Wynik: %{_cenget('score', 0)})
+  Rekomendacja: {_iqget('recommendation', 'Dobra')}
 """
 
     if partner_data and compatibility:
         partner_name = partner_data.get('name', 'Partner')
-        compat_score = compatibility.get('score', 0)
-        compat_category = compatibility.get('category', 'NIEZNANY')
+        compat_score = _cmpget('score', 0)
+        compat_category = _cmpget('category', 'NIEZNANY')
 
         prompt += f"""
 Analiza Kompatybilnosci - {user_name} ↔ {partner_name}
@@ -1575,9 +1703,9 @@ Analiza Kompatybilnosci - {user_name} ↔ {partner_name}
 Wynik Kompatybilnosci: %{compat_score}
 Kategoria: {compat_category}
 """
-        if compatibility.get('sifat_overlap'):
+        if _cmpget('sifat_overlap'):
             prompt += f"Wspolne Cechy: {compatibility['sifat_overlap']}\n"
-        if compatibility.get('module_overlap'):
+        if _cmpget('module_overlap'):
             prompt += f"Wspolne Moduly: {compatibility['module_overlap']}\n"
 
     prompt += """
@@ -1599,26 +1727,51 @@ def get_context_summary(context: dict, lang: str = 'tr') -> str:
     Returns:
         Formatted summary string
     """
-    user = context.get('user', {})
-    partner = context.get('partner', {})
-    compat = context.get('compatibility', {})
+    user = _ctxget('user', {})
+    partner = _ctxget('partner', {})
+    compat = _ctxget('compatibility', {})
+    _uget = user.get
 
     summary = f"""
 📊 CONTEXT SUMMARY
 {'='*50}
-User: {user.get('name', 'Unknown')}
-Top Traits: {', '.join([t.get('name', t) for t in user.get('top_sifatlar', [])][:3])}
-Image Quality: %{user.get('image_quality', {}).get('overall_score', 0)}
-Golden Ratio: {user.get('golden_ratio', 0):.3f}
+User: {_uget('name', 'Unknown')}
+Top Traits: {', '.join([t.get('name', t) for t in _uget('top_sifatlar', [])][:3])}
+Image Quality: %{_uget('image_quality', {}).get('overall_score', 0)}
+Golden Ratio: {_uget('golden_ratio', 0):.3f}
 
-Similarities: {len(user.get('similarity', {}).get('celebrities', []))} celebrities loaded
+Similarities: {len(_uget('similarity', {}).get('celebrities', []))} celebrities loaded
 """
 
     if partner:
+        _cget = compat.get
         summary += f"""
 Partner: {partner.get('name', 'Unknown')}
-Compatibility Score: %{compat.get('score', 0)}
-Category: {compat.get('category', 'UNKNOWN')}
+Compatibility Score: %{_cget('score', 0)}
+Category: {_cget('category', 'UNKNOWN')}
 """
 
     return summary
+
+
+# Module-level lookup built once — avoids dict reconstruction on every get_system_prompt() call
+_LANG_MAP: dict = {
+    'tr': _get_turkish_prompt,
+    'en': _get_english_prompt,
+    'de': _get_german_prompt,
+    'ru': _get_russian_prompt,
+    'ar': _get_arabic_prompt,
+    'es': _get_spanish_prompt,
+    'ko': _get_korean_prompt,
+    'ja': _get_japanese_prompt,
+    'zh': _get_chinese_prompt,
+    'hi': _get_hindi_prompt,
+    'fr': _get_french_prompt,
+    'pt': _get_portuguese_prompt,
+    'bn': _get_bengali_prompt,
+    'id': _get_indonesian_prompt,
+    'ur': _get_urdu_prompt,
+    'it': _get_italian_prompt,
+    'vi': _get_vietnamese_prompt,
+    'pl': _get_polish_prompt,
+}

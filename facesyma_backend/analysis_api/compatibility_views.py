@@ -13,28 +13,40 @@ Endpoints:
 """
 import json
 import logging
+import time
+import jwt
+from functools import wraps
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from pymongo import MongoClient
+from bson import ObjectId
 from django.conf import settings
 import sys
-from pathlib import Path
 
 log = logging.getLogger(__name__)
 
+_VALID_CATEGORIES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL'})
+_VALID_COMMUNITY_TYPES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL'})
+_PROJ_PENDING_INVITE = {'_id': 0, 'community_id': 1, 'invited_at': 1, 'harmony_level': 1}
+_PROJ_COMMUNITY_BRIEF = {'name': 1, 'type': 1, 'trait_name': 1}
+
+_USER_COMPAT_PROJ    = {'_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1, 'top_sifats': 1, 'modules': 1}
+_COMMUNITY_LIST_PROJ = {'_id': 1, 'name': 1, 'type': 1, 'trait_name': 1, 'member_count': 1,
+                        'description': 1, 'created_at': 1, 'is_active': 1}
+_MEMBER_PROJ         = {'_id': 0, 'user_id': 1, 'harmony_level': 1, 'joined_at': 1, 'is_mod': 1}
+_SUB_STATUS_PROJ     = {'_id': 0, 'user_id': 1, 'tier': 1, 'status': 1, 'renews_at': 1}
+_JWT_SECRET: str = settings.JWT_SECRET
 
 # ── JWT yardımcısı ────────────────────────────────────────────────────────────
 def _get_user_id(request) -> int | None:
     """Token'dan user_id çıkar. Token yoksa None döner."""
-    import jwt
     auth = request.headers.get('Authorization', '')
     if not auth.startswith('Bearer '):
         return None
     try:
         payload = jwt.decode(
-            auth.split(' ', 1)[1], settings.JWT_SECRET, algorithms=['HS256']
+            auth.split(' ', 1)[1], _JWT_SECRET, algorithms=['HS256']
         )
         return payload.get('user_id')
     except Exception:
@@ -60,12 +72,14 @@ def _get_community_members_col():
     return _get_db()['community_members']
 
 
+_ENGINE_PATH: str = settings.FACESYMA_ENGINE_PATH
+
 # ── Compatibility Algorithm ───────────────────────────────────────────────────
 def _load_compatibility_module():
     """compatibility.py modülünü yükle"""
-    engine_path = settings.FACESYMA_ENGINE_PATH
-    if engine_path not in sys.path:
-        sys.path.insert(0, engine_path)
+    _spath = sys.path
+    if _ENGINE_PATH not in _spath:
+        _spath.insert(0, _ENGINE_PATH)
 
     try:
         # Lazy import to avoid circular dependencies
@@ -86,18 +100,16 @@ def _get_user_profile(user_id):
     from admin_api.utils.mongo import get_users_col
 
     users_col = get_users_col()
-    user = users_col.find_one({'id': user_id}, {
-        '_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1,
-        'top_sifats': 1, 'modules': 1
-    })
+    user = users_col.find_one({'id': user_id}, _USER_COMPAT_PROJ)
 
     if not user:
         return None
 
     # Eksik alanlar için defaults
-    user.setdefault('golden_ratio', 1.618)
-    user.setdefault('top_sifats', [])
-    user.setdefault('modules', [])
+    _usd = user.setdefault
+    _usd('golden_ratio', 1.618)
+    _usd('top_sifats', [])
+    _usd('modules', [])
 
     return user
 
@@ -135,28 +147,31 @@ class CheckCompatibilityView(View):
 
     def post(self, request):
         try:
+            user1_id = _get_user_id(request)
+            if not user1_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
             data = json.loads(request.body)
-            user1_id = data.get('user1_id')
             user2_id = data.get('user2_id')
 
-            if not user1_id or not user2_id:
-                return JsonResponse({'detail': 'user1_id ve user2_id gerekli.'}, status=400)
+            if not user2_id:
+                return JsonResponse({'detail': 'user2_id gerekli.'}, status=400)
 
             if user1_id == user2_id:
-                return JsonResponse({'detail': 'Aynı kullanıcıyla uyum kontrol edilemez.'}, status=400)
+                return JsonResponse({'detail': 'Cannot check compatibility with yourself.'}, status=400)
 
             # Profilleri al
             user1 = _get_user_profile(user1_id)
             user2 = _get_user_profile(user2_id)
 
             if not user1 or not user2:
-                return JsonResponse({'detail': 'Kullanıcılardan biri bulunamadı.'}, status=404)
+                return JsonResponse({'detail': 'One of the users was not found.'}, status=404)
 
             # Uyum algoritmasını yükle ve hesapla
             calc_compat, _ = _load_compatibility_module()
 
             if not calc_compat:
-                return JsonResponse({'detail': 'Compatibility modülü yüklenemedı.'}, status=500)
+                return JsonResponse({'detail': 'Compatibility module could not be loaded.'}, status=500)
 
             result = calc_compat(user1, user2)
 
@@ -174,7 +189,7 @@ class CheckCompatibilityView(View):
                     'sifat_overlap': result['sifat_overlap'],
                     'module_overlap': result['module_overlap'],
                     'conflict_count': result['conflict_count'],
-                    'calculated_at': __import__('time').time()
+                    'calculated_at': time.time()
                 }},
                 upsert=True
             )
@@ -185,10 +200,10 @@ class CheckCompatibilityView(View):
             })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON.'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
         except Exception as e:
-            log.exception(f'CheckCompatibility hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'CheckCompatibility error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -225,31 +240,33 @@ class FindCompatibleUsersView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            user_id = data.get('user_id')
-            limit = data.get('limit', 10)
-            category_filter = data.get('category')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli.'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
+            data = json.loads(request.body)
+            _dget = data.get
+            try:
+                limit = min(max(1, int(_dget('limit', 10))), 200)
+            except (TypeError, ValueError):
+                limit = 10
+            raw_category = _dget('category')
+            category_filter = raw_category if raw_category in _VALID_CATEGORIES else None
 
             # Kullanıcı profilini al
             user = _get_user_profile(user_id)
             if not user:
-                return JsonResponse({'detail': 'Kullanıcı bulunamadı.'}, status=404)
+                return JsonResponse({'detail': 'User not found.'}, status=404)
 
             # Uyum algoritmasını yükle
             _, find_compat = _load_compatibility_module()
             if not find_compat:
-                return JsonResponse({'detail': 'Compatibility modülü yüklenemedı.'}, status=500)
+                return JsonResponse({'detail': 'Compatibility module could not be loaded.'}, status=500)
 
             # Tüm kullanıcıları al (opsiyonel: pagination eklenebilir)
             from admin_api.utils.mongo import get_users_col
             users_col = get_users_col()
-            all_users = list(users_col.find({'id': {'$ne': user_id}}, {
-                '_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1,
-                'top_sifats': 1, 'modules': 1
-            }).limit(1000))  # Performans: ilk 1000 kullanıcı
+            all_users = list(users_col.find({'id': {'$ne': user_id}}, _USER_COMPAT_PROJ).limit(1000))  # Performans: ilk 1000 kullanıcı
 
             # Uyumlu kullanıcıları bul
             results = find_compat(user_id, [user] + all_users, category_filter, limit)
@@ -261,10 +278,10 @@ class FindCompatibleUsersView(View):
             })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON.'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
         except Exception as e:
-            log.exception(f'FindCompatibleUsers hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'FindCompatibleUsers error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -291,15 +308,9 @@ class CompatibilityStatsView(View):
 
     def get(self, request):
         try:
-            user_id = request.GET.get('user_id')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli.'}, status=400)
-
-            try:
-                user_id = int(user_id)
-            except ValueError:
-                return JsonResponse({'detail': 'user_id sayısal olmalıdır.'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
             compat_col = _get_compatibility_col()
 
@@ -339,8 +350,8 @@ class CompatibilityStatsView(View):
             })
 
         except Exception as e:
-            log.exception(f'CompatibilityStats hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'CompatibilityStats error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -348,7 +359,7 @@ class ListCommunitiesView(View):
     """
     GET /api/v1/communities/?type=TRAIT&limit=20
 
-    Toplulukları listele.
+    Communityları listele.
 
     Query Parameters:
         type: TRAIT, MODULE, CATEGORY (optional)
@@ -360,7 +371,7 @@ class ListCommunitiesView(View):
             "data": [
                 {
                     "id": ObjectId,
-                    "name": "Liderlik Topluluğu",
+                    "name": "Leaderboard Topluluğu",
                     "type": "TRAIT",
                     "trait_name": "Lider",
                     "member_count": 1245,
@@ -374,26 +385,26 @@ class ListCommunitiesView(View):
 
     def get(self, request):
         try:
-            community_type = request.GET.get('type')
-            limit = int(request.GET.get('limit', 20))
+            _qget = request.GET.get
+            community_type = _qget('type')
+            try:
+                limit = min(max(1, int(_qget('limit', 20))), 200)
+            except (ValueError, TypeError):
+                limit = 20
 
             communities_col = _get_communities_col()
 
-            # Filter oluştur
             filter_dict = {}
-            if community_type:
+            if community_type and community_type in _VALID_COMMUNITY_TYPES:
                 filter_dict['type'] = community_type
 
             # Sorgu yap
-            communities = list(communities_col.find(filter_dict, {
-                '_id': 1, 'name': 1, 'type': 1, 'trait_name': 1,
-                'member_count': 1, 'description': 1, 'created_at': 1,
-                'is_active': 1
-            }).sort('member_count', -1).limit(limit))
+            communities = list(communities_col.find(filter_dict, _COMMUNITY_LIST_PROJ).sort('member_count', -1).limit(limit))
 
             # ObjectId'yi string'e çevir
             for c in communities:
-                c['_id'] = str(c['_id'])
+                _oid = c['_id']
+                c['_id'] = str(_oid)
 
             return JsonResponse({
                 'success': True,
@@ -402,10 +413,10 @@ class ListCommunitiesView(View):
             })
 
         except ValueError:
-            return JsonResponse({'detail': 'limit sayısal olmalıdır.'}, status=400)
+            return JsonResponse({'detail': 'limit must be numeric.'}, status=400)
         except Exception as e:
-            log.exception(f'ListCommunities hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'ListCommunities error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -435,51 +446,51 @@ class JoinCommunityView(View):
 
     def post(self, request, community_id=None):
         try:
-            if not community_id:
-                return JsonResponse({'detail': 'community_id gerekli.'}, status=400)
-
-            data = json.loads(request.body) if request.body else {}
-            user_id = data.get('user_id')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli.'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
+            if not community_id:
+                return JsonResponse({'detail': 'community_id is required.'}, status=400)
 
             communities_col = _get_communities_col()
             members_col = _get_community_members_col()
 
             # Topluluğu kontrol et
+            _community_oid = None
             try:
-                from bson import ObjectId
-                community = communities_col.find_one({'_id': ObjectId(community_id)})
-            except:
-                community = communities_col.find_one({'_id': community_id})
+                _community_oid = ObjectId(community_id)
+                community = communities_col.find_one({'_id': _community_oid}, {'_id': 1})
+            except Exception:
+                community = communities_col.find_one({'_id': community_id}, {'_id': 1})
 
             if not community:
-                return JsonResponse({'detail': 'Topluluk bulunamadı.'}, status=404)
+                return JsonResponse({'detail': 'Community not found.'}, status=404)
 
             # Kullanıcı profilini al (harmony score için)
             user = _get_user_profile(user_id)
             harmony_level = 75 if not user else 75  # Default harmony
+            _joined_ts = time.time()
 
-            # Üyeliği ekle (duplicate olursa update et)
-            import time
-            members_col.update_one(
+            # Üyeliği ekle — sadece yeni kayıt ise member_count artır
+            upsert_result = members_col.update_one(
                 {'community_id': community_id, 'user_id': user_id},
                 {'$set': {
                     'community_id': community_id,
                     'user_id': user_id,
                     'harmony_level': harmony_level,
                     'is_mod': False,
-                    'joined_at': time.time()
+                    'joined_at': _joined_ts,
                 }},
                 upsert=True
             )
 
-            # Topluluk üye sayısını artır
-            communities_col.update_one(
-                {'_id': community_id if isinstance(community_id, str) else ObjectId(community_id)},
-                {'$inc': {'member_count': 1}}
-            )
+            # Yalnızca yeni eklendiyse üye sayısını artır (duplicate upsert'te artırma)
+            if upsert_result.upserted_id is not None:
+                communities_col.update_one(
+                    {'_id': _community_oid or community_id},
+                    {'$inc': {'member_count': 1}}
+                )
 
             return JsonResponse({
                 'success': True,
@@ -488,15 +499,15 @@ class JoinCommunityView(View):
                     'user_id': user_id,
                     'membership_status': 'active',
                     'harmony_level': harmony_level,
-                    'joined_at': __import__('time').time()
+                    'joined_at': _joined_ts,
                 }
             })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON.'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
         except Exception as e:
-            log.exception(f'JoinCommunity hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'JoinCommunity error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -513,7 +524,7 @@ class ListPendingInvitationsView(View):
             "data": [
                 {
                     "community_id": ObjectId,
-                    "community_name": "Liderlik Topluluğu",
+                    "community_name": "Leaderboard Topluluğu",
                     "community_type": "TRAIT",
                     "invited_at": timestamp,
                     "harmony_level": 75
@@ -526,15 +537,9 @@ class ListPendingInvitationsView(View):
 
     def get(self, request):
         try:
-            user_id = request.GET.get('user_id')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli.'}, status=400)
-
-            try:
-                user_id = int(user_id)
-            except ValueError:
-                return JsonResponse({'detail': 'user_id sayısal olmalıdır.'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
             members_col = _get_community_members_col()
             communities_col = _get_communities_col()
@@ -543,25 +548,39 @@ class ListPendingInvitationsView(View):
             pending = list(members_col.find({
                 'user_id': user_id,
                 'status': 'pending'
-            }).sort('invited_at', -1))
+            }, _PROJ_PENDING_INVITE
+            ).sort('invited_at', -1).limit(100))
 
-            # Topluluk bilgilerini zenginleştir
+            # Community bilgilerini zenginleştir — batch fetch
+            raw_cids = [inv['community_id'] for inv in pending]
+            oid_cids = []
+            _oca = oid_cids.append
+            for cid in raw_cids:
+                try:
+                    _oca(ObjectId(cid))
+                except Exception:
+                    _oca(cid)
+            communities_map = {
+                str(c['_id']): c
+                for c in communities_col.find(
+                    {'_id': {'$in': oid_cids}},
+                    _PROJ_COMMUNITY_BRIEF
+                )
+            }
             invitations = []
             for invite in pending:
-                try:
-                    from bson import ObjectId
-                    community = communities_col.find_one({'_id': ObjectId(invite['community_id'])})
-                except:
-                    community = communities_col.find_one({'_id': invite['community_id']})
-
+                _cid = invite['community_id']
+                community = communities_map.get(str(_cid))
                 if community:
+                    _cget = community.get
+                    _iget = invite.get
                     invitations.append({
-                        'community_id': str(invite['community_id']),
-                        'community_name': community.get('name', 'Unknown'),
-                        'community_type': community.get('type', 'TRAIT'),
-                        'trait_name': community.get('trait_name', ''),
-                        'invited_at': invite.get('invited_at'),
-                        'harmony_level': invite.get('harmony_level', 75)
+                        'community_id': str(_cid),
+                        'community_name': _cget('name', 'Unknown'),
+                        'community_type': _cget('type', 'TRAIT'),
+                        'trait_name': _cget('trait_name', ''),
+                        'invited_at': _iget('invited_at'),
+                        'harmony_level': _iget('harmony_level', 75)
                     })
 
             return JsonResponse({
@@ -571,8 +590,8 @@ class ListPendingInvitationsView(View):
             })
 
         except Exception as e:
-            log.exception(f'ListPendingInvitations hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'ListPendingInvitations error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -580,7 +599,7 @@ class ApproveCommunityInvitationView(View):
     """
     POST /api/v1/communities/{id}/approve/
 
-    Topluluk davetiyesini onayla veya reddet.
+    Community davetiyesini onayla veya reddet.
     ✅ Kullanıcı onayı olmadan hiçbir sohbet başlamayacak!
 
     Request:
@@ -604,52 +623,54 @@ class ApproveCommunityInvitationView(View):
     def post(self, request, community_id=None):
         try:
             if not community_id:
-                return JsonResponse({'detail': 'community_id gerekli.'}, status=400)
+                return JsonResponse({'detail': 'community_id is required.'}, status=400)
 
-            data = json.loads(request.body) if request.body else {}
-            user_id = data.get('user_id')
+            user_id = _get_user_id(request)
+            if not user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
+            _body = request.body
+            data = json.loads(_body) if _body else {}
             action = data.get('action', 'approve')  # 'approve' or 'reject'
 
-            if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli.'}, status=400)
-
-            if action not in ['approve', 'reject']:
-                return JsonResponse({'detail': 'action "approve" veya "reject" olmalıdır.'}, status=400)
+            if action not in {'approve', 'reject'}:
+                return JsonResponse({'detail': 'action must be "approve" or "reject".'}, status=400)
 
             members_col = _get_community_members_col()
+            _fau = members_col.find_one_and_update
 
-            # Pending davetiye bul
-            invitation = members_col.find_one({
-                'community_id': community_id,
-                'user_id': user_id,
-                'status': 'pending'
-            })
+            # Atomically claim the pending invitation (prevents double-approval race)
+            if action == 'approve':
+                _approve_ts = time.time()
+                claimed = _fau(
+                    {'community_id': community_id, 'user_id': user_id, 'status': 'pending'},
+                    {'$set': {
+                        'status': 'active',
+                        'approved_at': _approve_ts,
+                        'joined_at': _approve_ts,
+                    }}
+                )
+            else:
+                claimed = _fau(
+                    {'community_id': community_id, 'user_id': user_id, 'status': 'pending'},
+                    {'$set': {'status': 'rejected'}}
+                )
 
-            if not invitation:
-                return JsonResponse({'detail': 'Topluluk davetiyesi bulunamadı.'}, status=404)
+            if not claimed:
+                return JsonResponse({'detail': 'Community invitation not found.'}, status=404)
 
             # Davetiye onayı veya reddi
             if action == 'approve':
-                # ✅ Kullanıcı davetiyeyi kabul etti
-                members_col.update_one(
-                    {'community_id': community_id, 'user_id': user_id},
-                    {'$set': {
-                        'status': 'active',
-                        'approved_at': __import__('time').time(),
-                        'joined_at': __import__('time').time()
-                    }}
-                )
-
-                # Topluluk üye sayısını artır
+                # Community üye sayısını artır (claimed garantisi: yalnızca bir kez çalışır)
                 communities_col = _get_communities_col()
+                _cuo = communities_col.update_one
                 try:
-                    from bson import ObjectId
-                    communities_col.update_one(
+                    _cuo(
                         {'_id': ObjectId(community_id)},
                         {'$inc': {'member_count': 1}}
                     )
-                except:
-                    communities_col.update_one(
+                except Exception:
+                    _cuo(
                         {'_id': community_id},
                         {'$inc': {'member_count': 1}}
                     )
@@ -660,32 +681,26 @@ class ApproveCommunityInvitationView(View):
                         'community_id': community_id,
                         'user_id': user_id,
                         'status': 'active',
-                        'message': 'Topluluğa başarıyla katıldınız!'
+                        'message': 'Successfully joined the community!'
                     }
                 })
 
             else:  # reject
-                # ❌ Kullanıcı davetiyeyi reddetti
-                members_col.update_one(
-                    {'community_id': community_id, 'user_id': user_id},
-                    {'$set': {'status': 'rejected'}}
-                )
-
                 return JsonResponse({
                     'success': True,
                     'data': {
                         'community_id': community_id,
                         'user_id': user_id,
                         'status': 'rejected',
-                        'message': 'Davetiye reddedildi.'
+                        'message': 'Invitation declined.'
                     }
                 })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON.'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
         except Exception as e:
-            log.exception(f'ApproveCommunityInvitation hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'ApproveCommunityInvitation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -718,27 +733,34 @@ class ListCommunityMembersView(View):
     def get(self, request, community_id=None):
         try:
             if not community_id:
-                return JsonResponse({'detail': 'community_id gerekli.'}, status=400)
+                return JsonResponse({'detail': 'community_id is required.'}, status=400)
 
-            sort_by = request.GET.get('sort_by', 'harmony')
-            limit = int(request.GET.get('limit', 50))
+            _qget = request.GET.get
+            sort_by = _qget('sort_by', 'harmony')
+            try:
+                limit = min(max(1, int(_qget('limit', 50))), 200)
+            except (ValueError, TypeError):
+                limit = 50
 
             members_col = _get_community_members_col()
 
             # Üyeleri al
             sort_field = 'harmony_level' if sort_by == 'harmony' else 'joined_at'
-            members = list(members_col.find({'community_id': community_id}, {
-                '_id': 0, 'user_id': 1, 'harmony_level': 1,
-                'joined_at': 1, 'is_mod': 1
-            }).sort(sort_field, -1).limit(limit))
+            members = list(members_col.find(
+                {'community_id': community_id}, _MEMBER_PROJ
+            ).sort(sort_field, -1).limit(limit))
 
             # Kullanıcı bilgilerini zenginleştir
             from admin_api.utils.mongo import get_users_col
             users_col = get_users_col()
 
+            member_ids = [m['user_id'] for m in members]
+            users_map = {u['id']: u for u in users_col.find(
+                {'id': {'$in': member_ids}}, {'id': 1, 'username': 1}
+            )}
             for member in members:
-                user = users_col.find_one({'id': member['user_id']}, {'username': 1})
-                member['username'] = user['username'] if user else 'Unknown'
+                u = users_map.get(member['user_id'])
+                member['username'] = u['username'] if u else 'Unknown'
 
             return JsonResponse({
                 'success': True,
@@ -747,10 +769,10 @@ class ListCommunityMembersView(View):
             })
 
         except ValueError:
-            return JsonResponse({'detail': 'limit sayısal olmalıdır.'}, status=400)
+            return JsonResponse({'detail': 'limit must be numeric.'}, status=400)
         except Exception as e:
-            log.exception(f'ListCommunityMembers hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'ListCommunityMembers error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Subscription Helper Functions ─────────────────────────────────────────────────
@@ -765,19 +787,19 @@ def get_user_subscription(user_id: int) -> dict:
     """Kullanıcının subscription durumunu al"""
     sub_col = _get_subscription_col()
 
-    sub = sub_col.find_one({'user_id': user_id})
+    sub = sub_col.find_one({'user_id': user_id}, _SUB_STATUS_PROJ)
+    _now = time.time()
 
     if not sub:
-        # Yeni kullanıcı → varsayılan olarak free tier
         return {
             'user_id': user_id,
             'tier': 'free',
             'status': 'active',
-            'created_at': time.time()
+            'created_at': _now,
         }
 
     # Subscription süresi doldu mu?
-    if sub['tier'] == 'premium' and sub.get('renews_at', float('inf')) < time.time():
+    if sub['tier'] == 'premium' and sub.get('renews_at', float('inf')) < _now:
         # Süresi dolmuş → free tier'a düşür
         sub_col.update_one(
             {'user_id': user_id},
@@ -791,37 +813,23 @@ def get_user_subscription(user_id: int) -> dict:
 
 def count_monthly_checks(user_id: int) -> int:
     """Bu ayda yapılan compatibility check sayısını say"""
-    compat_col = _get_db()['compatibility']
-
-    now = time.time()
-    month_ago = now - (30 * 24 * 60 * 60)
-
-    count = compat_col.count_documents({
-        '$or': [
-            {'user1_id': user_id},
-            {'user2_id': user_id}
-        ],
+    month_ago = time.time() - (30 * 24 * 60 * 60)
+    return _get_db()['compatibility'].count_documents({
+        '$or': [{'user1_id': user_id}, {'user2_id': user_id}],
         'calculated_at': {'$gt': month_ago}
     })
-
-    return count
 
 
 def count_joined_communities(user_id: int) -> int:
     """Kullanıcının katıldığı topluluk sayısı (active status)"""
-    members_col = _get_db()['community_members']
-
-    count = members_col.count_documents({
+    return _get_db()['community_members'].count_documents({
         'user_id': user_id,
         'status': 'active'
     })
 
-    return count
-
 
 def check_free_tier_limit(user_id: int, feature: str) -> bool:
     """Free tier limitini kontrol et"""
-
     if feature == 'compatibility_check':
         return count_monthly_checks(user_id) < 3
 
@@ -829,16 +837,11 @@ def check_free_tier_limit(user_id: int, feature: str) -> bool:
         return count_joined_communities(user_id) < 1
 
     elif feature == 'direct_message':
-        # Ay içinde gönderilen mesaj sayısını say
-        messages_col = _get_db()['community_messages']
-        now = time.time()
-        month_ago = now - (30 * 24 * 60 * 60)
-
-        count = messages_col.count_documents({
+        month_ago = time.time() - (30 * 24 * 60 * 60)
+        count = _get_db()['community_messages'].count_documents({
             'from_user_id': user_id,
             'created_at': {'$gt': month_ago}
         })
-
         return count < 10
 
     else:
@@ -848,7 +851,6 @@ def check_free_tier_limit(user_id: int, feature: str) -> bool:
 def require_premium_feature(feature_name):
     """Decorator: Premium feature'ı kontrol et"""
     def decorator(view_func):
-        from functools import wraps
         @wraps(view_func)
         def wrapper(self, request, *args, **kwargs):
             user_id = _get_user_id(request)
@@ -867,7 +869,7 @@ def require_premium_feature(feature_name):
             # Free tier: limit kontrol et
             if not check_free_tier_limit(user_id, feature_name):
                 return JsonResponse({
-                    'detail': f'Free tier limitine ulaştınız ({feature_name})',
+                    'detail': f'Free tier limit reached ({feature_name})',
                     'upgrade_url': '/api/v1/subscription/upgrade/',
                     'upgrade_price': '$9.99/month'
                 }, status=402)  # Payment Required
@@ -889,46 +891,46 @@ class SubscriptionStatusView(View):
 
     def get(self, request):
         try:
-            user_id = request.GET.get('user_id')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id parametresi gerekli'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
-            user_id = int(user_id)
             sub = get_user_subscription(user_id)
+            _tier = sub['tier']
 
             # Kullanım bilgilerini oluştur
             usage = {
                 'compatibility_checks': {
                     'used': count_monthly_checks(user_id),
-                    'limit': 3 if sub['tier'] == 'free' else None
+                    'limit': 3 if _tier == 'free' else None
                 },
                 'communities_joined': {
                     'used': count_joined_communities(user_id),
-                    'limit': 1 if sub['tier'] == 'free' else None
+                    'limit': 1 if _tier == 'free' else None
                 }
             }
 
+            _sget = sub.get
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'tier': sub['tier'],
-                    'status': sub.get('status', 'active'),
-                    'renews_at': sub.get('renews_at'),
+                    'tier': _tier,
+                    'status': _sget('status', 'active'),
+                    'renews_at': _sget('renews_at'),
                     'usage': usage,
                     'features': {
-                        'unlimited_messaging': sub['tier'] == 'premium',
-                        'unlimited_communities': sub['tier'] == 'premium',
-                        'file_sharing': sub['tier'] == 'premium'
+                        'unlimited_messaging': _tier == 'premium',
+                        'unlimited_communities': _tier == 'premium',
+                        'file_sharing': _tier == 'premium'
                     }
                 }
             })
 
         except ValueError:
-            return JsonResponse({'detail': 'user_id sayısal olmalıdır'}, status=400)
+            return JsonResponse({'detail': 'user_id must be numeric'}, status=400)
         except Exception as e:
-            log.exception(f'SubscriptionStatus hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'SubscriptionStatus error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -936,39 +938,39 @@ class SubscriptionUpgradeView(View):
     """
     POST /api/v1/subscription/upgrade/
 
-    Premium'a upgrade et. Şimdilik mock checkout döner.
-    İleride Stripe/iyzico entegrasyonu yapılacak.
+    Premium'a upgrade et.
+    Ödeme: Google Pay / Apple Pay (client-side).
+    Vakıfbank Sanal Pos: ileriki versiyon güncellemesi ile entegre edilecek.
     """
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            user_id = data.get('user_id')
-            billing_cycle = data.get('billing_cycle', 'monthly')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
-            # TODO: Stripe/iyzico entegrasyonu
-            # Şimdi: mock checkout URL döner
+            data = json.loads(request.body)
+            billing_cycle = data.get('billing_cycle', 'monthly')
+            if billing_cycle not in ('monthly', 'yearly'):
+                billing_cycle = 'monthly'
 
-            price = '$9.99/month' if billing_cycle == 'monthly' else '$89/year'
+            price_try = '199.99 TRY/ay' if billing_cycle == 'monthly' else '1699 TRY/yıl'
 
             return JsonResponse({
                 'success': True,
                 'data': {
-                    'checkout_url': 'https://checkout.stripe.com/pay/mock_session_' + str(user_id),
-                    'price': price,
+                    'payment_methods': ['google_pay', 'apple_pay'],
+                    'price': price_try,
                     'billing_cycle': billing_cycle,
-                    'message': 'Ödeme sayfasına yönlendirileceksiniz'
+                    'message': 'Ödeme Google Pay veya Apple Pay ile tamamlanır.'
                 }
             })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON'}, status=400)
         except Exception as e:
-            log.exception(f'SubscriptionUpgrade hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'SubscriptionUpgrade error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -981,16 +983,14 @@ class SubscriptionCancelView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            user_id = data.get('user_id')
-
+            user_id = _get_user_id(request)
             if not user_id:
-                return JsonResponse({'detail': 'user_id gerekli'}, status=400)
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
             sub_col = _get_subscription_col()
 
             sub_col.update_one(
-                {'user_id': int(user_id)},
+                {'user_id': user_id},
                 {'$set': {
                     'tier': 'free',
                     'status': 'cancelled',
@@ -1008,7 +1008,7 @@ class SubscriptionCancelView(View):
             })
 
         except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Geçersiz JSON'}, status=400)
+            return JsonResponse({'detail': 'Invalid JSON'}, status=400)
         except Exception as e:
-            log.exception(f'SubscriptionCancel hatası: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            log.exception(f'SubscriptionCancel error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

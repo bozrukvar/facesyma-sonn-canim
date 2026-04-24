@@ -4,9 +4,9 @@ Manages conversation history, context, and semantic memory for coherent conversa
 """
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from operator import attrgetter
 from typing import Dict, List, Any, Optional
-from collections import deque
 import logging
 
 log = logging.getLogger(__name__)
@@ -27,8 +27,7 @@ class Conversation:
         self.conversation_id = conversation_id
         self.user_id = user_id
         self.language = language
-        self.created_at = datetime.now().isoformat()
-        self.updated_at = datetime.now().isoformat()
+        self.created_at = self.updated_at = datetime.now().isoformat()
         self.messages: List[Message] = []
         self.theme = "general"  # general, career, relationships, etc.
         self.summary = ""
@@ -50,20 +49,23 @@ class ConversationMemory:
             try:
                 with open(self.memory_db_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    for conv_id, conv_data in data.get("conversations", {}).items():
+                    _dget = data.get
+                    for conv_id, conv_data in _dget("conversations", {}).items():
+                        _cdget = conv_data.get
                         conv = Conversation(conv_id, conv_data["user_id"],
-                                          conv_data.get("language", "tr"))
-                        for msg_data in conv_data.get("messages", []):
+                                          _cdget("language", "tr"))
+                        for msg_data in _cdget("messages", []):
+                            _mdget = msg_data.get
                             msg = Message(msg_data["role"], msg_data["content"],
-                                        msg_data.get("category"), msg_data.get("module"))
+                                        _mdget("category"), _mdget("module"))
                             conv.messages.append(msg)
-                        conv.theme = conv_data.get("theme", "general")
-                        conv.summary = conv_data.get("summary", "")
-                        conv.key_topics = conv_data.get("key_topics", [])
+                        conv.theme     = _cdget("theme", "general")
+                        conv.summary   = _cdget("summary", "")
+                        conv.key_topics= _cdget("key_topics", [])
                         self.conversations[conv_id] = conv
 
-                    self.user_summaries = data.get("user_summaries", {})
-                    self.semantic_index = data.get("semantic_index", {})
+                    self.user_summaries = _dget("user_summaries", {})
+                    self.semantic_index = _dget("semantic_index", {})
 
                 log.info(f"Loaded {len(self.conversations)} conversations")
             except Exception as e:
@@ -124,19 +126,20 @@ class ConversationMemory:
             return False
 
         msg = Message(role, content, category, module)
-        conv.messages.append(msg)
+        _msgs = conv.messages
+        _msgs.append(msg)
         conv.updated_at = datetime.now().isoformat()
 
         # Limit history
-        if len(conv.messages) > self.max_history:
-            conv.messages = conv.messages[-self.max_history:]
+        if len(_msgs) > self.max_history:
+            conv.messages = _msgs[-self.max_history:]
 
         # Update semantic index
         if category:
-            if category not in self.semantic_index:
-                self.semantic_index[category] = []
-            if conversation_id not in self.semantic_index[category]:
-                self.semantic_index[category].append(conversation_id)
+            _si = self.semantic_index
+            cat_list = _si.setdefault(category, [])
+            if conversation_id not in cat_list:
+                cat_list.append(conversation_id)
 
         self.save_conversations()
         return True
@@ -213,7 +216,7 @@ class ConversationMemory:
                 "summary": conv.summary,
                 "key_topics": conv.key_topics
             }
-            for conv in sorted(convs, key=lambda x: x.updated_at, reverse=True)
+            for conv in sorted(convs, key=attrgetter('updated_at'), reverse=True)
         ]
 
     def find_related_conversations(self, topic: str, user_id: str) -> List[Conversation]:
@@ -228,7 +231,6 @@ class ConversationMemory:
 
     def cleanup_old_conversations(self, days: int = 90) -> int:
         """Delete conversations older than N days"""
-        from datetime import timedelta
         cutoff = (datetime.now() - timedelta(days=days)).isoformat()
         to_delete = [
             cid for cid, conv in self.conversations.items()
@@ -237,5 +239,6 @@ class ConversationMemory:
         for cid in to_delete:
             del self.conversations[cid]
         self.save_conversations()
-        log.info(f"Cleaned up {len(to_delete)} old conversations")
-        return len(to_delete)
+        _n = len(to_delete)
+        log.info(f"Cleaned up {_n} old conversations")
+        return _n

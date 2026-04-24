@@ -19,25 +19,53 @@ Test Types (20 soru, 5-li Likert):
 
 import json
 import logging
+import time
+from functools import lru_cache
+import jwt
+from datetime import datetime
 from pathlib import Path
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from bson import ObjectId
 from django.conf import settings
 from .assessment_recommendations import generate_recommendations
+from admin_api.utils.mongo import get_assessment_results_col
 
 log = logging.getLogger(__name__)
 
+_JWT_SECRET: str = settings.JWT_SECRET
+_ASSESSMENT_HISTORY_PROJ = {'_id': 1, 'test_type': 1, 'overall_score': 1,
+                             'overall_level_tr': 1, 'created_at': 1, 'responses_counted': 1}
+
 # Supported test types
-VALID_TESTS = ['skills', 'hr', 'personality', 'career', 'relationship', 'vocation']
+VALID_TESTS = frozenset({'skills', 'hr', 'personality', 'career', 'relationship', 'vocation'})
+
+_QUESTIONS_DIR = Path(settings.BASE_DIR) / 'questions'
+
+_DOMAIN_KEY_MAP: dict = {
+    'skills': 'domain', 'hr': 'domain', 'personality': 'domain',
+    'career': 'domain', 'relationship': 'subscale', 'vocation': 'domain',
+}
+
+
+def _get_user_id(request):
+    """Extract user_id from JWT Bearer token. Returns None if missing/invalid."""
+    auth = request.headers.get('Authorization', '')
+    if not auth.startswith('Bearer '):
+        return None
+    try:
+        payload = jwt.decode(
+            auth.split(' ', 1)[1], _JWT_SECRET, algorithms=['HS256']
+        )
+        return payload.get('user_id')
+    except Exception:
+        return None
 
 
 def _get_questions_path(test_type: str) -> Path:
-    """Get path to questionnaire JSON file."""
-    # Questions are in questions subdirectory within facesyma_backend
-    base = Path(settings.BASE_DIR)
-    return base / 'questions' / f'{test_type}_questions.json'
+    return _QUESTIONS_DIR / f'{test_type}_questions.json'
 
 
 def _load_questions(test_type: str) -> dict | None:
@@ -58,17 +86,9 @@ def _load_questions(test_type: str) -> dict | None:
         return None
 
 
+@lru_cache(maxsize=32)
 def _get_domain_key(test_type: str) -> str:
-    """Get the domain/subscale key name for each test type."""
-    mapping = {
-        'skills': 'domain',
-        'hr': 'domain',
-        'personality': 'domain',
-        'career': 'domain',
-        'relationship': 'subscale',
-        'vocation': 'domain',
-    }
-    return mapping.get(test_type, 'domain')
+    return _DOMAIN_KEY_MAP.get(test_type, 'domain')
 
 
 def _score_test(test_data: dict, responses: list) -> dict:
@@ -82,19 +102,21 @@ def _score_test(test_data: dict, responses: list) -> dict:
     Returns:
         Scoring breakdown by domain
     """
-    domain_key = _get_domain_key(test_data.get('test_type', 'skills'))
+    _tdget = test_data.get
+    domain_key = _get_domain_key(_tdget('test_type', 'skills'))
     scores = {}
     question_count = {}
 
     # Build question lookup
     questions_by_id = {}
-    for q in test_data.get('questions', []):
+    for q in _tdget('questions', []):
         questions_by_id[q['q_id']] = q
 
     # Process responses
     for resp in responses:
-        q_id = resp.get('q_id')
-        score = resp.get('score', 0)
+        _rget = resp.get
+        q_id = _rget('q_id')
+        score = _rget('score', 0)
 
         # Validate score range (1-5)
         if not isinstance(score, int) or score < 1 or score > 5:
@@ -105,10 +127,11 @@ def _score_test(test_data: dict, responses: list) -> dict:
             continue
 
         q = questions_by_id[q_id]
-        domain = q.get(domain_key, 'unknown')
+        _qget = q.get
+        domain = _qget(domain_key, 'unknown')
 
         # Handle reverse-scored items
-        if q.get('reverse_scored', False):
+        if _qget('reverse_scored', False):
             score = 6 - score  # Reverse: 1→5, 2→4, 3→3, 4→2, 5→1
 
         if domain not in scores:
@@ -179,38 +202,43 @@ class AssessmentQuestionsView(View):
                 }, status=404)
 
             # Extract questions and translate to requested language
-            domain_key = _get_domain_key(test_data.get('test_type', 'skills'))
+            _tdget = test_data.get
+            domain_key = _get_domain_key(_tdget('test_type', 'skills'))
             questions = []
-            for q in test_data.get('questions', []):
-                translations = q.get('translations', {})
-                text = translations.get(lang, translations.get('tr', ''))
+            for q in _tdget('questions', []):
+                _qget = q.get
+                translations = _qget('translations', {})
+                _tget = translations.get
+                text = _tget(lang, _tget('tr', ''))
 
                 questions.append({
                     'q_id': q['q_id'],
                     'order': q['order'],
                     'text': text,
-                    'domain': q.get(domain_key, 'unknown'),
-                    'reverse_scored': q.get('reverse_scored', False),
+                    'domain': _qget(domain_key, 'unknown'),
+                    'reverse_scored': _qget('reverse_scored', False),
                 })
 
             # Get scale labels
-            scale_labels = test_data.get('scale_labels', {}).get(lang,
-                                        test_data.get('scale_labels', {}).get('tr', {}))
+            _all_scale_labels = _tdget('scale_labels', {})
+            _aslget = _all_scale_labels.get
+            scale_labels = _aslget(lang, _aslget('tr', {}))
+            _slget = scale_labels.get
 
             return JsonResponse({
                 'success': True,
                 'data': {
                     'test_type': test_type,
-                    'version': test_data.get('version', '1.0'),
-                    'description': test_data.get('description', ''),
-                    'domains': test_data.get('domains') or test_data.get('subscales', []),
+                    'version': _tdget('version', '1.0'),
+                    'description': _tdget('description', ''),
+                    'domains': _tdget('domains') or _tdget('subscales', []),
                     'questions': questions,
                     'scale': {
-                        '1': scale_labels.get('1', 'Strongly Disagree'),
-                        '2': scale_labels.get('2', 'Disagree'),
-                        '3': scale_labels.get('3', 'Neutral'),
-                        '4': scale_labels.get('4', 'Agree'),
-                        '5': scale_labels.get('5', 'Strongly Agree'),
+                        '1': _slget('1', 'Strongly Disagree'),
+                        '2': _slget('2', 'Disagree'),
+                        '3': _slget('3', 'Neutral'),
+                        '4': _slget('4', 'Agree'),
+                        '5': _slget('5', 'Strongly Agree'),
                     },
                     'total_questions': len(questions),
                 }
@@ -218,7 +246,7 @@ class AssessmentQuestionsView(View):
 
         except Exception as e:
             log.exception(f'Error fetching questions: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Assessment Submit View ─────────────────────────────────────────────────────
@@ -254,8 +282,9 @@ class AssessmentSubmitView(View):
             except json.JSONDecodeError:
                 return JsonResponse({'detail': 'Invalid JSON'}, status=400)
 
-            lang = body.get('lang', 'tr')
-            responses = body.get('responses', [])
+            _bget2 = body.get
+            lang = _bget2('lang', 'tr')
+            responses = _bget2('responses', [])
 
             # Validate responses
             if not isinstance(responses, list) or len(responses) == 0:
@@ -302,24 +331,25 @@ class AssessmentSubmitView(View):
                 lang=lang
             )
 
+            _rrget = recommendations_result.get
             return JsonResponse({
                 'success': True,
                 'data': {
                     'test_type': test_type,
-                    'completed_at': __import__('time').time(),
+                    'completed_at': time.time(),
                     'overall_score': round(overall_score, 2),
                     'overall_level': overall_level,
                     'overall_level_tr': overall_level_tr,
                     'breakdown': breakdown,
                     'responses_counted': len([r for r in responses if r.get('q_id')]),
-                    'recommendations': recommendations_result.get('recommendations', []),
-                    'recommendations_status': recommendations_result.get('status', 'unknown'),
+                    'recommendations': _rrget('recommendations', []),
+                    'recommendations_status': _rrget('status', 'unknown'),
                 }
             })
 
         except Exception as e:
             log.exception(f'Error submitting test: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ── Assessment Results Storage (MongoDB) ──────────────────────────────────────
@@ -354,26 +384,21 @@ class SaveAssessmentResultView(View):
             except json.JSONDecodeError:
                 return JsonResponse({'detail': 'Invalid JSON'}, status=400)
 
-            # Get user (if authenticated)
-            user_id = None
-            if hasattr(request, 'user') and request.user.is_authenticated:
-                user_id = str(request.user.id)
+            # Get user (if authenticated) — optional, anonymous submissions allowed
+            user_id = _get_user_id(request)
 
             # Save to MongoDB
-            from admin_api.utils.mongo import get_assessment_results_col
-            from datetime import datetime
-            from bson import ObjectId
-
             col = get_assessment_results_col()
+            _bget = body.get
             result_doc = {
                 '_id': ObjectId(),
                 'user_id': user_id,
                 'test_type': test_type,
-                'overall_score': body.get('overall_score'),
-                'overall_level_tr': body.get('overall_level_tr'),
-                'breakdown': body.get('breakdown', {}),
-                'recommendations': body.get('recommendations', []),
-                'responses_counted': body.get('responses_counted'),
+                'overall_score': _bget('overall_score'),
+                'overall_level_tr': _bget('overall_level_tr'),
+                'breakdown': _bget('breakdown', {}),
+                'recommendations': _bget('recommendations', []),
+                'responses_counted': _bget('responses_counted'),
                 'created_at': datetime.utcnow(),
             }
 
@@ -390,7 +415,7 @@ class SaveAssessmentResultView(View):
 
         except Exception as e:
             log.exception(f'Error saving assessment result: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -403,39 +428,36 @@ class GetAssessmentHistoryView(View):
 
     def get(self, request):
         try:
-            # Get user (if authenticated)
-            user_id = None
-            if hasattr(request, 'user') and request.user.is_authenticated:
-                user_id = str(request.user.id)
-            else:
-                return JsonResponse({
-                    'detail': 'Authentication required'
-                }, status=401)
+            user_id = _get_user_id(request)
+            if not user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
             # Get limit from query params
-            limit = int(request.GET.get('limit', 10))
-            if limit > 100:
-                limit = 100
+            try:
+                limit = min(max(1, int(request.GET.get('limit', 10))), 100)
+            except (ValueError, TypeError):
+                limit = 10
 
             # Query MongoDB
-            from admin_api.utils.mongo import get_assessment_results_col
-
             col = get_assessment_results_col()
             results = list(col.find(
                 {'user_id': user_id},
+                _ASSESSMENT_HISTORY_PROJ,
                 sort=[('created_at', -1)],
             ).limit(limit))
 
             # Format results
             formatted = []
             for r in results:
+                _rget = r.get
+                _cat = _rget('created_at')
                 formatted.append({
                     'id': str(r['_id']),
-                    'test_type': r.get('test_type'),
-                    'overall_score': r.get('overall_score'),
-                    'overall_level_tr': r.get('overall_level_tr'),
-                    'created_at': r.get('created_at').isoformat() if r.get('created_at') else None,
-                    'responses_counted': r.get('responses_counted'),
+                    'test_type': _rget('test_type'),
+                    'overall_score': _rget('overall_score'),
+                    'overall_level_tr': _rget('overall_level_tr'),
+                    'created_at': _cat.isoformat() if _cat else None,
+                    'responses_counted': _rget('responses_counted'),
                 })
 
             return JsonResponse({
@@ -448,4 +470,4 @@ class GetAssessmentHistoryView(View):
 
         except Exception as e:
             log.exception(f'Error fetching assessment history: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

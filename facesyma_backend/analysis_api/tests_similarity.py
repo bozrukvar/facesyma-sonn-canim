@@ -68,10 +68,12 @@ class SimilarityMatcherTests(TestCase):
         if results:  # If database has data
             self.assertLessEqual(len(results), 3)
             if len(results) > 0:
-                self.assertIn('rank', results[0])
-                self.assertIn('name', results[0])
-                self.assertIn('score', results[0])
-                self.assertTrue(0 <= results[0]['score'] <= 100)
+                _ain = self.assertIn
+                _r0 = results[0]
+                _ain('rank', _r0)
+                _ain('name', _r0)
+                _ain('score', _r0)
+                self.assertTrue(0 <= _r0['score'] <= 100)
 
     def test_match_historical_returns_top_3(self):
         """Test historical matching returns max 3 results"""
@@ -112,21 +114,23 @@ class SimilarityMatcherTests(TestCase):
         results = self.matcher.match_user_to_similarities(test_sifatlar, 'tr')
 
         # Should have all 5 categories
-        self.assertIn('celebrities', results)
-        self.assertIn('historical', results)
-        self.assertIn('objects', results)
-        self.assertIn('plants', results)
-        self.assertIn('animals', results)
+        _assertIn = self.assertIn
+        _assertIn('celebrities', results)
+        _assertIn('historical', results)
+        _assertIn('objects', results)
+        _assertIn('plants', results)
+        _assertIn('animals', results)
 
         # Each category should be a list
         for category in ['celebrities', 'historical', 'objects', 'plants', 'animals']:
-            self.assertIsInstance(results[category], list)
-            if results[category]:
+            _rc = results[category]
+            self.assertIsInstance(_rc, list)
+            if _rc:
                 # If results exist, check structure
-                match = results[category][0]
-                self.assertIn('rank', match)
-                self.assertIn('name', match)
-                self.assertIn('score', match)
+                match = _rc[0]
+                _assertIn('rank', match)
+                _assertIn('name', match)
+                _assertIn('score', match)
 
     def test_generate_summary_turkish(self):
         """Test summary generation in Turkish"""

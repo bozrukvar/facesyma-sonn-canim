@@ -19,6 +19,50 @@ Yeni dil eklemek için:
   6. SUPPORTED_LANGUAGES["xx"] ekle
 """
 
+from functools import lru_cache
+from .modules import get_registry
+
+_MODULES_INTRO = {
+    "tr": "## Erişebileceğin Modüller\nSen şu modüllere erişebilirsin ve kullanıcıyı uygun durumlarda bunları kullanmaya teşvik etmelisin:",
+    "en": "## Available Modules\nYou have access to the following modules and should proactively suggest them when appropriate:",
+    "de": "## Verfügbare Module\nDu hast Zugriff auf die folgenden Module und solltest diese proaktiv vorschlagen:",
+    "ru": "## Доступные модули\nУ тебя есть доступ к следующим модулям, и ты должен активно их предлагать:",
+    "ar": "## الوحدات المتاحة\nلديك الوصول إلى الوحدات التالية ويجب عليك اقتراحها بنشاط:",
+    "es": "## Módulos Disponibles\nTienes acceso a los siguientes módulos y debes sugerirlos proactivamente:",
+    "ko": "## 이용 가능한 모듈\n다음 모듈에 액세스할 수 있으며 적절할 때 적극적으로 제안해야 합니다:",
+    "ja": "## 利用可能なモジュール\n次のモジュールにアクセスでき、適切な場合に積極的に提案する必要があります:",
+    "zh": "## 可用模块\n您可以访问以下模块，并应在适当时主动建议它们:",
+    "hi": "## उपलब्ध मॉड्यूल\nआपके पास निम्नलिखित मॉड्यूल तक पहुंच है और आपको उचित समय पर उन्हें सक्रिय रूप से सुझाना चाहिए:",
+    "fr": "## Modules Disponibles\nVous avez accès aux modules suivants et devriez les suggérer proactivement:",
+    "pt": "## Módulos Disponíveis\nVocê tem acesso aos seguintes módulos e deve sugerir-los proativamente:",
+    "bn": "## উপলব্ধ মডিউল\nআপনার কাছে নিম্নলিখিত মডিউলগুলিতে অ্যাক্সেস রয়েছে এবং আপনি সেগুলি সক্রিয়ভাবে পরামর্শ দেওয়া উচিত:",
+    "id": "## Modul Tersedia\nAnda memiliki akses ke modul berikut dan harus secara proaktif menyarankannya:",
+    "ur": "## دستیاب ماڈیول\nآپ کو مندرجہ ذیل ماڈیول تک رسائی ہے اور آپ کو انہیں فعال طور پر تجویز کرنا چاہیے:",
+    "it": "## Moduli Disponibili\nHai accesso ai seguenti moduli e devi suggerirli proattivamente:",
+    "vi": "## Mô-đun Có sẵn\nBạn có quyền truy cập vào các mô-đun sau đây và nên gợi ý chúng một cách chủ động:",
+    "pl": "## Dostępne moduły\nMasz dostęp do następujących modułów i powinieneś je aktywnie sugerować:",
+}
+_MODULE_SUGGESTIONS = {
+    "tr": [
+        "Astroloji: 'Doğum tarihinizi söylerseniz astroloji haritanızı çıkarabilirim'",
+        "Kişilik Testi: 'Kişiliğinizi daha iyi anlamak için 20 sorulu test yapabiliriz'",
+        "Kariyer Testi: 'Kariyer yolunuzu keşfetmek için test çözsünüz'",
+        "İK/Çalışma Stili: 'Takım ortamında rolünüzü anlamak için test yapabiliriz'",
+        "Beceri Testi: 'Güçlü ve zayıf yönlerinizi belirlemek için test yapabiliriz'",
+        "Meslek Tercihi: '20 soruda ideal mesleğinizi bulabiliriz'",
+        "İlişki & EQ: 'Duygusal zekanızı ve ilişki stilinizi ölçebiliriz'",
+    ],
+    "en": [
+        "Astrology: 'If you share your birth date and time, I can create your astrological chart'",
+        "Personality Test: 'We can take a 20-question personality test to understand you better'",
+        "Career Test: 'Discover your ideal career path with our career aptitude test'",
+        "Work Style Test: 'Understand your role in team environments'",
+        "Skills Test: 'Identify your strengths and areas for growth'",
+        "Vocational Test: \"Find your ideal profession based on Holland's model\"",
+        "Relationship Test: 'Measure your emotional intelligence and relationship style'",
+    ],
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # PERSONAS — her dil kendi kültürel tonunda
 # ─────────────────────────────────────────────────────────────────────────────
@@ -239,80 +283,87 @@ SECTION_TITLES = {
 # ─────────────────────────────────────────────────────────────────────────────
 # Yardımcılar
 # ─────────────────────────────────────────────────────────────────────────────
+@lru_cache(maxsize=32)
 def _get_module_labels(lang: str) -> dict:
     return MODULE_LABELS.get(lang, MODULE_LABELS["en"])
 
+@lru_cache(maxsize=32)
 def _get_section_titles(lang: str) -> dict:
     return SECTION_TITLES.get(lang, SECTION_TITLES["en"])
 
 def _format_analysis(analysis: dict, lang: str) -> str:
-    labels = _get_module_labels(lang)
-    titles = _get_section_titles(lang)
-    lines  = []
+    labels  = _get_module_labels(lang)
+    titles  = _get_section_titles(lang)
+    lines   = []
+    _append = lines.append
+    _aget   = analysis.get
 
     # ── Face Analysis (if available) ────────────────────────────────────────
-    face_analysis = analysis.get("face_analysis")
+    face_analysis = _aget("face_analysis")
     if face_analysis:
-        lines.append(f"[{titles['face_analysis']}]")
+        _append(f"[{titles['face_analysis']}]")
 
         # Character summary
-        summary = face_analysis.get("character_summary", "")
+        _faget = face_analysis.get
+        summary = _faget("character_summary", "")
         if summary:
-            lines.append(f"{summary}\n")
+            _append(f"{summary}\n")
 
         # Key attributes with scores
-        key_attrs = face_analysis.get("key_attributes", {})
+        _tattrs = titles['attributes']
+        key_attrs = _faget("key_attributes", {})
         if key_attrs:
-            lines.append(f"[{titles['attributes']}]")
+            _append(f"[{_tattrs}]")
             for attr_name, score in list(key_attrs.items())[:15]:
-                desc = face_analysis.get("attribute_descriptions", {}).get(attr_name, "")
+                desc = _faget("attribute_descriptions", {}).get(attr_name, "")
                 line = f"• {attr_name}: {score} — "
                 if desc:
                     line += str(desc)[:150]
                 else:
                     line += f"Score: {score}"
-                lines.append(line)
+                _append(line)
 
-    golden = analysis.get("golden_ratio") or analysis.get("score")
+    golden = _aget("golden_ratio") or _aget("score")
     if golden:
-        lines.append(f"• {titles['golden']}: {golden}/100")
+        _append(f"• {titles['golden']}: {golden}/100")
 
-    face_type = analysis.get("face_type")
+    face_type = _aget("face_type")
     if face_type:
-        lines.append(f"• {titles['face_type']}: {face_type}")
+        _append(f"• {titles['face_type']}: {face_type}")
 
-    attrs = analysis.get("attributes", [])
+    attrs = _aget("attributes", [])
     if attrs:
-        lines.append(f"\n[{titles['attributes']}]")
+        _append(f"\n[{_tattrs}]")
         for a in attrs[:10]:
-            name  = a.get("name", "")
-            score = a.get("score", "")
-            desc  = a.get("description", "")
+            _aget2 = a.get
+            name  = _aget2("name", "")
+            score = _aget2("score", "")
+            desc  = _aget2("description", "")
             if name:
                 line = f"• {name}"
                 if score:
                     line += f" ({score}/100)"
                 if desc:
                     line += f" — {str(desc)[:100]}"
-                lines.append(line)
+                _append(line)
 
     for mod_key, mod_label in labels.items():
-        val = analysis.get(mod_key)
+        val = _aget(mod_key)
         if not val:
             continue
-        lines.append(f"\n[{mod_label}]")
+        _append(f"\n[{mod_label}]")
         if isinstance(val, str):
-            lines.append(val[:400] + ("…" if len(val) > 400 else ""))
+            _append(val[:400] + ("…" if len(val) > 400 else ""))
         elif isinstance(val, list):
             for item in val[:5]:
-                lines.append(f"• {item}")
+                _append(f"• {item}")
         elif isinstance(val, dict):
             for k, v in list(val.items())[:5]:
-                lines.append(f"• {k}: {v}")
+                _append(f"• {k}: {v}")
 
-    daily = analysis.get("daily")
+    daily = _aget("daily")
     if daily:
-        lines.append(f"\n[{titles['daily']}]\n{daily}")
+        _append(f"\n[{titles['daily']}]\n{daily}")
 
     return "\n".join(lines) if lines else titles["no_data"]
 
@@ -345,69 +396,25 @@ def build_system_prompt(analysis: dict, lang: str = "tr") -> str:
 
 def _build_modules_section(lang: str = "tr") -> str:
     """Build module capabilities section for system prompt."""
-    from .modules import get_registry
-
     registry = get_registry()
     modules = registry.get_all()
 
-    # Module descriptions per language
-    modules_intro = {
-        "tr": "## Erişebileceğin Modüller\nSen şu modüllere erişebilirsin ve kullanıcıyı uygun durumlarda bunları kullanmaya teşvik etmelisin:",
-        "en": "## Available Modules\nYou have access to the following modules and should proactively suggest them when appropriate:",
-        "de": "## Verfügbare Module\nDu hast Zugriff auf die folgenden Module und solltest diese proaktiv vorschlagen:",
-        "ru": "## Доступные модули\nУ тебя есть доступ к следующим модулям, и ты должен активно их предлагать:",
-        "ar": "## الوحدات المتاحة\nلديك الوصول إلى الوحدات التالية ويجب عليك اقتراحها بنشاط:",
-        "es": "## Módulos Disponibles\nTienes acceso a los siguientes módulos y debes sugerirlos proactivamente:",
-        "ko": "## 이용 가능한 모듈\n다음 모듈에 액세스할 수 있으며 적절할 때 적극적으로 제안해야 합니다:",
-        "ja": "## 利用可能なモジュール\n次のモジュールにアクセスでき、適切な場合に積極的に提案する必要があります:",
-        "zh": "## 可用模块\n您可以访问以下模块，并应在适当时主动建议它们:",
-        "hi": "## उपलब्ध मॉड्यूल\nआपके पास निम्नलिखित मॉड्यूल तक पहुंच है और आपको उचित समय पर उन्हें सक्रिय रूप से सुझाना चाहिए:",
-        "fr": "## Modules Disponibles\nVous avez accès aux modules suivants et devriez les suggérer proactivement:",
-        "pt": "## Módulos Disponíveis\nVocê tem acesso aos seguintes módulos e deve sugerir-los proativamente:",
-        "bn": "## উপলব্ধ মডিউল\nআপনার কাছে নিম্নলিখিত মডিউলগুলিতে অ্যাক্সেস রয়েছে এবং আপনি সেগুলি সক্রিয়ভাবে পরামর্শ দেওয়া উচিত:",
-        "id": "## Modul Tersedia\nAnda memiliki akses ke modul berikut dan harus secara proaktif menyarankannya:",
-        "ur": "## دستیاب ماڈیول\nآپ کو مندرجہ ذیل ماڈیول تک رسائی ہے اور آپ کو انہیں فعال طور پر تجویز کرنا چاہیے:",
-        "it": "## Moduli Disponibili\nHai accesso ai seguenti moduli e devi suggerirli proattivamente:",
-        "vi": "## Mô-đun Có sẵn\nBạn có quyền truy cập vào các mô-đun sau đây và nên gợi ý chúng một cách chủ động:",
-        "pl": "## Dostępne moduły\nMasz dostęp do następujących modułów i powinieneś je aktywnie sugerować:",
-    }
-
-    # Proactive suggestions per language
-    suggestions = {
-        "tr": [
-            "Astroloji: 'Doğum tarihinizi söylerseniz astroloji haritanızı çıkarabilirim'",
-            "Kişilik Testi: 'Kişiliğinizi daha iyi anlamak için 20 sorulu test yapabiliriz'",
-            "Kariyer Testi: 'Kariyer yolunuzu keşfetmek için test çözsünüz'",
-            "İK/Çalışma Stili: 'Takım ortamında rolünüzü anlamak için test yapabiliriz'",
-            "Beceri Testi: 'Güçlü ve zayıf yönlerinizi belirlemek için test yapabiliriz'",
-            "Meslek Tercihi: '20 soruda ideal mesleğinizi bulabiliriz'",
-            "İlişki & EQ: 'Duygusal zekanızı ve ilişki stilinizi ölçebiliriz'",
-        ],
-        "en": [
-            "Astrology: 'If you share your birth date and time, I can create your astrological chart'",
-            "Personality Test: 'We can take a 20-question personality test to understand you better'",
-            "Career Test: 'Discover your ideal career path with our career aptitude test'",
-            "Work Style Test: 'Understand your role in team environments'",
-            "Skills Test: 'Identify your strengths and areas for growth'",
-            "Vocational Test: 'Find your ideal profession based on Holland\\'s model'",
-            "Relationship Test: 'Measure your emotional intelligence and relationship style'",
-        ],
-    }
-
-    intro = modules_intro.get(lang, modules_intro["en"])
+    intro = _MODULES_INTRO.get(lang, _MODULES_INTRO["en"])
 
     # Format module list
     module_lines = []
     for module in modules:
-        display = module.get("display", {}).get(lang, module["name"])
-        desc = module.get("description", {}).get(lang, "")
+        _mget = module.get
+        display = _mget("display", {}).get(lang, module["name"])
+        desc = _mget("description", {}).get(lang, "")
         module_lines.append(f"- {display}: {desc}")
 
-    module_list = "\n".join(module_lines)
+    _njoin = "\n".join
+    module_list = _njoin(module_lines)
 
     # Add proactive suggestions
-    sugg_list = suggestions.get(lang, suggestions["en"])
-    sugg_text = "\n".join(sugg_list[:3])  # Top 3 suggestions
+    sugg_list = _MODULE_SUGGESTIONS.get(lang, _MODULE_SUGGESTIONS["en"])
+    sugg_text = _njoin(sugg_list[:3])  # Top 3 suggestions
 
     return f"{intro}\n{module_list}\n\n## Proaktif Öneriler\nUygun fırsatlarda şu şekilde modülleri öner:\n{sugg_text}"
 

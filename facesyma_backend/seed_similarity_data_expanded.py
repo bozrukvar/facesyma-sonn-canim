@@ -21,7 +21,7 @@ from pymongo import MongoClient
 
 MONGO_URI = os.environ.get(
     'MONGO_URI',
-    'mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE'
+    ''
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -614,6 +614,7 @@ def seed_expanded_data():
         # ── Plants ─────────────────────────────────────────────────────────────
         print(f"🌸 Seeding {len(PLANTS)} plants/flowers...")
         plants_col = db['similarities_plants']
+        _pcd = plants_col.count_documents
         plants_col.delete_many({})
         if PLANTS:
             plants_col.insert_many(PLANTS)
@@ -622,6 +623,7 @@ def seed_expanded_data():
         # ── Animals ────────────────────────────────────────────────────────────
         print(f"🦁 Seeding {len(ANIMALS)} animals...")
         animals_col = db['similarities_animals']
+        _acd = animals_col.count_documents
         animals_col.delete_many({})
         if ANIMALS:
             animals_col.insert_many(ANIMALS)
@@ -632,20 +634,22 @@ def seed_expanded_data():
         print("✅ EXPANDED Data Seeding Complete!")
         print("="*70)
 
-        total = (
-            celebrities_col.count_documents({}) +
-            historical_col.count_documents({}) +
-            objects_col.count_documents({}) +
-            plants_col.count_documents({}) +
-            animals_col.count_documents({})
-        )
+        _ccd = celebrities_col.count_documents
+        _hcd = historical_col.count_documents
+        _ocd = objects_col.count_documents
+        _n_cel = _ccd({})
+        _n_his = _hcd({})
+        _n_obj = _ocd({})
+        _n_pla = _pcd({})
+        _n_ani = _acd({})
+        total = _n_cel + _n_his + _n_obj + _n_pla + _n_ani
 
         print(f"\n📊 Total Entries: {total}")
-        print(f"   🎬 Celebrities:  {celebrities_col.count_documents({})}")
-        print(f"   📜 Historical:   {historical_col.count_documents({})}")
-        print(f"   🎨 Objects:      {objects_col.count_documents({})}")
-        print(f"   🌸 Plants:       {plants_col.count_documents({})}")
-        print(f"   🦁 Animals:      {animals_col.count_documents({})}")
+        print(f"   🎬 Celebrities:  {_n_cel}")
+        print(f"   📜 Historical:   {_n_his}")
+        print(f"   🎨 Objects:      {_n_obj}")
+        print(f"   🌸 Plants:       {_n_pla}")
+        print(f"   🦁 Animals:      {_n_ani}")
 
         print(f"\n✨ Phase 1 Similarity Module READY with {total} entries!")
 

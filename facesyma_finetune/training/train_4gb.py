@@ -204,11 +204,13 @@ def save_model(model, tokenizer, output_dir):
 
 def main():
     parser = argparse.ArgumentParser(description="Fine-tune Llama 3.1 8B on 4GB GPU")
-    parser.add_argument("--dataset", required=True, help="Path to JSONL dataset")
-    parser.add_argument("--epochs", type=int, default=3, help="Number of epochs")
-    parser.add_argument("--output", default=OUTPUT_DIR, help="Output directory")
+    _addarg = parser.add_argument
+    _addarg("--dataset", required=True, help="Path to JSONL dataset")
+    _addarg("--epochs", type=int, default=3, help="Number of epochs")
+    _addarg("--output", default=OUTPUT_DIR, help="Output directory")
 
     args = parser.parse_args()
+    _out = args.output
 
     print("\n" + "="*70)
     print("FACESYMA PHASE 2B - Local GPU Training (4GB)")
@@ -218,13 +220,13 @@ def main():
     model, tokenizer = load_and_prepare_model()
     model = add_lora(model)
     dataset = load_dataset_from_file(args.dataset)
-    train_model(model, tokenizer, dataset, args.output, args.epochs)
-    save_model(model, tokenizer, args.output)
+    train_model(model, tokenizer, dataset, _out, args.epochs)
+    save_model(model, tokenizer, _out)
 
     print("\n" + "="*70)
     print("✅ ALL DONE!")
     print("="*70)
-    print(f"\nModel saved to: {args.output}")
+    print(f"\nModel saved to: {_out}")
     print(f"\nNext steps:")
     print(f"  1. Copy model to: facesyma_finetune/serving/models/")
     print(f"  2. Start vLLM: docker-compose up")

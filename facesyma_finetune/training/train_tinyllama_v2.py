@@ -122,8 +122,9 @@ def format_chat_prompt(messages):
     """TinyLlama chat format"""
     prompt = ""
     for msg in messages:
-        role = msg.get("role", "user")
-        content = msg.get("content", "")
+        _mget = msg.get
+        role = _mget("role", "user")
+        content = _mget("content", "")
 
         if role == "system":
             prompt += f"<|im_start|>system\n{content}<|im_end|>\n"

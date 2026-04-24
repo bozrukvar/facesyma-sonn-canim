@@ -115,17 +115,19 @@ class LLMConfig:
 
     def get_ollama_params(self) -> Dict[str, Any]:
         """Get Ollama API parameters"""
+        _cfg = self.config
+        _inf = _cfg["inference"]
         return {
-            "model": self.config["model"]["name"],
+            "model": _cfg["model"]["name"],
             "stream": False,
             "options": {
-                "temperature": self.config["inference"]["temperature"],
-                "top_p": self.config["inference"]["top_p"],
-                "top_k": self.config["inference"]["top_k"],
-                "repeat_penalty": self.config["inference"]["repeat_penalty"],
-                "num_ctx": self.config["inference"]["num_ctx"],
-                "num_predict": self.config["inference"]["num_predict"],
-                "num_threads": self.config["inference"]["num_threads"],
+                "temperature": _inf["temperature"],
+                "top_p": _inf["top_p"],
+                "top_k": _inf["top_k"],
+                "repeat_penalty": _inf["repeat_penalty"],
+                "num_ctx": _inf["num_ctx"],
+                "num_predict": _inf["num_predict"],
+                "num_threads": _inf["num_threads"],
             }
         }
 
@@ -139,12 +141,13 @@ class LLMConfig:
 
     def print_config(self):
         """Print configuration for debugging"""
+        _info = log.info
         import json
-        log.info(f"\n{'='*60}")
-        log.info(f"LLM Configuration ({self.deployment_env})")
-        log.info(f"{'='*60}")
-        log.info(json.dumps(self.config, indent=2, default=str))
-        log.info(f"{'='*60}\n")
+        _info(f"\n{'='*60}")
+        _info(f"LLM Configuration ({self.deployment_env})")
+        _info(f"{'='*60}")
+        _info(json.dumps(self.config, indent=2, default=str))
+        _info(f"{'='*60}\n")
 
 
 class LLMCache:
@@ -165,18 +168,20 @@ class LLMCache:
 
     def set(self, key: str, value: str):
         """Cache response"""
-        if len(self.cache) >= self.max_cache_size:
+        _cache = self.cache
+        if len(_cache) >= self.max_cache_size:
             # Remove oldest item
-            oldest_key = next(iter(self.cache))
-            del self.cache[oldest_key]
-        self.cache[key] = value
+            oldest_key = next(iter(_cache))
+            del _cache[oldest_key]
+        _cache[key] = value
 
     def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
-        total = self.hit_count + self.miss_count
-        hit_rate = (self.hit_count / total * 100) if total > 0 else 0
+        _hc = self.hit_count
+        total = _hc + self.miss_count
+        hit_rate = (_hc / total * 100) if total > 0 else 0
         return {
-            "hit_count": self.hit_count,
+            "hit_count": _hc,
             "miss_count": self.miss_count,
             "hit_rate": f"{hit_rate:.1f}%",
             "cache_size": len(self.cache),
@@ -208,9 +213,11 @@ class LLMBatcher:
 
     def get_batch(self) -> Optional[list]:
         """Get ready batch"""
-        if len(self.pending_requests) >= self.batch_size:
-            batch = self.pending_requests[:self.batch_size]
-            self.pending_requests = self.pending_requests[self.batch_size:]
+        _pr = self.pending_requests
+        _bsz = self.batch_size
+        if len(_pr) >= _bsz:
+            batch = _pr[:_bsz]
+            self.pending_requests = _pr[_bsz:]
             self.processed += len(batch)
             return batch
         return None
@@ -221,11 +228,13 @@ class LLMBatcher:
 
     def get_stats(self) -> Dict[str, Any]:
         """Get batch statistics"""
+        _proc = self.processed
+        _lpr = len(self.pending_requests)
         return {
-            "processed": self.processed,
-            "pending": len(self.pending_requests),
+            "processed": _proc,
+            "pending": _lpr,
             "batch_size": self.batch_size,
-            "efficiency": f"{(self.processed / max(1, self.processed + len(self.pending_requests)) * 100):.1f}%"
+            "efficiency": f"{(_proc / max(1, _proc + _lpr) * 100):.1f}%"
         }
 
 
@@ -249,14 +258,17 @@ class PerformanceMonitor:
 
     def get_stats(self) -> Dict[str, Any]:
         """Get performance statistics"""
-        avg_latency = (self.total_latency / max(1, self.total_requests - self.error_count)) if self.total_requests > 0 else 0
-        throughput = (self.total_tokens / max(1, self.total_latency)) if self.total_latency > 0 else 0
+        _tr = self.total_requests
+        _ec = self.error_count
+        _tl = self.total_latency
+        avg_latency = (_tl / max(1, _tr - _ec)) if _tr > 0 else 0
+        throughput = (self.total_tokens / max(1, _tl)) if _tl > 0 else 0
 
         return {
-            "total_requests": self.total_requests,
-            "successful_requests": self.total_requests - self.error_count,
-            "failed_requests": self.error_count,
-            "error_rate": f"{(self.error_count / max(1, self.total_requests) * 100):.2f}%",
+            "total_requests": _tr,
+            "successful_requests": _tr - _ec,
+            "failed_requests": _ec,
+            "error_rate": f"{(_ec / max(1, _tr) * 100):.2f}%",
             "avg_latency_ms": f"{avg_latency * 1000:.2f}",
             "tokens_per_second": f"{throughput:.2f}",
             "total_tokens": self.total_tokens

@@ -17,6 +17,8 @@ from django.conf import settings
 
 from admin_api.utils.auth import _require_admin
 
+_GOOGLE_TRANSLATE_API_KEY: str = _GOOGLE_TRANSLATE_API_KEY
+
 
 def _json(request):
     """Request body JSON'ı parse et"""
@@ -28,12 +30,13 @@ def _json(request):
 
 # ──── Atomik JSON yazma (thread-safe) ──────────────────────────────────────────
 _file_lock = threading.Lock()
+_SIFAT_DB_PATH = Path(settings.SIFAT_DB_PATH)
 
 
 def _load_sifat_db() -> dict:
     """Sıfat veritabanını diskten oku"""
     try:
-        with open(settings.SIFAT_DB_PATH, 'r', encoding='utf-8') as f:
+        with open(_SIFAT_DB_PATH, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
         return {'metadata': {'total_sifatlar': 0}, 'sifatlar': {}}
@@ -46,25 +49,24 @@ def _save_sifat_db(data: dict) -> bool:
     Sıfat veritabanını diskten kaydet (atomik).
     Önce .tmp dosyasına yaz, sonra os.replace() ile taşı.
 
-    Returns: True başarılı, False başarısız
+    Returns: True başarılı, False failed
     """
     with _file_lock:
         try:
-            db_path = Path(settings.SIFAT_DB_PATH)
-            tmp_path = db_path.parent / f"{db_path.name}.tmp"
+            tmp_path = _SIFAT_DB_PATH.parent / f"{_SIFAT_DB_PATH.name}.tmp"
 
             # Tmp dosyasına yaz
             with open(tmp_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
             # Atomik taşı
-            os.replace(tmp_path, db_path)
+            os.replace(tmp_path, _SIFAT_DB_PATH)
             return True
         except Exception as e:
             # Tmp dosyasını temizle
             try:
                 os.remove(tmp_path)
-            except:
+            except Exception:
                 pass
             return False
 
@@ -76,7 +78,7 @@ def _translate_with_google(text: str, target_lang: str) -> str:
     target_lang: 'en', 'de', vb.
     Returns: çevirilen metin veya orijinal metin (API key yoksa)
     """
-    api_key = settings.GOOGLE_TRANSLATE_API_KEY
+    api_key = _GOOGLE_TRANSLATE_API_KEY
     if not api_key:
         return text  # Anahtarı yoksa, orijinali döner
 
@@ -115,11 +117,16 @@ class SifatListView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 10)), 50)
-        tur_filter = request.GET.get('tur', '').strip()
-        search = request.GET.get('search', '').strip().lower()
+        # Query params — safe int parsing
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page  = max(1, int(_qpget('page',  1)))
+            limit = min(max(1, int(_qpget('limit', 10))), 50)
+        except (ValueError, TypeError):
+            page, limit = 1, 10
+        tur_filter = _qpget('tur', '').strip()
+        search = _qpget('search', '').strip().lower()
 
         db = _load_sifat_db()
         sifatlar = db.get('sifatlar', {})
@@ -127,19 +134,22 @@ class SifatListView(View):
         # Filter ve arama
         filtered = []
         for key, sifat in sifatlar.items():
+            _sfget = sifat.get
+            _tur = _sfget('tur')
+            _ad  = _sfget('ad', '')
             # Tür filtresi
-            if tur_filter and sifat.get('tur') != tur_filter:
+            if tur_filter and _tur != tur_filter:
                 continue
 
             # Arama
-            if search and search not in sifat.get('ad', '').lower():
+            if search and search not in _ad.lower():
                 continue
 
             filtered.append({
-                'no': sifat.get('no'),
-                'ad': sifat.get('ad'),
-                'tur': sifat.get('tur'),
-                'cumle_count': len(sifat.get('cumleler', [])),
+                'no': _sfget('no'),
+                'ad': _ad,
+                'tur': _tur,
+                'cumle_count': len(_sfget('cumleler', [])),
             })
 
         # Sayfalama
@@ -185,7 +195,7 @@ class SifatDetailView(View):
 
         if not sifat:
             return JsonResponse(
-                {'detail': f'Sıfat #{no} bulunamadı.'},
+                {'detail': f'Adjective #{no} not found.'},
                 status=404
             )
 
@@ -219,26 +229,42 @@ class SifatCreateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         data = _json(request)
+        _dget = data.get
+        _ad  = _dget('ad')
+        _tur = _dget('tur')
 
         # Doğrulama
-        if not data.get('ad'):
-            return JsonResponse({'detail': 'Sıfat adı zorunlu.'}, status=400)
-        if not data.get('tur'):
-            return JsonResponse({'detail': 'Sıfat türü zorunlu.'}, status=400)
+        if not _ad:
+            return JsonResponse({'detail': 'Adjective name is required.'}, status=400)
+        if not _tur:
+            return JsonResponse({'detail': 'Adjective type is required.'}, status=400)
 
         db = _load_sifat_db()
         sifatlar = db.get('sifatlar', {})
 
         # Sonraki ID
-        next_id = max([int(k) for k in sifatlar.keys()], default=0) + 1
+        int_keys = []
+        for k in sifatlar.keys():
+            try:
+                int_keys.append(int(k))
+            except (ValueError, TypeError):
+                pass
+        next_id = (max(int_keys) if int_keys else 0) + 1
+
+        raw_cumleler = _dget('cumleler', [])
+        validated_cumleler = [
+            {'no': int((_cg := c.get)('no', 0)), 'metin': str(_cg('metin', ''))[:1000]}
+            for c in (raw_cumleler if isinstance(raw_cumleler, list) else [])
+            if isinstance(c, dict)
+        ]
 
         # Yeni sıfat
         new_sifat = {
             'no': next_id,
-            'grup_no': data.get('grup_no', 1),
-            'tur': data.get('tur'),
-            'ad': data.get('ad'),
-            'cumleler': data.get('cumleler', []),
+            'grup_no': _dget('grup_no', 1),
+            'tur': _tur,
+            'ad': _ad,
+            'cumleler': validated_cumleler,
         }
 
         sifatlar[str(next_id)] = new_sifat
@@ -249,12 +275,12 @@ class SifatCreateView(View):
         # Kaydet
         if not _save_sifat_db(db):
             return JsonResponse(
-                {'detail': 'Dosya kaydedilemedi.'},
+                {'detail': 'Failed to save data.'},
                 status=500
             )
 
         return JsonResponse({
-            'message': f'Sıfat oluşturuldu: #{next_id}',
+            'message': f'Adjective created: #{next_id}',
             'sifat': new_sifat
         }, status=201)
 
@@ -287,7 +313,7 @@ class SifatUpdateView(View):
         sifat = sifatlar.get(str(no))
         if not sifat:
             return JsonResponse(
-                {'detail': f'Sıfat #{no} bulunamadı.'},
+                {'detail': f'Adjective #{no} not found.'},
                 status=404
             )
 
@@ -299,17 +325,22 @@ class SifatUpdateView(View):
         if 'grup_no' in data:
             sifat['grup_no'] = data['grup_no']
         if 'cumleler' in data:
-            sifat['cumleler'] = data['cumleler']
+            raw = data['cumleler']
+            sifat['cumleler'] = [
+                {'no': int((_cg := c.get)('no', 0)), 'metin': str(_cg('metin', ''))[:1000]}
+                for c in (raw if isinstance(raw, list) else [])
+                if isinstance(c, dict)
+            ]
 
         # Kaydet
         if not _save_sifat_db(db):
             return JsonResponse(
-                {'detail': 'Dosya kaydedilemedi.'},
+                {'detail': 'Failed to save data.'},
                 status=500
             )
 
         return JsonResponse({
-            'message': f'Sıfat güncellendi: #{no}',
+            'message': f'Adjective updated: #{no}',
             'sifat': sifat
         })
 
@@ -336,25 +367,26 @@ class SifatDeleteView(View):
 
         db = _load_sifat_db()
         sifatlar = db.get('sifatlar', {})
+        _no_str = str(no)
 
-        if str(no) not in sifatlar:
+        if _no_str not in sifatlar:
             return JsonResponse(
-                {'detail': f'Sıfat #{no} bulunamadı.'},
+                {'detail': f'Adjective #{no} not found.'},
                 status=404
             )
 
-        deleted = sifatlar.pop(str(no))
+        deleted = sifatlar.pop(_no_str)
         db['metadata']['total_sifatlar'] = len(sifatlar)
 
         # Kaydet
         if not _save_sifat_db(db):
             return JsonResponse(
-                {'detail': 'Dosya kaydedilemedi.'},
+                {'detail': 'Failed to save data.'},
                 status=500
             )
 
         return JsonResponse({
-            'message': f'Sıfat silindi: {deleted.get("ad")} (#{no})'
+            'message': f'Adjective deleted: {deleted.get("ad")} (#{no})'
         })
 
 
@@ -383,13 +415,18 @@ class SifatAddCumleView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         data = _json(request)
-        lang = data.get('lang', '').strip().lower()
-        cumleler = data.get('cumleler', [])
+        _dget = data.get
+        lang = _dget('lang', '').strip().lower()
+        cumleler = _dget('cumleler', [])
 
         if not lang:
             return JsonResponse({'detail': 'Dil kodu zorunlu (lang).'}, status=400)
+        if lang not in SUPPORTED_LANGUAGES:
+            return JsonResponse({'detail': f'Desteklenmeyen dil: {lang}'}, status=400)
         if not cumleler:
-            return JsonResponse({'detail': 'Cümleler zorunlu.'}, status=400)
+            return JsonResponse({'detail': 'Sentences are required.'}, status=400)
+        if not isinstance(cumleler, list) or len(cumleler) > 500:
+            return JsonResponse({'detail': 'cumleler must be a list of up to 500 items.'}, status=400)
 
         db = _load_sifat_db()
         sifatlar = db.get('sifatlar', {})
@@ -397,25 +434,33 @@ class SifatAddCumleView(View):
         sifat = sifatlar.get(str(no))
         if not sifat:
             return JsonResponse(
-                {'detail': f'Sıfat #{no} bulunamadı.'},
+                {'detail': f'Adjective #{no} not found.'},
                 status=404
             )
 
         # Alan adı: cumleler (Türkçe) veya cumleler_en, cumleler_de, vb.
         field_name = 'cumleler' if lang == 'tr' else f'cumleler_{lang}'
 
+        # Validate and sanitize cumle objects
+        validated = []
+        for item in cumleler:
+            if not isinstance(item, dict):
+                continue
+            _iget = item.get
+            validated.append({'no': int(_iget('no', 0)), 'metin': str(_iget('metin', ''))[:1000]})
+
         # Cümleleri ekle
-        sifat[field_name] = cumleler
+        sifat[field_name] = validated
 
         # Kaydet
         if not _save_sifat_db(db):
             return JsonResponse(
-                {'detail': 'Dosya kaydedilemedi.'},
+                {'detail': 'Failed to save data.'},
                 status=500
             )
 
         return JsonResponse({
-            'message': f'Sıfat #{no} için {lang.upper()} cümleleri eklendi.',
+            'message': f'Adjective #{no}: {lang.upper()} sentences added.',
             'field': field_name,
             'cumle_count': len(cumleler),
         })
@@ -449,21 +494,24 @@ class SifatAutoTranslateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         # API key kontrol
-        if not settings.GOOGLE_TRANSLATE_API_KEY:
+        if not _GOOGLE_TRANSLATE_API_KEY:
             return JsonResponse(
-                {'detail': 'Google Translate API key yapılandırılmamış.'},
+                {'detail': 'Google Translate API key is not configured.'},
                 status=501
             )
 
         data = _json(request)
-        target_lang = data.get('target_lang', '').strip().lower()
-        source_field = data.get('field', 'cumleler')
+        _dget = data.get
+        target_lang = _dget('target_lang', '').strip().lower()
+        source_field = _dget('field', 'cumleler')
 
         if not target_lang:
             return JsonResponse(
                 {'detail': 'Hedef dil (target_lang) zorunlu.'},
                 status=400
             )
+        if target_lang not in SUPPORTED_LANGUAGES:
+            return JsonResponse({'detail': f'Desteklenmeyen dil: {target_lang}'}, status=400)
 
         db = _load_sifat_db()
         sifatlar = db.get('sifatlar', {})
@@ -471,7 +519,7 @@ class SifatAutoTranslateView(View):
         sifat = sifatlar.get(str(no))
         if not sifat:
             return JsonResponse(
-                {'detail': f'Sıfat #{no} bulunamadı.'},
+                {'detail': f'Adjective #{no} not found.'},
                 status=404
             )
 
@@ -479,18 +527,19 @@ class SifatAutoTranslateView(View):
         source_cumleler = sifat.get(source_field, [])
         if not source_cumleler:
             return JsonResponse(
-                {'detail': f'Kaynak cümleleri bulunamadı ({source_field}).'},
+                {'detail': f'Source sentences not found ({source_field}).'},
                 status=400
             )
 
         # Çevir
         translated = []
         for cumle_obj in source_cumleler:
-            metin = cumle_obj.get('metin', '')
+            _coget = cumle_obj.get
+            metin = _coget('metin', '')
             translated_metin = _translate_with_google(metin, target_lang)
 
             translated.append({
-                'no': cumle_obj.get('no'),
+                'no': _coget('no'),
                 'metin': translated_metin
             })
 
@@ -503,12 +552,12 @@ class SifatAutoTranslateView(View):
         # Kaydet
         if not _save_sifat_db(db):
             return JsonResponse(
-                {'detail': 'Dosya kaydedilemedi.'},
+                {'detail': 'Failed to save data.'},
                 status=500
             )
 
         return JsonResponse({
-            'message': f'Sıfat #{no} otomatik olarak {target_lang.upper()} diline çevrildi.',
+            'message': f'Adjective #{no} auto-translated to {target_lang.upper()}.',
             'field': target_field,
             'translated_count': len(translated),
         })
@@ -524,6 +573,12 @@ class SifatSyncStatusView(View):
     """Dil çeviri durumunu kontrol et"""
 
     def get(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError) as e:
+            status = 401 if isinstance(e, ValueError) else 403
+            return JsonResponse({'detail': str(e)}, status=status)
+
         try:
             db = _load_sifat_db()
             sifatlar = db.get('sifatlar', {})
@@ -557,7 +612,7 @@ class SifatSyncStatusView(View):
             })
 
         except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -565,6 +620,12 @@ class SifatBatchSyncView(View):
     """Toplu dil çevirisi tetikle"""
 
     def post(self, request):
+        try:
+            _require_admin(request)
+        except (ValueError, PermissionError) as e:
+            status = 401 if isinstance(e, ValueError) else 403
+            return JsonResponse({'detail': str(e)}, status=status)
+
         try:
             data = _json(request)
             target_lang = data.get('lang', 'en')
@@ -577,7 +638,7 @@ class SifatBatchSyncView(View):
 
             if target_lang == 'tr':
                 return JsonResponse(
-                    {'detail': 'Türkçe çevirisi zaten mevcut (kaynak dil)'},
+                    {'detail': 'Turkish translation already exists (source language)'},
                     status=400
                 )
 
@@ -585,7 +646,7 @@ class SifatBatchSyncView(View):
             sifatlar = db.get('sifatlar', {})
 
             if not sifatlar:
-                return JsonResponse({'detail': 'Sıfat veritabanı boş'}, status=400)
+                return JsonResponse({'detail': 'Adjective database is empty'}, status=400)
 
             target_field = f'cumleler_{target_lang}'
             translated_count = 0
@@ -608,11 +669,12 @@ class SifatBatchSyncView(View):
                     # Çevir
                     translated = []
                     for cumle_obj in source_cumleler:
-                        metin = cumle_obj.get('metin', '')
+                        _coget = cumle_obj.get
+                        metin = _coget('metin', '')
                         translated_metin = _translate_with_google(metin, target_lang)
 
                         translated.append({
-                            'no': cumle_obj.get('no'),
+                            'no': _coget('no'),
                             'metin': translated_metin
                         })
 
@@ -640,4 +702,4 @@ class SifatBatchSyncView(View):
             })
 
         except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

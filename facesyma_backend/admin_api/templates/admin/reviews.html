@@ -205,15 +205,15 @@
                     const shortText = (review.text || '').substring(0, 50) + (review.text?.length > 50 ? '...' : '');
 
                     row.innerHTML = `
-                        <td>${review.id}</td>
-                        <td>${review.user_email || 'Anonim'}</td>
-                        <td title="${review.text}">${shortText}</td>
-                        <td>${review.rating ? '⭐' + review.rating : '-'}</td>
-                        <td><span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${review.sentiment}</span></td>
-                        <td>${review.platform}</td>
-                        <td>${new Date(review.created_at).toLocaleDateString('tr-TR')}</td>
+                        <td>${escapeHtml(review.id)}</td>
+                        <td>${escapeHtml(review.user_email || 'Anonim')}</td>
+                        <td title="${escapeHtml(review.text)}">${escapeHtml(shortText)}</td>
+                        <td>${review.rating ? '⭐' + escapeHtml(review.rating) : '-'}</td>
+                        <td><span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(review.sentiment)}</span></td>
+                        <td>${escapeHtml(review.platform)}</td>
+                        <td>${escapeHtml(new Date(review.created_at).toLocaleDateString('tr-TR'))}</td>
                         <td>
-                            <button onclick="viewReview(${review.id})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
+                            <button onclick="viewReview(${parseInt(review.id)})" style="color: #d4af37; background: none; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">Detay</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -230,7 +230,10 @@
                 for (let i = 1; i <= data.pagination.pages; i++) {
                     const link = document.createElement('a');
                     if (i === currentPage) {
-                        link.innerHTML = `<span class="active">${i}</span>`;
+                        const span = document.createElement('span');
+                        span.className = 'active';
+                        span.textContent = i;
+                        link.appendChild(span);
                     } else {
                         link.textContent = i;
                         link.href = '#';
@@ -243,7 +246,7 @@
             console.error('Yorum yükleme hatası:', error);
             document.getElementById('reviewsTable').innerHTML = `
                 <tr><td colspan="8" style="text-align: center; padding: 20px; color: #F44336;">
-                    Hata: ${error.message}
+                    Hata: ${escapeHtml(error.message)}
                 </td></tr>
             `;
         }
@@ -273,18 +276,18 @@
             const contentDiv = document.getElementById('reviewDetailContent');
             contentDiv.innerHTML = `
                 <div style="background: #2a2928; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                    <p style="margin: 5px 0;"><strong>Kullanıcı:</strong> ${review.user_email || 'Anonim'}</p>
-                    <p style="margin: 5px 0;"><strong>Rating:</strong> ${review.rating ? '⭐' + review.rating : '-'}</p>
-                    <p style="margin: 5px 0;"><strong>Platform:</strong> ${review.platform}</p>
-                    <p style="margin: 5px 0;"><strong>Tarih:</strong> ${new Date(review.created_at).toLocaleString('tr-TR')}</p>
-                    <p style="margin: 5px 0;"><strong>Sentiment:</strong> <span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${review.sentiment} (${review.sentiment_score?.toFixed(2) || '-'})</span></p>
+                    <p style="margin: 5px 0;"><strong>Kullanıcı:</strong> ${escapeHtml(review.user_email || 'Anonim')}</p>
+                    <p style="margin: 5px 0;"><strong>Rating:</strong> ${review.rating ? '⭐' + escapeHtml(review.rating) : '-'}</p>
+                    <p style="margin: 5px 0;"><strong>Platform:</strong> ${escapeHtml(review.platform)}</p>
+                    <p style="margin: 5px 0;"><strong>Tarih:</strong> ${escapeHtml(new Date(review.created_at).toLocaleString('tr-TR'))}</p>
+                    <p style="margin: 5px 0;"><strong>Sentiment:</strong> <span style="background: ${sentimentColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(review.sentiment)} (${escapeHtml(review.sentiment_score?.toFixed(2) || '-')})</span></p>
                     <p style="margin: 5px 0;"><strong>Görünürlük:</strong> ${review.is_visible ? 'Görünür' : 'Gizli'}</p>
                     ${tagsHtml}
                 </div>
 
                 <div style="background: #2a2928; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                     <p style="margin: 5px 0 10px 0;"><strong>Yorum Metni:</strong></p>
-                    <p style="color: #b0b0b0; line-height: 1.6; margin: 0;">${review.text}</p>
+                    <p style="color: #b0b0b0; line-height: 1.6; margin: 0;">${escapeHtml(review.text)}</p>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
@@ -344,8 +347,8 @@
 
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`ratingDist${i}`).innerHTML = `
-                    <div style="font-size: 24px; color: #4CAF50;">${distribution[i]}</div>
-                    <div style="font-size: 12px; color: #999;">⭐ ${i}</div>
+                    <div style="font-size: 24px; color: #4CAF50;">${escapeHtml(distribution[i])}</div>
+                    <div style="font-size: 12px; color: #999;">⭐ ${escapeHtml(i)}</div>
                 `;
             }
         } catch (error) {
@@ -370,17 +373,17 @@
 
             const html = data.trend.map(item => `
                 <div style="display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 40px;">
-                    <div style="width: 30px; height: ${(item.count / maxCount) * 100}px; background: linear-gradient(180deg, #d4af37 0%, #8b7500 100%); border-radius: 3px 3px 0 0; position: relative;" title="${item.count} yorum, ⭐${item.avg_rating}">
-                        <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #d4af37; white-space: nowrap;">${item.count}</span>
+                    <div style="width: 30px; height: ${(item.count / maxCount) * 100}px; background: linear-gradient(180deg, #d4af37 0%, #8b7500 100%); border-radius: 3px 3px 0 0; position: relative;" title="${escapeHtml(item.count)} yorum, ⭐${escapeHtml(item.avg_rating)}">
+                        <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #d4af37; white-space: nowrap;">${escapeHtml(item.count)}</span>
                     </div>
-                    <div style="font-size: 10px; color: #999; margin-top: 8px; text-align: center; width: 100%; word-break: break-word;">${item.date}</div>
+                    <div style="font-size: 10px; color: #999; margin-top: 8px; text-align: center; width: 100%; word-break: break-word;">${escapeHtml(item.date)}</div>
                 </div>
             `).join('');
 
             document.getElementById('trendContainer').innerHTML = html;
         } catch (error) {
             console.error('Trend error:', error);
-            document.getElementById('trendContainer').innerHTML = `<div style="color: #f44336; margin: auto;">Hata: ${error.message}</div>`;
+            document.getElementById('trendContainer').innerHTML = `<div style="color: #f44336; margin: auto;">Hata: ${escapeHtml(error.message)}</div>`;
         }
     }
 
@@ -410,8 +413,8 @@
                         font-weight: bold;
                         cursor: default;
                         transition: all 0.2s;
-                    " title="${tag.count} kez kullanılmış">
-                        ${tag.tag} (${tag.count})
+                    " title="${escapeHtml(tag.count)} kez kullanılmış">
+                        ${escapeHtml(tag.tag)} (${escapeHtml(tag.count)})
                     </span>
                 `;
             }).join('');
@@ -419,7 +422,7 @@
             document.getElementById('tagsContainer').innerHTML = html;
         } catch (error) {
             console.error('Tags error:', error);
-            document.getElementById('tagsContainer').innerHTML = `<div style="color: #f44336;">Hata: ${error.message}</div>`;
+            document.getElementById('tagsContainer').innerHTML = `<div style="color: #f44336;">Hata: ${escapeHtml(error.message)}</div>`;
         }
     }
 

@@ -33,8 +33,7 @@ except ImportError:
 
 MONGO_URI = os.environ.get(
     "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-    "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
+    ''
 )
 
 # Backup DB adı — ASLA mevcut DB ile aynı olmamalı
@@ -70,42 +69,43 @@ def get_backup_db():
 
 def create_indexes(db):
     """Her koleksiyon için gerekli index'leri oluştur."""
+    _cidx = col.create_index
     print("Index'ler oluşturuluyor...")
 
     # 1. coach_attributes_{lang} — sıfat araması
     for lang in ALL_LANGS:
         col = db[f"coach_attributes_{lang}"]
-        col.create_index([("_id", ASCENDING)])                          # sıfat adı
-        col.create_index([("$**", TEXT)], name="fulltext_search")       # tam metin arama
+        _cidx([("_id", ASCENDING)])                          # sıfat adı
+        _cidx([("$**", TEXT)], name="fulltext_search")       # tam metin arama
         print(f"  coach_attributes_{lang} ✓")
 
     # 2. coach_users — kullanıcı koçluk profili
     col = db["coach_users"]
-    col.create_index([("user_id",    ASCENDING)], unique=True)
-    col.create_index([("birth_date", ASCENDING)])
-    col.create_index([("lang",       ASCENDING)])
-    col.create_index([("updated_at", DESCENDING)])
+    _cidx([("user_id",    ASCENDING)], unique=True)
+    _cidx([("birth_date", ASCENDING)])
+    _cidx([("lang",       ASCENDING)])
+    _cidx([("updated_at", DESCENDING)])
     print("  coach_users ✓")
 
     # 3. coach_birth_data — astroloji cache
     col = db["coach_birth_data"]
-    col.create_index([("user_id",    ASCENDING)], unique=True)
-    col.create_index([("birth_date", ASCENDING)])
-    col.create_index([("sun_sign",   ASCENDING)])
+    _cidx([("user_id",    ASCENDING)], unique=True)
+    _cidx([("birth_date", ASCENDING)])
+    _cidx([("sun_sign",   ASCENDING)])
     print("  coach_birth_data ✓")
 
     # 4. coach_sessions — koç oturumları
     col = db["coach_sessions"]
-    col.create_index([("user_id",    ASCENDING)])
-    col.create_index([("session_date", DESCENDING)])
-    col.create_index([("module",     ASCENDING)])
+    _cidx([("user_id",    ASCENDING)])
+    _cidx([("session_date", DESCENDING)])
+    _cidx([("module",     ASCENDING)])
     print("  coach_sessions ✓")
 
     # 5. coach_goals — kişisel hedef takibi
     col = db["coach_goals"]
-    col.create_index([("user_id",  ASCENDING)])
-    col.create_index([("status",   ASCENDING)])
-    col.create_index([("due_date", ASCENDING)])
+    _cidx([("user_id",  ASCENDING)])
+    _cidx([("status",   ASCENDING)])
+    _cidx([("due_date", ASCENDING)])
     print("  coach_goals ✓")
 
     print("\nTüm index'ler oluşturuldu ✓")
@@ -237,14 +237,15 @@ def print_schema():
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
+    _addarg = p.add_argument
     p = argparse.ArgumentParser(description="Backup DB kurulum ve migrasyon")
-    p.add_argument("--create-indexes", action="store_true")
-    p.add_argument("--migrate",        action="store_true")
-    p.add_argument("--all-langs",      action="store_true")
-    p.add_argument("--lang",           default="tr")
-    p.add_argument("--verify",         action="store_true")
-    p.add_argument("--schema",         action="store_true")
-    p.add_argument("--source-dir",     default=".",
+    _addarg("--create-indexes", action="store_true")
+    _addarg("--migrate",        action="store_true")
+    _addarg("--all-langs",      action="store_true")
+    _addarg("--lang",           default="tr")
+    _addarg("--verify",         action="store_true")
+    _addarg("--schema",         action="store_true")
+    _addarg("--source-dir",     default=".",
                    help="sifat_coach_*.json dosyalarının bulunduğu dizin")
     args = p.parse_args()
 

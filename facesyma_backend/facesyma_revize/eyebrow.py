@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 
 #eyebrow = [63, 293,159,386,145, 374]
 eyebrow = [105,145,159,334,374,386]

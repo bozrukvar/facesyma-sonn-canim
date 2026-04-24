@@ -6,24 +6,30 @@ import {
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { Card, Badge, WarmAvatar } from '../components/ui';
+import { Card, WarmAvatar } from '../components/ui';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { HomeNavProp } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
-const CARD_W = (width - theme.spacing.lg * 2 - theme.spacing.sm) / 2;
+const CARD_W = (width - spacing.lg * 2 - spacing.sm) / 2;
 
-const getFeatures = (lang: string) => [
-  { id:'analysis', emoji:'👁', title: t('features.analysis', lang), desc: t('features.analysis_desc', lang), screen:'Analysis', accent: theme.colors.gold },
-  { id:'astrology',emoji:'✨', title: t('features.astrology', lang), desc: t('features.astrology_desc', lang), screen:'Astrology', accent:'#9B7AE0' },
-  { id:'art',      emoji:'🎨', title: t('features.art', lang), desc: t('features.art_desc', lang), screen:'ArtMatch', accent:'#7AE0B0' },
-  { id:'twins',    emoji:'👥', title: t('features.twins', lang), desc: t('features.twins_desc', lang), screen:'Twins', accent:'#E07A7A' },
-  { id:'daily',    emoji:'🌟', title: t('features.daily', lang), desc: t('features.daily_desc', lang), screen:'Daily', accent:'#7AAEE0' },
-  { id:'assessment',emoji:'📋', title: t('features.assessment', lang), desc: t('features.assessment_desc', lang), screen:'Assessment', accent:'#E0A17A', badge: t('common.required', lang).substring(0, 3) },
-  { id:'fashion',  emoji:'👗', title: t('features.fashion', lang), desc: t('features.fashion_desc', lang), screen:'Fashion', accent:'#9B5DE5', badge: t('common.required', lang).substring(0, 3) },
-  { id:'chat',     emoji:'💬', title: t('features.chat', lang), desc: t('features.chat_desc', lang), screen:'Chat', accent: theme.colors.warmAmber, badge: t('common.required', lang).substring(0, 3) },
-];
+const getFeatures = (lang: string) => {
+  const reqBadge = t('common.required', lang).substring(0, 3);
+  return [
+    { id:'analysis', emoji:'👁', title: t('features.analysis', lang), desc: t('features.analysis_desc', lang), screen:'Analysis', accent: colors.gold },
+    { id:'astrology',emoji:'✨', title: t('features.astrology', lang), desc: t('features.astrology_desc', lang), screen:'Astrology', accent:'#9B7AE0' },
+    { id:'art',      emoji:'🎨', title: t('features.art', lang), desc: t('features.art_desc', lang), screen:'ArtMatch', accent:'#7AE0B0' },
+    { id:'twins',    emoji:'👥', title: t('features.twins', lang), desc: t('features.twins_desc', lang), screen:'Twins', accent:'#E07A7A' },
+    { id:'daily',    emoji:'🌟', title: t('features.daily', lang), desc: t('features.daily_desc', lang), screen:'Daily', accent:'#7AAEE0' },
+    { id:'assessment',emoji:'📋', title: t('features.assessment', lang), desc: t('features.assessment_desc', lang), screen:'Assessment', accent:'#E0A17A', badge: reqBadge },
+    { id:'fashion',  emoji:'👗', title: t('features.fashion', lang), desc: t('features.fashion_desc', lang), screen:'Fashion', accent:'#9B5DE5', badge: reqBadge },
+    { id:'chat',     emoji:'💬', title: t('features.chat', lang), desc: t('features.chat_desc', lang), screen:'Chat', accent: colors.warmAmber, badge: reqBadge },
+  ];
+};
 
 const getGreetings = (lang: string) => [
   t('home.greeting_morning', lang),
@@ -31,12 +37,15 @@ const getGreetings = (lang: string) => [
   t('home.greeting_evening', lang),
 ];
 
-const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { lang } = useLanguage();
-  const user    = useSelector((s: RootState) => s.auth.user);
+  const user           = useSelector((s: RootState) => s.auth.user);
+  const lastAnalysis   = useSelector((s: RootState) => s.analysis.lastResult);
   const FEATURES = useMemo(() => getFeatures(lang), [lang]);
   const GREETINGS = useMemo(() => getGreetings(lang), [lang]);
-  const greeting= GREETINGS[new Date().getHours() % 3];
+  const _h = new Date().getHours();
+  const greeting = _h >= 5 && _h < 12 ? GREETINGS[0] : _h >= 12 && _h < 18 ? GREETINGS[1] : GREETINGS[2];
   const firstName = user?.name?.split(' ')[0] || t('home.default_user', lang);
 
   return (
@@ -44,11 +53,11 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <StatusBar barStyle="light-content" />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.md }]}
       >
         {/* Header — sıcak karşılama */}
         <View style={styles.header}>
-          <View style={{ flex:1 }}>
+          <View style={styles.flex1}>
             <Text style={styles.greeting}>{greeting},</Text>
             <Text style={styles.name}>{firstName} 👋</Text>
           </View>
@@ -64,12 +73,12 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </View>
 
         {/* Hero — AI Asistan çağrısı */}
-        <Card variant="warm" onPress={() => navigation.navigate('Chat')} style={styles.heroCard}>
+        <Card variant="warm" onPress={() => navigation.navigate('Chat', lastAnalysis ? { analysisResult: lastAnalysis, lang } : { lang })} style={styles.heroCard}>
           <View style={styles.heroRow}>
             <View style={styles.heroBadge}>
-              <Text style={{ fontSize: 24 }}>💬</Text>
+              <Text style={styles.heroIcon}>💬</Text>
             </View>
-            <View style={{ flex:1, marginLeft: theme.spacing.md }}>
+            <View style={styles.heroBody}>
               <Text style={styles.heroTitle}>{t('home.hero_title', lang)}</Text>
               <Text style={styles.heroDesc}>
                 {t('home.hero_desc', lang)}
@@ -86,8 +95,8 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           activeOpacity={0.88}
         >
           <View style={styles.analyzeGlow} />
-          <Text style={{ fontSize: 28 }}>👁</Text>
-          <View style={{ marginLeft: theme.spacing.md, flex:1 }}>
+          <Text style={styles.analyzeIcon}>👁</Text>
+          <View style={styles.analyzeBody}>
             <Text style={styles.analyzeTitle}>{t('home.analyze_title', lang)}</Text>
             <Text style={styles.analyzeDesc}>{t('home.analyze_desc', lang)}</Text>
           </View>
@@ -97,23 +106,23 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {/* Modüller */}
         <Text style={styles.sectionLabel}>{t('home.modules', lang)}</Text>
         <View style={styles.grid}>
-          {FEATURES.map(f => (
+          {FEATURES.map(({ id: fId, accent: fAccent, badge: fBadge, screen: fScreen, emoji: fEmoji, title: fTitle, desc: fDesc }) => (
             <TouchableOpacity
-              key={f.id}
-              style={[styles.featureCard, { borderColor: `${f.accent}28` }]}
-              onPress={() => navigation.navigate(f.screen)}
+              key={fId}
+              style={[styles.featureCard, { borderColor: `${fAccent}28` }]}
+              onPress={() => (navigation.navigate as unknown as (screen: string, params?: object) => void)(fScreen, lastAnalysis ? { analysisResult: lastAnalysis, lang } : { lang })}
               activeOpacity={0.85}
             >
-              {f.badge && (
+              {fBadge && (
                 <View style={styles.featureBadge}>
-                  <Text style={[styles.featureBadgeText, { color: f.accent }]}>{f.badge}</Text>
+                  <Text style={[styles.featureBadgeText, { color: fAccent }]}>{fBadge}</Text>
                 </View>
               )}
-              <View style={[styles.featureIconWrap, { backgroundColor: `${f.accent}12` }]}>
-                <Text style={{ fontSize: 22 }}>{f.emoji}</Text>
+              <View style={[styles.featureIconWrap, { backgroundColor: `${fAccent}12` }]}>
+                <Text style={styles.featureIcon}>{fEmoji}</Text>
               </View>
-              <Text style={styles.featureTitle}>{f.title}</Text>
-              <Text style={styles.featureDesc}>{f.desc}</Text>
+              <Text style={styles.featureTitle}>{fTitle}</Text>
+              <Text style={styles.featureDesc}>{fDesc}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -124,7 +133,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           style={styles.historyEmpty}
           onPress={() => navigation.navigate('Analysis')}
         >
-          <Text style={{ fontSize: 24, marginBottom: 6 }}>📷</Text>
+          <Text style={styles.historyIcon}>📷</Text>
           <Text style={styles.historyEmptyText}>
             {t('home.history_empty_cta', lang)}
           </Text>
@@ -135,95 +144,102 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor: theme.colors.background },
+  container: { flex:1, backgroundColor: colors.background },
   scroll: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop:        theme.spacing.lg + 48,
-    paddingBottom:     theme.spacing.xxxl,
+    paddingHorizontal: spacing.lg,
+    paddingTop:        spacing.lg,
+    paddingBottom:     spacing.xxxl,
   },
-  header:  { flexDirection:'row', alignItems:'center', marginBottom: theme.spacing.lg },
-  greeting:{ ...theme.typography.body, color: theme.colors.textMuted },
-  name:    { ...theme.typography.h1, marginTop:2 },
+  header:  { flexDirection:'row', alignItems:'center', marginBottom: spacing.lg },
+  greeting:{ ...typography.body, color: colors.textMuted },
+  name:    { ...typography.h1, marginTop:2 },
 
   // Hero
-  heroCard: { marginBottom: theme.spacing.md },
+  heroCard: { marginBottom: spacing.md },
   heroRow:  { flexDirection:'row', alignItems:'center' },
   heroBadge:{
-    width:52, height:52, borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderWidth:1, borderColor:`${theme.colors.warmAmber}30`,
+    width:52, height:52, borderRadius: radius.lg,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth:1, borderColor:`${colors.warmAmber}30`,
     alignItems:'center', justifyContent:'center',
   },
-  heroTitle:{ ...theme.typography.h3, marginBottom:3 },
-  heroDesc: { ...theme.typography.caption, fontSize:12, color: theme.colors.textWarm },
-  heroArrow:{ ...theme.typography.h2, color: theme.colors.warmAmber, fontSize:20 },
+  heroTitle:{ ...typography.h3, marginBottom:3 },
+  heroDesc: { ...typography.caption, fontSize:12, color: colors.textWarm },
+  heroArrow:{ ...typography.h2, color: colors.warmAmber, fontSize:20 },
 
   // Analiz butonu
   analyzeBtn:{
-    backgroundColor: theme.colors.surface,
-    borderRadius:    theme.radius.xl,
+    backgroundColor: colors.surface,
+    borderRadius:    radius.xl,
     borderWidth:     1,
-    borderColor:     theme.colors.goldDark,
-    padding:         theme.spacing.lg,
-    marginBottom:    theme.spacing.xl,
+    borderColor:     colors.goldDark,
+    padding:         spacing.lg,
+    marginBottom:    spacing.xl,
     flexDirection:   'row',
     alignItems:      'center',
     overflow:        'hidden',
-    ...theme.shadow.gold,
+    ...shadow.gold,
   },
   analyzeGlow:{
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: theme.colors.goldGlow,
+    backgroundColor: colors.goldGlow,
   },
-  analyzeTitle: { ...theme.typography.h2, marginBottom:3 },
-  analyzeDesc:  { ...theme.typography.caption, fontSize:12, color: theme.colors.textWarm },
+  analyzeTitle: { ...typography.h2, marginBottom:3 },
+  analyzeDesc:  { ...typography.caption, fontSize:12, color: colors.textWarm },
   analyzeTag: {
-    backgroundColor: theme.colors.gold,
-    borderRadius: theme.radius.full,
+    backgroundColor: colors.gold,
+    borderRadius: radius.full,
     paddingHorizontal:10, paddingVertical:5,
   },
-  analyzeTagText: { ...theme.typography.goldLabel, color:'#000', fontSize:9 },
+  analyzeTagText: { ...typography.goldLabel, color:'#000', fontSize:9 },
 
   // Section
-  sectionLabel: { ...theme.typography.goldLabel, marginBottom: theme.spacing.md },
+  sectionLabel: { ...typography.goldLabel, marginBottom: spacing.md },
 
   // Grid
-  grid: { flexDirection:'row', flexWrap:'wrap', gap: theme.spacing.sm, marginBottom: theme.spacing.xl },
+  grid: { flexDirection:'row', flexWrap:'wrap', gap: spacing.sm, marginBottom: spacing.xl },
   featureCard: {
     width:           CARD_W,
-    backgroundColor: theme.colors.surface,
-    borderRadius:    theme.radius.lg,
+    backgroundColor: colors.surface,
+    borderRadius:    radius.lg,
     borderWidth:     1,
-    padding:         theme.spacing.md,
+    padding:         spacing.md,
     minHeight:       120,
     position:        'relative',
   },
   featureBadge: {
     position:'absolute', top:8, right:8,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: colors.surface,
     paddingHorizontal:6, paddingVertical:2,
-    borderRadius: theme.radius.full,
+    borderRadius: radius.full,
   },
   featureBadgeText: { fontFamily:'System', fontSize:8, fontWeight:'700', letterSpacing:1 },
   featureIconWrap: {
-    width:44, height:44, borderRadius: theme.radius.md,
+    width:44, height:44, borderRadius: radius.md,
     alignItems:'center', justifyContent:'center',
-    marginBottom: theme.spacing.sm,
+    marginBottom: spacing.sm,
   },
-  featureTitle: { ...theme.typography.h3, fontSize:13, marginBottom:3 },
-  featureDesc:  { ...theme.typography.caption, fontSize:11, color: theme.colors.textWarm },
+  featureTitle: { ...typography.h3, fontSize:13, marginBottom:3 },
+  featureDesc:  { ...typography.caption, fontSize:11, color: colors.textWarm },
 
   // History
   historyEmpty: {
-    backgroundColor: theme.colors.surface,
-    borderRadius:    theme.radius.lg,
+    backgroundColor: colors.surface,
+    borderRadius:    radius.lg,
     borderWidth:     1,
-    borderColor:     theme.colors.border,
+    borderColor:     colors.border,
     borderStyle:     'dashed',
-    padding:         theme.spacing.xl,
+    padding:         spacing.xl,
     alignItems:      'center',
   },
-  historyEmptyText: { ...theme.typography.body, color: theme.colors.textMuted, fontSize:13 },
+  historyEmptyText: { ...typography.body, color: colors.textMuted, fontSize:13 },
+  flex1:       { flex: 1 },
+  heroIcon:    { fontSize: 24 },
+  heroBody:    { flex: 1, marginLeft: spacing.md },
+  analyzeIcon: { fontSize: 28 },
+  analyzeBody: { marginLeft: spacing.md, flex: 1 },
+  featureIcon: { fontSize: 22 },
+  historyIcon: { fontSize: 24, marginBottom: 6 },
 });
 
 export default HomeScreen;

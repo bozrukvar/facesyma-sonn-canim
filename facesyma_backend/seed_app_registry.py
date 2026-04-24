@@ -77,9 +77,9 @@ def seed_app_registry():
     apps = [mobile_app, web_app]
 
     for app in apps:
-        # Idempotent: app_id'ye göre, sadece ekle kısmını koşulsuz set et
+        _aid = app['app_id']
         result = col.update_one(
-            {'app_id': app['app_id']},
+            {'app_id': _aid},
             {
                 '$setOnInsert': app
             },
@@ -87,9 +87,9 @@ def seed_app_registry():
         )
 
         if result.upserted_id:
-            print(f"✓ Seeded: {app['app_id']}")
+            print(f"✓ Seeded: {_aid}")
         else:
-            print(f"⊘ Already exists, skipped: {app['app_id']}")
+            print(f"⊘ Already exists, skipped: {_aid}")
 
     client.close()
     print("\n✓ App registry seeding complete")

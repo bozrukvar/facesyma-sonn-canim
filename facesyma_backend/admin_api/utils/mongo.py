@@ -6,7 +6,7 @@ Connection pooling ve atomic ID generation ile optimize.
 """
 
 import logging
-from pymongo import MongoClient, ReturnDocument
+from pymongo import MongoClient, ReturnDocument, ASCENDING, DESCENDING
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -15,6 +15,42 @@ log = logging.getLogger(__name__)
 
 _main_client: MongoClient | None = None
 _coach_client: MongoClient | None = None
+
+
+def _ensure_indexes(db) -> None:
+    """Create critical indexes on first startup. Safe to call multiple times (no-ops if exist)."""
+    try:
+        # Users — login/registration queries hit email on every request
+        users = db['appfaceapi_myuser']
+        _uidx = users.create_index
+        _uidx([('email', ASCENDING)], unique=True, sparse=True, background=True)
+        _uidx([('id', ASCENDING)], unique=True, background=True)
+        _uidx([('google_id', ASCENDING)], sparse=True, background=True)
+        _uidx([('date_joined', DESCENDING)], background=True)
+        _uidx([('app_source', ASCENDING), ('date_joined', DESCENDING)], background=True)
+
+        # Analysis history — fetched per user, sorted by time
+        history = db['analysis_history']
+        _hci = history.create_index
+        _hci([('user_id', ASCENDING), ('created_at', DESCENDING)], background=True)
+        _hci([('app_source', ASCENDING), ('created_at', DESCENDING)], background=True)
+
+        # Admin users
+        admins = db['admin_users']
+        _aci = admins.create_index
+        _aci([('email', ASCENDING)], unique=True, sparse=True, background=True)
+        _aci([('id', ASCENDING)], unique=True, background=True)
+
+        # Compatibility analytics queries
+        compat = db['compatibility']
+        _cidx = compat.create_index
+        _cidx([('category', ASCENDING)], background=True)
+        _cidx([('score', ASCENDING)], background=True)
+        _cidx([('user_id', ASCENDING)], background=True)
+
+        log.info("✓ MongoDB indexes ensured")
+    except Exception as e:
+        log.warning(f"Index creation warning: {e}")
 
 
 def _get_main_client() -> MongoClient:
@@ -26,10 +62,12 @@ def _get_main_client() -> MongoClient:
             maxPoolSize=50,
             minPoolSize=5,
             maxIdleTimeMS=30000,
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=5000,
+            serverSelectionTimeoutMS=20000,
+            connectTimeoutMS=20000,
+            socketTimeoutMS=20000,
             retryWrites=True,
         )
+        _ensure_indexes(_main_client['facesyma-backend'])
         log.info("✓ MongoDB main client initialized (pool: 5-50 connections)")
     return _main_client
 
@@ -54,6 +92,11 @@ def _get_coach_client() -> MongoClient:
 def _get_db():
     """Get facesyma-backend database with pooled connection"""
     return _get_main_client()['facesyma-backend']
+
+
+def _get_backup_db():
+    """Get facesyma-backups database with pooled connection"""
+    return _get_main_client()['facesyma-backups']
 
 
 def get_users_col():

@@ -2,15 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Dimensions, ActivityIndicator, Alert, Image, ProgressBarAndroid,
+  Dimensions, ActivityIndicator, Alert, Image,
 } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { setAnalysisResult } from '../store/analysisSlice';
 import { AnalysisAPI } from '../services/api';
 import { Card, ScoreRing, GoldButton, SectionLabel, Badge } from '../components/ui';
 import { FaceScannerOverlay } from '../components/FaceScannerOverlay';
 import theme from '../utils/theme';
+const { colors, spacing, typography, radius } = theme;
 import { validateImageQuality, getQualityMessage, ImageQualityResult } from '../utils/imageQuality';
 import { useLanguage } from '../utils/LanguageContext';
+import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { AnalysisResult } from '../types/api';
+import type { AnalysisNavProp } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
 
@@ -19,35 +27,43 @@ type AnalysisStep = 'pick' | 'quality_check' | 'preview' | 'result';
 interface AnalysisState {
   imageUri: string | null;
   qualityResult: ImageQualityResult | null;
-  analysisResult: any | null;
+  analysisResult: AnalysisResult | null;
   loading: boolean;
   step: AnalysisStep;
   lang: string;
 }
 
-const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation }) => {
+  const insets     = useSafeAreaInsets();
+  const insetsTop  = insets.top;
+  const dispatch = useDispatch<AppDispatch>();
   const { lang, setLang, availableLangs } = useLanguage();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [qualityResult, setQualityResult] = useState<ImageQualityResult | null>(null);
-  const [result,   setResult]   = useState<any>(null);
+  const [result,   setResult]   = useState<AnalysisResult | null>(null);
   const [loading,  setLoading]  = useState(false);
   const [step,     setStep]     = useState<AnalysisStep>('pick');
   const [scanProgress, setScanProgress] = useState(0);
 
   const pickImage = async (source: 'camera'|'library') => {
-    const opts = { mediaType:'photo' as const, quality:0.85 as const, maxWidth:1024, maxHeight:1024 };
+    const opts = { mediaType:'photo' as const, quality:0.8 as const, maxWidth:1024, maxHeight:1024 };
     const fn = source === 'camera' ? launchCamera : launchImageLibrary;
     fn(opts, async (res) => {
       if (res.assets?.[0]?.uri) {
-        setImageUri(res.assets[0].uri);
+        const asset = res.assets[0];
+        setImageUri(asset.uri ?? null);
         setResult(null);
         setLoading(true);
         try {
-          const quality = await validateImageQuality(res.assets[0].uri);
+          const quality = await validateImageQuality(asset.uri ?? '', {
+            width:    asset.width,
+            height:   asset.height,
+            fileSize: asset.fileSize,
+          }, lang);
           setQualityResult(quality);
           setStep('quality_check');
         } catch (e: any) {
-          Alert.alert('Kalite Kontrol Hatası', 'Fotoğraf analiz edilemedi. Lütfen tekrar deneyin.');
+          Alert.alert(t('analysis.quality_check', lang), t('common.generic_error', lang));
           setStep('pick');
         } finally {
           setLoading(false);
@@ -62,9 +78,10 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     try {
       const data = await AnalysisAPI.analyze(imageUri, lang);
       setResult(data);
+      dispatch(setAnalysisResult({ result: data, imageUri }));
       setStep('result');
     } catch (e: any) {
-      Alert.alert('Analiz Hatası', e.response?.data?.detail || 'Bir hata oluştu.');
+      Alert.alert(t('common.error', lang), e.response?.data?.detail || t('common.generic_error', lang));
     } finally {
       setLoading(false);
     }
@@ -105,39 +122,42 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   // ── Ekran: Kalite Kontrol ────────────────────────────────────────────────
   if (step === 'quality_check' && qualityResult && imageUri) {
-    const qualityMsg = getQualityMessage(qualityResult.overall_score);
+    const qualityMsg  = getQualityMessage(qualityResult.overall_score, lang);
+    const qmColor     = qualityMsg.color;
+    const canUpload   = qualityResult.can_upload;
+    const scoreLabel  = t('analysis.score', lang);
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
           <TouchableOpacity onPress={reset}><Text style={styles.back}>←</Text></TouchableOpacity>
-          <Text style={styles.headerTitle}>Kalite Kontrol</Text>
-          <View style={{ width:40 }} />
+          <Text style={styles.headerTitle}>{t('analysis.quality_check', lang)}</Text>
+          <View style={styles.spacer} />
         </View>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           {/* Fotoğraf */}
           <Image source={{ uri: imageUri }} style={styles.qualityImg} />
 
           {/* Genel Kalite Skoru */}
-          <Card style={[styles.scoreCard, { backgroundColor: qualityMsg.color + '20', borderColor: qualityMsg.color }]}>
+          <Card style={[styles.scoreCard, { backgroundColor: qmColor + '20', borderColor: qmColor }]}>
             <Text style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>{qualityMsg.emoji}</Text>
-            <Text style={[styles.scoreTitle, { color: qualityMsg.color }]}>
+            <Text style={[styles.scoreTitle, { color: qmColor }]}>
               {Math.round(qualityResult.overall_score)}%
             </Text>
-            <Text style={[styles.scoreSubtitle, { color: qualityMsg.color }]}>
+            <Text style={[styles.scoreSubtitle, { color: qmColor }]}>
               {qualityMsg.title}
             </Text>
-            <Text style={[styles.recommendation, { color: theme.colors.textWarm, marginTop: 8 }]}>
+            <Text style={styles.recommendationNote}>
               {qualityResult.recommendation}
             </Text>
           </Card>
 
           {/* Detaylı Metrikler */}
-          <SectionLabel>DETAYLARI</SectionLabel>
+          <SectionLabel>{t('analysis.details', lang)}</SectionLabel>
 
           {/* Parlaklık */}
           <Card style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>☀️ Parlaklık</Text>
+              <Text style={styles.metricLabel}>☀️ {t('analysis.brightness', lang)}</Text>
               <Text style={styles.metricValue}>{qualityResult.brightness.value}/255</Text>
             </View>
             <View style={styles.progressContainer}>
@@ -151,13 +171,13 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 ]}
               />
             </View>
-            <Text style={styles.metricScore}>Skor: {Math.round(qualityResult.brightness.score)}%</Text>
+            <Text style={styles.metricScore}>{scoreLabel}: {Math.round(qualityResult.brightness.score)}%</Text>
           </Card>
 
           {/* Kontrast */}
           <Card style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>◻️ Kontrast</Text>
+              <Text style={styles.metricLabel}>◻️ {t('analysis.contrast', lang)}</Text>
               <Text style={styles.metricValue}>{qualityResult.contrast.value}/100</Text>
             </View>
             <View style={styles.progressContainer}>
@@ -171,13 +191,13 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 ]}
               />
             </View>
-            <Text style={styles.metricScore}>Skor: {Math.round(qualityResult.contrast.score)}%</Text>
+            <Text style={styles.metricScore}>{scoreLabel}: {Math.round(qualityResult.contrast.score)}%</Text>
           </Card>
 
           {/* Yüz Konumu */}
           <Card style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Text style={styles.metricLabel}>🎯 Yüz Konumu</Text>
+              <Text style={styles.metricLabel}>🎯 {t('analysis.face_position', lang)}</Text>
               <Text style={styles.metricValue}>
                 ({qualityResult.face_centering.offset_x}, {qualityResult.face_centering.offset_y})%
               </Text>
@@ -193,19 +213,19 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 ]}
               />
             </View>
-            <Text style={styles.metricScore}>Skor: {Math.round(qualityResult.face_centering.score)}%</Text>
+            <Text style={styles.metricScore}>{scoreLabel}: {Math.round(qualityResult.face_centering.score)}%</Text>
           </Card>
 
           {/* Butonlar */}
-          <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+          <View style={styles.actionRow}>
             <TouchableOpacity style={styles.retakeBtn} onPress={reset}>
-              <Text style={styles.retakeBtnText}>YENIDEN ÇEK</Text>
+              <Text style={styles.retakeBtnText}>{t('analysis.retake', lang)}</Text>
             </TouchableOpacity>
             <GoldButton
-              title={qualityResult.can_upload ? 'DEVAM ET' : 'KALİTE DÜŞÜK'}
-              onPress={() => qualityResult.can_upload && setStep('preview')}
-              disabled={!qualityResult.can_upload}
-              style={{ flex: 1 }}
+              title={canUpload ? t('analysis.continue', lang) : t('analysis.low_quality', lang)}
+              onPress={() => canUpload && setStep('preview')}
+              disabled={!canUpload}
+              style={styles.flex1}
             />
           </View>
         </ScrollView>
@@ -216,27 +236,27 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // ── Ekran: Fotoğraf seç ──────────────────────────────────────────────────
   if (step === 'pick') return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Yüz Analizi</Text>
-        <View style={{ width:40 }} />
+        <Text style={styles.headerTitle}>{t('analysis.title', lang)}</Text>
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Dil seçimi */}
-        <SectionLabel>DİL SEÇ</SectionLabel>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom:20 }}>
-          {availableLangs.map(l => (
+        <SectionLabel>{t('analysis.language_select', lang)}</SectionLabel>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.langScroll}>
+          {availableLangs.map(({ code, flag }) => (
             <TouchableOpacity
-              key={l.code}
-              style={[styles.langChip, lang === l.code && styles.langChipActive]}
-              onPress={() => setLang(l.code)}
+              key={code}
+              style={[styles.langChip, lang === code && styles.langChipActive]}
+              onPress={() => setLang(code)}
             >
-              <Text style={{ fontSize:16 }}>{l.flag}</Text>
-              <Text style={[styles.langText, lang === l.code && styles.langTextActive]}>
-                {l.code.toUpperCase()}
+              <Text style={{ fontSize:16 }}>{flag}</Text>
+              <Text style={[styles.langText, lang === code && styles.langTextActive]}>
+                {code.toUpperCase()}
               </Text>
             </TouchableOpacity>
           ))}
@@ -245,28 +265,28 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {/* Pick area */}
         <View style={styles.pickArea}>
           <Text style={{ fontSize: 52, marginBottom:12 }}>📸</Text>
-          <Text style={styles.pickTitle}>Fotoğraf Yükle</Text>
-          <Text style={styles.pickDesc}>Yüzünün net göründüğü bir fotoğraf seç</Text>
+          <Text style={styles.pickTitle}>{t('analysis.upload_photo', lang)}</Text>
+          <Text style={styles.pickDesc}>{t('analysis.upload_hint', lang)}</Text>
 
           <GoldButton
-            title="FOTOĞRAF ÇEK"
+            title={t('analysis.take_photo', lang)}
             onPress={() => pickImage('camera')}
             icon="📷"
-            style={{ marginTop:20 }}
+            style={styles.mt20}
           />
           <GoldButton
-            title="GALERİDEN SEÇ"
+            title={t('analysis.choose_gallery', lang)}
             onPress={() => pickImage('library')}
             variant="outline"
             icon="🖼"
-            style={{ marginTop:10 }}
+            style={styles.mt10}
           />
         </View>
 
-        <Card variant="warm" style={{ marginTop:16 }}>
-          <Text style={styles.tipsTitle}>💡 İpuçları</Text>
-          {['Yüz net görünsün', 'İyi aydınlatılmış ortam', 'Düz bakış açısı', 'Aksesuar olmadan'].map((t,i) => (
-            <Text key={i} style={styles.tip}>• {t}</Text>
+        <Card variant="warm" style={styles.mt16}>
+          <Text style={styles.tipsTitle}>{t('analysis.tips', lang)}</Text>
+          {[t('analysis.tip1', lang), t('analysis.tip2', lang), t('analysis.tip3', lang), t('analysis.tip4', lang)].map((tip, i) => (
+            <Text key={i} style={styles.tip}>• {tip}</Text>
           ))}
         </Card>
       </ScrollView>
@@ -276,32 +296,33 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // ── Ekran: Önizleme ──────────────────────────────────────────────────────
   if (step === 'preview') return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
         <TouchableOpacity onPress={reset}><Text style={styles.back}>←</Text></TouchableOpacity>
-        <Text style={styles.headerTitle}>Önizleme</Text>
-        <View style={{ width:40 }} />
+        <Text style={styles.headerTitle}>{t('analysis.preview', lang)}</Text>
+        <View style={styles.spacer} />
       </View>
-      <View style={{ flex:1, padding: theme.spacing.lg, alignItems:'center' }}>
+      <View style={styles.previewBody}>
         {imageUri && (
           <Image source={{ uri: imageUri }} style={styles.previewImg} />
         )}
-        <View style={{ flexDirection:'row', width:'100%', gap:10, marginTop:16 }}>
+        <View style={styles.previewBtns}>
           <TouchableOpacity style={styles.changeBtn} onPress={reset} disabled={loading}>
-            <Text style={styles.changeBtnText}>Değiştir</Text>
+            <Text style={styles.changeBtnText}>{t('analysis.change', lang)}</Text>
           </TouchableOpacity>
           <GoldButton
-            title={loading ? '' : 'ANALİZ ET'}
+            title={loading ? '' : t('analysis.analyze', lang)}
             onPress={startAnalysis}
             loading={loading}
-            style={{ flex:1 }}
+            style={styles.flex1}
           />
         </View>
         {loading && imageUri && (
-          <View style={{ marginTop:24, width:'100%', alignItems:'center' }}>
+          <View style={styles.scannerWrap}>
             <FaceScannerOverlay
               imageUri={imageUri}
               progress={Math.min(scanProgress, 95)}
               scanDuration={5000}
+              lang={lang}
             />
           </View>
         )}
@@ -312,10 +333,10 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // ── Ekran: Sonuçlar ──────────────────────────────────────────────────────
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={reset}><Text style={styles.back}>← Yeni</Text></TouchableOpacity>
-        <Text style={styles.headerTitle}>Sonuçlar</Text>
-        <View style={{ width:40 }} />
+      <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
+        <TouchableOpacity onPress={reset}><Text style={styles.back}>{t('analysis.new_label', lang)}</Text></TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('analysis.results', lang)}</Text>
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -324,23 +345,23 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           {imageUri && (
             <Image source={{ uri: imageUri }} style={styles.resultImg} />
           )}
-          <View style={{ flex:1, gap:12, justifyContent:'center' }}>
+          <View style={styles.scoreCol}>
             {result?.golden_ratio != null && (
-              <ScoreRing score={Math.round(result.golden_ratio)} label="Altın Oran" size={80} />
+              <ScoreRing score={Math.round(result.golden_ratio)} label={t('analysis.golden_ratio', lang)} size={80} />
             )}
           </View>
         </View>
 
         {/* Analiz Özeti */}
-        <View style={{ flexDirection:'row', gap:8, marginBottom: theme.spacing.md, flexWrap:'wrap' }}>
+        <View style={styles.badgeRow}>
           {result?.face_detected !== false && (
-            <Badge label="✓ Yüz Algılandı" color={theme.colors.gold} />
+            <Badge label={t('analysis.face_detected', lang)} color={colors.gold} />
           )}
           {result?.age_group && (
-            <Badge label={`Yaş: ${result.age_group}`} color={theme.colors.textWarm} />
+            <Badge label={`${t('analysis.age', lang)}: ${result.age_group}`} color={colors.textWarm} />
           )}
           {result?.gender && (
-            <Badge label={`Cinsiyet: ${result.gender}`} color={theme.colors.textWarm} />
+            <Badge label={`${t('analysis.gender', lang)}: ${result.gender}`} color={colors.textWarm} />
           )}
         </View>
 
@@ -348,16 +369,16 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <Card variant="warm" style={styles.chatCTA}>
           <View style={styles.chatCTARow}>
             <View style={styles.chatCTAIcon}><Text style={{ fontSize:22 }}>✨</Text></View>
-            <View style={{ flex:1 }}>
-              <Text style={styles.chatCTATitle}>Asistanınla Konuş</Text>
-              <Text style={styles.chatCTADesc}>Sonuçları yorumla, soru sor, derine in</Text>
+            <View style={styles.ctaFlex1}>
+              <Text style={styles.chatCTATitle}>{t('analysis.chat_title', lang)}</Text>
+              <Text style={styles.chatCTADesc}>{t('analysis.chat_desc', lang)}</Text>
             </View>
           </View>
           <GoldButton
-            title="ASISTANLA KONUŞ"
+            title={t('analysis.chat_btn', lang)}
             variant="warm"
             onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
-            style={{ marginTop:12 }}
+            style={styles.ctaBtn}
           />
         </Card>
 
@@ -365,28 +386,28 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <Card style={styles.fashionCTA}>
           <View style={styles.fashionCTARow}>
             <View style={styles.fashionCTAIcon}><Text style={{ fontSize:22 }}>👗</Text></View>
-            <View style={{ flex:1 }}>
-              <Text style={styles.fashionCTATitle}>Giyim Danışmanı</Text>
-              <Text style={styles.fashionCTADesc}>Karakterine uygun stil önerileri</Text>
+            <View style={styles.ctaFlex1}>
+              <Text style={styles.fashionCTATitle}>{t('analysis.fashion_title', lang)}</Text>
+              <Text style={styles.fashionCTADesc}>{t('analysis.fashion_desc', lang)}</Text>
             </View>
           </View>
           <GoldButton
-            title="GİYİM ÖNERİLERİNİ GÖR"
+            title={t('analysis.fashion_btn', lang)}
             variant="outline"
             icon="👗"
             onPress={() => navigation.navigate('Fashion', { analysisResult: result, lang })}
-            style={{ marginTop:12 }}
+            style={styles.ctaBtn}
           />
         </Card>
 
         {/* Özellikler */}
-        {result?.attributes?.length > 0 && (
+        {(result?.attributes?.length ?? 0) > 0 && result && (
           <>
-            <SectionLabel>KARAKTERİSTİKLER</SectionLabel>
-            {result.attributes.slice(0, 6).map((a: any, i: number) => (
+            <SectionLabel>{t('analysis.characteristics', lang)}</SectionLabel>
+            {(result.attributes ?? []).slice(0, 6).map((a, i) => (
               <Card key={i} style={styles.attrCard}>
-                <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
-                  <View style={{ flex:1 }}>
+                <View style={styles.attrRow}>
+                  <View style={styles.ctaFlex1}>
                     <Text style={styles.attrName}>{a.name}</Text>
                     {a.description && (
                       <Text style={styles.attrDesc} numberOfLines={2}>{a.description}</Text>
@@ -401,23 +422,23 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {result?.kariyer && (
           <>
-            <SectionLabel>KARİYER</SectionLabel>
+            <SectionLabel>{t('analysis.career', lang)}</SectionLabel>
             <Card variant="gold"><Text style={styles.moduleText}>{result.kariyer}</Text></Card>
           </>
         )}
 
         {result?.liderlik && (
           <>
-            <SectionLabel>LİDERLİK</SectionLabel>
+            <SectionLabel>{t('analysis.leadership', lang)}</SectionLabel>
             <Card><Text style={styles.moduleText}>{result.liderlik}</Text></Card>
           </>
         )}
 
         {result?.daily && (
           <>
-            <SectionLabel>GÜNLÜK MESAJ</SectionLabel>
+            <SectionLabel>{t('analysis.daily_msg', lang)}</SectionLabel>
             <Card variant="warm">
-              <Text style={[styles.moduleText, { fontStyle:'italic', color: theme.colors.textWarm }]}>
+              <Text style={styles.moduleTextDaily}>
                 "{result.daily}"
               </Text>
             </Card>
@@ -425,10 +446,10 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         )}
 
         <GoldButton
-          title="YENİ ANALİZ"
+          title={t('analysis.new_analysis', lang)}
           onPress={reset}
           variant="outline"
-          style={{ marginTop: theme.spacing.xl }}
+          style={styles.mtXl}
         />
       </ScrollView>
     </View>
@@ -436,120 +457,120 @@ const AnalysisScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor: theme.colors.background },
+  container: { flex:1, backgroundColor: colors.background },
   header: {
     flexDirection:'row', alignItems:'center', justifyContent:'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.lg + 44,
-    paddingBottom: theme.spacing.md,
-    borderBottomWidth:1, borderBottomColor: theme.colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth:1, borderBottomColor: colors.border,
   },
-  back:        { ...theme.typography.body, color: theme.colors.gold, fontSize:22 },
-  headerTitle: { ...theme.typography.h3, letterSpacing:0.5 },
-  scroll: { padding: theme.spacing.lg, paddingBottom: theme.spacing.xxxl },
+  back:        { ...typography.body, color: colors.gold, fontSize:22 },
+  headerTitle: { ...typography.h3, letterSpacing:0.5 },
+  scroll: { padding: spacing.lg, paddingBottom: spacing.xxxl },
 
   // Lang chips
   langChip: {
     flexDirection:'row', alignItems:'center', gap:5,
     paddingHorizontal:12, paddingVertical:8,
-    borderRadius: theme.radius.full,
-    borderWidth:1, borderColor: theme.colors.border,
+    borderRadius: radius.full,
+    borderWidth:1, borderColor: colors.border,
     marginRight:8,
   },
-  langChipActive: { borderColor: theme.colors.gold, backgroundColor: theme.colors.goldGlow },
-  langText:       { ...theme.typography.caption, color: theme.colors.textMuted, fontSize:11 },
-  langTextActive: { color: theme.colors.gold, fontWeight:'700' },
+  langChipActive: { borderColor: colors.gold, backgroundColor: colors.goldGlow },
+  langText:       { ...typography.caption, color: colors.textMuted, fontSize:11 },
+  langTextActive: { color: colors.gold, fontWeight:'700' },
 
   // Pick
   pickArea: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.xl, borderWidth:1,
-    borderColor: theme.colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl, borderWidth:1,
+    borderColor: colors.border,
     borderStyle: 'dashed',
-    padding: theme.spacing.xl, alignItems:'center',
+    padding: spacing.xl, alignItems:'center',
   },
-  pickTitle: { ...theme.typography.h2, marginBottom:8 },
-  pickDesc:  { ...theme.typography.body, textAlign:'center', color: theme.colors.textWarm },
-  tipsTitle: { ...theme.typography.h3, fontSize:13, marginBottom:8 },
-  tip:       { ...theme.typography.caption, marginBottom:4, fontSize:12, color: theme.colors.textWarm },
+  pickTitle: { ...typography.h2, marginBottom:8 },
+  pickDesc:  { ...typography.body, textAlign:'center', color: colors.textWarm },
+  tipsTitle: { ...typography.h3, fontSize:13, marginBottom:8 },
+  tip:       { ...typography.caption, marginBottom:4, fontSize:12, color: colors.textWarm },
 
   // Preview
   previewImg: {
-    width:  width - theme.spacing.xl * 2,
-    height: width - theme.spacing.xl * 2,
-    borderRadius: theme.radius.xl,
+    width:  width - spacing.xl * 2,
+    height: width - spacing.xl * 2,
+    borderRadius: radius.xl,
   },
   changeBtn: {
-    height:52, paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.radius.md, borderWidth:1,
-    borderColor: theme.colors.border,
+    height:52, paddingHorizontal: spacing.lg,
+    borderRadius: radius.md, borderWidth:1,
+    borderColor: colors.border,
     alignItems:'center', justifyContent:'center',
   },
-  changeBtnText: { ...theme.typography.label, color: theme.colors.textMuted, fontSize:12 },
-  analyzingText: { ...theme.typography.bodyWarm },
+  changeBtnText: { ...typography.label, color: colors.textMuted, fontSize:12 },
+  analyzingText: { ...typography.bodyWarm },
 
   // Result
-  resultTop: { flexDirection:'row', gap: theme.spacing.lg, alignItems:'center', marginBottom: theme.spacing.md },
-  resultImg: { width:90, height:90, borderRadius: theme.radius.lg },
+  resultTop: { flexDirection:'row', gap: spacing.lg, alignItems:'center', marginBottom: spacing.md },
+  resultImg: { width:90, height:90, borderRadius: radius.lg },
 
   // Chat CTA
-  chatCTA:    { marginBottom: theme.spacing.md },
+  chatCTA:    { marginBottom: spacing.md },
   chatCTARow: { flexDirection:'row', alignItems:'center', gap:12 },
   chatCTAIcon:{
-    width:48, height:48, borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderWidth:1, borderColor:`${theme.colors.warmAmber}30`,
+    width:48, height:48, borderRadius: radius.lg,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth:1, borderColor:`${colors.warmAmber}30`,
     alignItems:'center', justifyContent:'center',
   },
-  chatCTATitle: { ...theme.typography.h3, fontSize:14, marginBottom:3 },
-  chatCTADesc:  { ...theme.typography.caption, color: theme.colors.textWarm, fontSize:11 },
+  chatCTATitle: { ...typography.h3, fontSize:14, marginBottom:3 },
+  chatCTADesc:  { ...typography.caption, color: colors.textWarm, fontSize:11 },
 
   // Fashion CTA
-  fashionCTA:    { marginBottom: theme.spacing.md, borderColor:'#9B5DE528', backgroundColor: theme.colors.surface },
+  fashionCTA:    { marginBottom: spacing.md, borderColor:'#9B5DE528', backgroundColor: colors.surface },
   fashionCTARow: { flexDirection:'row', alignItems:'center', gap:12 },
   fashionCTAIcon:{
-    width:48, height:48, borderRadius: theme.radius.lg,
+    width:48, height:48, borderRadius: radius.lg,
     backgroundColor: '#9B5DE512',
     borderWidth:1, borderColor:'#9B5DE530',
     alignItems:'center', justifyContent:'center',
   },
-  fashionCTATitle: { ...theme.typography.h3, fontSize:14, marginBottom:3 },
-  fashionCTADesc:  { ...theme.typography.caption, color: theme.colors.textWarm, fontSize:11 },
+  fashionCTATitle: { ...typography.h3, fontSize:14, marginBottom:3 },
+  fashionCTADesc:  { ...typography.caption, color: colors.textWarm, fontSize:11 },
 
   // Attrs
   attrCard: { marginBottom:8 },
-  attrName: { ...theme.typography.h3, fontSize:13, marginBottom:3 },
-  attrDesc: { ...theme.typography.caption, fontSize:11, color: theme.colors.textWarm },
-  moduleText: { ...theme.typography.bodyWarm, lineHeight:22, fontSize:13 },
+  attrRow:  { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 12 },
+  attrName: { ...typography.h3, fontSize:13, marginBottom:3 },
+  attrDesc: { ...typography.caption, fontSize:11, color: colors.textWarm },
+  moduleText: { ...typography.bodyWarm, lineHeight:22, fontSize:13 },
 
   // Quality Check
   qualityImg: {
-    width: width - theme.spacing.xl * 2,
-    height: width - theme.spacing.xl * 2,
-    borderRadius: theme.radius.xl,
-    marginBottom: theme.spacing.lg,
+    width: width - spacing.xl * 2,
+    height: width - spacing.xl * 2,
+    borderRadius: radius.xl,
+    marginBottom: spacing.lg,
   },
   scoreCard: {
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
     borderWidth: 2,
     alignItems: 'center',
   },
   scoreTitle: {
-    ...theme.typography.h1,
+    ...typography.h1,
     fontSize: 32,
   },
   scoreSubtitle: {
-    ...theme.typography.h3,
+    ...typography.h3,
     fontSize: 14,
     marginTop: 4,
   },
   recommendation: {
-    ...theme.typography.body,
+    ...typography.body,
     textAlign: 'center',
   },
   metricCard: {
-    marginBottom: theme.spacing.md,
+    marginBottom: spacing.md,
   },
   metricHeader: {
     flexDirection: 'row',
@@ -557,18 +578,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metricLabel: {
-    ...theme.typography.label,
+    ...typography.label,
     fontSize: 12,
     fontWeight: '600',
   },
   metricValue: {
-    ...theme.typography.caption,
+    ...typography.caption,
     fontSize: 11,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
   },
   progressContainer: {
     height: 6,
-    backgroundColor: theme.colors.border,
+    backgroundColor: colors.border,
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
@@ -578,24 +599,41 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   metricScore: {
-    ...theme.typography.caption,
+    ...typography.caption,
     fontSize: 10,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
   },
   retakeBtn: {
     flex: 1,
     height: 52,
-    borderRadius: theme.radius.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   retakeBtnText: {
-    ...theme.typography.label,
-    color: theme.colors.textMuted,
+    ...typography.label,
+    color: colors.textMuted,
     fontSize: 12,
   },
+  spacer:       { width: 40 },
+  actionRow:    { flexDirection: 'row' as const, gap: 10, marginTop: 20 },
+  flex1:        { flex: 1 },
+  previewBody:  { flex: 1, padding: spacing.lg, alignItems: 'center' as const },
+  previewBtns:  { flexDirection: 'row' as const, width: '100%', gap: 10, marginTop: 16 },
+  scannerWrap:  { marginTop: 24, width: '100%', alignItems: 'center' as const },
+  scoreCol:     { flex: 1, gap: 12, justifyContent: 'center' as const },
+  badgeRow:     { flexDirection: 'row' as const, gap: 8, marginBottom: spacing.md, flexWrap: 'wrap' as const },
+  ctaFlex1:     { flex: 1 },
+  ctaBtn:       { marginTop: 12 },
+  langScroll:        { marginBottom: 20 },
+  mt20:              { marginTop: 20 },
+  mt10:              { marginTop: 10 },
+  mt16:              { marginTop: 16 },
+  mtXl:              { marginTop: spacing.xl },
+  recommendationNote:{ ...typography.body, textAlign: 'center' as const, color: colors.textWarm, marginTop: 8 },
+  moduleTextDaily:   { ...typography.bodyWarm, lineHeight:22, fontSize:13, fontStyle: 'italic' as const, color: colors.textWarm },
 });
 
 export default AnalysisScreen;

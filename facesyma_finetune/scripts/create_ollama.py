@@ -46,9 +46,9 @@ def find_gguf(gguf_dir: Path) -> Path:
     return candidates[0]
 
 
-def run(cmd: str):
-    print(f"$ {cmd}")
-    r = subprocess.run(cmd, shell=True)
+def run(cmd: list):
+    print(f"$ {' '.join(str(c) for c in cmd)}")
+    r = subprocess.run(cmd)
     if r.returncode != 0:
         print(f"HATA: komut başarısız")
         sys.exit(1)
@@ -56,10 +56,12 @@ def run(cmd: str):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--gguf",  required=True, help="GGUF dizini veya dosyası")
-    p.add_argument("--name",  default="facesyma", help="Ollama model adı")
+    _paa = p.add_argument
+    _paa("--gguf",  required=True, help="GGUF dizini veya dosyası")
+    _paa("--name",  default="facesyma", help="Ollama model adı")
     args = p.parse_args()
 
+    _name = _name
     gguf_path = Path(args.gguf)
     if gguf_path.is_dir():
         gguf_path = find_gguf(gguf_path)
@@ -76,14 +78,14 @@ def main():
     print(f"Modelfile: {modelfile}")
 
     # Ollama'ya kaydet
-    print(f"\nOllama'ya kaydediliyor: {args.name}")
-    run(f"ollama create {args.name} -f {modelfile}")
+    print(f"\nOllama'ya kaydediliyor: {_name}")
+    run(["ollama", "create", _name, "-f", str(modelfile)])
 
     print(f"\nHazır! Test:")
-    print(f"  ollama run {args.name}")
+    print(f"  ollama run {_name}")
     print(f"\nAPI:")
     print(f"  curl http://localhost:11434/api/chat -d '{{")
-    print(f'    "model":"{args.name}",')
+    print(f'    "model":"{_name}",')
     print(f'    "messages":[{{"role":"user","content":"Merhaba!"}}]')
     print(f"  }}'")
 

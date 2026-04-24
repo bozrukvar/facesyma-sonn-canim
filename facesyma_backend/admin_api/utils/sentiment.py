@@ -8,6 +8,11 @@ Harici kütüphane gerektirmez.
 import re
 import unicodedata
 
+_RE_PUNCT      = re.compile(r'[^\w\s]')
+_RE_WHITESPACE = re.compile(r'\s+')
+
+_NEUTRAL_RESULT = {"sentiment": "neutral", "score": 0.0, "pos_hits": 0, "neg_hits": 0, "confidence": 0.0}
+
 # ──── TÜRKÇE KEYWORDLER ─────────────────────────────────────────────────────
 TR_POSITIVE = [
     "harika", "mükemmel", "süper", "sevdim", "çok iyi", "güzel", "beğendim",
@@ -22,7 +27,7 @@ TR_POSITIVE = [
 TR_NEGATIVE = [
     "kötü", "berbat", "beğenmedim", "çalışmıyor", "bozuk", "yavaş", "hata",
     "sorun", "kötüydü", "hayal kırıklığı", "üzgün", "sinirli", "kızgın",
-    "rahatsız", "mutsuz", "pişman", "memnun değil", "başarısız", "zayıf",
+    "rahatsız", "mutsuz", "pişman", "memnun değil", "failed", "zayıf",
     "güvenli değil", "karmaşık", "zor", "sıkıcı", "monoton", "kırıcı",
     "acı", "ağır", "düşük kalite", "berbat", "feci", "korkunç", "felaket",
     "çöp", "saçma", "aptal", "garip", "alışılmadık", "hatalı", "yanlış",
@@ -70,10 +75,10 @@ def _normalize_text(text: str) -> str:
     text = text.encode('ascii', 'ignore').decode('ascii')
 
     # Noktalama ve özel karakterleri kaldır (boşluk bırak)
-    text = re.sub(r'[^\w\s]', ' ', text)
+    text = _RE_PUNCT.sub(' ', text)
 
     # Çoklu boşlukları tek boşluğa dönüştür
-    text = re.sub(r'\s+', ' ', text).strip()
+    text = _RE_WHITESPACE.sub(' ', text).strip()
 
     return text
 
@@ -95,13 +100,7 @@ def analyze_sentiment(text: str) -> dict:
         }
     """
     if not text or not isinstance(text, str):
-        return {
-            "sentiment": "neutral",
-            "score": 0.0,
-            "pos_hits": 0,
-            "neg_hits": 0,
-            "confidence": 0.0
-        }
+        return _NEUTRAL_RESULT
 
     normalized = _normalize_text(text)
     words = normalized.split()

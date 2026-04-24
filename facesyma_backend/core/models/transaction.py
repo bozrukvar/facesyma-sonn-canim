@@ -14,6 +14,7 @@ class TransactionType(Enum):
     DAILY_LOGIN = "daily_login"
     MEAL_GAME = "meal_game"
     DISCOVERY_GAME = "discovery_game"
+    COACHING_QUEST = "coaching_quest"
 
     def __str__(self):
         return self.value

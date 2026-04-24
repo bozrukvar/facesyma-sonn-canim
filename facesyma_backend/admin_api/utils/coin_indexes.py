@@ -15,17 +15,18 @@ def create_coin_indexes():
 
     # ── Transaction collection indexes ────────────────────────────────
     trans_col = db['coin_transactions']
+    _cidx = trans_col.create_index
 
     # Index 1: user_id + created_at (main query for history)
-    trans_col.create_index([("user_id", -1), ("created_at", -1)])
+    _cidx([("user_id", -1), ("created_at", -1)])
     print("✓ Index: coin_transactions(user_id DESC, created_at DESC)")
 
     # Index 2: user_id + type (for filtering by type)
-    trans_col.create_index([("user_id", 1), ("type", 1)])
+    _cidx([("user_id", 1), ("type", 1)])
     print("✓ Index: coin_transactions(user_id, type)")
 
     # Index 3: created_at (for admin reporting)
-    trans_col.create_index([("created_at", -1)])
+    _cidx([("created_at", -1)])
     print("✓ Index: coin_transactions(created_at DESC)")
 
     # Index 4: TTL - delete old transactions after 2 years (optional)
@@ -35,21 +36,22 @@ def create_coin_indexes():
 
     # ── User collection indexes (extend existing) ────────────────────
     users_col = db['appfaceapi_myuser']
+    _cidx = users_col.create_index
 
     # Index 1: coins (for leaderboard filtering)
-    users_col.create_index([("coins", -1)])
+    _cidx([("coins", -1)])
     print("✓ Index: appfaceapi_myuser(coins DESC)")
 
     # Index 2: total_earned (for stats)
-    users_col.create_index([("total_earned", -1)])
+    _cidx([("total_earned", -1)])
     print("✓ Index: appfaceapi_myuser(total_earned DESC)")
 
     # Index 3: streak_count (for leaderboard)
-    users_col.create_index([("streak_count", -1)])
+    _cidx([("streak_count", -1)])
     print("✓ Index: appfaceapi_myuser(streak_count DESC)")
 
     # Index 4: last_daily_quest (for checking completion)
-    users_col.create_index([("last_daily_quest", 1)])
+    _cidx([("last_daily_quest", 1)])
     print("✓ Index: appfaceapi_myuser(last_daily_quest)")
 
     print("\n✅ All coin indexes created successfully!")

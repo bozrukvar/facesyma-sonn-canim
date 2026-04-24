@@ -15,19 +15,15 @@ API Endpoints:
 - GET /health - Health check
 """
 
-import io
 import base64
 import logging
 import numpy as np
 from typing import Optional, Dict, List, Any
 from datetime import datetime
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import cv2
 import mediapipe as mp
-from PIL import Image
-import asyncio
 from functools import lru_cache
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -36,6 +32,28 @@ from functools import lru_cache
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+_OBJECT_MESSAGES = {
+    'bottle':    'Bu bir bardak/şişe. Lütfen yüzünüzün fotoğrafını çekin.',
+    'cup':       'Bu bir kupa. Lütfen yüzünüzün fotoğrafını çekin.',
+    'glass':     'Bu bir bardak. Lütfen yüzünüzün fotoğrafını çekin.',
+    'dog':       'Bu bir köpek. Lütfen insan yüzü çekin.',
+    'cat':       'Bu bir kedi. Lütfen insan yüzü çekin.',
+    'bird':      'Bu bir kuş. Lütfen insan yüzü çekin.',
+    'animal':    'Bu bir hayvan. Lütfen insan yüzü çekin.',
+    'car':       'Bu bir araba. Lütfen yüzünüzün fotoğrafını çekin.',
+    'person':    'İnsan tespit edildi ama yüz net değil. Lütfen yüzünüze yakın çekin.',
+    'tree':      'Bu bir ağaç. Lütfen yüzünüzün fotoğrafını çekin.',
+    'flower':    'Bu bir çiçek. Lütfen yüzünüzün fotoğrafını çekin.',
+    'food':      'Bu yemek. Lütfen yüzünüzün fotoğrafını çekin.',
+    'phone':     'Bu bir telefon. Lütfen yüzünüzün fotoğrafını çekin.',
+    'laptop':    'Bu bir bilgisayar. Lütfen yüzünüzün fotoğrafını çekin.',
+    'book':      'Bu bir kitap. Lütfen yüzünüzün fotoğrafını çekin.',
+    'teddy bear':'Bu bir oyuncak. Lütfen yüzünüzün fotoğrafını çekin.',
+    'cake':      'Bu bir pasta. Lütfen yüzünüzün fotoğrafını çekin.',
+    'donut':     'Bu bir donut. Lütfen yüzünüzün fotoğrafını çekin.',
+    'pizza':     'Bu pizza. Lütfen yüzünüzün fotoğrafını çekin.',
+}
 
 app = FastAPI(
     title="Face Validation Service",
@@ -51,6 +69,9 @@ mp_pose = mp.solutions.pose
 # ═══════════════════════════════════════════════════════════════════════════
 # Models
 # ═══════════════════════════════════════════════════════════════════════════
+
+_MAX_B64_LEN = 27_000_000  # ~20 MB decoded
+
 
 class FaceValidationRequest(BaseModel):
     image: str  # Base64 encoded image
@@ -127,7 +148,8 @@ class FaceDetectionService:
         # Detect faces with MediaPipe
         results = self.face_detection.process(image_rgb)
 
-        if not results.detections:
+        _rd = results.detections
+        if not _rd:
             return {
                 'face_detected': False,
                 'face_count': 0,
@@ -135,7 +157,7 @@ class FaceDetectionService:
             }
 
         faces = []
-        for detection in results.detections:
+        for detection in _rd:
             bbox = detection.location_data.relative_bounding_box
 
             # Convert relative to absolute coordinates
@@ -162,15 +184,16 @@ class FaceDetectionService:
                     'width': face_width,
                     'height': face_height
                 },
-                'confidence': detection.score[0] if detection.score else 0.7,
+                'confidence': (_ds := detection.score)[0] if _ds else 0.7,
                 'angle': angle,
                 'size_ratio': size_ratio,
                 'landmarks': self._extract_landmarks(detection)
             })
 
+        _nfaces = len(faces)
         return {
-            'face_detected': len(faces) > 0,
-            'face_count': len(faces),
+            'face_detected': _nfaces > 0,
+            'face_count': _nfaces,
             'faces': faces
         }
 
@@ -183,10 +206,11 @@ class FaceDetectionService:
             # Use MediaPipe Pose for better angle detection
             pose_results = self.pose.process(face_region)
 
-            if pose_results.pose_landmarks:
+            _landmarks = pose_results.pose_landmarks
+            if _landmarks:
                 # Use shoulder keypoints to estimate head angle
-                left_shoulder = pose_results.pose_landmarks[11]
-                right_shoulder = pose_results.pose_landmarks[12]
+                left_shoulder = _landmarks[11]
+                right_shoulder = _landmarks[12]
 
                 # Calculate angle from shoulders
                 angle = np.arctan2(
@@ -205,8 +229,9 @@ class FaceDetectionService:
         """Extract face landmarks if available"""
         landmarks = []
 
-        if hasattr(detection.location_data, 'relative_keypoints'):
-            for keypoint in detection.location_data.relative_keypoints:
+        _dld = detection.location_data
+        if hasattr(_dld, 'relative_keypoints'):
+            for keypoint in _dld.relative_keypoints:
                 landmarks.append({
                     'x': float(keypoint.x),
                     'y': float(keypoint.y),
@@ -243,10 +268,13 @@ class FaceDetectionService:
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             results = self.object_detector.detect(image_rgb)
 
-            if results.detections:
-                top_detection = results.detections[0]
-                category = top_detection.categories[0].category_name if top_detection.categories else 'unknown'
-                confidence = top_detection.categories[0].score if top_detection.categories else 0.0
+            _rdet = results.detections
+            if _rdet:
+                top_detection = _rdet[0]
+                _cats = top_detection.categories
+                _c0 = _cats[0] if _cats else None
+                category = _c0.category_name if _c0 else 'unknown'
+                confidence = _c0.score if _c0 else 0.0
 
                 return {
                     'object': category,
@@ -270,32 +298,10 @@ class FaceValidationService:
 
     def _get_object_message(self, obj_name: str) -> str:
         """Get Turkish message for detected non-face object"""
-        messages = {
-            'bottle': 'Bu bir bardak/şişe. Lütfen yüzünüzün fotoğrafını çekin.',
-            'cup': 'Bu bir kupa. Lütfen yüzünüzün fotoğrafını çekin.',
-            'glass': 'Bu bir bardak. Lütfen yüzünüzün fotoğrafını çekin.',
-            'dog': 'Bu bir köpek. Lütfen insan yüzü çekin.',
-            'cat': 'Bu bir kedi. Lütfen insan yüzü çekin.',
-            'bird': 'Bu bir kuş. Lütfen insan yüzü çekin.',
-            'animal': 'Bu bir hayvan. Lütfen insan yüzü çekin.',
-            'car': 'Bu bir araba. Lütfen yüzünüzün fotoğrafını çekin.',
-            'person': 'İnsan tespit edildi ama yüz net değil. Lütfen yüzünüze yakın çekin.',
-            'tree': 'Bu bir ağaç. Lütfen yüzünüzün fotoğrafını çekin.',
-            'flower': 'Bu bir çiçek. Lütfen yüzünüzün fotoğrafını çekin.',
-            'food': 'Bu yemek. Lütfen yüzünüzün fotoğrafını çekin.',
-            'phone': 'Bu bir telefon. Lütfen yüzünüzün fotoğrafını çekin.',
-            'laptop': 'Bu bir bilgisayar. Lütfen yüzünüzün fotoğrafını çekin.',
-            'book': 'Bu bir kitap. Lütfen yüzünüzün fotoğrafını çekin.',
-            'teddy bear': 'Bu bir oyuncak. Lütfen yüzünüzün fotoğrafını çekin.',
-            'cake': 'Bu bir pasta. Lütfen yüzünüzün fotoğrafını çekin.',
-            'donut': 'Bu bir donut. Lütfen yüzünüzün fotoğrafını çekin.',
-            'pizza': 'Bu pizza. Lütfen yüzünüzün fotoğrafını çekin.',
-        }
-
-        for key, message in messages.items():
-            if key.lower() in obj_name.lower() or obj_name.lower() in key.lower():
+        _obj_lower = obj_name.lower()
+        for key, message in _OBJECT_MESSAGES.items():
+            if key in _obj_lower or _obj_lower in key:
                 return message
-
         return f'Lütfen insan yüzünün fotoğrafını çekin. (Tespit edilen: {obj_name})'
 
     def validate_face_photo(self, image: np.ndarray, strict: bool = False) -> FaceValidationResponse:
@@ -308,19 +314,24 @@ class FaceValidationService:
         """
         h, w = image.shape[:2]
         issues = []
+        _iappend = issues.append
         recommendations = []
+        _rappend = recommendations.append
         score = 100
 
         # Detect faces
         detection_result = self.detector.detect_face(image)
+        _drfd = detection_result['face_detected']
+        _drfc = detection_result['face_count']
 
-        if not detection_result['face_detected']:
+        if not _drfd:
             # Try to identify what was in the image instead
             detected_obj = self.detector.detect_object(image)
 
             if detected_obj:
-                issue_message = self._get_object_message(detected_obj['object'])
-                detected_object = detected_obj['object']
+                _doobj = detected_obj['object']
+                issue_message = self._get_object_message(_doobj)
+                detected_object = _doobj
             else:
                 issue_message = 'Yüz tespit edilemedi. Lütfen yüzünüzün fotoğrafını çekin.'
                 detected_object = None
@@ -341,9 +352,9 @@ class FaceValidationService:
             )
 
         # Multiple faces detected
-        if detection_result['face_count'] > 1:
-            issues.append('Birden fazla yüz tespit edildi')
-            recommendations.append('Sadece sizin yüzünüzün görüneceği bir fotoğraf çekin')
+        if _drfc > 1:
+            _iappend('Birden fazla yüz tespit edildi')
+            _rappend('Sadece sizin yüzünüzün görüneceği bir fotoğraf çekin')
             score -= 30
 
         # Get primary face
@@ -360,17 +371,17 @@ class FaceValidationService:
         abs_angle = abs(angle)
 
         if abs_angle > 45:  # Very tilted
-            issues.append(f'Yüz çok eğik ({abs_angle:.0f}°)')
-            recommendations.append('Kameraya daha düz bakacak şekilde çekin')
+            _iappend(f'Yüz çok eğik ({abs_angle:.0f}°)')
+            _rappend('Kameraya daha düz bakacak şekilde çekin')
             score -= 25
         elif abs_angle > 30:  # Moderately tilted
-            recommendations.append('Kameraya biraz daha düz bakabilirsiniz')
+            _rappend('Kameraya biraz daha düz bakabilirsiniz')
             score -= 10
 
         # Profile detection (side face)
         if abs_angle > 60:
-            issues.append('Yan yüz (profile) tespit edildi')
-            recommendations.append('Kameraya doğru bakacak şekilde konumlandırın')
+            _iappend('Yan yüz (profile) tespit edildi')
+            _rappend('Kameraya doğru bakacak şekilde konumlandırın')
             score -= 15
 
         # ═══════════════════════════════════════════════════════════════════
@@ -378,19 +389,19 @@ class FaceValidationService:
         # ═══════════════════════════════════════════════════════════════════
 
         if size_ratio < 5:  # Too small
-            issues.append(f'Yüz çok küçük ({size_ratio:.1f}% of image)')
-            recommendations.append('Kameraya yaklaşın veya daha yakın bir fotoğraf yükleyin')
+            _iappend(f'Yüz çok küçük ({size_ratio:.1f}% of image)')
+            _rappend('Kameraya yaklaşın veya daha yakın bir fotoğraf yükleyin')
             score -= 25
         elif size_ratio < 15:  # Relatively small
-            recommendations.append('Kameraya biraz daha yaklaşabilirsiniz')
+            _rappend('Kameraya biraz daha yaklaşabilirsiniz')
             score -= 10
 
         if size_ratio > 90:  # Too large
-            issues.append(f'Yüz çok büyük ({size_ratio:.1f}% of image)')
-            recommendations.append('Kamerada biraz geriye çekilin')
+            _iappend(f'Yüz çok büyük ({size_ratio:.1f}% of image)')
+            _rappend('Kamerada biraz geriye çekilin')
             score -= 20
         elif size_ratio > 70:  # Relatively large
-            recommendations.append('Kamerada biraz geriye çekilebilirsiniz')
+            _rappend('Kamerada biraz geriye çekilebilirsiniz')
             score -= 5
 
         # ═══════════════════════════════════════════════════════════════════
@@ -400,19 +411,19 @@ class FaceValidationService:
         brightness = self._calculate_brightness(image)
 
         if brightness < 30:
-            issues.append('Çok karanlık')
-            recommendations.append('Daha aydınlık bir yere gitmeyi deneyin')
+            _iappend('Çok karanlık')
+            _rappend('Daha aydınlık bir yere gitmeyi deneyin')
             score -= 15
         elif brightness < 50:
-            recommendations.append('Daha aydınlık bir ortam tercih edebilirsiniz')
+            _rappend('Daha aydınlık bir ortam tercih edebilirsiniz')
             score -= 8
 
         if brightness > 95:
-            issues.append('Çok parlak/kontrast düşük')
-            recommendations.append('Doğrudan güneş ışığından kaçınız')
+            _iappend('Çok parlak/kontrast düşük')
+            _rappend('Doğrudan güneş ışığından kaçınız')
             score -= 12
         elif brightness > 85:
-            recommendations.append('Daha az parlak bir ortamda çekim yapabilirsiniz')
+            _rappend('Daha az parlak bir ortamda çekim yapabilirsiniz')
             score -= 5
 
         # ═══════════════════════════════════════════════════════════════════
@@ -433,13 +444,13 @@ class FaceValidationService:
         if strict:
             is_valid = score >= 70 and len(issues) == 0
         else:
-            is_valid = score >= 40 and detection_result['face_detected']
+            is_valid = score >= 40 and _drfd
 
         return FaceValidationResponse(
             is_valid=is_valid,
             score=score,
             face_detected=True,
-            face_count=detection_result['face_count'],
+            face_count=_drfc,
             face_box={
                 'x': float(face_box['x']),
                 'y': float(face_box['y']),
@@ -503,8 +514,11 @@ async def validate_face(request: FaceValidationRequest):
     ✅ Brightness issues
     """
     try:
+        _ri = request.image
+        if len(_ri) > _MAX_B64_LEN:
+            raise HTTPException(status_code=400, detail="Image too large")
         # Decode base64 image
-        image_data = base64.b64decode(request.image)
+        image_data = base64.b64decode(_ri)
         image = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
 
         if image is None:
@@ -520,13 +534,16 @@ async def validate_face(request: FaceValidationRequest):
         raise
     except Exception as e:
         logger.error(f"Validation error: {e}")
-        raise HTTPException(status_code=500, detail=f"Validation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Validation failed. Please try again.")
 
 @app.post("/api/v1/face/analyze", response_model=FaceAnalysisResponse)
 async def analyze_face(request: FaceValidationRequest):
     """Detailed face analysis with landmarks"""
     try:
-        image_data = base64.b64decode(request.image)
+        _ri = request.image
+        if len(_ri) > _MAX_B64_LEN:
+            raise HTTPException(status_code=400, detail="Image too large")
+        image_data = base64.b64decode(_ri)
         image = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
 
         if image is None:
@@ -540,12 +557,15 @@ async def analyze_face(request: FaceValidationRequest):
 
         face = detection['faces'][0]
 
+        _box = face['box']
+        _fangle = face['angle']
+        _fsratio = face['size_ratio']
         return FaceAnalysisResponse(
             face_box={
-                'x': float(face['box']['x']),
-                'y': float(face['box']['y']),
-                'width': float(face['box']['width']),
-                'height': float(face['box']['height'])
+                'x': float(_box['x']),
+                'y': float(_box['y']),
+                'width': float(_box['width']),
+                'height': float(_box['height'])
             },
             landmarks=[
                 LandmarkPoint(
@@ -556,12 +576,12 @@ async def analyze_face(request: FaceValidationRequest):
                 )
                 for lm in face['landmarks']
             ],
-            face_angle=float(face['angle']),
-            face_size=float(face['size_ratio']),
+            face_angle=float(_fangle),
+            face_size=float(_fsratio),
             quality_metrics={
                 'confidence': float(face['confidence']),
-                'angle_deviation': float(abs(face['angle'])),
-                'size_ratio': float(face['size_ratio'])
+                'angle_deviation': float(abs(_fangle)),
+                'size_ratio': float(_fsratio)
             }
         )
 
@@ -569,7 +589,7 @@ async def analyze_face(request: FaceValidationRequest):
         raise
     except Exception as e:
         logger.error(f"Analysis error: {e}")
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Analysis failed. Please try again.")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Startup/Shutdown
@@ -577,11 +597,12 @@ async def analyze_face(request: FaceValidationRequest):
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Face Validation Service starting...")
+    _linfo = logger.info
+    _linfo("Face Validation Service starting...")
     # Pre-load models
     get_detection_service()
     get_validation_service()
-    logger.info("Models loaded successfully")
+    _linfo("Models loaded successfully")
 
 if __name__ == "__main__":
     import uvicorn

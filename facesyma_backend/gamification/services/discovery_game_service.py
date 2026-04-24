@@ -1,5 +1,4 @@
 """Discovery game service"""
-from typing import Optional, Dict, Any, List
 
 
 class DiscoveryGameService:

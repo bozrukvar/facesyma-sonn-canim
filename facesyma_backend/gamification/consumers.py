@@ -11,10 +11,14 @@ Handles:
 
 import json
 import logging
+import jwt
 from datetime import datetime
-from channels.db import database_sync_to_async
+from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
+from django.conf import settings
+
+_JWT_SECRET: str = settings.JWT_SECRET
 
 log = logging.getLogger(__name__)
 
@@ -33,18 +37,33 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
         """Handle WebSocket connection"""
         try:
             # Get leaderboard_type and parameters from URL route
-            self.leaderboard_type = self.scope['url_route']['kwargs'].get('leaderboard_type', 'global')
-            self.trait_id = self.scope['url_route']['kwargs'].get('trait_id')
-            self.community_id = self.scope['url_route']['kwargs'].get('community_id')
-            self.user_id = self.scope['user'].id if self.scope['user'].is_authenticated else None
+            _scope = self.scope
+            _kwargs = _scope['url_route']['kwargs']
+            _kget = _kwargs.get
+            self.leaderboard_type = _kget('leaderboard_type', 'global')
+            _lt = self.leaderboard_type
+            self.trait_id = _kget('trait_id')
+            self.community_id = _kget('community_id')
+            qs = parse_qs(_scope.get('query_string', b'').decode())
+            token = (qs.get('token') or [''])[0]
+            self.user_id = None
+            if token:
+                try:
+                    payload = jwt.decode(token, _JWT_SECRET, algorithms=['HS256'])
+                    self.user_id = payload.get('user_id')
+                except Exception:
+                    log.warning('LeaderboardWS rejected: invalid/expired token')
+                    await self.close(code=4401)
+                    return
 
             # Generate room name
             self.room_name = self._generate_room_name()
             self.room_group_name = f"leaderboard_{self.room_name}"
+            _rgn = self.room_group_name
 
             # Join room
             await self.channel_layer.group_add(
-                self.room_group_name,
+                _rgn,
                 self.channel_name
             )
 
@@ -52,17 +71,17 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
 
             log.info(
                 f"✓ WebSocket connected: user={self.user_id}, "
-                f"leaderboard={self.leaderboard_type}, room={self.room_group_name}"
+                f"leaderboard={_lt}, room={_rgn}"
             )
 
             # Send initial connection message
             await self.send(json.dumps({
                 "type": "connection",
                 "status": "connected",
-                "leaderboard_type": self.leaderboard_type,
+                "leaderboard_type": _lt,
                 "trait_id": self.trait_id,
                 "community_id": self.community_id,
-                "message": f"Connected to {self.leaderboard_type} leaderboard"
+                "message": f"Connected to {_lt} leaderboard"
             }))
 
         except Exception as e:
@@ -73,14 +92,15 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
         """Handle WebSocket disconnection"""
         try:
             # Leave room group
+            _rgn = self.room_group_name
             await self.channel_layer.group_discard(
-                self.room_group_name,
+                _rgn,
                 self.channel_name
             )
 
             log.info(
                 f"✓ WebSocket disconnected: user={self.user_id}, "
-                f"room={self.room_group_name}, code={close_code}"
+                f"room={_rgn}, code={close_code}"
             )
 
         except Exception as e:
@@ -95,20 +115,22 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
         - {"type": "unsubscribe"} — Unsubscribe from updates
         - {"type": "ping"} — Keep-alive ping
         """
+        _send = self.send
+        _jdumps = json.dumps
         try:
             data = json.loads(text_data)
             message_type = data.get('type', 'ping')
 
             if message_type == 'ping':
                 # Respond to ping
-                await self.send(json.dumps({
+                await _send(_jdumps({
                     "type": "pong",
                     "timestamp": datetime.utcnow().isoformat()
                 }))
 
             elif message_type == 'subscribe':
                 # Already subscribed by default
-                await self.send(json.dumps({
+                await _send(_jdumps({
                     "type": "subscribed",
                     "status": "ok",
                     "message": "Subscribed to leaderboard updates"
@@ -120,7 +142,7 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
                     self.room_group_name,
                     self.channel_name
                 )
-                await self.send(json.dumps({
+                await _send(_jdumps({
                     "type": "unsubscribed",
                     "status": "ok",
                     "message": "Unsubscribed from leaderboard updates"
@@ -128,21 +150,21 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
 
             else:
                 # Unknown message type
-                await self.send(json.dumps({
+                await _send(_jdumps({
                     "type": "error",
                     "error": f"Unknown message type: {message_type}"
                 }))
 
         except json.JSONDecodeError:
-            await self.send(json.dumps({
+            await _send(_jdumps({
                 "type": "error",
                 "error": "Invalid JSON format"
             }))
         except Exception as e:
             log.error(f"WebSocket receive error: {e}")
-            await self.send(json.dumps({
+            await _send(_jdumps({
                 "type": "error",
-                "error": str(e)
+                "error": "An error occurred processing your request."
             }))
 
     async def leaderboard_update(self, event):
@@ -160,14 +182,15 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
         }
         """
         try:
+            _eget = event.get
             # Forward update to WebSocket client
             await self.send(json.dumps({
                 "type": "leaderboard_update",
-                "leaderboard_type": event.get("leaderboard_type"),
-                "trait_id": event.get("trait_id"),
-                "community_id": event.get("community_id"),
-                "updated_at": event.get("updated_at"),
-                "reason": event.get("reason"),
+                "leaderboard_type": _eget("leaderboard_type"),
+                "trait_id": _eget("trait_id"),
+                "community_id": _eget("community_id"),
+                "updated_at": _eget("updated_at"),
+                "reason": _eget("reason"),
                 "message": "Leaderboard updated, please refresh"
             }))
 
@@ -190,15 +213,16 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
         }
         """
         try:
+            _eget = event.get
             # Forward rank change to WebSocket client
             await self.send(json.dumps({
                 "type": "rank_change",
-                "user_id": event.get("user_id"),
-                "username": event.get("username"),
-                "old_rank": event.get("old_rank"),
-                "new_rank": event.get("new_rank"),
-                "coins_gained": event.get("coins_gained"),
-                "timestamp": event.get("timestamp")
+                "user_id": _eget("user_id"),
+                "username": _eget("username"),
+                "old_rank": _eget("old_rank"),
+                "new_rank": _eget("new_rank"),
+                "coins_gained": _eget("coins_gained"),
+                "timestamp": _eget("timestamp")
             }))
 
         except Exception as e:
@@ -206,11 +230,12 @@ class LeaderboardConsumer(AsyncWebsocketConsumer):
 
     def _generate_room_name(self) -> str:
         """Generate room name from leaderboard parameters"""
-        if self.leaderboard_type == 'global':
+        _lt = self.leaderboard_type
+        if _lt == 'global':
             return "global"
-        elif self.leaderboard_type == 'trait':
+        elif _lt == 'trait':
             return f"trait_{self.trait_id}"
-        elif self.leaderboard_type == 'community':
+        elif _lt == 'community':
             return f"community_{self.community_id}"
         else:
             return "global"

@@ -20,6 +20,14 @@ from django.conf import settings
 
 log = logging.getLogger(__name__)
 
+_DEFAULT_FROM_EMAIL: str  = settings.DEFAULT_FROM_EMAIL
+_SLACK_WEBHOOK_URL:  str  = getattr(settings, 'SLACK_WEBHOOK_URL', '')
+_ALERT_RULE_PROJECTION = {
+    '_id': 0, 'id': 1, 'name': 1, 'description': 1, 'metric': 1,
+    'condition': 1, 'threshold': 1, 'last_triggered_at': 1,
+    'cooldown_minutes': 1, 'notify_email': 1, 'slack_webhook_url': 1,
+}
+
 # Global scheduler instance
 _scheduler = None
 
@@ -51,13 +59,14 @@ def _job_take_trait_snapshots():
             LeaderboardTrendService
         )
 
+        _lwarn = log.warning
         # Get all unique sifats
         db = _get_db()
         users_col = db["appfaceapi_myuser"]
         sifats = users_col.distinct("top_sifats")
 
         if not sifats:
-            log.warning("No sifats found to snapshot")
+            _lwarn("No sifats found to snapshot")
             return
 
         count = 0
@@ -73,7 +82,7 @@ def _job_take_trait_snapshots():
                 )
                 count += 1
             except Exception as e:
-                log.warning(f"Failed to snapshot trait {sifat_id}: {e}")
+                _lwarn(f"Failed to snapshot trait {sifat_id}: {e}")
 
         log.info(f"✓ Daily snapshots (trait): {count} traits")
 
@@ -92,7 +101,7 @@ def _job_take_community_snapshots():
         # Get all communities
         db = _get_db()
         communities_col = db["communities"]
-        communities = communities_col.find({}, {"_id": 1})
+        communities = communities_col.find({}, {"_id": 1}).limit(1000)
 
         count = 0
         for community in communities:
@@ -137,100 +146,105 @@ def _job_check_expired_subscriptions():
         subs_col = db["user_subscriptions"]
         users_col = db["appfaceapi_myuser"]
         events_col = db["subscription_events"]
+        _scf = subs_col.find
+        _scum = subs_col.update_many
+        _ucum = users_col.update_many
+        _ecim = events_col.insert_many
         now = datetime.utcnow()
+        now_iso = now.isoformat()
         now_ts = time.time()
 
         expired_count = 0
 
         # Check path 1: expires_date (ISO string, RevenueCat)
         expired_docs = list(
-            subs_col.find(
+            _scf(
                 {
-                    "expires_date": {"$lt": now.isoformat()},
+                    "expires_date": {"$lt": now_iso},
                     "plan": "premium",
-                }
-            )
+                },
+                {"_id": 1, "user_id": 1, "expires_date": 1},
+            ).limit(10000)
         )
 
-        for doc in expired_docs:
-            user_id = doc.get("user_id")
-            if not user_id:
-                continue
-
-            # Update subscription doc
-            subs_col.update_one(
-                {"_id": doc["_id"]},
-                {
-                    "$set": {
-                        "plan": "free",
-                        "status": "expired",
-                        "expired_at": now.isoformat(),
-                    }
-                },
+        if expired_docs:
+            # Bulk update subscriptions (N update_one → 1 update_many)
+            expired_oids_1 = [d["_id"] for d in expired_docs]
+            _scum(
+                {"_id": {"$in": expired_oids_1}},
+                {"$set": {"plan": "free", "status": "expired", "expired_at": now_iso}},
             )
 
-            # Update user doc — CRITICAL FIX
-            user = users_col.find_one({"id": user_id})
-            if user:
-                users_col.update_one({"id": user_id}, {"$set": {"plan": "free"}})
+            # Bulk update users (N update_one → 1 update_many)
+            expired_user_ids_1 = [uid for d in expired_docs if (uid := d.get("user_id"))]
+            if expired_user_ids_1:
+                _ucum({"id": {"$in": expired_user_ids_1}}, {"$set": {"plan": "free"}})
 
-            # Log event
-            events_col.insert_one(
+            # Batch-fetch user emails for event log
+            users_map_1 = {
+                u["id"]: u.get("email", "")
+                for u in users_col.find({"id": {"$in": expired_user_ids_1}}, {"id": 1, "email": 1})
+            }
+
+            # Bulk insert events (N insert_one → 1 insert_many)
+            event_docs_1 = [
                 {
                     "type": "expired",
-                    "user_id": user_id,
-                    "user_email": user.get("email") if user else "",
-                    "expired_at": now.isoformat(),
-                    "detail": f"Subscription expired. expires_date was {doc.get('expires_date')}",
+                    "user_id": uid,
+                    "user_email": users_map_1.get(uid, ""),
+                    "expired_at": now_iso,
+                    "detail": f"Subscription expired. expires_date was {d.get('expires_date')}",
                 }
-            )
-
-            expired_count += 1
+                for d in expired_docs if (uid := d.get("user_id"))
+            ]
+            if event_docs_1:
+                _ecim(event_docs_1, ordered=False)
+            expired_count += len(expired_docs)
 
         # Check path 2: renews_at (Unix timestamp, freemium)
         expired_docs_2 = list(
-            subs_col.find(
+            _scf(
                 {
                     "renews_at": {"$lt": now_ts},
                     "tier": "premium",
-                }
-            )
+                },
+                {"_id": 1, "user_id": 1, "renews_at": 1},
+            ).limit(10000)
         )
 
-        for doc in expired_docs_2:
-            user_id = doc.get("user_id")
-            if not user_id:
-                continue
-
-            # Update subscription doc
-            subs_col.update_one(
-                {"_id": doc["_id"]},
-                {
-                    "$set": {
-                        "tier": "free",
-                        "status": "expired",
-                        "expired_at": now.isoformat(),
-                    }
-                },
+        if expired_docs_2:
+            # Bulk update subscriptions (N update_one → 1 update_many)
+            expired_oids_2 = [d["_id"] for d in expired_docs_2]
+            _scum(
+                {"_id": {"$in": expired_oids_2}},
+                {"$set": {"tier": "free", "status": "expired", "expired_at": now_iso}},
             )
 
-            # Update user doc
-            user = users_col.find_one({"id": user_id})
-            if user:
-                users_col.update_one({"id": user_id}, {"$set": {"plan": "free"}})
+            # Bulk update users (N update_one → 1 update_many)
+            expired_user_ids_2 = [uid for d in expired_docs_2 if (uid := d.get("user_id"))]
+            if expired_user_ids_2:
+                _ucum({"id": {"$in": expired_user_ids_2}}, {"$set": {"plan": "free"}})
 
-            # Log event
-            events_col.insert_one(
+            # Batch-fetch user emails for event log
+            users_map_2 = {
+                u["id"]: u.get("email", "")
+                for u in users_col.find({"id": {"$in": expired_user_ids_2}}, {"id": 1, "email": 1})
+            }
+
+            # Bulk insert events (N insert_one → 1 insert_many)
+            event_docs_2 = [
                 {
                     "type": "expired",
-                    "user_id": user_id,
-                    "user_email": user.get("email") if user else "",
-                    "expired_at": now.isoformat(),
-                    "detail": f"Subscription expired. renews_at was {doc.get('renews_at')}",
+                    "user_id": uid,
+                    "user_email": users_map_2.get(uid, ""),
+                    "expired_at": now_iso,
+                    "detail": f"Subscription expired. renews_at was {d.get('renews_at')}",
                 }
-            )
-
-            expired_count += 1
+                for d in expired_docs_2 if (uid := d.get("user_id"))
+            ]
+            if event_docs_2:
+                _ecim(event_docs_2, ordered=False)
+            expired_count += len(expired_docs_2)
 
         log.info(f"✓ Checked subscriptions: {expired_count} expired and downgraded")
 
@@ -248,9 +262,12 @@ def _job_send_renewal_reminders():
         users_col = db["appfaceapi_myuser"]
         notif_col = db["subscription_notifications"]
         now = datetime.utcnow()
+        now_iso = now.isoformat()
         now_ts = time.time()
 
         reminder_count = 0
+        _scf = subs_col.find
+        _ncim = notif_col.insert_many
 
         # Find subscriptions expiring in 3-8 days
         future_3d = now + timedelta(days=3)
@@ -258,90 +275,98 @@ def _job_send_renewal_reminders():
 
         # Path 1: expires_date (ISO string)
         expiring_soon = list(
-            subs_col.find(
+            _scf(
                 {
                     "expires_date": {
                         "$gte": future_3d.isoformat(),
                         "$lt": future_8d.isoformat(),
                     },
                     "plan": "premium",
-                }
-            )
+                },
+                {"_id": 0, "user_id": 1, "expires_date": 1},
+            ).limit(10000)
         )
 
+        # Batch-fetch users for expiring soon (avoid N+1)
+        soon_ids_1 = [uid for d in expiring_soon if (uid := d.get("user_id"))]
+        soon_users_1 = {u["id"]: u for u in users_col.find({"id": {"$in": soon_ids_1}}, {"id": 1, "email": 1})}
+
+        batch_1 = []
         for doc in expiring_soon:
-            user_id = doc.get("user_id")
+            _dget = doc.get
+            user_id = _dget("user_id")
             if not user_id:
                 continue
-
-            user = users_col.find_one({"id": user_id})
+            user = soon_users_1.get(user_id)
             if not user:
                 continue
-
-            expires_date = doc.get("expires_date")
+            expires_date = _dget("expires_date")
             try:
-                exp_dt = datetime.fromisoformat(expires_date.replace("Z", "+00:00"))
+                exp_dt = datetime.fromisoformat((expires_date or "").replace("Z", "+00:00"))
                 expires_in_days = (exp_dt - now).days
             except Exception:
                 expires_in_days = 5
+            batch_1.append({
+                "type": "reminder",
+                "user_id": user_id,
+                "user_email": user.get("email"),
+                "expires_in_days": expires_in_days,
+                "expires_at": expires_date,
+                "created_at": now_iso,
+                "email_sent": False,
+            })
 
-            # Create notification
-            notif_col.insert_one(
-                {
-                    "type": "reminder",
-                    "user_id": user_id,
-                    "user_email": user.get("email"),
-                    "expires_in_days": expires_in_days,
-                    "expires_at": expires_date,
-                    "created_at": now.isoformat(),
-                    "email_sent": False,
-                }
-            )
-
-            reminder_count += 1
+        if batch_1:
+            _ncim(batch_1, ordered=False)
+        reminder_count += len(batch_1)
 
         # Path 2: renews_at (Unix timestamp)
         future_3d_ts = now_ts + (3 * 86400)
         future_8d_ts = now_ts + (8 * 86400)
 
         expiring_soon_2 = list(
-            subs_col.find(
+            _scf(
                 {
                     "renews_at": {
                         "$gte": future_3d_ts,
                         "$lt": future_8d_ts,
                     },
                     "tier": "premium",
-                }
-            )
+                },
+                {"_id": 0, "user_id": 1, "renews_at": 1},
+            ).limit(10000)
         )
 
+        soon_ids_2 = [uid for d in expiring_soon_2 if (uid := d.get("user_id"))]
+        soon_users_2 = {u["id"]: u for u in users_col.find({"id": {"$in": soon_ids_2}}, {"id": 1, "email": 1})}
+
+        batch_2 = []
         for doc in expiring_soon_2:
-            user_id = doc.get("user_id")
+            _dget = doc.get
+            user_id = _dget("user_id")
             if not user_id:
                 continue
-
-            user = users_col.find_one({"id": user_id})
+            user = soon_users_2.get(user_id)
             if not user:
                 continue
+            renews_at = _dget("renews_at")
+            try:
+                expires_in_days = int((renews_at - now_ts) / 86400) if renews_at else 5
+            except (TypeError, ValueError):
+                expires_in_days = 5
+            batch_2.append({
+                "type": "reminder",
+                "user_id": user_id,
+                "user_email": user.get("email"),
+                "expires_in_days": expires_in_days,
+                "expires_at": datetime.utcfromtimestamp(renews_at).isoformat() if renews_at else None,
+                "created_at": now_iso,
+                "email_sent": False,
+            })
 
-            renews_at = doc.get("renews_at")
-            expires_in_days = int((renews_at - now_ts) / 86400)
-
-            # Create notification
-            notif_col.insert_one(
-                {
-                    "type": "reminder",
-                    "user_id": user_id,
-                    "user_email": user.get("email"),
-                    "expires_in_days": expires_in_days,
-                    "expires_at": datetime.fromtimestamp(renews_at).isoformat(),
-                    "created_at": now.isoformat(),
-                    "email_sent": False,
-                }
-            )
-
-            reminder_count += 1
+        if batch_2:
+            _ncim(batch_2, ordered=False)
+        reminder_count += len(batch_2)
 
         log.info(f"✓ Sent renewal reminders: {reminder_count} notifications created")
 
@@ -358,8 +383,9 @@ def _fetch_metric(metric: str) -> float:
 
         now = datetime.utcnow()
         today_start = datetime(now.year, now.month, now.day)
-        today_start_ts = today_start.timestamp()
-        one_hour_ago_ts = (now - timedelta(hours=1)).timestamp()
+        today_start_ts  = today_start.timestamp()
+        _one_hour_ago   = now - timedelta(hours=1)
+        one_hour_ago_ts = _one_hour_ago.timestamp()
 
         users_col = get_users_col()
         history_col = get_history_col()
@@ -379,16 +405,18 @@ def _fetch_metric(metric: str) -> float:
         elif metric == 'error_rate_1h':
             db = _get_db()
             audit_col = db['admin_activity_log']
-            total = audit_col.count_documents({
-                'timestamp': {'$gte': (now - timedelta(hours=1)).isoformat()}
-            })
-            if total == 0:
-                return 0.0
-            errors = audit_col.count_documents({
-                'timestamp': {'$gte': (now - timedelta(hours=1)).isoformat()},
-                'action': {'$regex': 'delete|error', '$options': 'i'}
-            })
-            return (errors / total) * 100.0
+            hour_ago = _one_hour_ago.isoformat()
+            _er = next(audit_col.aggregate([
+                {'$match': {'timestamp': {'$gte': hour_ago}}},
+                {'$facet': {
+                    'total':  [{'$count': 'n'}],
+                    'errors': [{'$match': {'action': {'$regex': 'delete|error', '$options': 'i'}}}, {'$count': 'n'}],
+                }}
+            ]), {})
+            _erget = _er.get
+            total  = (_erget('total',  [{}])[0] or {}).get('n', 0)
+            errors = (_erget('errors', [{}])[0] or {}).get('n', 0)
+            return (errors / total) * 100.0 if total else 0.0
 
         return 0.0
     except Exception as e:
@@ -411,76 +439,93 @@ def _send_slack_notification(rule: dict, value: float) -> bool:
 
     Supports both global webhook (settings.SLACK_WEBHOOK_URL) and per-rule webhook.
     """
-    from django.conf import settings
-    webhook_url = getattr(settings, 'SLACK_WEBHOOK_URL', '') or rule.get('slack_webhook_url', '')
+    _ruleget = rule.get
+    webhook_url = _SLACK_WEBHOOK_URL or _ruleget('slack_webhook_url', '')
     if not webhook_url:
+        return False
+
+    _lwarn = log.warning
+    # SSRF guard — only allow Slack's official webhook domain
+    if not webhook_url.startswith('https://hooks.slack.com/'):
+        _lwarn(f"Blocked Slack webhook with unexpected URL for rule '{_ruleget('name')}'")
         return False
 
     try:
         payload = {
-            "text": f"⚠️ *[Facesyma Alert]* {rule['name']}",
+            "text": f"⚠️ *[Facesyma Alert]* {_ruleget('name')}",
             "attachments": [{
                 "color": "#ff0000",
                 "fields": [
-                    {"title": "Metrik", "value": rule['metric'], "short": True},
-                    {"title": "Mevcut Değer", "value": str(value), "short": True},
-                    {"title": "Eşik", "value": str(rule['threshold']), "short": True},
-                    {"title": "Açıklama", "value": rule.get('description', ''), "short": False},
+                    {"title": "Metric", "value": _ruleget('metric', ''), "short": True},
+                    {"title": "Current Value", "value": str(value), "short": True},
+                    {"title": "Threshold", "value": str(rule['threshold']), "short": True},
+                    {"title": "Description", "value": _ruleget('description', ''), "short": False},
                 ]
             }]
         }
         resp = requests.post(webhook_url, json=payload, timeout=5)
         return resp.status_code == 200
     except Exception as e:
-        log.warning(f"Failed to send Slack notification: {e}")
+        _lwarn(f"Failed to send Slack notification: {e}")
         return False
 
 
 def _job_check_alert_rules():
     """Check all enabled alert rules every 15 minutes."""
     try:
+        _lerr = log.error
         from admin_api.utils.mongo import _get_db, _next_id
 
         db = _get_db()
         rules_col = db['alert_rules']
         history_col = db['alert_history']
 
-        rules = list(rules_col.find({'enabled': True}))
+        rules = list(rules_col.find({'enabled': True}, _ALERT_RULE_PROJECTION).limit(200))
         now = datetime.utcnow()
+        now_iso = now.isoformat()
 
         triggered_count = 0
 
+        # Pre-fetch all distinct metrics needed by active rules (avoids duplicate DB queries)
+        needed_metrics = {rule['metric'] for rule in rules if rule.get('metric')}
+        metric_cache = {m: _fetch_metric(m) for m in needed_metrics}
+
         for rule in rules:
             try:
+                _rget = rule.get
+                _thresh = rule['threshold']
+                _rname = rule['name']
+                _rmetric = rule['metric']
+                _ruleid = rule['id']
                 # Check cooldown
-                if rule.get('last_triggered_at'):
+                if _rget('last_triggered_at'):
                     last = datetime.fromisoformat(rule['last_triggered_at'])
-                    cooldown_seconds = rule.get('cooldown_minutes', 60) * 60
+                    cooldown_seconds = _rget('cooldown_minutes', 60) * 60
                     if (now - last).total_seconds() < cooldown_seconds:
                         continue
 
-                # Get metric value
-                value = _fetch_metric(rule['metric'])
+                # Get metric value from cache
+                value = metric_cache.get(_rmetric, 0.0)
 
                 # Evaluate condition
-                if _evaluate_condition(value, rule['condition'], rule['threshold']):
+                if _evaluate_condition(value, rule['condition'], _thresh):
                     # Trigger alert
                     email_sent = False
                     slack_sent = False
 
                     # Send email notification
-                    if rule.get('notify_email'):
+                    if _rget('notify_email'):
                         try:
                             send_mail(
-                                subject=f"[Facesyma Alert] {rule['name']}",
-                                message=f"{rule['description']}\n\nMevcut değer: {value}\nEşik: {rule['threshold']}",
-                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                subject=f"[Facesyma Alert] {_rname}",
+                                message=f"{rule['description']}\n\nCurrent value: {value}\nThreshold: {_thresh}",
+                                from_email=_DEFAULT_FROM_EMAIL,
                                 recipient_list=[rule['notify_email']],
                                 fail_silently=True
                             )
                             email_sent = True
                         except Exception as e:
-                            log.warning(f"Failed to send alert email for rule {rule['id']}: {e}")
+                            log.warning(f"Failed to send alert email for rule {_ruleid}: {e}")
 
                     # Send Slack notification
                     slack_sent = _send_slack_notification(rule, value)
@@ -488,30 +533,30 @@ def _job_check_alert_rules():
                     # Record trigger
                     history_col.insert_one({
                         'id': _next_id(history_col),
-                        'rule_id': rule['id'],
-                        'rule_name': rule['name'],
+                        'rule_id': _ruleid,
+                        'rule_name': _rname,
                         'metric_value': value,
-                        'threshold': rule['threshold'],
-                        'triggered_at': now.isoformat(),
+                        'threshold': _thresh,
+                        'triggered_at': now_iso,
                         'email_sent': email_sent,
-                        'slack_sent': slack_sent,  # YENİ
+                        'slack_sent': slack_sent,
                     })
 
                     # Update last trigger time
                     rules_col.update_one(
-                        {'id': rule['id']},
-                        {'$set': {'last_triggered_at': now.isoformat()}}
+                        {'id': _ruleid},
+                        {'$set': {'last_triggered_at': now_iso}}
                     )
 
                     # Broadcast alert triggered event to admin panel (WS)
                     try:
                         from admin_api.consumers import send_admin_event
                         send_admin_event('alert_triggered', {
-                            'rule_name': rule['name'],
-                            'metric': rule['metric'],
+                            'rule_name': _rname,
+                            'metric': _rmetric,
                             'value': value,
-                            'threshold': rule['threshold'],
-                            'time': now.isoformat()
+                            'threshold': _thresh,
+                            'time': now_iso,
                         })
                     except Exception:
                         pass  # WS broadcast failure shouldn't break alert checking
@@ -519,13 +564,13 @@ def _job_check_alert_rules():
                     triggered_count += 1
 
             except Exception as e:
-                log.error(f"Error checking rule {rule.get('id')}: {e}")
+                _lerr(f"Error checking rule {rule.get('id')}: {e}")
 
         if triggered_count > 0:
             log.info(f"✓ Alert rules checked: {triggered_count} alerts triggered")
 
     except Exception as e:
-        log.error(f"✗ Failed to check alert rules: {e}")
+        _lerr(f"✗ Failed to check alert rules: {e}")
 
 
 def start_scheduler():
@@ -548,9 +593,10 @@ def start_scheduler():
 
     try:
         _scheduler = BackgroundScheduler()
+        _addjob = _scheduler.add_job
 
         # Global leaderboard snapshot (daily at 2:00 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_take_global_snapshot,
             CronTrigger(hour=2, minute=0),
             id="job_global_snapshot",
@@ -559,7 +605,7 @@ def start_scheduler():
         )
 
         # Trait leaderboard snapshots (daily at 2:15 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_take_trait_snapshots,
             CronTrigger(hour=2, minute=15),
             id="job_trait_snapshots",
@@ -568,7 +614,7 @@ def start_scheduler():
         )
 
         # Community leaderboard snapshots (daily at 2:30 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_take_community_snapshots,
             CronTrigger(hour=2, minute=30),
             id="job_community_snapshots",
@@ -577,7 +623,7 @@ def start_scheduler():
         )
 
         # Old snapshot cleanup (daily at 3:00 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_cleanup_old_snapshots,
             CronTrigger(hour=3, minute=0),
             id="job_cleanup",
@@ -586,7 +632,7 @@ def start_scheduler():
         )
 
         # Check expired subscriptions (daily at 0:05 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_check_expired_subscriptions,
             CronTrigger(hour=0, minute=5),
             id="job_check_expired_subs",
@@ -595,7 +641,7 @@ def start_scheduler():
         )
 
         # Send renewal reminders (daily at 9:00 AM UTC)
-        _scheduler.add_job(
+        _addjob(
             _job_send_renewal_reminders,
             CronTrigger(hour=9, minute=0),
             id="job_renewal_reminders",
@@ -604,7 +650,7 @@ def start_scheduler():
         )
 
         # Check alert rules (every 15 minutes)
-        _scheduler.add_job(
+        _addjob(
             _job_check_alert_rules,
             IntervalTrigger(minutes=15),
             id="job_check_alert_rules",

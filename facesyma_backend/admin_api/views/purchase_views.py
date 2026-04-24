@@ -14,6 +14,10 @@ from admin_api.utils.auth import _require_admin
 from admin_api.utils.mongo import get_users_col, get_plan_log_col
 
 
+_VALID_PURCHASE_PLANS  = frozenset({'free', 'premium', 'tier_a', 'tier_b', 'tier_c', 'tier_d'})
+_PREMIUM_USER_PROJ     = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'date_joined': 1, 'auth_method': 1}
+
+
 def _json(request):
     """Request body JSON'ı parse et"""
     try:
@@ -45,9 +49,13 @@ class PremiumListView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 20)), 100)
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 20))), 100)
+        except (ValueError, TypeError):
+            page, limit = 1, 20
 
         col = get_users_col()
 
@@ -56,10 +64,7 @@ class PremiumListView(View):
         skip = (page - 1) * limit
 
         users = list(
-            col.find(
-                {'plan': 'premium'},
-                {'password': 0}
-            )
+            col.find({'plan': 'premium'}, _PREMIUM_USER_PROJ)
             .sort([('date_joined', -1)])
             .skip(skip)
             .limit(limit)
@@ -68,11 +73,11 @@ class PremiumListView(View):
         return JsonResponse({
             'premium_users': [
                 {
-                    'id': u.get('id'),
-                    'email': u.get('email'),
-                    'username': u.get('username'),
-                    'joined_at': str(u.get('date_joined', '')),
-                    'auth_method': u.get('auth_method'),
+                    'id': (_ug := u.get)('id'),
+                    'email': _ug('email'),
+                    'username': _ug('username'),
+                    'joined_at': str(_ug('date_joined', '')),
+                    'auth_method': _ug('auth_method'),
                 }
                 for u in users
             ],
@@ -86,7 +91,7 @@ class PremiumListView(View):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ── Plan İstatistikleri ───────────────────────────────────────────────────────
+# ── Plan Statleri ───────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -114,26 +119,21 @@ class PurchaseStatsView(View):
 
         col = get_users_col()
 
-        # Toplam kullanıcı
-        total = col.count_documents({})
+        _pf = next(col.aggregate([{'$facet': {
+            'total':            [{'$count': 'n'}],
+            'inactive_premium': [{'$match': {'plan': 'premium', 'is_active': False}}, {'$count': 'n'}],
+            'by_plan':          [{'$group': {'_id': '$plan', 'count': {'$sum': 1}}}],
+        }}]), {})
+        _pfget = _pf.get
+        total            = (_pfget('total',            [{}])[0] or {}).get('n', 0)
+        inactive_premium = (_pfget('inactive_premium', [{}])[0] or {}).get('n', 0)
+        plan_dict        = {doc['_id'] or 'free': doc['count'] for doc in _pfget('by_plan', [])}
 
-        # Plan dağılımı
-        plan_stats = col.aggregate([
-            {'$group': {'_id': '$plan', 'count': {'$sum': 1}}},
-        ])
-        plan_dict = {doc['_id'] or 'free': doc['count'] for doc in plan_stats}
+        _pdget = plan_dict.get
+        premium_count = _pdget('premium', 0)
+        free_count = _pdget('free', 0)
 
-        premium_count = plan_dict.get('premium', 0)
-        free_count = plan_dict.get('free', 0)
-
-        # Simüle edilmiş gelir (premium = $9.99/ay)
         estimated_monthly_revenue = premium_count * 9.99
-
-        # Churn rate (simüle: inactive premium / total premium)
-        inactive_premium = col.count_documents({
-            'plan': 'premium',
-            'is_active': False
-        })
         churn_rate = (inactive_premium / premium_count * 100) if premium_count > 0 else 0
 
         return JsonResponse({
@@ -172,18 +172,28 @@ class PlanChangeLogView(View):
         except PermissionError as e:
             return JsonResponse({'detail': str(e)}, status=403)
 
-        # Query params
-        page = max(1, int(request.GET.get('page', 1)))
-        limit = min(int(request.GET.get('limit', 50)), 200)
-        user_id = request.GET.get('user_id', None)
-        plan = request.GET.get('plan', None)
+        try:
+            _qp = request.GET
+            _qpget = _qp.get
+            page = max(1, int(_qpget('page', 1)))
+            limit = min(max(1, int(_qpget('limit', 50))), 200)
+        except (ValueError, TypeError):
+            page, limit = 1, 50
+        user_id = _qpget('user_id', None)
+        plan = _qpget('plan', None)
+
+        if plan and plan not in _VALID_PURCHASE_PLANS:
+            plan = None
 
         col = get_plan_log_col()
 
         # Query
         query = {}
         if user_id:
-            query['user_id'] = int(user_id)
+            try:
+                query['user_id'] = int(user_id)
+            except (ValueError, TypeError):
+                return JsonResponse({'detail': 'user_id must be an integer.'}, status=400)
         if plan:
             query['new_plan'] = plan
 

@@ -14,6 +14,8 @@ class Command(BaseCommand):
     help = 'Seed default alert rules into MongoDB'
 
     def handle(self, *args, **options):
+        _write = self.stdout.write
+        _style = self.style
         try:
             db = _get_db()
             rules_col = db['alert_rules']
@@ -53,20 +55,22 @@ class Command(BaseCommand):
             ]
 
             seeded_count = 0
+            _success = _style.SUCCESS
 
             for rule_data in default_rules:
+                _rdname = rule_data['name']
                 # Check if rule already exists by name
-                existing = rules_col.find_one({'name': rule_data['name']})
+                existing = rules_col.find_one({'name': _rdname})
                 if existing:
-                    self.stdout.write(
-                        self.style.WARNING(f'⊘ Skipped (exists): {rule_data["name"]}')
+                    _write(
+                        _style.WARNING(f'⊘ Skipped (exists): {_rdname}')
                     )
                     continue
 
                 # Create new rule
                 rule = {
                     'id': _next_id(rules_col),
-                    'name': rule_data['name'],
+                    'name': _rdname,
                     'description': rule_data['description'],
                     'metric': rule_data['metric'],
                     'condition': rule_data['condition'],
@@ -75,23 +79,23 @@ class Command(BaseCommand):
                     'cooldown_minutes': rule_data['cooldown_minutes'],
                     'notify_email': rule_data['notify_email'],
                     'last_triggered_at': None,
-                    'created_at': datetime.utcnow().isoformat(),
-                    'updated_at': datetime.utcnow().isoformat(),
+                    'created_at': (_ts := datetime.utcnow().isoformat()),
+                    'updated_at': _ts,
                 }
 
                 rules_col.insert_one(rule)
                 seeded_count += 1
 
-                self.stdout.write(
-                    self.style.SUCCESS(f'✓ Seeded: {rule_data["name"]}')
+                _write(
+                    _success(f'✓ Seeded: {_rdname}')
                 )
 
-            self.stdout.write(
-                self.style.SUCCESS(f'\n✓ Total seeded: {seeded_count} alert rules')
+            _write(
+                _success(f'\n✓ Total seeded: {seeded_count} alert rules')
             )
 
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'✗ Error seeding alert rules: {e}')
+            _write(
+                _style.ERROR(f'✗ Error seeding alert rules: {e}')
             )
             raise

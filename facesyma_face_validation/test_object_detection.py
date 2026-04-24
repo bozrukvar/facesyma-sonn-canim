@@ -44,20 +44,21 @@ def test_face_validation(image_path: str, test_name: str):
         print(f"✓ Response status: {response.status_code}")
         result = response.json()
 
+        _rget = result.get
         print(f"\n📊 Results:")
-        print(f"  Face Detected: {result.get('face_detected')}")
-        print(f"  Is Valid: {result.get('is_valid')}")
-        print(f"  Score: {result.get('score')}")
+        print(f"  Face Detected: {_rget('face_detected')}")
+        print(f"  Is Valid: {_rget('is_valid')}")
+        print(f"  Score: {_rget('score')}")
 
-        if result.get('detected_object'):
-            print(f"  🔍 Detected Object: {result.get('detected_object')}")
+        if _rget('detected_object'):
+            print(f"  🔍 Detected Object: {_rget('detected_object')}")
 
         print(f"\n💬 Issues:")
-        for issue in result.get('issues', []):
+        for issue in _rget('issues', []):
             print(f"  • {issue}")
 
         print(f"\n💡 Recommendations:")
-        for rec in result.get('recommendations', []):
+        for rec in _rget('recommendations', []):
             print(f"  • {rec}")
 
         return result

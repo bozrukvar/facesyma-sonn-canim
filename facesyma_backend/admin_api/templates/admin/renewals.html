@@ -302,9 +302,9 @@ async function loadStatus() {
                 const row = jobsTable.insertRow();
                 const nextRun = job.next_run_time ? new Date(job.next_run_time).toLocaleString('tr-TR') : 'N/A';
                 row.innerHTML = `
-                    <td>${job.id}</td>
-                    <td>${job.name}</td>
-                    <td>${nextRun}</td>
+                    <td>${escapeHtml(job.id)}</td>
+                    <td>${escapeHtml(job.name)}</td>
+                    <td>${escapeHtml(nextRun)}</td>
                 `;
             });
         } else {
@@ -319,9 +319,9 @@ async function loadStatus() {
             data.expiring_soon.forEach(user => {
                 const row = expiringTable.insertRow();
                 row.innerHTML = `
-                    <td>${user.user_id}</td>
-                    <td>${new Date(user.expires_date).toLocaleDateString('tr-TR')}</td>
-                    <td>${user.days_left} gün</td>
+                    <td>${escapeHtml(user.user_id)}</td>
+                    <td>${escapeHtml(new Date(user.expires_date).toLocaleDateString('tr-TR'))}</td>
+                    <td>${escapeHtml(user.days_left)} gün</td>
                 `;
             });
         } else {
@@ -337,11 +337,11 @@ async function loadStatus() {
                 const row = eventsTable.insertRow();
                 const eventDate = new Date(event.event_at || event.created_at).toLocaleString('tr-TR');
                 row.innerHTML = `
-                    <td>${eventDate}</td>
-                    <td><span style="background: #d4af37; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">${event.type}</span></td>
-                    <td>${event.user_id || '-'}</td>
-                    <td>${event.user_email || '-'}</td>
-                    <td style="font-size: 12px; color: #999;">${(event.detail || '').substring(0, 50)}...</td>
+                    <td>${escapeHtml(eventDate)}</td>
+                    <td><span style="background: #d4af37; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">${escapeHtml(event.type)}</span></td>
+                    <td>${escapeHtml(event.user_id || '-')}</td>
+                    <td>${escapeHtml(event.user_email || '-')}</td>
+                    <td style="font-size: 12px; color: #999;">${escapeHtml((event.detail || '').substring(0, 50))}...</td>
                 `;
             });
         } else {
@@ -365,8 +365,8 @@ async function triggerRenewalCheck() {
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = `
             <strong>✓ Başarılı!</strong><br>
-            ${data.message}<br>
-            <small>${data.expired_count} abonelik downgrade edildi.</small>
+            ${escapeHtml(data.message || '')}<br>
+            <small>${escapeHtml(String(data.expired_count ?? 0))} abonelik downgrade edildi.</small>
         `;
 
         // Reload status
@@ -402,11 +402,11 @@ async function loadEvents(page = 1) {
                 const row = eventsTable.insertRow();
                 const eventDate = new Date(event.event_at || event.created_at).toLocaleString('tr-TR');
                 row.innerHTML = `
-                    <td>${eventDate}</td>
-                    <td><span style="background: #d4af37; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">${event.type}</span></td>
-                    <td>${event.user_id || '-'}</td>
-                    <td>${event.user_email || '-'}</td>
-                    <td style="font-size: 12px; color: #999;">${(event.detail || '').substring(0, 50)}...</td>
+                    <td>${escapeHtml(eventDate)}</td>
+                    <td><span style="background: #d4af37; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">${escapeHtml(event.type)}</span></td>
+                    <td>${escapeHtml(event.user_id || '-')}</td>
+                    <td>${escapeHtml(event.user_email || '-')}</td>
+                    <td style="font-size: 12px; color: #999;">${escapeHtml((event.detail || '').substring(0, 50))}...</td>
                 `;
             });
         } else {
@@ -431,7 +431,7 @@ async function loadEvents(page = 1) {
         }
     } catch (error) {
         console.error('Load events error:', error);
-        document.getElementById('eventsTable').innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f44336;">Hata: ${error.message}</td></tr>`;
+        document.getElementById('eventsTable').innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f44336;">Hata: ${escapeHtml(error.message)}</td></tr>`;
     }
 }
 

@@ -7,7 +7,10 @@ Manages app status, configs, and generates per-app statistics.
 
 import json
 import logging
+import re as _re
 from datetime import datetime, timedelta
+
+_RE_FLAG_KEY = _re.compile(r'^[a-z_][a-z0-9_]{0,49}$')
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -93,36 +96,33 @@ class AppListView(View):
             users_col = get_users_col()
             history_col = get_history_col()
 
-            apps = list(registry_col.find({}, {'_id': 0}))
-            thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+            apps = list(registry_col.find({}, {'_id': 0}).limit(100))
+            _thirty_ago = datetime.utcnow() - timedelta(days=30)
+            thirty_days_ago = _thirty_ago.isoformat()
+            thirty_ago_ts = _thirty_ago.timestamp()
 
             result = []
             for app in apps:
                 app_id = app['app_id']
                 source_query = _get_source_query(app_id)
 
-                # User stats
-                total_users = users_col.count_documents(source_query)
-                active_users = users_col.count_documents({
-                    **source_query,
-                    'is_active': True
-                })
+                _uf = next(users_col.aggregate([{'$facet': {
+                    'total':    [{'$match': source_query},                                                   {'$count': 'n'}],
+                    'active':   [{'$match': {**source_query, 'is_active': True}},                           {'$count': 'n'}],
+                    'new_30d':  [{'$match': {**source_query, 'date_joined': {'$gte': thirty_days_ago}}},    {'$count': 'n'}],
+                }}]), {})
+                _ufget = _uf.get
+                total_users   = (_ufget('total',   [{}])[0] or {}).get('n', 0)
+                active_users  = (_ufget('active',  [{}])[0] or {}).get('n', 0)
+                new_users_30d = (_ufget('new_30d', [{}])[0] or {}).get('n', 0)
 
-                # Analysis stats (with backward compat for app_source)
-                analyses_total = history_col.count_documents(source_query)
-
-                # Last 30 days (Unix timestamp)
-                thirty_ago_ts = (datetime.utcnow() - timedelta(days=30)).timestamp()
-                analyses_30d = history_col.count_documents({
-                    **source_query,
-                    'created_at': {'$gte': thirty_ago_ts}
-                })
-
-                # New users last 30 days
-                new_users_30d = users_col.count_documents({
-                    **source_query,
-                    'date_joined': {'$gte': thirty_days_ago}
-                })
+                _hf = next(history_col.aggregate([{'$facet': {
+                    'total': [{'$match': source_query},                                                      {'$count': 'n'}],
+                    '30d':   [{'$match': {**source_query, 'created_at': {'$gte': thirty_ago_ts}}},           {'$count': 'n'}],
+                }}]), {})
+                _hfget = _hf.get
+                analyses_total = (_hfget('total', [{}])[0] or {}).get('n', 0)
+                analyses_30d   = (_hfget('30d',   [{}])[0] or {}).get('n', 0)
 
                 result.append({
                     **app,
@@ -139,7 +139,7 @@ class AppListView(View):
 
         except Exception as e:
             log.exception(f'App list error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ═════════════════════════════════════════════════════════════════════════════════
@@ -176,23 +176,27 @@ class AppDetailView(View):
             history_col = get_history_col()
 
             source_query = _get_source_query(app_id)
-            thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+            _thirty_ago = datetime.utcnow() - timedelta(days=30)
+            thirty_days_ago = _thirty_ago.isoformat()
+            thirty_ago_ts = _thirty_ago.timestamp()
 
-            total_users = users_col.count_documents(source_query)
-            active_users = users_col.count_documents({
-                **source_query,
-                'is_active': True
-            })
-            analyses_total = history_col.count_documents(source_query)
-            thirty_ago_ts = (datetime.utcnow() - timedelta(days=30)).timestamp()
-            analyses_30d = history_col.count_documents({
-                **source_query,
-                'created_at': {'$gte': thirty_ago_ts}
-            })
-            new_users_30d = users_col.count_documents({
-                **source_query,
-                'date_joined': {'$gte': thirty_days_ago}
-            })
+            _uf = next(users_col.aggregate([{'$facet': {
+                'total':   [{'$match': source_query},                                                  {'$count': 'n'}],
+                'active':  [{'$match': {**source_query, 'is_active': True}},                          {'$count': 'n'}],
+                'new_30d': [{'$match': {**source_query, 'date_joined': {'$gte': thirty_days_ago}}},   {'$count': 'n'}],
+            }}]), {})
+            _ufget = _uf.get
+            total_users   = (_ufget('total',   [{}])[0] or {}).get('n', 0)
+            active_users  = (_ufget('active',  [{}])[0] or {}).get('n', 0)
+            new_users_30d = (_ufget('new_30d', [{}])[0] or {}).get('n', 0)
+
+            _hf = next(history_col.aggregate([{'$facet': {
+                'total': [{'$match': source_query},                                                    {'$count': 'n'}],
+                '30d':   [{'$match': {**source_query, 'created_at': {'$gte': thirty_ago_ts}}},         {'$count': 'n'}],
+            }}]), {})
+            _hfget2 = _hf.get
+            analyses_total = (_hfget2('total', [{}])[0] or {}).get('n', 0)
+            analyses_30d   = (_hfget2('30d',   [{}])[0] or {}).get('n', 0)
 
             app['stats'] = {
                 'total_users': total_users,
@@ -206,7 +210,7 @@ class AppDetailView(View):
 
         except Exception as e:
             log.exception(f'App detail error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ═════════════════════════════════════════════════════════════════════════════════
@@ -245,14 +249,15 @@ class AppConfigUpdateView(View):
         try:
             data = _json(request)
             registry_col = get_app_registry_col()
+            _rcfo = registry_col.find_one
 
             # Check if app exists
-            app = registry_col.find_one({'app_id': app_id})
+            app = _rcfo({'app_id': app_id}, {'_id': 1})
             if not app:
                 return JsonResponse({'detail': 'App not found'}, status=404)
 
             # Build update operations (dot-notation for nested fields)
-            update_ops = {'updated_at': datetime.now().isoformat()}
+            update_ops = {'updated_at': datetime.utcnow().isoformat()}
 
             if 'maintenance_mode' in data:
                 update_ops['config.maintenance_mode'] = bool(data['maintenance_mode'])
@@ -260,13 +265,19 @@ class AppConfigUpdateView(View):
                 update_ops['config.maintenance_message'] = str(data['maintenance_message'])
             if 'min_version' in data:
                 update_ops['config.min_version'] = str(data['min_version'])
-            if 'status' in data and data['status'] in ('active', 'inactive', 'maintenance'):
-                update_ops['status'] = data['status']
+            if 'status' in data:
+                _dstatus = data['status']
+                if _dstatus in ('active', 'inactive', 'maintenance'):
+                    update_ops['status'] = _dstatus
 
             # Handle feature flags (merge, don't overwrite)
-            if 'feature_flags' in data and isinstance(data['feature_flags'], dict):
-                for flag, val in data['feature_flags'].items():
-                    update_ops[f'config.feature_flags.{flag}'] = bool(val)
+            if 'feature_flags' in data:
+                _dff = data['feature_flags']
+                if isinstance(_dff, dict):
+                    for flag, val in _dff.items():
+                        if not isinstance(flag, str) or not _RE_FLAG_KEY.match(flag):
+                            continue
+                        update_ops[f'config.feature_flags.{flag}'] = bool(val)
 
             if len(update_ops) > 1:  # If more than just updated_at
                 registry_col.update_one({'app_id': app_id}, {'$set': update_ops})
@@ -279,12 +290,14 @@ class AppConfigUpdateView(View):
             )
 
             # Return updated app
-            updated_app = registry_col.find_one({'app_id': app_id}, {'_id': 0})
+            updated_app = _rcfo({'app_id': app_id}, {'_id': 0})
+            if not updated_app:
+                return JsonResponse({'detail': 'App not found after update.'}, status=404)
             return JsonResponse({'app': updated_app, 'message': 'Config updated'})
 
         except Exception as e:
             log.exception(f'App config update error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
 # ═════════════════════════════════════════════════════════════════════════════════
@@ -343,62 +356,45 @@ class AppStatsView(View):
 
             now = datetime.utcnow()
             today_start = datetime(now.year, now.month, now.day).isoformat()
-            week_ago = (now - timedelta(days=7)).isoformat()
-            month_ago = (now - timedelta(days=30)).isoformat()
-            month_ago_ts = (now - timedelta(days=30)).timestamp()
+            _week_ago_dt  = now - timedelta(days=7)
+            _month_ago_dt = now - timedelta(days=30)
+            week_ago      = _week_ago_dt.isoformat()
+            month_ago     = _month_ago_dt.isoformat()
+            month_ago_ts  = _month_ago_dt.timestamp()
 
-            # User stats
-            total_users = users_col.count_documents(source_query)
-            active_users = users_col.count_documents({
-                **source_query,
-                'is_active': True
-            })
-            inactive_users = total_users - active_users
+            day_ago_ts  = (now - timedelta(days=1)).timestamp()
+            week_ago_ts = _week_ago_dt.timestamp()
 
-            # By plan
-            plan_stats = users_col.aggregate([
-                {'$match': source_query},
-                {'$group': {'_id': '$plan', 'count': {'$sum': 1}}}
-            ])
-            by_plan = {doc['_id'] or 'free': doc['count'] for doc in plan_stats}
+            _uf = next(users_col.aggregate([{'$facet': {
+                'total':        [{'$match': source_query},                                                    {'$count': 'n'}],
+                'active':       [{'$match': {**source_query, 'is_active': True}},                            {'$count': 'n'}],
+                'today':        [{'$match': {**source_query, 'date_joined': {'$gte': today_start}}},         {'$count': 'n'}],
+                'this_week':    [{'$match': {**source_query, 'date_joined': {'$gte': week_ago}}},            {'$count': 'n'}],
+                'by_plan':      [{'$match': source_query}, {'$group': {'_id': '$plan',        'count': {'$sum': 1}}}],
+                'by_auth':      [{'$match': source_query}, {'$group': {'_id': '$auth_method', 'count': {'$sum': 1}}}],
+            }}]), {})
+            _ufget = _uf.get
+            total_users          = (_ufget('total',     [{}])[0] or {}).get('n', 0)
+            active_users         = (_ufget('active',    [{}])[0] or {}).get('n', 0)
+            inactive_users       = total_users - active_users
+            registered_today     = (_ufget('today',     [{}])[0] or {}).get('n', 0)
+            registered_this_week = (_ufget('this_week', [{}])[0] or {}).get('n', 0)
+            by_plan              = {doc['_id'] or 'free': doc['count'] for doc in _ufget('by_plan', [])}
+            by_auth_method       = {doc['_id']: doc['count']           for doc in _ufget('by_auth', [])}
 
-            # By auth method
-            auth_stats = users_col.aggregate([
-                {'$match': source_query},
-                {'$group': {'_id': '$auth_method', 'count': {'$sum': 1}}}
-            ])
-            by_auth_method = {doc['_id']: doc['count'] for doc in auth_stats}
-
-            registered_today = users_col.count_documents({
-                **source_query,
-                'date_joined': {'$gte': today_start}
-            })
-            registered_this_week = users_col.count_documents({
-                **source_query,
-                'date_joined': {'$gte': week_ago}
-            })
-
-            # Analysis stats
-            total_analyses = history_col.count_documents(source_query)
-            today_analyses = history_col.count_documents({
-                **source_query,
-                'created_at': {'$gte': (datetime.utcnow()).timestamp() - 86400}  # Last 24 hours
-            })
-            week_analyses = history_col.count_documents({
-                **source_query,
-                'created_at': {'$gte': (now - timedelta(days=7)).timestamp()}
-            })
-            month_analyses = history_col.count_documents({
-                **source_query,
-                'created_at': {'$gte': month_ago_ts}
-            })
-
-            # By mode
-            mode_stats = history_col.aggregate([
-                {'$match': source_query},
-                {'$group': {'_id': '$mode', 'count': {'$sum': 1}}}
-            ])
-            by_mode = {doc['_id']: doc['count'] for doc in mode_stats}
+            _hf = next(history_col.aggregate([{'$facet': {
+                'total':   [{'$match': source_query},                                                                 {'$count': 'n'}],
+                'today':   [{'$match': {**source_query, 'created_at': {'$gte': day_ago_ts}}},                        {'$count': 'n'}],
+                'week':    [{'$match': {**source_query, 'created_at': {'$gte': week_ago_ts}}},                       {'$count': 'n'}],
+                'month':   [{'$match': {**source_query, 'created_at': {'$gte': month_ago_ts}}},                      {'$count': 'n'}],
+                'by_mode': [{'$match': source_query}, {'$group': {'_id': '$mode', 'count': {'$sum': 1}}}],
+            }}]), {})
+            _hfget = _hf.get
+            total_analyses  = (_hfget('total', [{}])[0] or {}).get('n', 0)
+            today_analyses  = (_hfget('today', [{}])[0] or {}).get('n', 0)
+            week_analyses   = (_hfget('week',  [{}])[0] or {}).get('n', 0)
+            month_analyses  = (_hfget('month', [{}])[0] or {}).get('n', 0)
+            by_mode         = {doc['_id']: doc['count'] for doc in _hfget('by_mode', [])}
 
             return JsonResponse({
                 'app_id': app_id,
@@ -424,4 +420,4 @@ class AppStatsView(View):
 
         except Exception as e:
             log.exception(f'App stats error: {e}')
-            return JsonResponse({'detail': str(e)}, status=500)
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

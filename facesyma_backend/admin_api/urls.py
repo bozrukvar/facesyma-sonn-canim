@@ -55,8 +55,7 @@ from admin_api.views.analytics_views import (
 )
 from admin_api.views.live_analytics_views import LiveStatsView
 from admin_api.views.payment_views import (
-    PaymentTransactionsView, PaymentWebhookStripeView, PaymentWebhookIyzicoView,
-    RefundView, PaymentStatsView, PaymentSettingsView
+    PaymentTransactionsView, RefundView, PaymentStatsView, PaymentSettingsView
 )
 from admin_api.views.subscription_views import (
     VerifySubscriptionView, SubscriptionStatusView, FeatureAccessView,
@@ -230,10 +229,8 @@ api_patterns = [
     path('audit/logs/', AuditLogListView.as_view(), name='audit-logs'),
     path('audit/stats/', AuditLogStatsView.as_view(), name='audit-stats'),
 
-    # Payment Integration (PHASE 1)
+    # Payment (Google Pay / Apple Pay — client-side; Vakıfbank VPP: TODO)
     path('payments/transactions/', PaymentTransactionsView.as_view(), name='payment-transactions'),
-    path('payments/webhook/stripe/', PaymentWebhookStripeView.as_view(), name='webhook-stripe'),
-    path('payments/webhook/iyzico/', PaymentWebhookIyzicoView.as_view(), name='webhook-iyzico'),
     path('payments/refund/', RefundView.as_view(), name='payment-refund'),
     path('payments/stats/', PaymentStatsView.as_view(), name='payment-stats'),
     path('payments/settings/', PaymentSettingsView.as_view(), name='payment-settings'),

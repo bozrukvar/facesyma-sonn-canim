@@ -5,7 +5,8 @@ Yardımcı fonksiyonlar - Veri dönüşümleri, validation
 """
 
 import logging
-from typing import Dict, List, Tuple, Optional
+from operator import itemgetter
+from typing import Dict, List, Tuple
 from datetime import datetime, timedelta
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ def get_user_sifat_scores(sifat_data: Dict) -> List[Tuple[str, float]]:
     ]
 
     # Skora göre sırala
-    sifats.sort(key=lambda x: x[1], reverse=True)
+    sifats.sort(key=itemgetter(1), reverse=True)
 
     return sifats
 
@@ -98,13 +99,17 @@ def format_recommendation_for_chat(
 
 def _format_recommendation_tr(recommendation: Dict) -> str:
     """Türkçe format"""
-    date = recommendation.get("date", "Bugün")
-    user_sifats = recommendation.get("user_sifats", [])
+    _rget = recommendation.get
+    date = _rget("date", "Bugün")
+    user_sifats = _rget("user_sifats", [])
     sifat_str = ", ".join(user_sifats) if user_sifats else "profil verileriniz"
 
-    breakfast = recommendation.get("breakfast", {})
-    lunch = recommendation.get("lunch", {})
-    dinner = recommendation.get("dinner", {})
+    breakfast = _rget("breakfast", {})
+    lunch = _rget("lunch", {})
+    dinner = _rget("dinner", {})
+    _bget = breakfast.get
+    _lget = lunch.get
+    _dget = dinner.get
 
     text = f"""
 🍽️ **{date} Beslenme Koçluğu**
@@ -112,16 +117,16 @@ def _format_recommendation_tr(recommendation: Dict) -> str:
 Sıfatlarınız: {sifat_str}
 
 **☀️ Sabah Öğünü:**
-🥣 {breakfast.get('name', 'N/A')}
-📝 {breakfast.get('reason', 'İyi bir seçim')}
+🥣 {_bget('name', 'N/A')}
+📝 {_bget('reason', 'İyi bir seçim')}
 
 **🌤️ Öğlen Öğünü:**
-🥗 {lunch.get('name', 'N/A')}
-📝 {lunch.get('reason', 'İyi bir seçim')}
+🥗 {_lget('name', 'N/A')}
+📝 {_lget('reason', 'İyi bir seçim')}
 
 **🌙 Akşam Öğünü:**
-🍲 {dinner.get('name', 'N/A')}
-📝 {dinner.get('reason', 'İyi bir seçim')}
+🍲 {_dget('name', 'N/A')}
+📝 {_dget('reason', 'İyi bir seçim')}
 
 💡 *Alternatif tavsiyeleri görmek için "başka seçenekler" yazabilirsiniz*
 """
@@ -130,13 +135,17 @@ Sıfatlarınız: {sifat_str}
 
 def _format_recommendation_en(recommendation: Dict) -> str:
     """İngilizce format"""
-    date = recommendation.get("date", "Today")
-    user_sifats = recommendation.get("user_sifats", [])
+    _rget = recommendation.get
+    date = _rget("date", "Today")
+    user_sifats = _rget("user_sifats", [])
     sifat_str = ", ".join(user_sifats) if user_sifats else "your profile"
 
-    breakfast = recommendation.get("breakfast", {})
-    lunch = recommendation.get("lunch", {})
-    dinner = recommendation.get("dinner", {})
+    breakfast = _rget("breakfast", {})
+    lunch = _rget("lunch", {})
+    dinner = _rget("dinner", {})
+    _bget = breakfast.get
+    _lget = lunch.get
+    _dget = dinner.get
 
     text = f"""
 🍽️ **{date} Meal Recommendations**
@@ -144,16 +153,16 @@ def _format_recommendation_en(recommendation: Dict) -> str:
 Your traits: {sifat_str}
 
 **☀️ Breakfast:**
-🥣 {breakfast.get('name', 'N/A')}
-📝 {breakfast.get('reason', 'A great choice')}
+🥣 {_bget('name', 'N/A')}
+📝 {_bget('reason', 'A great choice')}
 
 **🌤️ Lunch:**
-🥗 {lunch.get('name', 'N/A')}
-📝 {lunch.get('reason', 'A great choice')}
+🥗 {_lget('name', 'N/A')}
+📝 {_lget('reason', 'A great choice')}
 
 **🌙 Dinner:**
-🍲 {dinner.get('name', 'N/A')}
-📝 {dinner.get('reason', 'A great choice')}
+🍲 {_dget('name', 'N/A')}
+📝 {_dget('reason', 'A great choice')}
 
 💡 *Type "other options" to see alternatives*
 """
@@ -173,10 +182,11 @@ def calculate_daily_nutrition(meals: List[Dict]) -> Dict:
 
     for meal in meals:
         nutrition = meal.get("nutrition", {})
-        total_calories += nutrition.get("calories", 0)
-        total_protein += nutrition.get("protein_g", 0)
-        total_carbs += nutrition.get("carbs_g", 0)
-        total_fat += nutrition.get("fat_g", 0)
+        _nutget = nutrition.get
+        total_calories += _nutget("calories", 0)
+        total_protein += _nutget("protein_g", 0)
+        total_carbs += _nutget("carbs_g", 0)
+        total_fat += _nutget("fat_g", 0)
 
     return {
         "total_calories": total_calories,
@@ -191,29 +201,38 @@ def calculate_daily_nutrition(meals: List[Dict]) -> Dict:
 
 def format_nutrition_info(nutrition: Dict, language: str = "tr") -> str:
     """Beslenme bilgisini formatla"""
+    _nget  = nutrition.get
+    _cal   = _nget('total_calories', 0)
+    _prot  = _nget('total_protein', 0)
+    _pp    = _nget('protein_percent', 0)
+    _carbs = _nget('total_carbs', 0)
+    _cp    = _nget('carbs_percent', 0)
+    _fat   = _nget('total_fat', 0)
+    _fp    = _nget('fat_percent', 0)
     if language == "tr":
         return f"""
 📊 **Günlük Beslenme Özeti:**
-- Kalori: {nutrition.get('total_calories', 0)} kcal
-- Protein: {nutrition.get('total_protein', 0):.1f}g ({nutrition.get('protein_percent', 0)}%)
-- Karbonhidrat: {nutrition.get('total_carbs', 0):.1f}g ({nutrition.get('carbs_percent', 0)}%)
-- Yağ: {nutrition.get('total_fat', 0):.1f}g ({nutrition.get('fat_percent', 0)}%)
+- Kalori: {_cal} kcal
+- Protein: {_prot:.1f}g ({_pp}%)
+- Karbonhidrat: {_carbs:.1f}g ({_cp}%)
+- Yağ: {_fat:.1f}g ({_fp}%)
 """
     else:
         return f"""
 📊 **Daily Nutrition Summary:**
-- Calories: {nutrition.get('total_calories', 0)} kcal
-- Protein: {nutrition.get('total_protein', 0):.1f}g ({nutrition.get('protein_percent', 0)}%)
-- Carbs: {nutrition.get('total_carbs', 0):.1f}g ({nutrition.get('carbs_percent', 0)}%)
-- Fat: {nutrition.get('total_fat', 0):.1f}g ({nutrition.get('fat_percent', 0)}%)
+- Calories: {_cal} kcal
+- Protein: {_prot:.1f}g ({_pp}%)
+- Carbs: {_carbs:.1f}g ({_cp}%)
+- Fat: {_fat:.1f}g ({_fp}%)
 """
 
 
 def log_recommendation(user_id: int, date: str, meals: Dict) -> None:
     """Tavsiyeyi loglama"""
-    breakfast = meals.get("breakfast", {}).get("name", "N/A")
-    lunch = meals.get("lunch", {}).get("name", "N/A")
-    dinner = meals.get("dinner", {}).get("name", "N/A")
+    _mget = meals.get
+    breakfast = _mget("breakfast", {}).get("name", "N/A")
+    lunch = _mget("lunch", {}).get("name", "N/A")
+    dinner = _mget("dinner", {}).get("name", "N/A")
 
     log.info(
         f"Recommendation for user {user_id} ({date}): "

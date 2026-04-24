@@ -260,16 +260,13 @@
             alert.classList.remove('show');
 
             try {
-                console.log('🔐 Logging in with:', email);
                 const response = await fetch('/api/v1/admin/auth/login/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
-                console.log('📡 Response status:', response.status);
                 const data = await response.json();
-                console.log('📦 Response data:', data);
 
                 if (!response.ok) {
                     const errorMsg = data.detail || 'Giriş başarısız';
@@ -280,6 +277,8 @@
                 // Token kaydet
                 console.log('💾 Saving token...');
                 localStorage.setItem('admin_token', data.access);
+                // Server-side HTML auth guard için session cookie
+                document.cookie = 'admin_session=1; path=/; SameSite=Strict';
                 console.log('✅ Token saved, redirecting to /admin/');
 
                 // Biraz bekle ve yönlendir

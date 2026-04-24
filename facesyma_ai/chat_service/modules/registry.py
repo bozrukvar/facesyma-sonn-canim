@@ -63,8 +63,9 @@ class ModuleRegistry:
         """
         lines = []
         for module in self.get_all():
-            display = module.get("display", {}).get(lang, module["name"])
-            desc = module.get("description", {}).get(lang, "")
+            _mget = module.get
+            display = _mget("display", {}).get(lang, module["name"])
+            desc = _mget("description", {}).get(lang, "")
             lines.append(f"- {display}: {desc}")
 
         return "\n".join(lines)
@@ -75,7 +76,8 @@ class ModuleRegistry:
         for module in self.get_all():
             keywords = module.get("trigger_keywords", {}).get(lang, [])
             for kw in keywords:
-                if kw.lower() in keyword_lower or keyword_lower in kw.lower():
+                _kw_lower = kw.lower()
+                if _kw_lower in keyword_lower or keyword_lower in _kw_lower:
                     return module
         return None
 

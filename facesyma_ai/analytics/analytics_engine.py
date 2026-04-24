@@ -5,6 +5,7 @@ Tracks personality insights, conversation patterns, and user behavior
 import json
 import os
 from datetime import datetime
+from operator import itemgetter, attrgetter
 from typing import Dict, List, Any, Optional
 from collections import defaultdict
 import logging
@@ -47,13 +48,14 @@ class AnalyticsEngine:
             try:
                 with open(self.analytics_db_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
+                    _dget = data.get
                     # Load insights
-                    for user_id, user_insights in data.get("insights", {}).items():
+                    for user_id, user_insights in _dget("insights", {}).items():
                         for insight_data in user_insights:
                             insight = PersonalityInsight(**insight_data)
                             self.insights[user_id].append(insight)
                     # Load metrics
-                    for user_id, metrics_data in data.get("metrics", {}).items():
+                    for user_id, metrics_data in _dget("metrics", {}).items():
                         metrics = ConversationMetrics(user_id)
                         metrics.__dict__.update(metrics_data)
                         self.metrics[user_id] = metrics
@@ -104,10 +106,11 @@ class AnalyticsEngine:
     def record_conversation(self, user_id: str, category: str, module: str,
                            language: str, message_count: int = 1):
         """Record conversation metrics"""
-        if user_id not in self.metrics:
-            self.metrics[user_id] = ConversationMetrics(user_id)
+        _met = self.metrics
+        if user_id not in _met:
+            _met[user_id] = ConversationMetrics(user_id)
 
-        metrics = self.metrics[user_id]
+        metrics = _met[user_id]
         metrics.total_conversations += 1
         metrics.total_messages += message_count
         metrics.favorite_categories[category] += 1
@@ -115,8 +118,9 @@ class AnalyticsEngine:
         metrics.languages_used[language] += 1
 
         # Calculate engagement (0-100)
-        metrics.engagement_score = min(100, (metrics.total_conversations * 5) +
-                                       (metrics.total_messages * 0.5))
+        _mtc = metrics.total_conversations
+        _mtm = metrics.total_messages
+        metrics.engagement_score = min(100, (_mtc * 5) + (_mtm * 0.5))
         self.save_analytics()
 
     def get_user_insights(self, user_id: str) -> Dict[str, Any]:
@@ -142,7 +146,7 @@ class AnalyticsEngine:
                     "insight": i.insight,
                     "confidence": i.confidence
                 }
-                for i in sorted(user_insights, key=lambda x: x.timestamp, reverse=True)[:10]
+                for i in sorted(user_insights, key=attrgetter('timestamp'), reverse=True)[:10]
             ]
         }
 
@@ -156,9 +160,9 @@ class AnalyticsEngine:
             "total_conversations": metrics.total_conversations,
             "total_messages": metrics.total_messages,
             "favorite_categories": dict(sorted(metrics.favorite_categories.items(),
-                                              key=lambda x: x[1], reverse=True)[:5]),
+                                              key=itemgetter(1), reverse=True)[:5]),
             "favorite_modules": dict(sorted(metrics.favorite_modules.items(),
-                                           key=lambda x: x[1], reverse=True)[:5]),
+                                           key=itemgetter(1), reverse=True)[:5]),
             "languages_used": dict(metrics.languages_used),
             "engagement_score": metrics.engagement_score
         }
@@ -166,7 +170,7 @@ class AnalyticsEngine:
     def get_top_insights(self, user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
         """Get top insights by confidence"""
         user_insights = self.insights.get(user_id, [])
-        sorted_insights = sorted(user_insights, key=lambda x: x.confidence, reverse=True)
+        sorted_insights = sorted(user_insights, key=attrgetter('confidence'), reverse=True)
 
         return [
             {
@@ -186,13 +190,13 @@ class AnalyticsEngine:
         if not insights or not metrics:
             return {"error": "Insufficient data"}
 
+        _eng = metrics["engagement_score"]
         return {
             "user_id": user_id,
             "total_insights": insights["total_insights"],
             "dominant_categories": list(insights["by_category"].keys())[:3],
-            "engagement_level": "high" if metrics["engagement_score"] > 70 else
-                               "medium" if metrics["engagement_score"] > 40 else "low",
-            "engagement_score": metrics["engagement_score"],
+            "engagement_level": "high" if _eng > 70 else "medium" if _eng > 40 else "low",
+            "engagement_score": _eng,
             "favorite_modules": list(metrics["favorite_modules"].keys())[:3],
             "primary_languages": list(metrics["languages_used"].keys()),
             "top_insights": self.get_top_insights(user_id, limit=5),

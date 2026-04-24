@@ -1,79 +1,120 @@
 /**
  * imageQuality.ts
  * ================
- * Fotoğraf kalitesi kontrolü:
- * 1. Brightness (parlaklık)
- * 2. Contrast (kontrast)
- * 3. Face Centering (yüz konumu)
+ * Fotoğraf kalitesi kontrolü — gerçek image metadata kullanarak
+ *
+ * Önceki sorun: tüm hesaplamalar Math.random() ile yapılıyordu.
+ * Şimdi: fileSize, width, height gibi gerçek değerlerden türetilir.
+ *
+ * Metrikler:
+ * 1. Parlaklık tahmini  → bytes/pixel oranı (dosya yoğunluğu proxy)
+ * 2. Kontrast tahmini   → çözünürlük (yüksek çözünürlük = daha fazla detay)
+ * 3. Yüz konumu tahmini → en-boy oranı (portrait = yüz merkezli)
  */
 
-import { Image, ImageSourcePropType } from 'react-native';
+import { Image } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import { t } from './i18n';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface ImageQualityResult {
-  overall_score: number;        // 0-100
+  overall_score: number;
   brightness: {
-    value: number;              // 0-255
-    score: number;              // 0-100
+    value: number;    // 0-255
+    score: number;    // 0-100
     status: 'good' | 'dark' | 'bright';
   };
   contrast: {
-    value: number;              // 0-100
-    score: number;              // 0-100
+    value: number;    // 0-100
+    score: number;    // 0-100
     status: 'good' | 'low' | 'high';
   };
   face_centering: {
-    offset_x: number;           // % offset
-    offset_y: number;           // % offset
-    score: number;              // 0-100
+    offset_x: number;
+    offset_y: number;
+    score: number;
     status: 'centered' | 'off_center';
   };
-  recommendation: string;        // Kullanıcıya göster
-  can_upload: boolean;          // Score >= 60
+  recommendation: string;
+  can_upload: boolean;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BRIGHTNESS CALCULATION
-// ─────────────────────────────────────────────────────────────────────────────
+export interface PickerImageMeta {
+  width?: number;
+  height?: number;
+  fileSize?: number;
+}
 
-export async function calculateBrightness(imageUri: string): Promise<number> {
+// ── Gerçek Metadata Çekme ─────────────────────────────────────────────────────
+
+interface ResolvedMeta {
+  width: number;
+  height: number;
+  fileSize: number;
+}
+
+async function resolveMetadata(
+  uri: string,
+  hint?: PickerImageMeta
+): Promise<ResolvedMeta> {
+  // ImagePicker'dan gelen metadata varsa kullan (en doğru)
+  if (hint?.width && hint?.height && hint?.fileSize) {
+    return {
+      width:    hint.width,
+      height:   hint.height,
+      fileSize: hint.fileSize,
+    };
+  }
+
+  // Yoksa filesystem'den çek
+  const [dims, fileInfo] = await Promise.all([
+    new Promise<{ width: number; height: number }>((resolve) => {
+      Image.getSize(
+        uri,
+        (w, h) => resolve({ width: w, height: h }),
+        ()     => resolve({ width: 480, height: 640 })   // safe fallback
+      );
+    }),
+    FileSystem.getInfoAsync(uri, { size: true }).catch(() => ({ size: 0 })),
+  ]);
+
+  return {
+    width:    hint?.width    ?? dims.width,
+    height:   hint?.height   ?? dims.height,
+    fileSize: hint?.fileSize ?? ((fileInfo as { size?: number }).size ?? 0),
+  };
+}
+
+// ── Parlaklık (bytes/pixel proxy) ─────────────────────────────────────────────
+
+export async function calculateBrightness(
+  imageUri: string,
+  meta?: ResolvedMeta
+): Promise<number> {
   /**
-   * Fotoğrafın ortalama parlaklığını hesapla
+   * Parlaklık proxy: bytes / pixel oranı
    *
-   * Yöntem: Image URI'dan base64 çekerek pixel analizi
+   * Düşük sıkıştırma (yüksek bpp) → zengin detay → iyi aydınlatma
+   * Tipik JPEG %85: 0.10 – 0.50 bpp
+   *   < 0.08 bpp: muhtemelen çok karanlık / düz
+   *   0.08 – 0.18: kabul edilebilir
+   *   0.18 – 0.45: iyi
    *
-   * Returns: 0-255 (0=çok karanlık, 255=çok parlak, 100-150=ideal)
+   * Çıktı aralığı: 40 – 210 (0-255 skalasında makul)
    */
   try {
-    // Base64 olarak oku
-    const base64 = await FileSystem.readAsStringAsync(imageUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+    const resolved = meta ?? await resolveMetadata(imageUri);
+    if (!resolved.fileSize || !resolved.width || !resolved.height) return 130;
 
-    // Image meta bilgisini al
-    return new Promise((resolve) => {
-      Image.getSize(imageUri, (width, height) => {
-        // Pixellerden sample al ve brightness hesapla
-        // Not: Mobile'da direct pixel access sınırlı, alternatif:
-        // - Backend'e göndererek analiz et (daha doğru)
-        // - Veya heuristic kullan (URI bilgisinden)
+    const pixels = resolved.width * resolved.height;
+    const bpp    = resolved.fileSize / pixels;
 
-        // Heuristic approach: File size ile tahmin et
-        const estimatedBrightness = Math.min(
-          255,
-          Math.max(0, 100 + (Math.random() * 50 - 25))
-        );
-
-        resolve(estimatedBrightness);
-      });
-    });
-  } catch (error) {
-    console.warn('Brightness calculation failed:', error);
-    return 150; // Default safe value
+    // 0.05 – 0.50 bpp → 40 – 210
+    const norm = Math.min(1, Math.max(0, (bpp - 0.05) / 0.45));
+    return Math.round(40 + norm * 170);
+  } catch {
+    return 130;
   }
 }
 
@@ -82,16 +123,6 @@ export function scoreBrightness(brightness: number): {
   status: 'good' | 'dark' | 'bright';
   message: string;
 } {
-  /**
-   * Parlaklık değerini 0-100 puanına dönüştür
-   *
-   * Ranges:
-   * - 0-40: Çok karanlık (dark)
-   * - 40-80: Uygun (good)
-   * - 80-200: İdeal (good)
-   * - 200-255: Çok parlak (bright)
-   */
-
   if (brightness < 40) {
     return {
       score: Math.max(0, (brightness / 40) * 50),
@@ -99,7 +130,6 @@ export function scoreBrightness(brightness: number): {
       message: '📸 Çok karanlık! Daha aydınlık yere git',
     };
   }
-
   if (brightness < 80) {
     return {
       score: 50 + ((brightness - 40) / 40) * 25,
@@ -107,7 +137,6 @@ export function scoreBrightness(brightness: number): {
       message: '📸 Biraz karanlık ama kabul edilebilir',
     };
   }
-
   if (brightness <= 200) {
     return {
       score: 100,
@@ -115,7 +144,6 @@ export function scoreBrightness(brightness: number): {
       message: '✅ Mükemmel aydınlatma!',
     };
   }
-
   if (brightness <= 240) {
     return {
       score: 100 - ((brightness - 200) / 40) * 25,
@@ -123,7 +151,6 @@ export function scoreBrightness(brightness: number): {
       message: '📸 Biraz parlak ama kabul edilebilir',
     };
   }
-
   return {
     score: Math.max(0, 100 - ((brightness - 240) / 15) * 50),
     status: 'bright',
@@ -131,30 +158,29 @@ export function scoreBrightness(brightness: number): {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTRAST CALCULATION
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Kontrast (çözünürlük proxy) ───────────────────────────────────────────────
 
-export async function calculateContrast(imageUri: string): Promise<number> {
+export async function calculateContrast(
+  imageUri: string,
+  meta?: ResolvedMeta
+): Promise<number> {
   /**
-   * Fotoğrafın kontrast seviyesini hesapla
+   * Kontrast proxy: minimum boyut (min(width, height))
    *
-   * Kontrast = (Max - Min) / (Max + Min) * 100
+   * Yüksek çözünürlük → daha fazla detay → genellikle iyi kontrast
+   *   200px → ~25
+   *   500px → ~51
+   *   900px → ~85
    *
-   * Returns: 0-100 (0=hiç kontrast, 50+=iyi kontrast, 100=maximum)
+   * Formül: 25 + ((minDim - 200) / 700) * 60   (clamp 15-90)
    */
   try {
-    // Base64 oku
-    const base64 = await FileSystem.readAsStringAsync(imageUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-
-    // Heuristic: File size'dan tahmin et (gerçek implementasyon için backend kullan)
-    const estimatedContrast = Math.min(100, 50 + Math.random() * 30);
-    return estimatedContrast;
-  } catch (error) {
-    console.warn('Contrast calculation failed:', error);
-    return 60; // Default safe value
+    const resolved = meta ?? await resolveMetadata(imageUri);
+    const minDim   = Math.min(resolved.width || 400, resolved.height || 500);
+    const value    = 25 + ((minDim - 200) / 700) * 60;
+    return Math.min(90, Math.max(15, Math.round(value)));
+  } catch {
+    return 55;
   }
 }
 
@@ -163,15 +189,6 @@ export function scoreContrast(contrast: number): {
   status: 'good' | 'low' | 'high';
   message: string;
 } {
-  /**
-   * Kontrast değerini 0-100 puanına dönüştür
-   *
-   * Ranges:
-   * - 0-30: Çok düşük kontrast (low) - renksiz
-   * - 30-70: İyi kontrast (good) - ideal
-   * - 70-100: Yüksek kontrast (high) - ama kabul edilebilir
-   */
-
   if (contrast < 30) {
     return {
       score: (contrast / 30) * 50,
@@ -179,7 +196,6 @@ export function scoreContrast(contrast: number): {
       message: '📸 Kontrast çok düşük, renk kaybı var',
     };
   }
-
   if (contrast <= 70) {
     return {
       score: 50 + ((contrast - 30) / 40) * 50,
@@ -187,7 +203,6 @@ export function scoreContrast(contrast: number): {
       message: '✅ Kontrast iyi!',
     };
   }
-
   return {
     score: 100,
     status: 'high',
@@ -195,182 +210,145 @@ export function scoreContrast(contrast: number): {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FACE CENTERING CHECK
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Yüz Konumu (en-boy oranı proxy) ──────────────────────────────────────────
 
-export async function calculateFaceCentering(imageUri: string): Promise<{
-  offset_x: number;
-  offset_y: number;
-}> {
+export async function calculateFaceCentering(
+  imageUri: string,
+  meta?: ResolvedMeta
+): Promise<{ offset_x: number; offset_y: number }> {
   /**
-   * Yüzün görüntü içindeki konumunu kontrol et
+   * Yüz konumu proxy: en-boy oranı
    *
-   * Returns:
-   * - offset_x: % -50 (solda) to +50 (sağda)
-   * - offset_y: % -50 (üstte) to +50 (altta)
+   * Selfie/portre: ratio 0.60 – 0.95 → yüz genellikle ortada
+   * Manzara (ratio > 1.4): yüz muhtemelen kenarda (offset_x yüksek)
+   * Çok uzun (ratio < 0.45): yüz muhtemelen üstte
    *
-   * İdeal: offset_x ve offset_y < 15%
+   * İdeal: ratio ≈ 0.75 (standart selfie)
    */
   try {
-    return new Promise((resolve) => {
-      Image.getSize(imageUri, (width, height) => {
-        // Heuristic: Kameradan çekilen fotoğraflar genelde düz gelir
-        // Gerçek implementasyon için: Face detection + calculate center
+    const resolved    = meta ?? await resolveMetadata(imageUri);
+    const w           = resolved.width  || 480;
+    const h           = resolved.height || 640;
+    const ratio       = w / h;
+    const idealRatio  = 0.75;
 
-        // Safe default (centered)
-        resolve({
-          offset_x: Math.random() * 20 - 10,  // -10 to +10
-          offset_y: Math.random() * 20 - 10,  // -10 to +10
-        });
-      });
-    });
-  } catch (error) {
-    console.warn('Face centering calculation failed:', error);
-    return { offset_x: 0, offset_y: 0 }; // Assume centered
+    // Yatay offset: geniş karelerde yüz kenarda olabilir
+    const offset_x = Math.round(
+      Math.min(35, Math.max(-35, (ratio - idealRatio) * 30))
+    );
+
+    // Dikey offset: çok uzun karelerde yüz üstte/altta olabilir
+    let offset_y = 0;
+    if (ratio < 0.50) offset_y = 18;
+    else if (ratio > 1.30) offset_y = -12;
+    else offset_y = Math.round((idealRatio - ratio) * 5);
+
+    return { offset_x, offset_y };
+  } catch {
+    return { offset_x: 0, offset_y: 0 };
   }
 }
 
-export function scoreCentering(offset_x: number, offset_y: number): {
+export function scoreCentering(
+  offset_x: number,
+  offset_y: number
+): {
   score: number;
   status: 'centered' | 'off_center';
   message: string;
 } {
-  /**
-   * Yüz konumunu puanla
-   *
-   * Ideal: offset < 15% (±15%)
-   * Kabul edilebilir: < 25%
-   * Reddedilecek: >= 25%
-   */
+  const maxOffset = Math.max(Math.abs(offset_x), Math.abs(offset_y));
 
-  const max_offset = Math.max(Math.abs(offset_x), Math.abs(offset_y));
-
-  if (max_offset <= 15) {
+  if (maxOffset <= 15) {
     return {
       score: 100,
       status: 'centered',
       message: '✅ Yüz mükemmel ortalı!',
     };
   }
-
-  if (max_offset <= 25) {
+  if (maxOffset <= 25) {
     return {
       score: 70,
       status: 'centered',
-      message: '📸 Yüz biraz dışarı ama kabul edilebilir',
+      message: '📸 Yüz biraz dışarıda ama kabul edilebilir',
     };
   }
-
   return {
-    score: Math.max(0, 100 - (max_offset - 25) * 5),
+    score: Math.max(0, 100 - (maxOffset - 25) * 5),
     status: 'off_center',
     message: '⚠️ Yüzü çerçevenin ortasına al',
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// OVERALL QUALITY SCORE
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Ana Kalite Fonksiyonu ─────────────────────────────────────────────────────
 
 export async function validateImageQuality(
-  imageUri: string
+  imageUri: string,
+  pickerMeta?: PickerImageMeta,
+  lang = 'tr'
 ): Promise<ImageQualityResult> {
   /**
-   * Tüm kontrolleri yap ve genel kalite puanı hesapla
+   * Tüm kontrolleri yap — gerçek metadata ile
    *
-   * Formula: (brightness_score*25 + contrast_score*25 + centering_score*50) / 100
-   *
-   * Threshold:
-   * - >= 60: Upload yapılabilir
-   * - < 60: Uyarı göster, tekrar çek öner
+   * Formula: (brightness*25 + contrast*25 + centering*50) / 100
+   * Eşik:   >= 60 → yüklenebilir
    */
 
-  // Calculate metrics
-  const brightness = await calculateBrightness(imageUri);
-  const contrast = await calculateContrast(imageUri);
-  const { offset_x, offset_y } = await calculateFaceCentering(imageUri);
+  // Metadata bir kez çek, tüm fonksiyonlara geçir
+  const meta = await resolveMetadata(imageUri, pickerMeta);
 
-  // Score each metric
-  const brightness_result = scoreBrightness(brightness);
-  const contrast_result = scoreContrast(contrast);
-  const centering_result = scoreCentering(offset_x, offset_y);
+  const brightnessVal              = await calculateBrightness(imageUri, meta);
+  const contrastVal                = await calculateContrast(imageUri, meta);
+  const { offset_x, offset_y }     = await calculateFaceCentering(imageUri, meta);
 
-  // Overall score (weighted average)
+  const brightnessResult = scoreBrightness(brightnessVal);
+  const contrastResult   = scoreContrast(contrastVal);
+  const centeringResult  = scoreCentering(offset_x, offset_y);
+
   const overall_score = Math.round(
-    brightness_result.score * 0.25 + // 25%
-    contrast_result.score * 0.25 +   // 25%
-    centering_result.score * 0.5      // 50%
+    brightnessResult.score * 0.25 +
+    contrastResult.score   * 0.25 +
+    centeringResult.score  * 0.50
   );
 
-  // Recommendation
-  let recommendation = '';
-  if (overall_score >= 80) {
-    recommendation = '🎯 Mükemmel! Hemen yükle';
-  } else if (overall_score >= 60) {
-    recommendation = '✅ Kabul edilebilir, yüklemeye hazır';
-  } else if (overall_score >= 40) {
-    recommendation = '⚠️ Kalitesi düşük, daha iyi çek';
-  } else {
-    recommendation = '❌ Çok kötü, yeniden çek';
-  }
+  let recommendation: string;
+  if (overall_score >= 80)      recommendation = t('quality.rec_excellent', lang);
+  else if (overall_score >= 60) recommendation = t('quality.rec_acceptable', lang);
+  else if (overall_score >= 40) recommendation = t('quality.rec_low', lang);
+  else                          recommendation = t('quality.rec_bad', lang);
 
   return {
     overall_score,
     brightness: {
-      value: Math.round(brightness),
-      score: brightness_result.score,
-      status: brightness_result.status,
+      value:  Math.round(brightnessVal),
+      score:  brightnessResult.score,
+      status: brightnessResult.status,
     },
     contrast: {
-      value: Math.round(contrast),
-      score: contrast_result.score,
-      status: contrast_result.status,
+      value:  Math.round(contrastVal),
+      score:  contrastResult.score,
+      status: contrastResult.status,
     },
     face_centering: {
-      offset_x: Math.round(offset_x),
-      offset_y: Math.round(offset_y),
-      score: centering_result.score,
-      status: centering_result.status,
+      offset_x,
+      offset_y,
+      score:  centeringResult.score,
+      status: centeringResult.status,
     },
     recommendation,
     can_upload: overall_score >= 60,
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER: Türkçe mesajlar
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Yardımcı: Türkçe kalite mesajı ───────────────────────────────────────────
 
-export function getQualityMessage(score: number): {
+export function getQualityMessage(score: number, lang = 'tr'): {
   title: string;
   color: string;
   emoji: string;
 } {
-  if (score >= 80) {
-    return {
-      title: 'Mükemmel Kalite',
-      color: '#2ecc71',  // Green
-      emoji: '✅',
-    };
-  }
-  if (score >= 60) {
-    return {
-      title: 'İyi Kalite',
-      color: '#f39c12',  // Orange
-      emoji: '👍',
-    };
-  }
-  if (score >= 40) {
-    return {
-      title: 'Düşük Kalite',
-      color: '#e74c3c',  // Red
-      emoji: '⚠️',
-    };
-  }
-  return {
-    title: 'Çok Kötü Kalite',
-    color: '#c0392b',  // Dark Red
-    emoji: '❌',
-  };
+  if (score >= 80) return { title: t('quality.excellent', lang), color: '#2ecc71', emoji: '✅' };
+  if (score >= 60) return { title: t('quality.good', lang),      color: '#f39c12', emoji: '👍' };
+  if (score >= 40) return { title: t('quality.low', lang),       color: '#e74c3c', emoji: '⚠️' };
+  return               { title: t('quality.very_low', lang),  color: '#c0392b', emoji: '❌' };
 }

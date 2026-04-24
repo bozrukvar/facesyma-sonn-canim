@@ -44,9 +44,9 @@ class TestCompatibilityCheckEndpoint(TestCase):
         mock_load.return_value = (mock_calc, None)
 
         user1 = {'id': 1, 'username': 'Ali', 'golden_ratio': 1.618,
-                'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+                'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
         user2 = {'id': 2, 'username': 'Ayşe', 'golden_ratio': 1.620,
-                'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+                'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
 
         mock_profile.side_effect = [user1, user2]
         mock_col.return_value = MagicMock()
@@ -59,11 +59,12 @@ class TestCompatibilityCheckEndpoint(TestCase):
         )
 
         # Verify response
-        self.assertEqual(response.status_code, 200)
+        _aeq = self.assertEqual
+        _aeq(response.status_code, 200)
         data = json.loads(response.content)
         self.assertTrue(data['success'])
-        self.assertEqual(data['data']['score'], 78.5)
-        self.assertEqual(data['data']['category'], 'UYUMLU')
+        _aeq(data['data']['score'], 78.5)
+        _aeq(data['data']['category'], 'UYUMLU')
 
     def test_missing_user_ids(self):
         """Test request with missing user IDs"""
@@ -78,7 +79,7 @@ class TestCompatibilityCheckEndpoint(TestCase):
         """Test error when comparing same user"""
         with patch('analysis_api.compatibility_views._get_user_profile') as mock_profile:
             mock_user = {'id': 1, 'username': 'Ali', 'golden_ratio': 1.618,
-                        'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+                        'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
             mock_profile.return_value = mock_user
 
             response = self.client.post(
@@ -123,7 +124,7 @@ class TestFindCompatibleUsersEndpoint(TestCase):
     def test_find_compatible_users(self, mock_db, mock_load, mock_profile):
         """Test finding compatible users"""
         user1 = {'id': 1, 'username': 'Ali', 'golden_ratio': 1.618,
-                'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+                'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
 
         mock_profile.return_value = user1
 
@@ -240,7 +241,7 @@ class TestListCommunitiesEndpoint(TestCase):
         mock_find.sort.return_value.limit.return_value = [
             {
                 '_id': 'community1',
-                'name': 'Liderlik Topluluğu',
+                'name': 'Leaderboard Topluluğu',
                 'type': 'TRAIT',
                 'trait_name': 'Lider',
                 'member_count': 1245,
@@ -252,11 +253,12 @@ class TestListCommunitiesEndpoint(TestCase):
 
         response = self.client.get(self.endpoint, {'limit': 20})
 
-        self.assertEqual(response.status_code, 200)
+        _aeq = self.assertEqual
+        _aeq(response.status_code, 200)
         data = json.loads(response.content)
         self.assertTrue(data['success'])
-        self.assertEqual(len(data['data']), 1)
-        self.assertEqual(data['data'][0]['name'], 'Liderlik Topluluğu')
+        _aeq(len(data['data']), 1)
+        _aeq(data['data'][0]['name'], 'Leaderboard Topluluğu')
 
     @patch('analysis_api.compatibility_views._get_communities_col')
     def test_filter_by_type(self, mock_col):
@@ -297,13 +299,13 @@ class TestJoinCommunityEndpoint(TestCase):
             'username': 'Ali',
             'golden_ratio': 1.618,
             'top_sifats': ['Lider'],
-            'modules': ['Liderlik']
+            'modules': ['Leaderboard']
         }
 
         mock_communities_col.return_value = MagicMock()
         mock_communities_col.return_value.find_one.return_value = {
             '_id': '507f1f77bcf86cd799439011',
-            'name': 'Liderlik Topluluğu'
+            'name': 'Leaderboard Topluluğu'
         }
 
         mock_members_col.return_value = MagicMock()
@@ -382,11 +384,12 @@ class TestListCommunityMembersEndpoint(TestCase):
 
         response = self.client.get(self.endpoint, {'limit': 50})
 
-        self.assertEqual(response.status_code, 200)
+        _aeq = self.assertEqual
+        _aeq(response.status_code, 200)
         data = json.loads(response.content)
         self.assertTrue(data['success'])
-        self.assertEqual(len(data['data']), 1)
-        self.assertEqual(data['data'][0]['harmony_level'], 85)
+        _aeq(len(data['data']), 1)
+        _aeq(data['data'][0]['harmony_level'], 85)
 
     @patch('analysis_api.compatibility_views._get_community_members_col')
     def test_sort_by_joined_at(self, mock_col):
@@ -458,13 +461,15 @@ def run_tests():
     suite = unittest.TestSuite()
 
     # Add all test cases
-    suite.addTests(loader.loadTestsFromTestCase(TestCompatibilityCheckEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestFindCompatibleUsersEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestCompatibilityStatsEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestListCommunitiesEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestJoinCommunityEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestListCommunityMembersEndpoint))
-    suite.addTests(loader.loadTestsFromTestCase(TestErrorHandling))
+    _add  = suite.addTests
+    _load = loader.loadTestsFromTestCase
+    _add(_load(TestCompatibilityCheckEndpoint))
+    _add(_load(TestFindCompatibleUsersEndpoint))
+    _add(_load(TestCompatibilityStatsEndpoint))
+    _add(_load(TestListCommunitiesEndpoint))
+    _add(_load(TestJoinCommunityEndpoint))
+    _add(_load(TestListCommunityMembersEndpoint))
+    _add(_load(TestErrorHandling))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

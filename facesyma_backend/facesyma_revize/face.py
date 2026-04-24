@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 
 face = ([10,151,55,285,8,356,127,152])
 
@@ -34,9 +33,11 @@ def face_input(img):
                 lis.append((x,y))
             return lis
     list = draw()
-    a = list[0][0]
-    b = list[0][1] - list[1][1]
-    c = list[0][1] + b
+    _l0 = list[0]
+    _l0_1 = _l0[1]
+    a = _l0[0]
+    b = _l0_1 - list[1][1]
+    c = _l0_1 + b
 
     face_cor[34] = (a,c)
     face_cor[35] = list[2]

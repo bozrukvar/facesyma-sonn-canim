@@ -64,9 +64,9 @@ def embed_text(text: str) -> List[float]:
         )
         response.raise_for_status()
         embedding = response.json().get("embedding", [])
-
-        if not embedding or len(embedding) != EMBEDDING_DIM:
-            raise RuntimeError(f"Invalid embedding dimension: expected {EMBEDDING_DIM}, got {len(embedding)}")
+        _emb_len = len(embedding)
+        if not embedding or _emb_len != EMBEDDING_DIM:
+            raise RuntimeError(f"Invalid embedding dimension: expected {EMBEDDING_DIM}, got {_emb_len}")
 
         # Cache to Redis for 7 days
         redis_set(cache_key, pickle.dumps(embedding), ttl=EMBEDDING_CACHE_TTL)
@@ -74,7 +74,7 @@ def embed_text(text: str) -> List[float]:
 
     except requests.exceptions.RequestException as e:
         log.error(f"Ollama embedding error: {e}")
-        raise RuntimeError(f"Failed to generate embedding: {str(e)}")
+        raise RuntimeError("Failed to generate embedding.")
 
 
 def get_embedding_dimension() -> int:

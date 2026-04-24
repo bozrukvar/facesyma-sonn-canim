@@ -35,7 +35,7 @@ class TestAutoAddToCommunities(unittest.TestCase):
         self.user_id = 1
         self.analysis_result = {
             'top_sifats': ['Lider', 'Disiplinli', 'Analitik'],
-            'modules': ['Liderlik', 'Kariyer', 'İletişim'],
+            'modules': ['Leaderboard', 'Kariyer', 'İletişim'],
             'sifat_scores': {
                 'lider': 0.92,
                 'disiplinli': 0.85,
@@ -51,7 +51,7 @@ class TestAutoAddToCommunities(unittest.TestCase):
         mock_communities = MagicMock()
         mock_communities.find_one.return_value = {
             '_id': 'community1',
-            'name': 'Liderlik Topluluğu'
+            'name': 'Leaderboard Topluluğu'
         }
         mock_communities_col.return_value = mock_communities
 
@@ -95,7 +95,7 @@ class TestAutoAddToCommunities(unittest.TestCase):
         mock_communities = MagicMock()
         mock_communities.find_one.return_value = {
             '_id': 'community1',
-            'name': 'Liderlik Topluluğu'
+            'name': 'Leaderboard Topluluğu'
         }
         mock_communities_col.return_value = mock_communities
 
@@ -200,9 +200,10 @@ class TestAutoAddToCommunities(unittest.TestCase):
 
         result = auto_add_to_communities(self.user_id, self.analysis_result)
 
-        self.assertIn('message', result)
-        self.assertIn('communities_joined', result)
-        self.assertIn('success', result)
+        _ain = self.assertIn
+        _ain('message', result)
+        _ain('communities_joined', result)
+        _ain('success', result)
 
 
 class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
@@ -223,7 +224,7 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
             'username': 'Ali',
             'golden_ratio': 1.618,
             'top_sifats': ['Lider'],
-            'modules': ['Liderlik']
+            'modules': ['Leaderboard']
         }
 
         # Mock compatibility function
@@ -238,7 +239,7 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
         mock_users.find.return_value.limit.return_value = [
             mock_profile.return_value,
             {'id': 2, 'username': 'Ayşe', 'golden_ratio': 1.620,
-             'top_sifats': ['Lider'], 'modules': ['Liderlik']}
+             'top_sifats': ['Lider'], 'modules': ['Leaderboard']}
         ]
         mock_users_col.return_value = mock_users
 
@@ -266,7 +267,7 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
             'username': 'Ali',
             'golden_ratio': 1.618,
             'top_sifats': ['Lider'],
-            'modules': ['Liderlik']
+            'modules': ['Leaderboard']
         }
         mock_load.return_value = (None, None)  # Load failed
 
@@ -281,7 +282,7 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
         """Test that limit parameter is respected"""
         mock_profile.return_value = {
             'id': 1, 'username': 'Ali', 'golden_ratio': 1.618,
-            'top_sifats': ['Lider'], 'modules': ['Liderlik']
+            'top_sifats': ['Lider'], 'modules': ['Leaderboard']
         }
 
         mock_find_compat = MagicMock(return_value=[
@@ -306,7 +307,7 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
         """Test return value structure"""
         mock_profile.return_value = {
             'id': 1, 'username': 'Ali', 'golden_ratio': 1.618,
-            'top_sifats': ['Lider'], 'modules': ['Liderlik']
+            'top_sifats': ['Lider'], 'modules': ['Leaderboard']
         }
 
         mock_find_compat = MagicMock(return_value=[])
@@ -317,12 +318,14 @@ class TestFindAndNotifyCompatibleUsers(unittest.TestCase):
         result = find_and_notify_compatible_users(self.user_id)
 
         # Check structure
-        self.assertIn('success', result)
-        self.assertIn('compatible_users', result)
-        self.assertIn('message', result)
-        self.assertIsInstance(result['success'], bool)
-        self.assertIsInstance(result['compatible_users'], int)
-        self.assertIsInstance(result['message'], str)
+        _ain = self.assertIn
+        _ais = self.assertIsInstance
+        _ain('success', result)
+        _ain('compatible_users', result)
+        _ain('message', result)
+        _ais(result['success'], bool)
+        _ais(result['compatible_users'], int)
+        _ais(result['message'], str)
 
     @patch('analysis_api.community_hooks._get_users_col')
     @patch('analysis_api.community_hooks._get_user_profile')

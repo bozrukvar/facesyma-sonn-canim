@@ -221,7 +221,7 @@
                 if (analysisData.data.by_mode) {
                     let modeHtml = '';
                     for (const [mode, count] of Object.entries(analysisData.data.by_mode)) {
-                        modeHtml += `<tr><td>${mode}</td><td>${count}</td></tr>`;
+                        modeHtml += `<tr><td>${escapeHtml(mode)}</td><td>${escapeHtml(count)}</td></tr>`;
                     }
                     document.getElementById('mode-breakdown').innerHTML = modeHtml || '<tr><td colspan="2">Veri yok</td></tr>';
                 }
@@ -233,7 +233,7 @@
                 let healthHtml = '';
                 for (const [service, status] of Object.entries(healthData.services_up)) {
                     const color = status === 'up' ? '#4CAF50' : '#F44336';
-                    healthHtml += `<div style="color: ${color};">● ${service}: ${status.toUpperCase()}</div>`;
+                    healthHtml += `<div style="color: ${color};">● ${escapeHtml(service)}: ${escapeHtml(status.toUpperCase())}</div>`;
                 }
                 document.getElementById('service-status').innerHTML = healthHtml;
             }
@@ -250,7 +250,7 @@
                 logsData.data.logs.slice(0, 5).forEach(log => {
                     logsHtml += `<tr>
                         <td style="color: #F44336;">ERROR</td>
-                        <td>${log.message || log.service || '-'}</td>
+                        <td>${escapeHtml(log.message || log.service || '-')}</td>
                         <td>1</td>
                     </tr>`;
                 });
@@ -277,12 +277,12 @@
                 data.data.recent_reports.forEach(report => {
                     const date = new Date(report.created_at).toLocaleString('tr-TR');
                     html += `<tr>
-                        <td>${report.title || report.report_type}</td>
-                        <td>${report.report_type}</td>
-                        <td>${date}</td>
-                        <td><span style="color: #4CAF50;">${report.status.toUpperCase()}</span></td>
-                        <td>${(report.file_size_kb / 1024).toFixed(2)} MB</td>
-                        <td><a href="${report.file_url}" style="color: #d4af37;">İndir</a></td>
+                        <td>${escapeHtml(report.title || report.report_type)}</td>
+                        <td>${escapeHtml(report.report_type)}</td>
+                        <td>${escapeHtml(date)}</td>
+                        <td><span style="color: #4CAF50;">${escapeHtml((report.status || '').toUpperCase())}</span></td>
+                        <td>${escapeHtml((report.file_size_kb / 1024).toFixed(2))} MB</td>
+                        <td><a href="${escapeHtml(report.file_url || '#')}" style="color: #d4af37;">İndir</a></td>
                     </tr>`;
                 });
                 document.getElementById('reports-table').innerHTML = html || '<tr><td colspan="6">Rapor yok</td></tr>';

@@ -36,6 +36,9 @@ from facesyma_ai.diet_coaching.utils import (
 
 log = logging.getLogger(__name__)
 
+_VALID_FEEDBACKS  = frozenset({'liked', 'disliked', 'neutral'})
+_VALID_MEAL_TYPES = frozenset({'breakfast', 'lunch', 'dinner'})
+
 router = APIRouter(prefix="/api/v1/diet", tags=["diet_coaching"])
 
 
@@ -118,6 +121,7 @@ async def get_recommendation(request: RecommendationRequest):
     Kullanıcının sıfatlarına, ülke/kültürüne ve beslenme tercihlerine göre
     sabah-öğlen-akşam yemek önerileri sunar.
     """
+    _lerr = log.error
     try:
         # UserProfile oluştur
         user_sifats = [
@@ -125,17 +129,19 @@ async def get_recommendation(request: RecommendationRequest):
             for s in request.sifats
         ]
 
+        _rveg = request.vegetarian; _rvegan = request.vegan
         dietary_pref = DietaryPreferences(
-            omnivore=not request.vegetarian and not request.vegan,
-            vegetarian=request.vegetarian,
-            vegan=request.vegan,
+            omnivore=not _rveg and not _rvegan,
+            vegetarian=_rveg,
+            vegan=_rvegan,
             gluten_free=request.gluten_free,
         )
 
+        _rlc = request.language_code
         user_profile = UserProfile(
             user_id=request.user_id,
             country=request.country,
-            language_code=request.language_code,
+            language_code=_rlc,
             sifats=user_sifats,
             dietary_preference=dietary_pref,
         )
@@ -156,15 +162,15 @@ async def get_recommendation(request: RecommendationRequest):
             data=recommendation,
             nutrition=nutrition,
             explanation=format_recommendation_for_chat(
-                recommendation.dict(), request.language_code
+                recommendation.dict(), _rlc
             ),
         )
 
     except ValueError as e:
-        log.error(f"Validation error: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        _lerr(f"Validation error: {e}")
+        raise HTTPException(status_code=400, detail="Invalid request parameters.")
     except Exception as e:
-        log.error(f"Recommendation error: {e}")
+        _lerr(f"Recommendation error: {e}")
         raise HTTPException(status_code=500, detail="Tavsiye alınamadı")
 
 
@@ -182,10 +188,11 @@ async def get_alternatives(request: AlternativesRequest):
             for s in request.sifats
         ]
 
+        _rveg = request.vegetarian; _rvegan = request.vegan
         dietary_pref = DietaryPreferences(
-            omnivore=not request.vegetarian and not request.vegan,
-            vegetarian=request.vegetarian,
-            vegan=request.vegan,
+            omnivore=not _rveg and not _rvegan,
+            vegetarian=_rveg,
+            vegan=_rvegan,
             gluten_free=request.gluten_free,
         )
 
@@ -198,13 +205,14 @@ async def get_alternatives(request: AlternativesRequest):
         )
 
         # Alternatifler al
+        _rmt = request.meal_type
         alternatives = get_meal_suggestions(
-            user_profile, request.meal_type, request.count
+            user_profile, _rmt, request.count
         )
 
         return AlternativesResponse(
             status="success",
-            meal_type=request.meal_type,
+            meal_type=_rmt,
             alternatives=alternatives,
             count=len(alternatives),
         )
@@ -222,36 +230,39 @@ async def submit_feedback(request: FeedbackRequest):
     Kullanıcının feedback'i kaydedilir ve
     gelecekteki tavsiyeler bu bilgi kullanılarak kişiselleştirilir.
     """
+    _lerr = log.error
     try:
-        feedback_valid = request.feedback.lower() in ["liked", "disliked", "neutral"]
-        if not feedback_valid:
+        _feedback = request.feedback
+        if _feedback.lower() not in _VALID_FEEDBACKS:
             raise ValueError("Feedback must be 'liked', 'disliked', or 'neutral'")
 
         # Feedback kaydet
+        _ruid = request.user_id
+        _rmid = request.meal_id
         success = record_meal_feedback(
-            request.user_id,
-            request.meal_id,
-            request.feedback,
+            _ruid,
+            _rmid,
+            _feedback,
         )
 
         if not success:
             raise Exception("Feedback could not be recorded")
 
         log.info(
-            f"Feedback recorded: user={request.user_id}, "
-            f"meal={request.meal_id}, feedback={request.feedback}"
+            f"Feedback recorded: user={_ruid}, "
+            f"meal={_rmid}, feedback={_feedback}"
         )
 
         return {
             "status": "success",
-            "message": f"Feedback başarıyla kaydedildi: {request.feedback}",
+            "message": f"Feedback başarıyla kaydedildi: {_feedback}",
         }
 
     except ValueError as e:
-        log.error(f"Validation error: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        _lerr(f"Validation error: {e}")
+        raise HTTPException(status_code=400, detail="Invalid request parameters.")
     except Exception as e:
-        log.error(f"Feedback error: {e}")
+        _lerr(f"Feedback error: {e}")
         raise HTTPException(status_code=500, detail="Feedback kaydedilemedi")
 
 
@@ -288,6 +299,7 @@ async def get_meals(
 
     Opsiyonel olarak öğün tipine göre filtreleyebilirsiniz.
     """
+    _lerr = log.error
     try:
         db = get_database()
         country_data = db.get_country_meals(language_code)
@@ -296,17 +308,18 @@ async def get_meals(
             raise ValueError(f"Country not found: {language_code}")
 
         # Öğün tipine göre filtrele
+        _gmbt = db.get_meals_by_type
         if meal_type:
-            if meal_type not in ["breakfast", "lunch", "dinner"]:
+            if meal_type not in _VALID_MEAL_TYPES:
                 raise ValueError("meal_type must be 'breakfast', 'lunch', or 'dinner'")
 
-            meals = db.get_meals_by_type(language_code, meal_type)
+            meals = _gmbt(language_code, meal_type)
             meals_list = [meal.dict() for meal in meals]
         else:
             # Tüm yemekleri döndür
             meals_list = []
-            for mt in ["breakfast", "lunch", "dinner"]:
-                meals = db.get_meals_by_type(language_code, mt)
+            for mt in _VALID_MEAL_TYPES:
+                meals = _gmbt(language_code, mt)
                 meals_list.extend([meal.dict() for meal in meals])
             meal_type = "all"
 
@@ -319,10 +332,10 @@ async def get_meals(
         )
 
     except ValueError as e:
-        log.error(f"Validation error: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        _lerr(f"Validation error: {e}")
+        raise HTTPException(status_code=400, detail="Invalid request parameters.")
     except Exception as e:
-        log.error(f"Meals error: {e}")
+        _lerr(f"Meals error: {e}")
         raise HTTPException(status_code=500, detail="Yemekler alınamadı")
 
 

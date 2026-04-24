@@ -1,0 +1,15 @@
+{
+  "extends": "./facesyma_mobile/node_modules/@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "./facesyma_mobile",
+    "paths": {
+      "@screens/*":    ["src/screens/*"],
+      "@components/*": ["src/components/*"],
+      "@services/*":   ["src/services/*"],
+      "@store/*":      ["src/store/*"],
+      "@utils/*":      ["src/utils/*"]
+    }
+  },
+  "include": ["facesyma_mobile/src/**/*"]
+}

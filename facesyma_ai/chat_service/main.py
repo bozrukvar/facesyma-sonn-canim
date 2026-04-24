@@ -17,11 +17,11 @@ Endpoint'ler:
   DELETE /chat/{id}     → Konuşmayı sil
 """
 
-import os, json, time, uuid, logging, sys, hashlib
+import os, json, uuid, logging, sys, hashlib
 from datetime import datetime
 from typing   import Optional
 
-import requests
+from groq import Groq
 from fastapi              import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic             import BaseModel
@@ -30,7 +30,7 @@ import jwt
 
 from facesyma_ai.core.redis_client import redis_get, redis_set
 
-from .system_prompt import build_system_prompt
+from .system_prompt import build_system_prompt, get_supported_languages
 from .modules import get_registry, init_registry, ALL_MODULES, execute_module
 from .intent import detect_intent
 from .sifat_fetcher import build_sifat_context, format_context_for_ollama
@@ -68,83 +68,88 @@ except ImportError as e:
     CONTEXT_BUILDER_AVAILABLE = False
 
 # ── Yapılandırma ───────────────────────────────────────────────────────────────
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://host.docker.internal:11434")
-MONGO_URI  = os.environ.get(
-    "MONGO_URI",
-    "mongodb+srv://facesyma:FaceSyma2021@cluster0.io98c.mongodb.net/"
-    "myFirstDatabase?ssl=true&ssl_cert_reqs=CERT_NONE"
-)
-JWT_SECRET  = os.environ.get("JWT_SECRET", "facesyma-jwt-secret-change-in-production")
-MODEL       = "orca-mini"  # Ollama model adı
-MAX_TOKENS  = 1024
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+MONGO_URI    = os.environ.get("MONGO_URI", "")
+JWT_SECRET   = os.environ.get("JWT_SECRET", "")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI environment variable must be set.")
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET environment variable must be set.")
+if not GROQ_API_KEY:
+    raise RuntimeError("GROQ_API_KEY environment variable must be set.")
+GROQ_MODEL  = "llama-3.1-8b-instant"
+MAX_TOKENS  = 512
 MAX_HISTORY = 20   # konuşma başına max mesaj sayısı
 LLM_RESPONSE_CACHE_TTL = 21600  # 6 hours
 
+_groq_client: Groq | None = None
+
+def _get_groq_client() -> Groq:
+    global _groq_client
+    if _groq_client is None:
+        _groq_client = Groq(api_key=GROQ_API_KEY)
+    return _groq_client
+
 log = logging.getLogger(__name__)
 
-# ── Ollama API Helper ──────────────────────────────────────────────────────────
-def call_ollama(system_prompt: str, messages: list, cacheable: bool = False) -> str:
+_DEFAULT_GREETINGS = {
+    "tr": "Merhaba! Analiz sonuçlarımı açıklar mısın?",
+    "en": "Hello! Can you explain my analysis results?",
+    "de": "Hallo! Kannst du mir meine Analyseergebnisse erklären?",
+    "ru": "Привет! Можешь объяснить мои результаты анализа?",
+    "ar": "مرحبا! هل يمكنك شرح نتائج تحليلي؟",
+    "es": "¡Hola! ¿Puedes explicarme mis resultados de análisis?",
+    "ko": "안녕하세요! 분석 결과를 설명해 주실 수 있나요?",
+    "ja": "こんにちは！分析結果を説明していただけますか？",
+}
+
+# ── Groq API Helper ────────────────────────────────────────────────────────────
+def call_groq(system_prompt: str, messages: list, cacheable: bool = False) -> str:
     """
-    Ollama API'sine çağrı yap, cevap al.
+    Groq API'sine çağrı yap, cevap al (llama-3.1-8b-instant).
 
     Args:
         system_prompt: System prompt for context
         messages: List of message dicts with role and content
         cacheable: If True, cache response in Redis for 6 hours.
-                  Use for deterministic module calls (career, music, etc.).
-                  Disable for free chat (temperature=0.7 makes caching pointless).
 
     Returns:
         LLM response text
     """
-    # Generate cache key from system prompt + recent messages
     cache_key = None
     if cacheable:
         key_input = system_prompt[:500] + str(messages[-3:] if len(messages) >= 3 else messages)
         key_hash = hashlib.sha256(key_input.encode()).hexdigest()[:32]
         cache_key = f"llm:v1:{key_hash}"
 
-        # Check Redis cache
         cached = redis_get(cache_key)
         if cached:
             try:
                 return cached.decode()
             except Exception as e:
                 log.warning(f"Failed to deserialize cached LLM response: {e}")
-                # Fall through to call Ollama
 
     try:
-        response = requests.post(
-            f"{OLLAMA_URL}/api/chat",
-            json={
-                "model": MODEL,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    *messages
-                ],
-                "stream": False,
-                "options": {
-                    "temperature": 0.7,
-                    "num_predict": 512,
-                    "top_p": 0.9,
-                    "top_k": 40,
-                    "repeat_penalty": 1.1,
-                    "num_ctx": 4096,
-                }
-            },
-            timeout=120
+        client = _get_groq_client()
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                *messages
+            ],
+            temperature=0.7,
+            max_tokens=MAX_TOKENS,
+            top_p=0.9,
         )
-        response.raise_for_status()
-        result = response.json()["message"]["content"]
+        result = response.choices[0].message.content
 
-        # Cache result if cacheable
         if cacheable and cache_key:
             redis_set(cache_key, result.encode(), ttl=LLM_RESPONSE_CACHE_TTL)
 
         return result
     except Exception as e:
-        log.error(f"Ollama error: {e}")
-        raise HTTPException(500, f"AI servisi hatası: {str(e)}")
+        log.error(f"Groq error: {e}")
+        raise HTTPException(500, "AI servisi geçici olarak kullanılamıyor.")
 
 # ── MongoDB Connection Pooling ────────────────────────────────────────────────
 _mongo_client: MongoClient | None = None
@@ -248,63 +253,58 @@ async def start_chat(
     Yüz analizi sonucuyla yeni bir sohbet başlatır.
     Asistan analiz sonucunu otomatik olarak yorumlar.
     """
-    user_id     = get_user_id(authorization)
-    conv_id     = str(uuid.uuid4())
+    user_id      = get_user_id(authorization)
+    conv_id      = str(uuid.uuid4())
+    _lang        = body.lang
+    _analysis    = body.analysis_result
 
     # ── Adım 1: Analysis Sonucunu Cache'le ───────────────────────────────
-    analysis_for_save = body.analysis_result
+    _linfo = log.info
+    _lwarn = log.warning
+    analysis_for_save = _analysis
     if CONTEXT_BUILDER_AVAILABLE and user_id:
         try:
-            cache_analysis_result(user_id, body.lang, body.analysis_result)
-            log.info(f"✓ Analysis cached for user {user_id}")
+            cache_analysis_result(user_id, _lang, _analysis)
+            _linfo(f"✓ Analysis cached for user {user_id}")
         except Exception as e:
-            log.warning(f"⚠️  Failed to cache analysis: {e}")
+            _lwarn(f"⚠️  Failed to cache analysis: {e}")
 
     # ── Adım 2: Context Oluştur (Ollama'ya gönderilecek) ──────────────────
     system_msg = None
     if CONTEXT_BUILDER_AVAILABLE and user_id:
         try:
-            ollama_context = build_ollama_context(user_id, body.lang)
-            system_msg = get_ollama_prompt(body.lang, ollama_context)
-            analysis_for_save = ollama_context.get("user", body.analysis_result)
-            log.info(f"✓ Ollama context built with enriched data")
+            ollama_context = build_ollama_context(user_id, _lang)
+            system_msg = get_ollama_prompt(_lang, ollama_context)
+            analysis_for_save = ollama_context.get("user", _analysis)
+            _linfo(f"✓ Ollama context built with enriched data")
         except Exception as e:
-            log.warning(f"⚠️  Failed to build context: {e}, falling back to basic system prompt")
+            _lwarn(f"⚠️  Failed to build context: {e}, falling back to basic system prompt")
             system_msg = None
 
     # ── Fallback: Temel system prompt ────────────────────────────────────
     if not system_msg:
-        system_msg = build_system_prompt(body.analysis_result, body.lang)
+        system_msg = build_system_prompt(_analysis, _lang)
 
     # İlk kullanıcı mesajı — belirtilmezse default
-    if body.first_message:
-        user_text = body.first_message
+    _bfm = body.first_message
+    if _bfm:
+        user_text = _bfm
     else:
-        greetings = {
-            "tr": "Merhaba! Analiz sonuçlarımı açıklar mısın?",
-            "en": "Hello! Can you explain my analysis results?",
-            "de": "Hallo! Kannst du mir meine Analyseergebnisse erklären?",
-            "ru": "Привет! Можешь объяснить мои результаты анализа?",
-            "ar": "مرحبا! هل يمكنك شرح نتائج تحليلي؟",
-            "es": "¡Hola! ¿Puedes explicarme mis resultados de análisis?",
-            "ko": "안녕하세요! 분석 결과를 설명해 주실 수 있나요?",
-            "ja": "こんにちは！分析結果を説明していただけますか？",
-        }
-        user_text = greetings.get(body.lang, greetings["tr"])
+        user_text = _DEFAULT_GREETINGS.get(_lang, _DEFAULT_GREETINGS["tr"])
 
     messages = [{"role": "user", "content": user_text}]
 
     # Ollama'ya gönder
-    assistant_text = call_ollama(system_msg, messages)
+    assistant_text = call_groq(system_msg, messages)
     messages.append({"role": "assistant", "content": assistant_text})
 
     # Kaydet (enriched context varsa o, yoksa original analysis)
-    save_conversation(conv_id, user_id, messages, analysis_for_save, body.lang)
+    save_conversation(conv_id, user_id, messages, analysis_for_save, _lang)
 
     return StartChatResponse(
         conversation_id   = conv_id,
         assistant_message = assistant_text,
-        lang              = body.lang,
+        lang              = _lang,
     )
 
 # ── Endpoint: Mesaj Gönder (with Orchestration) ─────────────────────────────
@@ -320,21 +320,27 @@ async def send_message(
     Kullanıcı bir modül ile ilgili bir şey söylerse (ör. "doğum tarihim..."),
     ilgili modülü çalıştırır ve sonucu sohbete ekler.
     """
-    conv = load_conversation(body.conversation_id)
+    _info = log.info
+    _cid = body.conversation_id
+    _msg = body.message
+    conv = load_conversation(_cid)
     if not conv:
         raise HTTPException(404, "Konuşma bulunamadı.")
 
-    user_lang = body.lang or conv.get("lang", "tr")
-    messages = conv.get("messages", [])
+    _convget = conv.get
+    user_lang = body.lang or _convget("lang", "tr")
+    messages = _convget("messages", [])
 
     # ── Adım 1: Intent Detection ─────────────────────────────────────────────
-    intent_result = detect_intent(body.message, user_lang)
-    log.info(f"Intent detected: {intent_result.get('intent')} (confidence: {intent_result.get('confidence')})")
+    intent_result = detect_intent(_msg, user_lang)
+    _irget = intent_result.get
+    _intent = _irget('intent')
+    _info(f"Intent detected: {_intent} (confidence: {_irget('confidence')})")
 
     # ── Adım 2: Module Execution (if module intent) ──────────────────────────
     module_context = ""
-    if intent_result.get("intent") != "chat":
-        module_name = intent_result.get("intent")
+    if _intent != "chat":
+        module_name = _intent
         registry = get_registry()
         module = registry.get(module_name)
 
@@ -342,37 +348,40 @@ async def send_message(
             # Execute the module
             exec_result = execute_module(
                 module_name,
-                intent_result.get("params", {}),
+                _irget("params", {}),
                 user_lang,
                 token=authorization
             )
 
-            if exec_result.get("status") == "success":
+            _erget = exec_result.get
+            _jd = json.dumps
+            if _erget("status") == "success":
                 # Format module result for AI context
-                result_data = exec_result.get("result", {})
+                result_data = _erget("result", {})
 
                 # Special handling: Store face_analysis in conversation analysis
                 if module_name == "face_analysis":
-                    conv["analysis"]["face_analysis"] = result_data
-                    log.info(f"✓ Face analysis stored in conversation")
+                    conv.setdefault("analysis", {})["face_analysis"] = result_data
+                    _info(f"✓ Face analysis stored in conversation")
 
-                module_context = f"\n\n[Modül Sonucu: {module_name}]\n{json.dumps(result_data, ensure_ascii=False, indent=2)}"
-                log.info(f"✓ Module executed successfully: {module_name}")
-            elif exec_result.get("status") == "pending":
+                module_context = f"\n\n[Modül Sonucu: {module_name}]\n{_jd(result_data, ensure_ascii=False, indent=2)}"
+                _info(f"✓ Module executed successfully: {module_name}")
+            elif _erget("status") == "pending":
                 # Test module - return questions to user
                 return MessageResponse(
-                    conversation_id=body.conversation_id,
-                    assistant_message=json.dumps({
+                    conversation_id=_cid,
+                    assistant_message=_jd({
                         "type": "test_pending",
-                        "test_type": exec_result.get("test_type"),
-                        "session_id": exec_result.get("session_id"),
-                        "questions": exec_result.get("questions", []),
+                        "test_type": _erget("test_type"),
+                        "session_id": _erget("session_id"),
+                        "questions": _erget("questions", []),
                     }, ensure_ascii=False),
                     usage={"input_tokens": 0, "output_tokens": 0},
                 )
 
     # ── Adım 3: System Prompt ───────────────────────────────────────────────
     # Try to use enriched context builder if available
+    _lwarn = log.warning
     system_msg = None
     user_id_for_context = get_user_id(authorization)
 
@@ -380,19 +389,20 @@ async def send_message(
         try:
             ollama_context = build_ollama_context(user_id_for_context, user_lang)
             system_msg = get_ollama_prompt(user_lang, ollama_context)
-            log.info(f"✓ Ollama context used for message endpoint")
+            _info(f"✓ Ollama context used for message endpoint")
         except Exception as e:
-            log.warning(f"⚠️  Failed to build context for message: {e}, using basic prompt")
+            _lwarn(f"⚠️  Failed to build context for message: {e}, using basic prompt")
             system_msg = None
 
     # Fallback: Temel system prompt
+    _conv_analysis = _convget("analysis") or {}
     if not system_msg:
-        system_msg = build_system_prompt(conv["analysis"], user_lang)
+        system_msg = build_system_prompt(_conv_analysis, user_lang)
 
     # Eğer modül context varsa (tavsiye, motivasyon, vb.), sıfat cümlelerini ekle
-    if module_context and intent_result.get("intent") != "chat":
-        module_name = intent_result.get("intent")
-        detected_sifatlar = conv["analysis"].get("face_analysis", {}).get("key_attributes", {})
+    if module_context and _intent != "chat":
+        module_name = _intent
+        detected_sifatlar = _conv_analysis.get("face_analysis", {}).get("key_attributes", {})
 
         if detected_sifatlar:
             # Sıfat context oluştur
@@ -409,10 +419,11 @@ async def send_message(
             # Ollama için format
             formatted_sifat = format_context_for_ollama(sifat_context, user_lang)
             system_msg += formatted_sifat
-            log.info(f"✓ Sıfat context eklendi: {len(detected_sifatlar)} sıfat")
+            _info(f"✓ Sıfat context eklendi: {len(detected_sifatlar)} sıfat")
 
     # ── Adım 4: Build Message History ────────────────────────────────────────
-    messages.append({"role": "user", "content": body.message})
+    _mappend = messages.append
+    _mappend({"role": "user", "content": _msg})
     trimmed = messages[-MAX_HISTORY:]
 
     # Add module context to system message if available
@@ -423,42 +434,41 @@ async def send_message(
     if RAG_AVAILABLE:
         try:
             # Get top sifatlar from analysis
-            analysis = conv.get("analysis", {})
             top_sifatlar = []
 
             # Try to get from face_analysis
-            if "face_analysis" in analysis:
-                key_attrs = analysis["face_analysis"].get("key_attributes", {})
+            if "face_analysis" in _conv_analysis:
+                key_attrs = _conv_analysis["face_analysis"].get("key_attributes", {})
                 top_sifatlar = list(key_attrs.keys())[:10]
 
             # Get RAG context based on user message and sifatlar
-            if top_sifatlar or body.message:
+            if top_sifatlar or _msg:
                 rag_context = get_relevant_context(
-                    body.message,
+                    _msg,
                     top_sifatlar,
                     user_lang
                 )
                 if rag_context:
                     system_msg += f"\n\n## Bilgi Tabanı\n{rag_context}"
-                    log.info(f"✓ RAG context injected ({len(rag_context)} chars)")
+                    _info(f"✓ RAG context injected ({len(rag_context)} chars)")
         except Exception as e:
-            log.warning(f"⚠️  RAG context injection failed: {e}")
+            _lwarn(f"⚠️  RAG context injection failed: {e}")
 
     # ── Adım 6: Call Ollama ──────────────────────────────────────────────────
-    assistant_text = call_ollama(system_msg, trimmed)
-    messages.append({"role": "assistant", "content": assistant_text})
+    assistant_text = call_groq(system_msg, trimmed)
+    _mappend({"role": "assistant", "content": assistant_text})
 
     # ── Adım 7: Save Conversation ────────────────────────────────────────────
     save_conversation(
-        body.conversation_id,
+        _cid,
         get_user_id(authorization),
         messages,
-        conv["analysis"],
+        _conv_analysis,
         user_lang,
     )
 
     return MessageResponse(
-        conversation_id   = body.conversation_id,
+        conversation_id   = _cid,
         assistant_message = assistant_text,
         usage             = {
             "input_tokens":  0,
@@ -486,10 +496,15 @@ async def get_history(authorization: Optional[str] = Header(default=None)):
 
 # ── Endpoint: Tek Konuşma ─────────────────────────────────────────────────────
 @app.get("/chat/{conversation_id}")
-async def get_conversation(conversation_id: str):
+async def get_conversation(conversation_id: str, authorization: Optional[str] = Header(default=None)):
+    user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Kimlik doğrulama gerekli.")
     conv = load_conversation(conversation_id)
     if not conv:
         raise HTTPException(404, "Konuşma bulunamadı.")
+    if conv.get("user_id") != user_id:
+        raise HTTPException(403, "Bu konuşmaya erişim izniniz yok.")
     conv["id"] = conv.pop("_id")
     return conv
 
@@ -516,11 +531,13 @@ async def list_modules(lang: str = "tr"):
     modules = []
 
     for module in registry.get_all():
+        _mget = module.get
+        _mn = module["name"]
         modules.append({
-            "name": module["name"],
-            "display": module.get("display", {}).get(lang, module["name"]),
-            "description": module.get("description", {}).get(lang, ""),
-            "requires_input": module.get("requires_input"),
+            "name": _mn,
+            "display": _mget("display", {}).get(lang, _mn),
+            "description": _mget("description", {}).get(lang, ""),
+            "requires_input": _mget("requires_input"),
         })
 
     return {"modules": modules, "total": len(modules)}
@@ -531,7 +548,7 @@ async def health():
     registry = get_registry()
     return {
         "status": "ok",
-        "model": MODEL,
+        "model": GROQ_MODEL,
         "modules_registered": len(registry.get_all()),
     }
 
@@ -539,7 +556,6 @@ async def health():
 @app.get("/languages")
 async def get_languages():
     """Desteklenen dillerin listesini döner — mobil/web dil seçici için."""
-    from .system_prompt import get_supported_languages
     return {"languages": get_supported_languages()}
 
 # ── Beslenme Koçluğu Router ────────────────────────────────────────────────────

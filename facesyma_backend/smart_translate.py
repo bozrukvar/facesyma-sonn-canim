@@ -408,43 +408,47 @@ def translate_po_file(po_file_path, lang_code):
 
     # Parse and translate each msgid
     lines = content.split('\n')
+    _n_lines = len(lines)
     result_lines = []
+    _append = result_lines.append
     i = 0
     translated_count = 0
 
-    while i < len(lines):
+    while i < _n_lines:
         line = lines[i]
+        _lsw = line.startswith
 
         # Look for msgid lines (skip header)
-        if line.startswith('msgid "') and not line.startswith('msgid ""'):
+        if _lsw('msgid "') and not _lsw('msgid ""'):
             # Extract the English string
             msgid_content = line[7:-1]
 
             # Handle multiline msgid
-            result_lines.append(line)
+            _append(line)
             i += 1
-            while i < len(lines) and lines[i].startswith('"') and not lines[i].startswith('msgstr'):
-                msgid_content += lines[i][1:-1]
-                result_lines.append(lines[i])
+            while i < _n_lines and lines[i].startswith('"') and not lines[i].startswith('msgstr'):
+                _li = lines[i]
+                msgid_content += _li[1:-1]
+                _append(_li)
                 i += 1
 
             # Look up translation
             translated = translations.get(msgid_content, None)
 
             # Add msgstr line
-            if i < len(lines) and lines[i].startswith('msgstr'):
+            if i < _n_lines and lines[i].startswith('msgstr'):
                 if translated:
-                    result_lines.append(f'msgstr "{translated}"')
+                    _append(f'msgstr "{translated}"')
                     translated_count += 1
                 else:
-                    result_lines.append(lines[i])
+                    _append(lines[i])
                 i += 1
             else:
                 if translated:
-                    result_lines.append(f'msgstr "{translated}"')
+                    _append(f'msgstr "{translated}"')
                     translated_count += 1
         else:
-            result_lines.append(line)
+            _append(line)
             i += 1
 
     # Write back

@@ -8,13 +8,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, SafeAreaView,
+  ActivityIndicator, Alert,
 } from 'react-native';
 import { CoachAPI } from '../services/api';
 import { Card, SectionLabel, Badge } from '../components/ui';
 import theme from '../utils/theme';
+const { colors } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { ScreenProps } from '../navigation/types';
+import type { AnalysisResult } from '../types/api';
 
 const getSeasons = (lang: string) => [
   { id: 'ilkbahar', emoji: '🌸', label: t('fashion.spring', lang) },
@@ -60,12 +64,13 @@ interface FashionData {
 }
 
 interface RouteParams {
-  analysisResult: any;
+  analysisResult: AnalysisResult;
   lang?: string;
 }
 
-const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, route }) => {
-  const { analysisResult } = route.params as RouteParams;
+const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
+  const insets        = useSafeAreaInsets();
+  const analysisResult = route.params?.analysisResult ?? {};
   const { lang } = useLanguage();
   const MEVSIMLER = useMemo(() => getSeasons(lang), [lang]);
   const KATEGORILER = useMemo(() => getCategories(lang), [lang]);
@@ -80,7 +85,7 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
       Alert.alert(t('common.error', lang), t('fashion.error_no_analysis', lang));
       navigation.goBack();
     }
-  }, [analysisResult, lang]);
+  }, [analysisResult, lang, navigation]);
 
   const fetchFashionAdvice = async () => {
     setLoading(true);
@@ -94,7 +99,6 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
       setData(response);
     } catch (error: any) {
       Alert.alert(t('common.error', lang), error.response?.data?.detail || t('common.generic_error', lang));
-      console.error('Fashion error:', error);
     } finally {
       setLoading(false);
     }
@@ -112,15 +116,18 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
     fetchFashionAdvice();
   };
 
+  const dataCoaching   = data?.coaching;
+  const dataRenkPaleti = data?.renk_paleti;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backBtn}>{t('fashion.back', lang)}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>👗 {t('fashion.title', lang)}</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView
@@ -130,25 +137,25 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
       >
         {/* Mevsim Seçici */}
         <View style={styles.section}>
-          <SectionLabel label={t('fashion.section_select_season', lang)} />
+          <SectionLabel>{t('fashion.section_select_season', lang)}</SectionLabel>
           <View style={styles.buttonRow}>
-            {MEVSIMLER.map((mevsim) => (
+            {MEVSIMLER.map(({ id: mId, emoji: mEmoji, label: mLabel }) => (
               <TouchableOpacity
-                key={mevsim.id}
+                key={mId}
                 style={[
                   styles.seasonBtn,
-                  selectedMevsim === mevsim.id && styles.seasonBtnActive,
+                  selectedMevsim === mId && styles.seasonBtnActive,
                 ]}
-                onPress={() => setSelectedMevsim(mevsim.id)}
+                onPress={() => setSelectedMevsim(mId)}
               >
-                <Text style={styles.seasonEmoji}>{mevsim.emoji}</Text>
+                <Text style={styles.seasonEmoji}>{mEmoji}</Text>
                 <Text
                   style={[
                     styles.seasonLabel,
-                    selectedMevsim === mevsim.id && styles.seasonLabelActive,
+                    selectedMevsim === mId && styles.seasonLabelActive,
                   ]}
                 >
-                  {mevsim.label}
+                  {mLabel}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -157,50 +164,50 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
 
         {/* Kategori Seçici */}
         <View style={styles.section}>
-          <SectionLabel label={t('fashion.section_select_category', lang)} />
+          <SectionLabel>{t('fashion.section_select_category', lang)}</SectionLabel>
           <View style={styles.categoryTabs}>
-            {KATEGORILER.map((kat) => (
+            {KATEGORILER.map(({ id: kId, emoji: kEmoji, label: kLabel }) => (
               <TouchableOpacity
-                key={kat.id}
+                key={kId}
                 style={[
                   styles.categoryTab,
-                  selectedKategori === kat.id && styles.categoryTabActive,
+                  selectedKategori === kId && styles.categoryTabActive,
                 ]}
-                onPress={() => setSelectedKategori(kat.id)}
+                onPress={() => setSelectedKategori(kId)}
               >
-                <Text style={styles.categoryEmoji}>{kat.emoji}</Text>
+                <Text style={styles.categoryEmoji}>{kEmoji}</Text>
                 <Text
                   style={[
                     styles.categoryTabLabel,
-                    selectedKategori === kat.id && styles.categoryTabLabelActive,
+                    selectedKategori === kId && styles.categoryTabLabelActive,
                   ]}
                 >
-                  {kat.label}
+                  {kLabel}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Load Button */}
-        {!data ? (
-          <TouchableOpacity
-            style={styles.loadBtn}
-            onPress={handleLoadAdvice}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.loadBtnText}>{t('fashion.load_advice', lang)}</Text>
-            )}
-          </TouchableOpacity>
-        ) : null}
+        {/* Load Button — mevsim/kategori değişince tekrar çekilebilsin */}
+        <TouchableOpacity
+          style={[styles.loadBtn, data ? styles.loadBtnRefresh : null]}
+          onPress={handleLoadAdvice}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.loadBtnText}>
+              {data ? t('fashion.try_another', lang) : t('fashion.load_advice', lang)}
+            </Text>
+          )}
+        </TouchableOpacity>
 
         {/* Results */}
         {loading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.gold} />
+            <ActivityIndicator size="large" color={colors.gold} />
             <Text style={styles.loadingText}>{t('fashion.loading', lang)}</Text>
           </View>
         )}
@@ -212,7 +219,7 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
               <View style={styles.cardHeader}>
                 <Text style={styles.cardTitle}>{t('fashion.style_profile', lang)}</Text>
               </View>
-              <Text style={styles.styleProfile}>{data.stil_profili || 'Karma-Adaptif'}</Text>
+              <Text style={styles.styleProfile}>{data.stil_profili || t('fashion.default_style', lang)}</Text>
               <View style={styles.sifatList}>
                 {data.dominant_sifatlar.map((sifat) => (
                   <Badge key={sifat} label={sifat} />
@@ -224,7 +231,7 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
             <Card style={styles.card}>
               <Text style={styles.cardTitle}>{t('fashion.color_palette', lang)}</Text>
               <View style={styles.colorRow}>
-                {data.renk_paleti?.ana?.map((color, idx) => (
+                {dataRenkPaleti?.ana?.map((color, idx) => (
                   <View key={`ana-${idx}`} style={styles.colorContainer}>
                     <View
                       style={[styles.colorSwatch, { backgroundColor: color }]}
@@ -233,11 +240,11 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
                   </View>
                 ))}
               </View>
-              {data.renk_paleti?.vurgu?.length > 0 && (
+              {(dataRenkPaleti?.vurgu?.length ?? 0) > 0 && (
                 <>
                   <Text style={styles.colorSubtitle}>{t('fashion.accent_colors', lang)}</Text>
                   <View style={styles.colorRow}>
-                    {data.renk_paleti.vurgu.map((color, idx) => (
+                    {dataRenkPaleti!.vurgu!.map((color, idx) => (
                       <View key={`vurgu-${idx}`} style={styles.colorContainer}>
                         <View
                           style={[styles.colorSwatch, { backgroundColor: color }]}
@@ -252,35 +259,35 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
 
             {/* Face Shape Note */}
             {data.yuz_sekli_notu && (
-              <Card style={[styles.card, { backgroundColor: theme.colors.warmAmberGlow }]}>
+              <Card style={styles.cardFaceShape}>
                 <Text style={styles.cardTitle}>{t('fashion.face_shape_note', lang)}</Text>
                 <Text style={styles.faceNote}>{data.yuz_sekli_notu}</Text>
               </Card>
             )}
 
             {/* Coaching Insights */}
-            {data.coaching && (
-              <Card style={[styles.card, { borderColor: '#9B5DE528', backgroundColor: '#9B5DE508' }]}>
+            {dataCoaching && (
+              <Card style={styles.cardCoaching}>
                 <Text style={styles.cardTitle}>💡 {t('fashion.style_advisor', lang)}</Text>
 
                 <View style={styles.coachingSection}>
                   <Text style={styles.coachingLabel}>{t('fashion.philosophy', lang)}</Text>
-                  <Text style={styles.coachingText}>{data.coaching.felsefe}</Text>
+                  <Text style={styles.coachingText}>{dataCoaching.felsefe}</Text>
                 </View>
 
                 <View style={styles.coachingSection}>
                   <Text style={styles.coachingLabel}>{t('fashion.combination', lang)}</Text>
-                  <Text style={styles.coachingText}>{data.coaching.kombinasyon}</Text>
+                  <Text style={styles.coachingText}>{dataCoaching.kombinasyon}</Text>
                 </View>
 
                 <View style={styles.coachingSection}>
                   <Text style={styles.coachingLabel}>{t('fashion.color_psychology', lang)}</Text>
-                  <Text style={styles.coachingText}>{data.coaching.renk_psikolojisi}</Text>
+                  <Text style={styles.coachingText}>{dataCoaching.renk_psikolojisi}</Text>
                 </View>
 
-                <View style={[styles.coachingSection, { marginBottom: 0 }]}>
+                <View style={styles.coachingSectionLast}>
                   <Text style={styles.coachingLabel}>{t('fashion.life_application', lang)}</Text>
-                  <Text style={styles.coachingText}>{data.coaching.yaşam_uyarlamasi}</Text>
+                  <Text style={styles.coachingText}>{dataCoaching.yaşam_uyarlamasi}</Text>
                 </View>
               </Card>
             )}
@@ -350,23 +357,19 @@ const FashionScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
               </View>
             ))}
 
-            {/* Reset Button */}
-            <TouchableOpacity style={styles.resetBtn} onPress={() => setData(null)}>
-              <Text style={styles.resetBtnText}>{t('fashion.try_another', lang)}</Text>
-            </TouchableOpacity>
           </>
         )}
 
-        <View style={{ height: 20 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -375,17 +378,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: colors.border,
   },
   backBtn: {
     fontSize: 16,
-    color: theme.colors.gold,
+    color: colors.gold,
     fontWeight: '600',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: theme.colors.text,
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -406,14 +409,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: 12,
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     borderWidth: 2,
     borderColor: 'transparent',
     alignItems: 'center',
   },
   seasonBtnActive: {
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.warmAmberGlow,
+    borderColor: colors.gold,
   },
   seasonEmoji: {
     fontSize: 24,
@@ -421,11 +424,11 @@ const styles = StyleSheet.create({
   },
   seasonLabel: {
     fontSize: 12,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
     fontWeight: '600',
   },
   seasonLabelActive: {
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   categoryTabs: {
     flexDirection: 'row',
@@ -437,14 +440,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 8,
     borderRadius: 10,
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     borderWidth: 2,
     borderColor: 'transparent',
     alignItems: 'center',
   },
   categoryTabActive: {
-    backgroundColor: theme.colors.warmAmberGlow,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.warmAmberGlow,
+    borderColor: colors.gold,
   },
   categoryEmoji: {
     fontSize: 20,
@@ -452,19 +455,24 @@ const styles = StyleSheet.create({
   },
   categoryTabLabel: {
     fontSize: 11,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
     fontWeight: '600',
   },
   categoryTabLabelActive: {
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   loadBtn: {
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
     alignItems: 'center',
     marginVertical: 20,
+  },
+  loadBtnRefresh: {
+    backgroundColor: colors.cardBg,
+    borderWidth: 1,
+    borderColor: colors.gold,
   },
   loadBtnText: {
     color: 'white',
@@ -479,7 +487,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: theme.colors.text,
+    color: colors.text,
   },
   card: {
     marginBottom: 16,
@@ -490,13 +498,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 8,
   },
   styleProfile: {
     fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.gold,
+    color: colors.gold,
     marginBottom: 12,
     textTransform: 'capitalize',
   },
@@ -521,31 +529,31 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: 6,
     borderWidth: 2,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
   },
   colorLabel: {
     fontSize: 11,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
     textAlign: 'center',
     maxWidth: 60,
   },
   colorSubtitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     marginTop: 12,
     marginBottom: 8,
   },
   faceNote: {
     fontSize: 14,
-    color: theme.colors.text,
+    color: colors.text,
     lineHeight: 20,
     fontStyle: 'italic',
   },
   mevsimTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.gold,
+    color: colors.gold,
     marginVertical: 16,
   },
   recommHeader: {
@@ -554,23 +562,23 @@ const styles = StyleSheet.create({
   kategoriBadge: {
     fontSize: 14,
     fontWeight: '700',
-    color: theme.colors.gold,
+    color: colors.gold,
     paddingVertical: 4,
     paddingHorizontal: 8,
-    backgroundColor: theme.colors.warmAmberGlow,
+    backgroundColor: colors.warmAmberGlow,
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
   subTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 8,
     marginTop: 12,
   },
   itemText: {
     fontSize: 13,
-    color: theme.colors.text,
+    color: colors.text,
     marginBottom: 4,
     lineHeight: 18,
   },
@@ -580,29 +588,29 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
   },
   chipText: {
     fontSize: 12,
-    color: theme.colors.text,
+    color: colors.text,
   },
   tipCard: {
-    backgroundColor: theme.colors.warmAmberGlow,
+    backgroundColor: colors.warmAmberGlow,
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 10,
     borderLeftWidth: 3,
-    borderLeftColor: theme.colors.gold,
+    borderLeftColor: colors.gold,
     marginTop: 12,
   },
   tipText: {
     fontSize: 13,
-    color: theme.colors.text,
+    color: colors.text,
     fontWeight: '500',
     lineHeight: 18,
   },
@@ -618,25 +626,30 @@ const styles = StyleSheet.create({
   },
   coachingText: {
     fontSize: 13,
-    color: theme.colors.text,
+    color: colors.text,
     lineHeight: 19,
     fontStyle: 'italic',
   },
   resetBtn: {
-    backgroundColor: theme.colors.cardBg,
+    backgroundColor: colors.cardBg,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
     marginVertical: 20,
   },
   resetBtnText: {
-    color: theme.colors.gold,
+    color: colors.gold,
     fontSize: 14,
     fontWeight: '600',
   },
+  spacer:            { width: 40 },
+  bottomSpacer:      { height: 20 },
+  cardFaceShape:     { marginBottom: 16, backgroundColor: colors.warmAmberGlow },
+  cardCoaching:      { marginBottom: 16, borderColor: '#9B5DE528', backgroundColor: '#9B5DE508' },
+  coachingSectionLast: { marginVertical: 12, marginBottom: 0 },
 });
 
 export default FashionScreen;
