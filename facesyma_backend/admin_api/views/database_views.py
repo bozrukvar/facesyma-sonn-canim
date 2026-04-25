@@ -17,7 +17,7 @@ from django.conf import settings
 
 from admin_api.utils.auth import _require_admin
 
-_GOOGLE_TRANSLATE_API_KEY: str = _GOOGLE_TRANSLATE_API_KEY
+_GOOGLE_TRANSLATE_API_KEY: str = os.environ.get('GOOGLE_TRANSLATE_API_KEY', '')
 
 
 def _json(request):
