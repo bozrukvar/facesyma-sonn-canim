@@ -36,6 +36,8 @@ from .intent import detect_intent
 from .sifat_fetcher import build_sifat_context, format_context_for_ollama
 from .routes.diet import router as diet_router
 
+log = logging.getLogger(__name__)
+
 # Import RAG system if available
 try:
     from ..rag.retriever import get_relevant_context
@@ -60,10 +62,8 @@ try:
     from analysis_api.ollama_system_prompt import get_system_prompt as get_ollama_prompt
 
     CONTEXT_BUILDER_AVAILABLE = True
-    log = logging.getLogger(__name__)
     log.info("✓ Django Chat Context Builder loaded successfully")
 except ImportError as e:
-    log = logging.getLogger(__name__)
     log.warning(f"⚠️  Chat Context Builder not available: {e}")
     CONTEXT_BUILDER_AVAILABLE = False
 
@@ -89,8 +89,6 @@ def _get_groq_client() -> Groq:
     if _groq_client is None:
         _groq_client = Groq(api_key=GROQ_API_KEY)
     return _groq_client
-
-log = logging.getLogger(__name__)
 
 _DEFAULT_GREETINGS = {
     "tr": "Merhaba! Analiz sonuçlarımı açıklar mısın?",
