@@ -75,9 +75,33 @@ class MealLeaderboardEntry:
         self.rank = rank
 
 
+COUNTRY_CODES: Dict[str, str] = {
+    'TR': 'Türkiye', 'US': 'United States', 'GB': 'United Kingdom',
+    'DE': 'Germany', 'FR': 'France', 'IT': 'Italy', 'ES': 'Spain',
+    'PT': 'Portugal', 'NL': 'Netherlands', 'BE': 'Belgium',
+    'CH': 'Switzerland', 'AT': 'Austria', 'PL': 'Poland', 'RU': 'Russia',
+    'JP': 'Japan', 'CN': 'China', 'KR': 'South Korea', 'IN': 'India',
+    'BR': 'Brazil', 'MX': 'Mexico', 'AR': 'Argentina', 'AU': 'Australia',
+    'CA': 'Canada', 'ZA': 'South Africa', 'EG': 'Egypt', 'NG': 'Nigeria',
+    'SA': 'Saudi Arabia', 'AE': 'UAE', 'IR': 'Iran', 'PK': 'Pakistan',
+    'ID': 'Indonesia', 'TH': 'Thailand', 'VN': 'Vietnam', 'MY': 'Malaysia',
+    'GR': 'Greece', 'SE': 'Sweden', 'NO': 'Norway', 'DK': 'Denmark',
+    'FI': 'Finland', 'CZ': 'Czech Republic', 'HU': 'Hungary', 'RO': 'Romania',
+    'BG': 'Bulgaria', 'HR': 'Croatia', 'SK': 'Slovakia', 'UA': 'Ukraine',
+    'BY': 'Belarus', 'RS': 'Serbia', 'SI': 'Slovenia', 'LT': 'Lithuania',
+    'LV': 'Latvia', 'EE': 'Estonia', 'IL': 'Israel', 'MA': 'Morocco',
+    'DZ': 'Algeria', 'TN': 'Tunisia', 'KE': 'Kenya', 'ET': 'Ethiopia',
+    'GH': 'Ghana', 'TZ': 'Tanzania', 'UG': 'Uganda', 'SN': 'Senegal',
+    'CL': 'Chile', 'CO': 'Colombia', 'PE': 'Peru', 'VE': 'Venezuela',
+    'EC': 'Ecuador', 'BO': 'Bolivia', 'PY': 'Paraguay', 'UY': 'Uruguay',
+    'NZ': 'New Zealand', 'SG': 'Singapore', 'PH': 'Philippines', 'BD': 'Bangladesh',
+    'OTHER': 'Other',
+}
+
 __all__ = [
     'Meal',
     'MealSelectionRequest',
     'MealSifatGuessRequest',
     'MealLeaderboardEntry',
+    'COUNTRY_CODES',
 ]
