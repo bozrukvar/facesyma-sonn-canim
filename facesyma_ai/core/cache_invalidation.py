@@ -20,7 +20,7 @@ Strategy:
 import logging
 from typing import List, Optional
 from enum import Enum
-from facesyma_ai.core.redis_client import redis_delete, redis_clear_pattern, get_redis
+from core.redis_client import redis_delete, redis_clear_pattern, get_redis
 
 log = logging.getLogger(__name__)
 
