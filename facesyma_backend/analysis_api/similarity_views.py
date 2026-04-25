@@ -18,7 +18,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
-from admin_api.utils.mongo import get_db as _get_mongo_db
+from admin_api.utils.mongo import _get_db as _get_mongo_db
 
 log = logging.getLogger(__name__)
 
