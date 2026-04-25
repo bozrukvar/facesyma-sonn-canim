@@ -28,7 +28,7 @@ from pydantic             import BaseModel
 from pymongo              import MongoClient, DESCENDING
 import jwt
 
-from facesyma_ai.core.redis_client import redis_get, redis_set
+from core.redis_client import redis_get, redis_set
 
 from .system_prompt import build_system_prompt, get_supported_languages
 from .modules import get_registry, init_registry, ALL_MODULES, execute_module

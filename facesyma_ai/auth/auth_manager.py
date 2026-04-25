@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import logging
 
-from facesyma_ai.core.redis_client import redis_get, redis_set, redis_delete
+from core.redis_client import redis_get, redis_set, redis_delete
 
 log = logging.getLogger(__name__)
 SESSION_STORAGE_TTL = 86400  # 24 hours (matches Session duration_hours default)

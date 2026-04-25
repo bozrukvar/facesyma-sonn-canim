@@ -14,7 +14,7 @@ import logging
 import hashlib
 import pickle
 from typing import List
-from facesyma_ai.core.redis_client import redis_get, redis_set, redis_clear_pattern
+from core.redis_client import redis_get, redis_set, redis_clear_pattern
 
 log = logging.getLogger(__name__)
 

@@ -26,7 +26,7 @@ except ImportError:
     raise ImportError("chromadb not installed. Run: pip install chromadb")
 
 from .embedder import embed_text
-from facesyma_ai.core.redis_client import redis_get, redis_set
+from core.redis_client import redis_get, redis_set
 
 log = logging.getLogger(__name__)
 

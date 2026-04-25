@@ -16,19 +16,19 @@ from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from facesyma_ai.diet_coaching import (
+from diet_coaching import (
     get_daily_recommendation,
     get_meal_suggestions,
     record_meal_feedback,
 )
-from facesyma_ai.diet_coaching.database import get_database
-from facesyma_ai.diet_coaching.models import (
+from diet_coaching.database import get_database
+from diet_coaching.models import (
     UserProfile,
     UserSifat,
     DietaryPreferences,
     DailyRecommendation,
 )
-from facesyma_ai.diet_coaching.utils import (
+from diet_coaching.utils import (
     format_recommendation_for_chat,
     calculate_daily_nutrition,
     format_nutrition_info,
