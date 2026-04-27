@@ -452,21 +452,92 @@ class TwinsView(View):
             try:
                 from database_twins import twins
                 result = twins(*images, lang)
-            except ImportError:
-                # Fallback: Return placeholder compatibility analysis
+            except Exception:
+                # Fallback: engine not available or crashed
                 result = generate_compatibility_placeholder(images, lang)
 
             if isinstance(result, str):
                 try:
                     result = json.loads(result)
                 except Exception:
-                    result = {'result': result}
+                    # Format: "97.88#textDescription..." — parse score and text
+                    raw = result.strip()
+                    if '#text' in raw:
+                        parts = raw.split('#text', 1)
+                        try:
+                            score = round(float(parts[0].strip()))
+                        except ValueError:
+                            score = 75
+                        description = parts[1].strip() if len(parts) > 1 else ''
+                        result = {
+                            'group_score': score,
+                            'overall_harmony': score,
+                            'person_count': len(images),
+                            'details': description,
+                            'pair_scores': {},
+                            'recommendations': [],
+                        }
+                    else:
+                        result = {'result': raw}
+
+            # Multi-dimension analysis: run enhanced_character mode on each photo
+            # (enhanced_databases returns structured dict with sifat_scores; plain
+            # databases() returns a text string which cannot be used for scoring)
+            analyses = []
+            for img_path in images:
+                try:
+                    person_data = _run_analysis(img_path, 'enhanced_character', lang)
+                    if isinstance(person_data, str):
+                        try:
+                            person_data = json.loads(person_data)
+                        except Exception:
+                            person_data = {}
+                    if isinstance(person_data, dict):
+                        log.info(f'Twins per-person keys: {list(person_data.keys())}, sifat_scores count: {len(person_data.get("sifat_scores", {}))}')
+                    else:
+                        log.warning(f'Twins per-person unexpected type: {type(person_data)}')
+                    analyses.append(person_data if isinstance(person_data, dict) else {})
+                except Exception as e:
+                    log.warning(f'Per-person twins analysis failed: {e}', exc_info=True)
+                    analyses.append({})
+
+            log.info(f'Twins analyses count={len(analyses)}, non-empty={sum(1 for a in analyses if a)}')
+            dimensions = _calculate_twins_dimensions(analyses, lang)
+            log.info(f'Twins dimensions keys: {list(dimensions.keys()) if dimensions else "EMPTY"}')
+
+            if isinstance(result, dict):
+                if dimensions:
+                    result['dimensions'] = dimensions
+                # If engine gave 0, compute group_score from dimension averages
+                if not result.get('group_score') and dimensions:
+                    gs = round(sum([
+                        dimensions['face_similarity'],
+                        dimensions['character_compat'],
+                        dimensions['complementarity'],
+                        dimensions['shared_strengths_score'],
+                        dimensions['eq_compat'],
+                    ]) / 5)
+                    result['group_score'] = gs
+                    result['overall_harmony'] = gs
 
             for p in images:
                 try:
                     os.remove(p)
                 except Exception:
                     pass
+
+            # Save to history
+            try:
+                app_source = request.POST.get('app_source', 'mobile')
+                history_doc = {
+                    'group_score':    result.get('group_score', 0) if isinstance(result, dict) else 0,
+                    'person_count':   len(images),
+                    'community_type': (dimensions or {}).get('community_type', ''),
+                    'pair_scores':    result.get('pair_scores', {}) if isinstance(result, dict) else {},
+                }
+                _save_history(uid, 'twins', lang, history_doc, app_source)
+            except Exception:
+                pass  # history save failure must not break the response
 
             return JsonResponse({'success': True, 'data': result})
 
@@ -491,6 +562,249 @@ _COMPAT_STRINGS = {
         'rec3':    'Computing compatibility features',
     },
 }
+
+
+# ── Twins extended analysis helpers ──────────────────────────────────────────
+_TWIN_CAT_KW = {
+    'romantic': frozenset({
+        'romantik', 'duygu', 'hassas', 'sevgi', 'şefkat', 'empat', 'sadakat', 'bağ',
+        'aşk', 'tutku', 'love', 'passion', 'tender', 'empath', 'loyal', 'caring', 'intimat',
+    }),
+    'social': frozenset({
+        'sosyal', 'arkadaş', 'iletişim', 'eğlenc', 'espri', 'sohbet', 'neşe', 'samim',
+        'dışa', 'social', 'friend', 'communic', 'fun', 'outgo', 'cheerful', 'hospitab',
+    }),
+    'teamwork': frozenset({
+        'liderlik', 'organize', 'sorumlul', 'güvenilir', 'kararlı', 'disiplin',
+        'iş', 'planlı', 'methodic', 'leader', 'organiz', 'responsib', 'reliable',
+        'disciplin', 'teamwork', 'cooperat',
+    }),
+}
+
+_ACTIVITY_MAP = [
+    (frozenset({'yaratıcı', 'sanat', 'estetik', 'creat', 'art', 'aesthet', 'imag'}),
+     {'tr': 'Sanat atölyesi veya müze gezisi', 'en': 'Art workshop or museum visit'}),
+    (frozenset({'sosyal', 'eğlenc', 'neşe', 'social', 'fun', 'cheerful', 'playful'}),
+     {'tr': 'Grup aktivitesi veya oyun gecesi', 'en': 'Group activity or game night'}),
+    (frozenset({'doğa', 'macera', 'enerji', 'spor', 'nature', 'adventur', 'sport', 'energ'}),
+     {'tr': 'Doğa yürüyüşü veya spor aktivitesi', 'en': 'Nature hike or sports activity'}),
+    (frozenset({'zeka', 'düşünce', 'merak', 'analiz', 'intellect', 'curious', 'analyt'}),
+     {'tr': 'Kitap kulübü veya tartışma gecesi', 'en': 'Book club or discussion night'}),
+    (frozenset({'yardım', 'empat', 'şefkat', 'help', 'compassion', 'kind', 'volunt'}),
+     {'tr': 'Gönüllü çalışma veya topluluk projesi', 'en': 'Volunteering or community project'}),
+    (frozenset({'romantik', 'tutku', 'aşk', 'passion', 'intimat', 'roman'}),
+     {'tr': 'Romantik akşam yemeği veya seyahat', 'en': 'Romantic dinner or travel'}),
+    (frozenset({'müzik', 'dans', 'ritim', 'music', 'danc', 'rhythm'}),
+     {'tr': 'Konser veya dans etkinliği', 'en': 'Concert or dance event'}),
+    (frozenset({'yemek', 'lezzet', 'mutfak', 'food', 'cook', 'cuisine', 'gourm'}),
+     {'tr': 'Yemek kursu veya gastronomi turu', 'en': 'Cooking class or gastronomy tour'}),
+    (frozenset({'seyahat', 'keşif', 'travel', 'explor', 'adventur', 'wander'}),
+     {'tr': 'Birlikte seyahat veya şehir keşfi', 'en': 'Travel or city exploration together'}),
+]
+
+_COMMUNITY_MAP = [
+    (frozenset({'yaratıcı', 'sanat', 'estetik', 'creat', 'art', 'aesthet'}),
+     {'tr': '🎨 Yaratıcı & Sanat Topluluğu', 'en': '🎨 Creative & Arts Community'}),
+    (frozenset({'liderlik', 'kariyer', 'girişim', 'leader', 'career', 'ambit', 'entrepren'}),
+     {'tr': '🚀 Kariyer & Girişim Grubu', 'en': '🚀 Career & Startup Group'}),
+    (frozenset({'sosyal', 'eğlenc', 'neşe', 'social', 'fun', 'cheerful'}),
+     {'tr': '🎉 Sosyal Etkileşim Çevresi', 'en': '🎉 Social Circle'}),
+    (frozenset({'doğa', 'macera', 'spor', 'nature', 'adventur', 'sport'}),
+     {'tr': '🌿 Macera & Doğa Grubu', 'en': '🌿 Adventure & Nature Group'}),
+    (frozenset({'empat', 'yardım', 'şefkat', 'empath', 'help', 'kind', 'compassion'}),
+     {'tr': '💝 Destek & Topluluk Grubu', 'en': '💝 Support & Community Group'}),
+    (frozenset({'zeka', 'analiz', 'merak', 'intellect', 'analyt', 'curious', 'philos'}),
+     {'tr': '🧩 Bilgi & Tartışma Kulübü', 'en': '🧩 Knowledge & Discussion Club'}),
+    (frozenset({'müzik', 'dans', 'ritim', 'music', 'danc', 'rhythm'}),
+     {'tr': '🎵 Müzik & Dans Topluluğu', 'en': '🎵 Music & Dance Community'}),
+    (frozenset({'romantik', 'sevgi', 'aşk', 'love', 'romantic', 'intimat'}),
+     {'tr': '💑 Çift & İlişki Topluluğu', 'en': '💑 Couples & Relationships Community'}),
+]
+
+
+def _match_kw(trait: str, keywords: frozenset) -> bool:
+    tl = trait.lower()
+    return any(kw in tl for kw in keywords)
+
+
+def _compat_for_cat(all_sifatlar: set, score_maps: list, keywords: frozenset, fallback: int) -> int:
+    diffs = [
+        max(sm.get(s, 50.0) for sm in score_maps) - min(sm.get(s, 50.0) for sm in score_maps)
+        for s in all_sifatlar if _match_kw(s, keywords)
+    ]
+    return max(0, min(100, round(100.0 - sum(diffs) / len(diffs)))) if diffs else fallback
+
+
+def _suggest_activities(positive_traits: list, lang: str) -> list:
+    lk = 'tr' if lang.startswith('tr') else 'en'
+    return [labels[lk] for kws, labels in _ACTIVITY_MAP
+            if any(_match_kw(t, kws) for t in positive_traits)][:3]
+
+
+def _suggest_community(all_traits: list, lang: str) -> str:
+    lk = 'tr' if lang.startswith('tr') else 'en'
+    best, best_n = None, 0
+    for kws, labels in _COMMUNITY_MAP:
+        n = sum(1 for t in all_traits if _match_kw(t, kws))
+        if n > best_n:
+            best_n, best = n, labels[lk]
+    return best or ('🤝 Genel Topluluk' if lang.startswith('tr') else '🤝 General Community')
+
+
+def _calculate_twins_dimensions(analyses: list, lang: str) -> dict:
+    """Compute 5 compatibility dimensions from per-person character analyses.
+
+    Each person's analysis must contain a 'sifatlar' list of {sifat, score} dicts.
+    Returns an empty dict when there are fewer than 2 non-empty analyses.
+    """
+    score_maps = []
+    for analysis in analyses:
+        sm = {}
+        if not isinstance(analysis, dict):
+            score_maps.append(sm)
+            continue
+
+        # Format 1: sifatlar list → [{sifat/name, score}]  (legacy)
+        sifatlar = analysis.get('sifatlar', [])
+        # Format 2: enhanced_databases → sifat_scores dict {name: 0-1 float}
+        sifat_scores = analysis.get('sifat_scores', {})
+        # Format 3: enhanced_databases → top_sifatlar list [{sifat, score}]
+        top_sifatlar = analysis.get('top_sifatlar', [])
+
+        if sifatlar:
+            for item in sifatlar:
+                if isinstance(item, dict):
+                    name = item.get('sifat', item.get('name', ''))
+                    try:
+                        s = float(item.get('score', 0))
+                        s = s * 100 if s <= 1.0 else s  # normalise 0-1 → 0-100
+                    except (TypeError, ValueError):
+                        s = 0.0
+                    if name:
+                        sm[name] = s
+        elif sifat_scores:
+            for name, s in sifat_scores.items():
+                try:
+                    s = float(s)
+                    s = s * 100 if s <= 1.0 else s
+                except (TypeError, ValueError):
+                    s = 0.0
+                if name:
+                    sm[name] = s
+        elif top_sifatlar:
+            for item in top_sifatlar:
+                if isinstance(item, dict):
+                    name = item.get('sifat', item.get('name', ''))
+                    try:
+                        s = float(item.get('score', 0))
+                        s = s * 100 if s <= 1.0 else s
+                    except (TypeError, ValueError):
+                        s = 0.0
+                    if name:
+                        sm[name] = s
+        score_maps.append(sm)
+
+    all_sifatlar = set()
+    for sm in score_maps:
+        all_sifatlar.update(sm.keys())
+
+    if not all_sifatlar or len([sm for sm in score_maps if sm]) < 2:
+        return {}
+
+    n = len(score_maps)
+
+    # 1. Yüz benzerliği — pairwise mean absolute difference across all traits
+    pair_sims = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            sm_a, sm_b = score_maps[i], score_maps[j]
+            diffs = [abs(sm_a.get(s, 50.0) - sm_b.get(s, 50.0)) for s in all_sifatlar]
+            if diffs:
+                pair_sims.append(max(0.0, 100.0 - sum(diffs) / len(diffs)))
+    face_similarity = round(sum(pair_sims) / len(pair_sims)) if pair_sims else 75
+
+    # 2. Karakter uyumu — alignment on traits all persons share
+    common = all_sifatlar.copy()
+    for sm in score_maps:
+        common &= set(sm.keys())
+    if common:
+        char_diffs = [max(sm.get(s, 50.0) for sm in score_maps) - min(sm.get(s, 50.0) for sm in score_maps)
+                      for s in common]
+        character_compat = max(0, min(100, round(100.0 - sum(char_diffs) / len(char_diffs))))
+    else:
+        character_compat = 65
+
+    # 3. Tamamlayıcılık — where one person excels, the other balances
+    HIGH = 65.0
+    sm_a, sm_b = score_maps[0], score_maps[1]
+    diff_count = complement_count = 0
+    for s in all_sifatlar:
+        a, b = sm_a.get(s, 50.0), sm_b.get(s, 50.0)
+        if abs(a - b) > 20:
+            diff_count += 1
+            if (a >= HIGH and b < HIGH) or (b >= HIGH and a < HIGH):
+                complement_count += 1
+    complement_score = round(min(100, 45 + (complement_count / diff_count) * 55)) if diff_count else 65
+
+    # 4. Ortak güçler — traits where everyone scores ≥ 68
+    HIGH_THRESHOLD = 68.0
+    shared_list = [s for s in common if all(sm.get(s, 0.0) >= HIGH_THRESHOLD for sm in score_maps)]
+    shared_strengths_score = min(100, round(50 + len(shared_list) * 4))
+
+    # 5. İletişim & EQ uyumu — closeness on emotional/communication traits
+    EQ_KEYWORDS = frozenset({
+        'empat', 'iletişim', 'sosyal', 'duygu', 'anlayış', 'dinle', 'saygı', 'güven',
+        'empath', 'communic', 'social', 'emotion', 'understand', 'listen', 'trust',
+    })
+    eq_compat = _compat_for_cat(all_sifatlar, score_maps, EQ_KEYWORDS,
+                                 fallback=round((face_similarity + character_compat) / 2))
+
+    # 6. Romantik uyum
+    romantic_compat = _compat_for_cat(
+        all_sifatlar, score_maps, _TWIN_CAT_KW['romantic'],
+        fallback=round((face_similarity * 0.35 + character_compat * 0.35 + complement_score * 0.3)),
+    )
+
+    # 7. Sosyal uyum
+    social_compat = _compat_for_cat(
+        all_sifatlar, score_maps, _TWIN_CAT_KW['social'],
+        fallback=round((eq_compat * 0.6 + character_compat * 0.4)),
+    )
+
+    # 8. Ekip çalışması uyumu
+    teamwork_compat = _compat_for_cat(
+        all_sifatlar, score_maps, _TWIN_CAT_KW['teamwork'],
+        fallback=round((character_compat * 0.5 + complement_score * 0.5)),
+    )
+
+    # 9. Olumlu ortak özellikler — her ikisi ≥ 60
+    positive_shared = [s for s in common if all(sm.get(s, 0.0) >= 60.0 for sm in score_maps)]
+
+    # 10. Gelişim alanları — her ikisi ≤ 42 (shared growth opportunities)
+    negative_shared = [s for s in common if all(sm.get(s, 100.0) <= 42.0 for sm in score_maps)]
+
+    # 11. Önerilen etkinlikler
+    all_traits_list = list(all_sifatlar)
+    activity_suggestions = _suggest_activities(positive_shared or all_traits_list, lang)
+
+    # 12. Topluluk önerisi
+    community_type = _suggest_community(positive_shared or all_traits_list, lang)
+
+    return {
+        'face_similarity':        face_similarity,
+        'character_compat':       character_compat,
+        'complementarity':        complement_score,
+        'shared_strengths_score': shared_strengths_score,
+        'shared_strengths_list':  shared_list[:8],
+        'eq_compat':              eq_compat,
+        'romantic_compat':        romantic_compat,
+        'social_compat':          social_compat,
+        'teamwork_compat':        teamwork_compat,
+        'positive_shared':        positive_shared[:10],
+        'negative_shared':        negative_shared[:6],
+        'activity_suggestions':   activity_suggestions,
+        'community_type':         community_type,
+    }
 
 
 def generate_compatibility_placeholder(images, lang='tr'):
@@ -531,6 +845,46 @@ class HistoryView(View):
             return JsonResponse({'detail': 'Unauthorized.'}, status=401)
         except Exception as e:
             log.exception('History fetch error')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
+
+
+# ── Geçmiş silme ─────────────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class HistoryDeleteView(View):
+    """Tek bir analiz kaydını siler (user sadece kendi kaydını silebilir)."""
+    def delete(self, request, record_id: str):
+        try:
+            uid = _require_auth(request)
+            col = get_history_col()
+            result = col.delete_one({'_id': record_id, 'user_id': uid})
+            if result.deleted_count == 0:
+                # Farklı id formatı dene (string uuid olabilir)
+                from bson import ObjectId
+                try:
+                    result = col.delete_one({'_id': ObjectId(record_id), 'user_id': uid})
+                except Exception:
+                    pass
+            return JsonResponse({'deleted': result.deleted_count > 0})
+        except PermissionError:
+            return JsonResponse({'detail': 'Unauthorized.'}, status=401)
+        except Exception:
+            log.exception('History delete error')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class HistoryDeleteAllView(View):
+    """Kullanıcının tüm analiz geçmişini siler."""
+    def delete(self, request):
+        try:
+            uid = _require_auth(request)
+            col = get_history_col()
+            result = col.delete_many({'user_id': uid})
+            return JsonResponse({'deleted_count': result.deleted_count})
+        except PermissionError:
+            return JsonResponse({'detail': 'Unauthorized.'}, status=401)
+        except Exception:
+            log.exception('History delete all error')
             return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
