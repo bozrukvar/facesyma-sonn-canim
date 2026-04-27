@@ -171,8 +171,7 @@ def twins(img1, img2, lang):
         result_att = result_att + round(random.uniform(5, 10), 2)
 
     _vals = list(total_att.values())
-    total_text = random.sample(_vals, len(_vals))
-    total_text = ''.join(map(str, total_text))
+    total_text = ''.join(map(str, random.sample(_vals, len(_vals)))) if _vals else ''
     result_text = " " + str(result_att) + "#text" + total_text
 
     # Extract per-person sifatlar from x (person 1) and y (person 2)
@@ -200,9 +199,17 @@ def twins(img1, img2, lang):
                 continue
             if not category or category == 'not_defined':
                 continue
+            # Try MongoDB lookup for Turkish trait names
             series = _sget(doc_id, {})
-            for sifat in series.get(category, {}):
-                sm[sifat] = 70.0
+            cat_sifatlar = series.get(category, {})
+            if cat_sifatlar:
+                for sifat in cat_sifatlar:
+                    sm[sifat] = 70.0
+            else:
+                # MongoDB unavailable — use category string directly as synthetic sifat
+                # "golden" categories score higher; others score lower
+                score = 85.0 if 'golden' in category else 65.0
+                sm[f'{doc_id}_{category}'] = score
         return sm
 
     return {
