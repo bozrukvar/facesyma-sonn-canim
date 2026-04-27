@@ -16,6 +16,9 @@ import theme from '../utils/theme';
 const { colors } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
 import type { AnalysisResult } from '../types/api';
@@ -70,6 +73,7 @@ interface RouteParams {
 
 const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
   const insets        = useSafeAreaInsets();
+  const dispatch      = useDispatch<AppDispatch>();
   const analysisResult = route.params?.analysisResult ?? {};
   const { lang } = useLanguage();
   const MEVSIMLER = useMemo(() => getSeasons(lang), [lang]);
@@ -97,6 +101,7 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
         selectedKategori || undefined
       );
       setData(response);
+      dispatch(markModuleUsed('fashion'));
     } catch (error: any) {
       Alert.alert(t('common.error', lang), error.response?.data?.detail || t('common.generic_error', lang));
     } finally {

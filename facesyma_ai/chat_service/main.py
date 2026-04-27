@@ -18,7 +18,7 @@ Endpoint'ler:
 """
 
 import os, json, uuid, logging, sys, hashlib
-from datetime import datetime
+from datetime import datetime, date, timezone
 from typing   import Optional
 
 from groq import Groq
@@ -28,7 +28,7 @@ from pydantic             import BaseModel
 from pymongo              import MongoClient, DESCENDING
 import jwt
 
-from core.redis_client import redis_get, redis_set
+from core.redis_client import redis_get, redis_set, get_redis
 
 from .system_prompt import build_system_prompt, get_supported_languages
 from .modules import get_registry, init_registry, ALL_MODULES, execute_module
@@ -81,6 +81,98 @@ GROQ_MODEL  = "llama-3.1-8b-instant"
 MAX_TOKENS  = 512
 MAX_HISTORY = 20   # konuşma başına max mesaj sayısı
 LLM_RESPONSE_CACHE_TTL = 21600  # 6 hours
+
+# ── Chat Kullanım Limitleri ───────────────────────────────────────────────────
+CHAT_FILE_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — chat dosya paylaşımı
+
+_CHAT_DAILY_LIMITS = {
+    'free':    5,
+    'premium': 200,
+}
+
+_LIMIT_MSGS = {
+    'tr': {
+        'free_hit':    'Günlük ücretsiz mesaj limitinize ({limit}) ulaştınız. '
+                       'Premium ile günde {premium} mesaj gönderin.',
+        'premium_hit': 'Günlük {limit} mesaj limitinize ulaştınız.',
+    },
+    'en': {
+        'free_hit':    'You reached your daily free message limit ({limit}). '
+                       'Upgrade to Premium for {premium} messages/day.',
+        'premium_hit': 'You reached your daily {limit} message limit.',
+    },
+}
+
+
+def _get_user_plan(user_id: int) -> str:
+    """MongoDB'den plan oku. Premium süresi dolmuşsa 'free' döner."""
+    try:
+        user = get_db()['users'].find_one(
+            {'id': user_id}, {'plan': 1, 'premium_expires_at': 1, '_id': 0}
+        )
+        if not user:
+            return 'free'
+        plan = user.get('plan', 'free')
+        if plan == 'premium':
+            exp = user.get('premium_expires_at')
+            if exp:
+                try:
+                    exp_dt = datetime.fromisoformat(exp)
+                    if exp_dt.tzinfo is None:
+                        exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+                    if datetime.now(timezone.utc) > exp_dt:
+                        return 'free'
+                except Exception:
+                    pass
+        return plan
+    except Exception:
+        return 'free'  # fail-safe
+
+
+def _chat_daily_key(user_id: int) -> str:
+    return f"chat:daily:{user_id}:{date.today().isoformat()}"
+
+
+def _check_and_increment_chat_limit(user_id: int) -> tuple:
+    """
+    Mesaj hakkı var mı kontrol et ve sayacı artır.
+
+    Returns (allowed: bool, used: int, limit: int, plan: str)
+    Redis down ise her zaman izin verir (graceful degradation).
+    """
+    plan  = _get_user_plan(user_id)
+    limit = _CHAT_DAILY_LIMITS.get(plan, _CHAT_DAILY_LIMITS['free'])
+    r     = get_redis()
+    if r is None:
+        return True, 0, limit, plan
+
+    key = _chat_daily_key(user_id)
+    try:
+        used = r.get(key)
+        used = int(used) if used else 0
+        if used >= limit:
+            return False, used, limit, plan
+        pipe = r.pipeline()
+        pipe.incr(key)
+        pipe.expire(key, 86400)  # 24 saatte sıfırla
+        pipe.execute()
+        return True, used + 1, limit, plan
+    except Exception:
+        return True, 0, limit, plan  # fail-safe
+
+
+def _chat_usage(user_id: int) -> tuple:
+    """(used, limit, plan) — display için, sayacı artırmaz."""
+    plan  = _get_user_plan(user_id)
+    limit = _CHAT_DAILY_LIMITS.get(plan, _CHAT_DAILY_LIMITS['free'])
+    r     = get_redis()
+    if r is None:
+        return 0, limit, plan
+    try:
+        used = r.get(_chat_daily_key(user_id))
+        return int(used) if used else 0, limit, plan
+    except Exception:
+        return 0, limit, plan
 
 _groq_client: Groq | None = None
 
@@ -203,6 +295,7 @@ class StartChatResponse(BaseModel):
     conversation_id: str
     assistant_message: str
     lang: str
+    usage: dict = {}
 
 class MessageResponse(BaseModel):
     conversation_id: str
@@ -292,7 +385,20 @@ async def start_chat(
 
     messages = [{"role": "user", "content": user_text}]
 
-    # Ollama'ya gönder
+    # ── Günlük limit kontrolü ─────────────────────────────────────────────
+    daily_used, daily_limit, _plan = 0, _CHAT_DAILY_LIMITS['free'], 'free'
+    if user_id:
+        allowed, daily_used, daily_limit, _plan = _check_and_increment_chat_limit(user_id)
+        if not allowed:
+            lk   = 'tr' if _lang.startswith('tr') else 'en'
+            msgs = _LIMIT_MSGS.get(lk, _LIMIT_MSGS['en'])
+            if _plan == 'free':
+                detail = msgs['free_hit'].format(limit=daily_limit, premium=_CHAT_DAILY_LIMITS['premium'])
+            else:
+                detail = msgs['premium_hit'].format(limit=daily_limit)
+            raise HTTPException(429, detail)
+
+    # Groq'a gönder
     assistant_text = call_groq(system_msg, messages)
     messages.append({"role": "assistant", "content": assistant_text})
 
@@ -303,6 +409,11 @@ async def start_chat(
         conversation_id   = conv_id,
         assistant_message = assistant_text,
         lang              = _lang,
+        usage             = {
+            'daily_used':  daily_used,
+            'daily_limit': daily_limit,
+            'plan':        _plan,
+        },
     )
 
 # ── Endpoint: Mesaj Gönder (with Orchestration) ─────────────────────────────
@@ -325,12 +436,38 @@ async def send_message(
     if not conv:
         raise HTTPException(404, "Konuşma bulunamadı.")
 
-    _convget = conv.get
+    _convget  = conv.get
     user_lang = body.lang or _convget("lang", "tr")
-    messages = _convget("messages", [])
+    messages  = _convget("messages", [])
+    user_id   = get_user_id(authorization)
+
+    # ── Günlük limit kontrolü ─────────────────────────────────────────────────
+    daily_used, daily_limit, _plan = 0, _CHAT_DAILY_LIMITS['free'], 'free'
+    if user_id:
+        allowed, daily_used, daily_limit, _plan = _check_and_increment_chat_limit(user_id)
+        if not allowed:
+            lk   = 'tr' if user_lang.startswith('tr') else 'en'
+            msgs = _LIMIT_MSGS.get(lk, _LIMIT_MSGS['en'])
+            if _plan == 'free':
+                detail = msgs['free_hit'].format(limit=daily_limit, premium=_CHAT_DAILY_LIMITS['premium'])
+            else:
+                detail = msgs['premium_hit'].format(limit=daily_limit)
+            raise HTTPException(429, detail)
 
     # ── Adım 1: Intent Detection ─────────────────────────────────────────────
-    intent_result = detect_intent(_msg, user_lang)
+    # Test cevabı veya zaten test yapılmışsa tekrar test başlatma
+    _test_answer_prefixes = ("Test cevaplarım:", "My answers:", "Cevaplarım:")
+    _is_test_answer = any(_msg.startswith(p) for p in _test_answer_prefixes)
+    _had_test = any(
+        m.get("content", "").startswith("[TEST_QUESTIONS]")
+        for m in messages
+        if m.get("role") == "assistant"
+    )
+
+    if _is_test_answer or _had_test:
+        intent_result = {"intent": "chat", "confidence": 1.0}
+    else:
+        intent_result = detect_intent(_msg, user_lang)
     _irget = intent_result.get
     _intent = _irget('intent')
     _info(f"Intent detected: {_intent} (confidence: {_irget('confidence')})")
@@ -365,27 +502,27 @@ async def send_message(
                 module_context = f"\n\n[Modül Sonucu: {module_name}]\n{_jd(result_data, ensure_ascii=False, indent=2)}"
                 _info(f"✓ Module executed successfully: {module_name}")
             elif _erget("status") == "pending":
-                # Test module - return questions to user
+                # Test module - return structured marker for mobile interactive rendering
+                test_payload = {
+                    "type": "test_pending",
+                    "test_type": _erget("test_type"),
+                    "session_id": _erget("session_id"),
+                    "questions": _erget("questions", []),
+                }
                 return MessageResponse(
                     conversation_id=_cid,
-                    assistant_message=_jd({
-                        "type": "test_pending",
-                        "test_type": _erget("test_type"),
-                        "session_id": _erget("session_id"),
-                        "questions": _erget("questions", []),
-                    }, ensure_ascii=False),
-                    usage={"input_tokens": 0, "output_tokens": 0},
+                    assistant_message="[TEST_QUESTIONS]" + _jd(test_payload, ensure_ascii=False),
+                    usage={"input_tokens": 0, "output_tokens": 0,
+                           "daily_used": daily_used, "daily_limit": daily_limit, "plan": _plan},
                 )
 
     # ── Adım 3: System Prompt ───────────────────────────────────────────────
     # Try to use enriched context builder if available
     _lwarn = log.warning
     system_msg = None
-    user_id_for_context = get_user_id(authorization)
-
-    if CONTEXT_BUILDER_AVAILABLE and user_id_for_context:
+    if CONTEXT_BUILDER_AVAILABLE and user_id:
         try:
-            ollama_context = build_ollama_context(user_id_for_context, user_lang)
+            ollama_context = build_ollama_context(user_id, user_lang)
             system_msg = get_ollama_prompt(user_lang, ollama_context)
             _info(f"✓ Ollama context used for message endpoint")
         except Exception as e:
@@ -459,7 +596,7 @@ async def send_message(
     # ── Adım 7: Save Conversation ────────────────────────────────────────────
     save_conversation(
         _cid,
-        get_user_id(authorization),
+        user_id,
         messages,
         _conv_analysis,
         user_lang,
@@ -471,6 +608,9 @@ async def send_message(
         usage             = {
             "input_tokens":  0,
             "output_tokens": 0,
+            "daily_used":    daily_used,
+            "daily_limit":   daily_limit,
+            "plan":          _plan,
         },
     )
 

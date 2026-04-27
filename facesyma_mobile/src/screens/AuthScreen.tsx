@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, KeyboardAvoidingView,
-  Platform, TouchableOpacity, Dimensions, Alert,
+  Platform, TouchableOpacity, Dimensions, Alert, Linking, Image,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -16,6 +16,9 @@ import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
+
+const TERMS_URL   = 'https://facesyma.com/wp-content/uploads/2024/07/maula-en.pdf';
+const PRIVACY_URL = 'https://facesyma.com/wp-content/uploads/2024/07/ppa-en.pdf';
 
 const { width } = Dimensions.get('window');
 
@@ -31,14 +34,15 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
   const { isLoading, error } = useSelector((s: RootState) => s.auth);
   const { lang } = useLanguage();
 
-  const [mode,     setMode]     = useState<Mode>('login');
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [name,     setName]     = useState('');
-  const [confirm,  setConfirm]  = useState('');
-  const [localErr, setLocalErr] = useState('');
+  const [mode,          setMode]          = useState<Mode>('login');
+  const [email,         setEmail]         = useState('');
+  const [password,      setPassword]      = useState('');
+  const [name,          setName]          = useState('');
+  const [confirm,       setConfirm]       = useState('');
+  const [localErr,      setLocalErr]      = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const switchMode = (m: Mode) => { setMode(m); dispatch(clearError()); setLocalErr(''); };
+  const switchMode = (m: Mode) => { setMode(m); dispatch(clearError()); setLocalErr(''); setTermsAccepted(false); };
 
   const handleForgotPassword = async () => {
     if (!email.trim()) {
@@ -63,8 +67,9 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
       if (!name.trim())         { setLocalErr(t('common.required', lang)); return; }
       if (password.length < 6)  { setLocalErr(t('auth.error_password_min', lang)); return; }
       if (password !== confirm)  { setLocalErr(t('common.generic_error', lang)); return; }
-      const r = await dispatch(registerWithEmail({ email, password, name }));
-      if (registerWithEmail.fulfilled.match(r)) navigation.replace('Main');
+      if (!termsAccepted)        { setLocalErr(t('auth.error_terms', lang)); return; }
+      const r = await dispatch(registerWithEmail({ email, password, name, terms_accepted: true, gdpr_consent: true }));
+      if (registerWithEmail.fulfilled.match(r)) navigation.replace('ProfileSetup');
     } else {
       const r = await dispatch(loginWithEmail({ email, password }));
       if (loginWithEmail.fulfilled.match(r)) navigation.replace('Main');
@@ -100,10 +105,17 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
       >
         {/* Logo */}
         <View style={styles.logoWrap}>
-          <View style={styles.logoRing}>
-            <Text style={styles.logoEmoji}>👁</Text>
+          <Image
+            source={require('../assets/logo.png')}
+            style={styles.logoImg}
+            resizeMode="contain"
+          />
+          <View style={styles.logoTextRow}>
+            <Text style={styles.logoName}>FaceSyma</Text>
+            <View style={styles.aiBadge}>
+              <Text style={styles.aiBadgeText}>AI</Text>
+            </View>
           </View>
-          <Text style={styles.logoName}>FACESYMA</Text>
           <Text style={styles.logoSub}>
             {mode === 'login' ? t('auth.welcome_back', lang) : t('auth.description', lang)}
           </Text>
@@ -170,6 +182,28 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
           </TouchableOpacity>
         )}
 
+        {mode === 'register' && (
+          <TouchableOpacity
+            style={styles.termsRow}
+            onPress={() => setTermsAccepted(p => !p)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
+              {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
+            </View>
+            <Text style={styles.termsText}>
+              <Text onPress={() => Linking.openURL(TERMS_URL)} style={styles.termsLink}>
+                {t('auth.terms_of_use', lang)}
+              </Text>
+              {' '}{t('auth.and', lang)}{' '}
+              <Text onPress={() => Linking.openURL(PRIVACY_URL)} style={styles.termsLink}>
+                {t('auth.privacy_policy', lang)}
+              </Text>
+              {t('auth.terms_accept_suffix', lang)}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <GoldButton
           title={mode === 'login' ? t('auth.sign_in', lang) : t('auth.sign_up', lang)}
           onPress={handleSubmit}
@@ -189,13 +223,8 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
           <View style={styles.googleIcon}><Text style={styles.googleIconText}>G</Text></View>
           <Text style={styles.googleText}>{t('auth.google', lang)}</Text>
         </TouchableOpacity>
-
-        {mode === 'register' && (
-          <Text style={styles.privacyText}>
-            {t('auth.privacy', lang)}
-          </Text>
-        )}
       </ScrollView>
+
     </KeyboardAvoidingView>
   );
 };
@@ -209,15 +238,21 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   logoWrap:  { alignItems:'center', marginBottom: spacing.xl },
-  logoRing:  {
-    width:64, height:64, borderRadius:32,
-    borderWidth:1.5, borderColor: colors.gold,
-    backgroundColor: colors.goldGlow,
-    alignItems:'center', justifyContent:'center',
+  logoImg: {
+    width: 80,
+    height: 80,
     marginBottom: spacing.md,
-    ...shadow.gold,
   },
-  logoName:  { ...typography.goldLabel, fontSize:18, letterSpacing:5, color: colors.gold, marginBottom:4 },
+  logoTextRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  logoName:  { fontFamily: 'Georgia', fontSize: 22, fontWeight: '700' as const, letterSpacing: 1, color: colors.gold },
+  aiBadge: {
+    backgroundColor: colors.gold,
+    borderRadius: 5,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignSelf: 'center',
+  },
+  aiBadgeText: { fontFamily: 'System', fontSize: 11, fontWeight: '800' as const, color: '#060F14', letterSpacing: 1 },
   logoSub:   { ...typography.bodyWarm, color: colors.textWarm },
   tabs: {
     flexDirection:'row', backgroundColor: colors.surface,
@@ -242,9 +277,27 @@ const styles = StyleSheet.create({
   },
   googleText:    { ...typography.label, color: colors.textPrimary, fontSize:13, letterSpacing:0.5 },
   googleIconText:{ color:'#fff', fontSize:13, fontWeight:'700' as const },
-  privacyText:   { ...typography.caption, textAlign:'center', marginTop: spacing.lg, lineHeight:18 },
-  logoEmoji:     { fontSize: 32 },
   submitBtn:     { marginTop: spacing.sm },
+  termsRow: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    marginTop: spacing.md, gap: spacing.sm,
+  },
+  checkbox: {
+    width: 22, height: 22, borderRadius: 6,
+    borderWidth: 1.5, borderColor: colors.border,
+    alignItems: 'center', justifyContent: 'center',
+    marginTop: 1,
+  },
+  checkboxChecked: { backgroundColor: colors.gold, borderColor: colors.gold },
+  checkmark:  { color: '#000', fontSize: 13, fontWeight: '700' as const },
+  termsText:  { ...typography.caption, flex: 1, lineHeight: 20, color: colors.textMuted },
+  termsLink:  { color: colors.gold, textDecorationLine: 'underline' as const },
+  webViewContainer: { flex: 1, backgroundColor: colors.background },
+  webViewClose: {
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    borderBottomWidth: 1, borderColor: colors.border,
+  },
+  webViewCloseText: { ...typography.label, color: colors.gold },
 });
 
 export default AuthScreen;

@@ -44,22 +44,47 @@ _MODULES_INTRO = {
 }
 _MODULE_SUGGESTIONS = {
     "tr": [
-        "Astroloji: 'Doğum tarihinizi söylerseniz astroloji haritanızı çıkarabilirim'",
-        "Kişilik Testi: 'Kişiliğinizi daha iyi anlamak için 20 sorulu test yapabiliriz'",
-        "Kariyer Testi: 'Kariyer yolunuzu keşfetmek için test çözsünüz'",
-        "İK/Çalışma Stili: 'Takım ortamında rolünüzü anlamak için test yapabiliriz'",
-        "Beceri Testi: 'Güçlü ve zayıf yönlerinizi belirlemek için test yapabiliriz'",
-        "Meslek Tercihi: '20 soruda ideal mesleğinizi bulabiliriz'",
-        "İlişki & EQ: 'Duygusal zekanızı ve ilişki stilinizi ölçebiliriz'",
+        # Kişilik
+        "Kişilik: 'Analizin kişiliğinin belirli boyutlarını ortaya koyuyor — Big Five testinde bu özelliklerin tam ağırlığını ölçmek ister misin?'",
+        "Kişilik: 'Seni bu kadar özgün yapan şeyin derinlerine inelim mi? 20 soruluk kişilik testim var.'",
+        # Kariyer
+        "Kariyer Testi: 'Bu analitik yönün kariyer seçiminde belirleyici olabilir — kariyer eğilim testini yapalım mı?'",
+        "Kariyer: 'Hangi sektörde parlayacağını merak ediyor musun? Kısa bir kariyer testi sana net bir tablo verebilir.'",
+        # İK & Liderlik
+        "İK/Çalışma Stili: 'Takım içindeki rolün ne? Bunu birlikte keşfedelim mi?'",
+        "Liderlik: 'Liderlik potansiyelin yüksek görünüyor — liderlik profilini çıkaralım mı?'",
+        # Beceri
+        "Beceri Testi: 'Güçlü olduğun alanları biliyor musun? Bir beceri haritası çıkaralım mı?'",
+        # Meslek
+        "Meslek Tercihi: 'Sana en uygun meslek nedir sorusunu Holland modeliyle cevaplayabilir miyiz?'",
+        # EQ & İlişki
+        "İlişki & EQ: 'Duygusal zekan analizde öne çıkıyor — bunu sayısal olarak ölçmek ister misin?'",
+        "İlişki: 'İlişki tarzın ve bağlanma biçimin hakkında merak ettiklerin var mı?'",
+        # Astroloji
+        "Astroloji: 'Doğum tarihinle analiz sonuçlarını karşılaştırırsak ilginç örtüşmeler bulabiliriz — deneyelim mi?'",
+        # Giyim & Stil
+        "Giyim & Tarz: 'Yüz tipine ve karakter özelliklerine göre sana yakışacak tarzı keşfedelim mi?'",
+        # Müzik
+        "Müzik: 'Kişilik analizine göre seni en çok etkileyen müzik türlerini biliyor musun?'",
+        # Film
+        "Film & Dizi: 'Analizine göre hangi film türleri seni daha çok etkileyebilir — bakalım mı?'",
+        # Motivasyon
+        "Motivasyon: 'Seni en çok neyin harekete geçirdiğini biliyor musun? Motivasyon profilini çıkaralım mı?'",
+        # Etkinlik
+        "Etkinlik: 'Bu özelliklerle sana uygun aktiviteleri önereyim mi?'",
     ],
     "en": [
-        "Astrology: 'If you share your birth date and time, I can create your astrological chart'",
-        "Personality Test: 'We can take a 20-question personality test to understand you better'",
-        "Career Test: 'Discover your ideal career path with our career aptitude test'",
-        "Work Style Test: 'Understand your role in team environments'",
-        "Skills Test: 'Identify your strengths and areas for growth'",
-        "Vocational Test: \"Find your ideal profession based on Holland's model\"",
-        "Relationship Test: 'Measure your emotional intelligence and relationship style'",
+        "Personality: 'Your analysis hints at some fascinating personality dimensions — want to measure them precisely with a Big Five test?'",
+        "Career Test: 'Your analytical traits could point to specific career paths — shall we run a quick career aptitude test?'",
+        "Work Style: 'Curious about your natural role in a team? We can find out in minutes.'",
+        "Leadership: 'Your profile suggests leadership potential — want to see your leadership style mapped out?'",
+        "Skills Test: 'Do you know your top 3 strengths? A skills assessment could map them clearly.'",
+        "Vocation: 'What is your ideal profession? Holland's model can give you a surprisingly accurate answer.'",
+        "Relationship & EQ: 'Your emotional intelligence stands out — want to put a number on it?'",
+        "Astrology: 'Want to see how your birth chart aligns with your face analysis? The parallels can be surprising.'",
+        "Style & Fashion: 'Based on your face shape and traits, I could suggest a style that feels uniquely you — interested?'",
+        "Music: 'Your personality profile suggests specific music genres that could resonate deeply — curious?'",
+        "Motivation: 'Do you know what drives you most? A motivation profile could reveal your core engine.'",
     ],
 }
 
@@ -212,8 +237,8 @@ MODULE_LABELS = {
 # RULES — 7 kural, her dilde
 # ─────────────────────────────────────────────────────────────────────────────
 RULES = {
-    "tr": "1. Sadece analiz verisine dayan.\n2. Her cevapta bir özelliğe atıf yap.\n3. 3-5 cümle tut.\n4. Olumsuzları fırsata çevir.\n5. Modül sorusunda o modülün verisini kullan.\n6. Veride olmayan şeyi kibarca söyle.\n7. İlk mesajda 2-3 özelliği vurgula.",
-    "en": "1. Base answers only on analysis data.\n2. Reference a specific trait in every response.\n3. Keep to 3-5 sentences.\n4. Reframe negatives as strengths.\n5. Use module data for module questions.\n6. Politely note if something is not in the data.\n7. Highlight 2-3 standout traits in your first message.",
+    "tr": "1. Sadece analiz verisine dayan.\n2. Her cevapta bir özelliğe atıf yap.\n3. 3-5 cümle tut.\n4. Olumsuzları fırsata çevir.\n5. Modül sorusunda o modülün verisini kullan.\n6. Veride olmayan şeyi kibarca söyle.\n7. İlk mesajda 2-3 özelliği vurgula.\n8. Cevabın sonunda kullanıcının merakını kışkırtan bir soru sor — sadece modülü öner, ASLA kendin soru üretme. Uygulama testleri otomatik gelecek.\n9. KESİNLİKLE kendi başına test soruları, çoktan seçmeli sorular veya anket üretme. 'Sonuçları Göster' gibi var olmayan butonlardan bahsetme.\n10. Sadece 'ister misin?', 'keşfedelim mi?', 'deneyelim mi?' gibi davet soruları sor.",
+    "en": "1. Base answers only on analysis data.\n2. Reference a specific trait in every response.\n3. Keep to 3-5 sentences.\n4. Reframe negatives as strengths.\n5. Use module data for module questions.\n6. Politely note if something is not in the data.\n7. Highlight 2-3 standout traits in your first message.\n8. End with a curiosity-sparking question suggesting a module — NEVER generate your own test questions. The app handles tests automatically.\n9. NEVER create your own multiple-choice questions, surveys, or fake interactive elements. Never mention non-existent buttons.\n10. Only invite with question forms: 'would you like to?', 'shall we?', 'want to find out?'",
     "de": "1. Antworten nur auf Basis der Analysedaten.\n2. In jeder Antwort auf ein Merkmal verweisen.\n3. 3-5 Saetze.\n4. Negative als Chancen umformulieren.\n5. Bei Modulfragen Moduldaten nutzen.\n6. Hoeflich mitteilen wenn etwas nicht in den Daten ist.\n7. Im ersten Satz 2-3 herausragende Eigenschaften hervorheben.",
     "ru": "1. Только данные анализа.\n2. В каждом ответе — конкретная черта.\n3. 3-5 предложений.\n4. Негатив — в возможности.\n5. При вопросе о модуле — данные модуля.\n6. Вежливо сообщай если в данных нет.\n7. В первом сообщении — 2-3 черты.",
     "ar": "1. الاستناد فقط لبيانات التحليل.\n2. الإشارة لسمة محددة في كل رد.\n3. 3-5 جمل.\n4. إعادة صياغة السلبيات كفرص.\n5. استخدام بيانات الوحدة للأسئلة المتعلقة بها.\n6. الإشارة بلطف إذا لم يكن شيء في البيانات.\n7. تسليط الضوء على 2-3 سمات في الرسالة الأولى.",
@@ -412,11 +437,18 @@ def _build_modules_section(lang: str = "tr") -> str:
     _njoin = "\n".join
     module_list = _njoin(module_lines)
 
-    # Add proactive suggestions
+    # Add proactive suggestions — rotate through all to keep variety
+    import random
     sugg_list = _MODULE_SUGGESTIONS.get(lang, _MODULE_SUGGESTIONS["en"])
-    sugg_text = _njoin(sugg_list[:3])  # Top 3 suggestions
+    sample = random.sample(sugg_list, min(5, len(sugg_list)))
+    sugg_text = _njoin(sample)
 
-    return f"{intro}\n{module_list}\n\n## Proaktif Öneriler\nUygun fırsatlarda şu şekilde modülleri öner:\n{sugg_text}"
+    engagement_rule = {
+        "tr": "Her cevabın sonunda bu listeden bağlama uygun BİR öneri sor — her seferinde farklı bir modül seç. Soru formu kullan ('ister misin?', 'keşfedelim mi?', 'deneyelim mi?'). Aynı öneriyi arka arkaya tekrarlama.",
+        "en": "At the end of each response, pick ONE contextually relevant suggestion from this list — vary the module each time. Always use question form ('want to?', 'shall we?', 'curious?'). Never repeat the same suggestion consecutively.",
+    }.get(lang, "Pick one suggestion per response, vary modules, use question form.")
+
+    return f"{intro}\n{module_list}\n\n## Merak & Keşif Stratejisi\n{engagement_rule}\n\nÖrnek öneriler:\n{sugg_text}"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Desteklenen diller

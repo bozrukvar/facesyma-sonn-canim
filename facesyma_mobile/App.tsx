@@ -8,7 +8,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { LanguageProvider } from './src/utils/LanguageContext';
 
 const App = () => (
-  <GestureHandlerRootView style={{ flex: 1 }}>
+  <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#0A0F14' }}>
     <SafeAreaProvider>
       <Provider store={store}>
         <LanguageProvider>

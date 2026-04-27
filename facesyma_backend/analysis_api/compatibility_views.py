@@ -758,9 +758,19 @@ class ListCommunityMembersView(View):
             users_map = {u['id']: u for u in users_col.find(
                 {'id': {'$in': member_ids}}, {'id': 1, 'username': 1}
             )}
+
+            # can_request_chat: bu toplulukta aktif olan herkes chat isteği alabilir
+            # (aynı toplulukta olmaları zaten yeterli)
+            requesting_user_id = _get_user_id(request)
             for member in members:
                 u = users_map.get(member['user_id'])
                 member['username'] = u['username'] if u else 'Unknown'
+                # Kendisi değilse ve toplulukta aktif üyeyse chat isteği gönderilebilir
+                member['can_request_chat'] = (
+                    requesting_user_id is not None
+                    and member['user_id'] != requesting_user_id
+                    and member.get('status', '') == 'active'
+                )
 
             return JsonResponse({
                 'success': True,

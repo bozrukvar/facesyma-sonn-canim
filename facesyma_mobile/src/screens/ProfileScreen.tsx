@@ -23,6 +23,8 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
   const handleMenuPress = (screen: string) => {
     if (screen === 'Chat') {
       navigation.navigate('Chat');
+    } else if (screen === 'Account') {
+      navigation.navigate('Account');
     } else {
       Alert.alert(t('profile.coming_soon', lang), `${screen} ${t('profile.feature_coming', lang)}`);
     }
@@ -41,13 +43,13 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
   );
 
   const MENU = [
-    { icon:'📊', label: t('profile.my_analysis', lang),   screen:'History' },
-    { icon:'💬', label: t('profile.my_chat', lang),       screen:'ChatHistory' },
-    { icon:'🌍', label: t('profile.language', lang),      screen:'Language' },
-    { icon:'🔔', label: t('profile.notifications', lang), screen:'Notifications' },
-    { icon:'🔒', label: t('profile.privacy', lang),       screen:'Privacy' },
-    { icon:'⭐', label: t('profile.rate_app', lang),      screen:'Rate' },
-    { icon:'💬', label: t('profile.support', lang),       screen:'Support' },
+    { icon:'👤', label: 'Hesabım',                          screen:'Account' },
+    { icon:'📊', label: t('profile.my_analysis', lang),    screen:'History' },
+    { icon:'💬', label: t('profile.my_chat', lang),        screen:'ChatHistory' },
+    { icon:'🌍', label: t('profile.language', lang),       screen:'Language' },
+    { icon:'🔔', label: t('profile.notifications', lang),  screen:'Notifications' },
+    { icon:'⭐', label: t('profile.rate_app', lang),       screen:'Rate' },
+    { icon:'💬', label: t('profile.support', lang),        screen:'Support' },
   ];
 
   const userPlan = user?.plan;

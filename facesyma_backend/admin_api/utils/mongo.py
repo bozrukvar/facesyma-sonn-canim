@@ -129,6 +129,21 @@ def get_app_registry_col():
     return _get_db()['app_registry']
 
 
+def get_peer_chat_requests_col():
+    """peer_chat_requests collection — sohbet onay istekleri"""
+    return _get_db()['peer_chat_requests']
+
+
+def get_peer_chat_rooms_col():
+    """peer_chat_rooms collection — aktif sohbet odaları"""
+    return _get_db()['peer_chat_rooms']
+
+
+def get_peer_messages_col():
+    """peer_messages collection — sohbet mesajları"""
+    return _get_db()['peer_messages']
+
+
 def _next_id(col) -> int:
     """
     Generate atomic auto-increment ID using counters collection.

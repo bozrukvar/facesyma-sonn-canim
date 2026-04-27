@@ -4,6 +4,17 @@ import axios, { AxiosInstance } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AssessmentResult } from '../types/api';
 
+export interface CommunityItem {
+  _id: string;
+  name: string;
+  type: string;
+  trait_name?: string;
+  member_count: number;
+  description?: string;
+  is_member?: boolean;
+  created_at?: string | number;
+}
+
 // ── Force-logout callback ──────────────────────────────────────────────────────
 // Circular import'u önlemek için: App.tsx'te registerLogoutHandler ile set edilir.
 // Token yenileme tamamen başarısız olursa Redux state + navigation sıfırlanır.
@@ -38,11 +49,11 @@ const SERVICES = {
 
 // Geliştirme ortamı (local)
 const DEV_SERVICES = {
-  analysis: 'http://10.0.2.2:8000/api/v1/analysis',  // Android emülatör
-  auth:     'http://10.0.2.2:8000/api/v1/auth',
-  chat:     'http://10.0.2.2:8000/api/v1/chat',
-  twins:    'http://10.0.2.2:8000/api/v1/analysis',
-  art:      'http://10.0.2.2:8000/api/v1/analysis',
+  analysis: 'http://10.0.2.2/api/v1/analysis',  // Android emülatör → nginx port 80
+  auth:     'http://10.0.2.2/api/v1/auth',
+  chat:     'http://10.0.2.2/api/v1/chat',
+  twins:    'http://10.0.2.2/api/v1/analysis',
+  art:      'http://10.0.2.2/api/v1/analysis',
 };
 
 const IS_DEV = __DEV__;
@@ -111,8 +122,16 @@ export const AuthAPI = {
     email: string;
     password: string;
     name: string;
+    terms_accepted: boolean;
+    gdpr_consent: boolean;
   }) => {
     const res = await authClient.post('/register/', data);
+    return res.data;
+  },
+
+  // Profil güncelle (onboarding + genel)
+  updateProfile: async (data: Record<string, unknown>) => {
+    const res = await authClient.patch('/me/', data);
     return res.data;
   },
 
@@ -162,6 +181,18 @@ export const AuthAPI = {
   logout: async () => {
     setCachedToken(null);
     await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+  },
+
+  // Hesap sil (GDPR — kalıcı silme)
+  deleteAccount: async () => {
+    const res = await authClient.delete('/me/delete/');
+    return res.data;
+  },
+
+  // Veri dışa aktar (GDPR Madde 20)
+  exportData: async () => {
+    const res = await authClient.get('/me/export/');
+    return res.data;
   },
 
   // Mevcut kullanıcıyı kontrol et
@@ -219,11 +250,11 @@ export const AnalysisAPI = {
     formData.append('lang', lang);
     formData.append('count', String(imageUris.length));
 
-    const res = await twinsClient.post('/analyze/', formData, {
+    const res = await twinsClient.post('/twins/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 90000,
     });
-    return res.data;
+    return res.data?.data ?? res.data;
   },
 
   // Art match
@@ -245,9 +276,37 @@ export const AnalysisAPI = {
     return res.data;
   },
 
+  // Tek analiz kaydını sil
+  deleteHistory: async (recordId: string) => {
+    const res = await analysisClient.delete(`/history/${encodeURIComponent(recordId)}/`);
+    return res.data;
+  },
+
+  // Tüm analiz geçmişini sil
+  deleteAllHistory: async () => {
+    const res = await analysisClient.delete('/history/all/');
+    return res.data;
+  },
+
   // Günlük motivasyon
   getDailyMotivation: async (lang = 'tr') => {
     const res = await analysisClient.get('/daily/', { params: { lang } });
+    return res.data;
+  },
+
+  // Topluluklar
+  listCommunities: async (type?: string, limit = 30) => {
+    const params: Record<string, unknown> = { limit };
+    if (type) params.type = type;
+    const res = await analysisClient.get('/communities/', { params });
+    return res.data as { success: boolean; data: CommunityItem[]; count: number };
+  },
+  joinCommunity: async (communityId: string) => {
+    const res = await analysisClient.post(`/communities/${encodeURIComponent(communityId)}/join/`);
+    return res.data as { success: boolean; data: { membership_status: string; harmony_level: number } };
+  },
+  getCommunityMembers: async (communityId: string, limit = 20) => {
+    const res = await analysisClient.get(`/communities/${encodeURIComponent(communityId)}/members/`, { params: { limit } });
     return res.data;
   },
 };
@@ -291,7 +350,7 @@ export const AssessmentAPI = {
 // ── AI Chat API (FastAPI :8002, routed through nginx /chat/) ─────────────────
 // DEV: direct to port 8002. PROD: via nginx location /chat/ → ai_chat:8002
 const AI_CHAT_BASE = __DEV__
-  ? 'http://10.0.2.2:8002'
+  ? 'http://10.0.2.2'  // Android emülatör → nginx port 80 → /chat/ → ai_chat:8002
   : 'https://api.facesyma.com';
 
 const aiChatAxios = axios.create({ baseURL: AI_CHAT_BASE, timeout: 60000 });
@@ -329,13 +388,13 @@ export const ChatAPI = {
     const res = await aiChatAxios.post('/chat/start', {
       analysis_result: analysisResult, lang, first_message: firstMessage,
     });
-    return res.data as { conversation_id: string; assistant_message: string; lang: string };
+    return res.data as { conversation_id: string; assistant_message: string; lang: string; usage: { daily_used: number; daily_limit: number; plan: string } };
   },
   sendMessage: async (conversationId: string, message: string, lang = 'tr') => {
     const res = await aiChatAxios.post('/chat/message', {
       conversation_id: conversationId, message, lang,
     });
-    return res.data as { conversation_id: string; assistant_message: string };
+    return res.data as { conversation_id: string; assistant_message: string; usage: { daily_used: number; daily_limit: number; plan: string } };
   },
   getHistory: async () => {
     const res = await aiChatAxios.get('/chat/history');
@@ -354,10 +413,116 @@ export const ChatAPI = {
   },
 };
 
+// ── Peer Chat API (Django backend /api/v1/analysis/peer-chat/) ───────────────
+export interface PeerChatRequest {
+  _id: string;
+  from_user_id: number;
+  from_username: string;
+  to_user_id: number;
+  compatibility_score: number;
+  source: string;
+  status: string;
+  created_at: number;
+  expires_at: number;
+}
+
+export interface PeerChatRoom {
+  _id: string;
+  room_id: string;
+  user_ids: number[];
+  other_user: { id: number; username: string };
+  source: string;
+  compatibility_score: number;
+  last_message_at: number | null;
+  last_message_preview: string;
+  my_unread: number;
+  is_active: boolean;
+}
+
+export interface PeerMessage {
+  _id: string;
+  room_id: string;
+  sender_id: number;
+  content: string;
+  type: 'text' | 'image' | 'file';
+  file_url: string | null;
+  file_name: string | null;
+  file_size_bytes: number | null;
+  created_at: number;
+  read_by: number[];
+}
+
+const peerChatBase = IS_DEV
+  ? 'http://10.0.2.2/api/v1/analysis'
+  : 'https://api.facesyma.com/api/v1/analysis';
+const peerChatClient = createClient(peerChatBase);
+
+export const PeerChatAPI = {
+  sendRequest: async (toUserId: number, compatScore?: number) => {
+    const res = await peerChatClient.post('/peer-chat/request/', {
+      to_user_id: toUserId,
+      compatibility_score: compatScore ?? 0,
+    });
+    return res.data as { success: boolean; request_id?: string; room_id?: string; message: string };
+  },
+
+  respondRequest: async (requestId: string, action: 'accept' | 'reject') => {
+    const res = await peerChatClient.post(`/peer-chat/request/${encodeURIComponent(requestId)}/respond/`, { action });
+    return res.data as { success: boolean; status: string; room_id?: string };
+  },
+
+  getPendingRequests: async () => {
+    const res = await peerChatClient.get('/peer-chat/request/pending/');
+    return res.data as { success: boolean; data: PeerChatRequest[]; count: number };
+  },
+
+  getRooms: async () => {
+    const res = await peerChatClient.get('/peer-chat/rooms/');
+    return res.data as { success: boolean; data: PeerChatRoom[]; count: number };
+  },
+
+  getMessages: async (roomId: string, before?: number, limit = 50) => {
+    const params: Record<string, unknown> = { limit };
+    if (before) params.before = before;
+    const res = await peerChatClient.get(`/peer-chat/rooms/${encodeURIComponent(roomId)}/messages/`, { params });
+    return res.data as { success: boolean; data: PeerMessage[]; count: number; has_more: boolean };
+  },
+
+  sendMessage: async (roomId: string, content: string) => {
+    const res = await peerChatClient.post(`/peer-chat/rooms/${encodeURIComponent(roomId)}/messages/`, { content });
+    return res.data as { success: boolean; message: PeerMessage };
+  },
+
+  markRead: async (roomId: string) => {
+    await peerChatClient.post(`/peer-chat/rooms/${encodeURIComponent(roomId)}/read/`);
+  },
+
+  leaveRoom: async (roomId: string) => {
+    await peerChatClient.delete(`/peer-chat/rooms/${encodeURIComponent(roomId)}/`);
+  },
+
+  uploadFile: async (roomId: string, fileUri: string, fileName: string, fileType: string) => {
+    const formData = new FormData();
+    formData.append('file', { uri: fileUri, name: fileName, type: fileType } as unknown as Blob);
+    formData.append('room_id', roomId);
+    const res = await peerChatClient.post('/peer-chat/upload/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
+    });
+    return res.data as { success: boolean; file_url: string; message?: PeerMessage };
+  },
+
+  getWsUrl: (roomId: string, token: string): string => {
+    const host = IS_DEV ? '10.0.2.2' : 'api.facesyma.com';
+    const protocol = IS_DEV ? 'ws' : 'wss';
+    return `${protocol}://${host}/ws/chat/${roomId}/?token=${token}`;
+  },
+};
+
 // ── Coach API (FastAPI :8003, routed through nginx /coach/) ──────────────────
 // nginx location /coach/ → coach:8003 — full path preserved, no rewrite
 const COACH_BASE = __DEV__
-  ? 'http://10.0.2.2:8003'
+  ? 'http://10.0.2.2'  // Android emülatör → nginx port 80 → /coach/ → coach:8003
   : 'https://api.facesyma.com';
 
 const coachAxios = axios.create({ baseURL: COACH_BASE, timeout: 30000 });

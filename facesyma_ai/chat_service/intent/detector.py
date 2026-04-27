@@ -23,6 +23,22 @@ _RE_DATE_YMD = re.compile(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})')
 _RE_DATE_DMY = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})')
 
 
+_TEST_EXPLICIT = {
+    "tr": ["test yap", "test çöz", "testi yap", "testi çöz", "test al", "sınav", "ölç beni", "test istiyorum", "evet yap", "evet çözelim"],
+    "en": ["take test", "run test", "do test", "quiz me", "test me", "start test", "yes let's", "yes do it"],
+    "de": ["test machen", "quiz", "test starten"],
+    "ru": ["пройти тест", "сделать тест", "тест"],
+    "ar": ["خذ الاختبار", "ابدأ الاختبار"],
+    "es": ["hacer test", "tomar test", "quiz"],
+    "ko": ["테스트 하기", "퀴즈"],
+    "ja": ["テストをする", "クイズ"],
+    "zh": ["做测试", "开始测试"],
+    "fr": ["faire le test", "passer le test"],
+    "pt": ["fazer teste", "quiz"],
+    "it": ["fare il test", "quiz"],
+}
+
+
 def quick_intent(message: str, lang: str) -> Optional[Dict]:
     """Fast keyword-based intent detection.
 
@@ -38,14 +54,22 @@ def quick_intent(message: str, lang: str) -> Optional[Dict]:
     registry = get_registry()
     message_lower = message.lower()
 
+    # Test modules require EXPLICIT user consent — keyword alone is not enough
+    explicit_triggers = _TEST_EXPLICIT.get(lang, _TEST_EXPLICIT["en"])
+    user_wants_test = any(phrase in message_lower for phrase in explicit_triggers)
+
     # Check each module's keywords
     for module in registry.get_all():
         _mget = module.get
+        module_name = module["name"]
         keywords = _mget("trigger_keywords", {}).get(lang, [])
         for keyword in keywords:
             if keyword.lower() in message_lower:
+                # Test modules only fire when user explicitly asks for a test
+                if module_name.startswith("test_") and not user_wants_test:
+                    continue
                 return {
-                    "intent": module["name"],
+                    "intent": module_name,
                     "confidence": 0.95,
                     "needs_input": _mget("requires_input") != "none",
                     "missing_fields": [],

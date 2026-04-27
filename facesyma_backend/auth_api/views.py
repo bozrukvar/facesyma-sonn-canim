@@ -99,19 +99,58 @@ def _make_tokens(user_id: int, email: str) -> dict:
     return {'access': access, 'refresh': refresh}
 
 
-_USER_PROJECTION = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1}
-_LOGIN_PROJECTION = {'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1, 'password': 1, 'is_active': 1}
+_USER_PROJECTION = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1,
+                    'birth_year': 1, 'gender': 1, 'country': 1, 'skin_tone': 1, 'hair_color': 1, 'eye_color': 1, 'goal': 1,
+                    'onboarding_completed': 1, 'terms_accepted': 1, 'gdpr_consent': 1,
+                    'last_login': 1, 'premium_expires_at': 1, 'cosmetic_surgery_regions': 1}
+_LOGIN_PROJECTION = {'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1,
+                     'password': 1, 'is_active': 1, 'onboarding_completed': 1, 'terms_accepted': 1, 'gdpr_consent': 1,
+                     'last_login': 1, 'premium_expires_at': 1, 'cosmetic_surgery_regions': 1}
+
+_VALID_GENDERS           = {'male', 'female', 'prefer_not_to_say'}
+_VALID_SKIN_TONES        = {'1', '2', '3', '4', '5', '6'}  # Fitzpatrick scale
+_VALID_HAIR_COLORS       = {'black', 'brown', 'blonde', 'red', 'white_gray', 'other'}
+_VALID_EYE_COLORS        = {'brown', 'black', 'blue', 'green', 'hazel', 'gray'}
+_VALID_GOALS             = {'self_discovery', 'style', 'career', 'fun'}
+_VALID_SURGERY_REGIONS   = {'nose', 'eyes', 'lips', 'cheeks', 'jawline', 'forehead', 'chin'}
 
 
 def _user_dict(u: dict) -> dict:
     _uget = u.get
+    _premium_exp        = _uget('premium_expires_at')
+    _premium_days_left  = None
+    _premium_hours_left = None
+    if _premium_exp:
+        try:
+            _exp_dt     = datetime.fromisoformat(_premium_exp)
+            _total_secs = (_exp_dt - datetime.utcnow()).total_seconds()
+            if _total_secs > 0:
+                _premium_days_left  = int(_total_secs // 86400)
+                _premium_hours_left = int((_total_secs % 86400) // 3600)
+        except Exception:
+            pass
     return {
-        'id':         _uget('id', 0),
-        'email':      _uget('email', ''),
-        'name':       _uget('username', _uget('name', '')),
-        'avatar':     _uget('avatar'),
-        'plan':       _uget('plan', 'free'),
-        'created_at': str(_uget('date_joined', '')),
+        'id':                        _uget('id', 0),
+        'email':                     _uget('email', ''),
+        'name':                      _uget('username', _uget('name', '')),
+        'avatar':                    _uget('avatar'),
+        'plan':                      _uget('plan', 'free'),
+        'created_at':                str(_uget('date_joined', '')),
+        'birth_year':                _uget('birth_year'),
+        'gender':                    _uget('gender'),
+        'country':                   _uget('country'),
+        'skin_tone':                 _uget('skin_tone'),
+        'hair_color':                _uget('hair_color'),
+        'eye_color':                 _uget('eye_color'),
+        'goal':                      _uget('goal'),
+        'onboarding_completed':      _uget('onboarding_completed', False),
+        'terms_accepted':            _uget('terms_accepted', False),
+        'gdpr_consent':              _uget('gdpr_consent', False),
+        'last_login':                _uget('last_login'),
+        'premium_expires_at':        _premium_exp,
+        'premium_days_left':         _premium_days_left,
+        'premium_hours_left':        _premium_hours_left,
+        'cosmetic_surgery_regions':  _uget('cosmetic_surgery_regions', []),
     }
 
 
@@ -140,6 +179,9 @@ class RegisterView(View):
         password = _dget('password', '')
         name     = _RE_WHITESPACE.sub(' ', _dget('name', '').strip())[:100]
 
+        terms_accepted = bool(_dget('terms_accepted', False))
+        gdpr_consent   = bool(_dget('gdpr_consent', False))
+
         if not email or not password or not name:
             return JsonResponse({'detail': 'Email, password and name are required.'}, status=400)
         if not _RE_EMAIL.match(email):
@@ -149,6 +191,8 @@ class RegisterView(View):
             return JsonResponse({'detail': 'Password must be at least 6 characters.'}, status=400)
         if _pw_len > 128:
             return JsonResponse({'detail': 'Password must be at most 128 characters.'}, status=400)
+        if not terms_accepted or not gdpr_consent:
+            return JsonResponse({'detail': 'You must accept the Terms of Use and Privacy Policy.'}, status=400)
 
         col = get_users_col()
         if col.find_one({'email': email}, {'_id': 1}):
@@ -166,6 +210,10 @@ class RegisterView(View):
             'date_joined': _now_iso,
             'is_active': True,
             'app_source': app_source,
+            'terms_accepted': terms_accepted,
+            'gdpr_consent': gdpr_consent,
+            'terms_accepted_at': _now_iso,
+            'onboarding_completed': False,
         }
         col.insert_one(doc)
         tokens = _make_tokens(uid, email)
@@ -232,6 +280,9 @@ class LoginView(View):
         if not stored_pw.startswith('pbkdf2:'):
             col.update_one({'_id': user['_id']}, {'$set': {'password': _hash(pw)}})
 
+        _now = datetime.utcnow().isoformat()
+        col.update_one({'_id': user['_id']}, {'$set': {'last_login': _now}})
+        user['last_login'] = _now
         tokens = _make_tokens(user['id'], email)
         return JsonResponse({**tokens, 'user': _user_dict(user)})
 
@@ -299,6 +350,9 @@ class GoogleAuthView(View):
             }
             col.insert_one(user)
 
+        _now = datetime.utcnow().isoformat()
+        col.update_one({'_id': user['_id']}, {'$set': {'last_login': _now}})
+        user['last_login'] = _now
         tokens = _make_tokens(user['id'], email)
         return JsonResponse({**tokens, 'user': _user_dict(user)})
 
@@ -345,7 +399,7 @@ class MeView(View):
             return JsonResponse({'detail': 'Authentication failed.'}, status=401)
 
     def patch(self, request):
-        """Profil güncelleme"""
+        """Profil güncelleme — onboarding dahil"""
         try:
             payload  = _decode_token(request)
             data     = _json(request)
@@ -355,6 +409,30 @@ class MeView(View):
                 update['username'] = str(data['username'])[:100]
             if 'avatar' in data:
                 update['avatar'] = str(data['avatar'])[:512]
+            # Onboarding zorunlu alanlar
+            if 'birth_year' in data:
+                by = int(data['birth_year'])
+                if 1900 <= by <= datetime.utcnow().year:
+                    update['birth_year'] = by
+            if 'gender' in data and data['gender'] in _VALID_GENDERS:
+                update['gender'] = data['gender']
+            if 'country' in data:
+                update['country'] = str(data['country'])[:100]
+            # Onboarding isteğe bağlı alanlar
+            if 'skin_tone' in data and str(data['skin_tone']) in _VALID_SKIN_TONES:
+                update['skin_tone'] = str(data['skin_tone'])
+            if 'hair_color' in data and data['hair_color'] in _VALID_HAIR_COLORS:
+                update['hair_color'] = data['hair_color']
+            if 'eye_color' in data and data['eye_color'] in _VALID_EYE_COLORS:
+                update['eye_color'] = data['eye_color']
+            if 'goal' in data and data['goal'] in _VALID_GOALS:
+                update['goal'] = data['goal']
+            if 'onboarding_completed' in data:
+                update['onboarding_completed'] = bool(data['onboarding_completed'])
+            if 'cosmetic_surgery_regions' in data:
+                regions = data['cosmetic_surgery_regions']
+                if isinstance(regions, list):
+                    update['cosmetic_surgery_regions'] = [r for r in regions if r in _VALID_SURGERY_REGIONS]
             _puid = payload['user_id']
             if update:
                 col.update_one({'id': _puid}, {'$set': update})
@@ -458,3 +536,92 @@ class PasswordResetRequestView(View):
 
         # Güvenlik: kullanıcı var olup olmadığından bağımsız aynı yanıt
         return JsonResponse({'detail': 'Password reset instructions have been sent to your email.'})
+
+
+# ── Hesap Silme (GDPR "right to erasure") ────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class DeleteAccountView(View):
+    """Hard delete — kullanıcının tüm verilerini MongoDB'den siler."""
+
+    def delete(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+        uid = payload.get('user_id')
+        if not uid:
+            return JsonResponse({'detail': 'Invalid token.'}, status=401)
+
+        try:
+            from admin_api.utils.mongo import _get_main_client
+            client = _get_main_client()
+            db     = client['facesyma_db']
+
+            # 1. Kullanıcı belgesi
+            db['users'].delete_one({'id': uid})
+            # 2. Analiz geçmişi
+            db['analysis_history'].delete_many({'user_id': uid})
+            # 3. Assessment sonuçları
+            db['assessment_results'].delete_many({'user_id': uid})
+            # 4. Chat konuşmaları (ai_chat service'i ayrı db kullanabilir; best-effort)
+            try:
+                db['conversations'].delete_many({'user_id': uid})
+                db['chat_messages'].delete_many({'user_id': uid})
+            except Exception:
+                pass
+
+            log.info(f'Account deleted: user_id={uid}')
+            return JsonResponse({'detail': 'Your account and all associated data have been permanently deleted.'})
+        except Exception:
+            log.exception(f'Account delete error: user_id={uid}')
+            return JsonResponse({'detail': 'Account deletion failed. Please try again.'}, status=500)
+
+
+# ── Veri Dışa Aktarma (GDPR Madde 20 — taşınabilirlik) ───────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class ExportDataView(View):
+    """Kullanıcının tüm verisini JSON olarak döner."""
+
+    def get(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+        uid = payload.get('user_id')
+        if not uid:
+            return JsonResponse({'detail': 'Invalid token.'}, status=401)
+
+        # Rate-limit: günde 3 istek
+        rate_key = f'export:{uid}'
+        try:
+            count = cache.get(rate_key, 0)
+            if count >= 3:
+                return JsonResponse({'detail': 'You can export your data up to 3 times per day.'}, status=429)
+            cache.set(rate_key, count + 1, timeout=86400)
+        except Exception:
+            pass
+
+        try:
+            from admin_api.utils.mongo import _get_main_client
+            client = _get_main_client()
+            db     = client['facesyma_db']
+
+            user = db['users'].find_one({'id': uid}, {'_id': 0, 'password': 0})
+            if not user:
+                return JsonResponse({'detail': 'User not found.'}, status=404)
+
+            history_cursor     = db['analysis_history'].find({'user_id': uid}, {'_id': 0})
+            assessment_cursor  = db['assessment_results'].find({'user_id': uid}, {'_id': 0})
+
+            export = {
+                'exported_at': datetime.utcnow().isoformat(),
+                'user': user,
+                'analysis_history': list(history_cursor),
+                'assessment_results': list(assessment_cursor),
+            }
+            return JsonResponse({'success': True, 'data': export})
+        except Exception:
+            log.exception(f'Data export error: user_id={uid}')
+            return JsonResponse({'detail': 'Data export failed. Please try again.'}, status=500)

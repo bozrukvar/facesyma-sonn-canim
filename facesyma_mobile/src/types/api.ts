@@ -44,12 +44,29 @@ export interface TwinPerson {
   avatar?: string;
 }
 
+export interface TwinsDimensions {
+  face_similarity: number;
+  character_compat: number;
+  complementarity: number;
+  shared_strengths_score: number;
+  shared_strengths_list: string[];
+  eq_compat: number;
+  romantic_compat: number;
+  social_compat: number;
+  teamwork_compat: number;
+  positive_shared: string[];
+  negative_shared: string[];
+  activity_suggestions: string[];
+  community_type: string;
+}
+
 export interface TwinsResult {
   group_score?: number;
   pair_scores?: Record<string, number>;
   similarity_scores?: TwinPerson[];
   average_similarity?: number;
   most_similar?: TwinPerson;
+  dimensions?: TwinsDimensions;
 }
 
 export interface AstrologyResult {

@@ -8,6 +8,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import { setAnalysisResult } from '../store/analysisSlice';
+import { markModuleUsed } from '../store/authSlice';
 import { AnalysisAPI } from '../services/api';
 import { Card, ScoreRing, GoldButton, SectionLabel, Badge } from '../components/ui';
 import { FaceScannerOverlay } from '../components/FaceScannerOverlay';
@@ -79,6 +80,7 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
       const data = await AnalysisAPI.analyze(imageUri, lang);
       setResult(data);
       dispatch(setAnalysisResult({ result: data, imageUri }));
+      dispatch(markModuleUsed('face_analysis'));
       setStep('result');
     } catch (e: any) {
       Alert.alert(t('common.error', lang), e.response?.data?.detail || t('common.generic_error', lang));

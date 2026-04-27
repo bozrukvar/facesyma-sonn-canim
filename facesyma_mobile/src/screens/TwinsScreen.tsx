@@ -11,15 +11,143 @@ import theme from '../utils/theme';
 const { colors, spacing, typography, radius } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
-import type { TwinsResult } from '../types/api';
+import type { TwinsResult, TwinsDimensions } from '../types/api';
 
 const { width } = Dimensions.get('window');
 const PHOTO_SIZE = (width - spacing.lg * 2 - spacing.sm * 2) / 3;
 
+// ── Shared helpers ─────────────────────────────────────────────────────────────
+interface DimRowProps { icon: string; label: string; score: number; }
+const DimRow = ({ icon, label, score }: DimRowProps) => {
+  const barW = width - spacing.lg * 2 - spacing.md * 2 - 32;
+  const fill  = Math.max(0, Math.min(100, score));
+  const color = fill >= 75 ? colors.gold : fill >= 50 ? '#c8a96e' : '#8c7654';
+  return (
+    <View style={dStyles.dimRow}>
+      <Text style={dStyles.dimIcon}>{icon}</Text>
+      <View style={dStyles.dimMid}>
+        <Text style={dStyles.dimLabel}>{label}</Text>
+        <View style={[dStyles.barBg, { width: barW }]}>
+          <View style={[dStyles.barFill, { width: `${fill}%` as any, backgroundColor: color }]} />
+        </View>
+      </View>
+      <Text style={[dStyles.dimScore, { color }]}>{fill}%</Text>
+    </View>
+  );
+};
+
+interface TagsRowProps { items: string[]; color: string; bgColor: string; }
+const TagsRow = ({ items, color, bgColor }: TagsRowProps) => (
+  <View style={dStyles.tags}>
+    {items.map(s => (
+      <View key={s} style={[dStyles.tag, { backgroundColor: bgColor, borderColor: color }]}>
+        <Text style={[dStyles.tagText, { color }]}>{s}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+// ── Analysis Dimensions Card ────────────────────────────────────────────────────
+interface DimensionsCardProps { dims: TwinsDimensions; lang: string; }
+const DimensionsCard = ({ dims, lang }: DimensionsCardProps) => {
+  const coreDims: { key: keyof TwinsDimensions; icon: string; labelKey: string }[] = [
+    { key: 'face_similarity',        icon: '👤', labelKey: 'twins.face_similarity' },
+    { key: 'character_compat',       icon: '🧠', labelKey: 'twins.char_compat' },
+    { key: 'complementarity',        icon: '⚖️', labelKey: 'twins.complementarity' },
+    { key: 'shared_strengths_score', icon: '💪', labelKey: 'twins.shared_strengths' },
+    { key: 'eq_compat',              icon: '💬', labelKey: 'twins.eq_compat' },
+  ];
+  return (
+    <Card style={dStyles.card}>
+      {coreDims.map(({ key, icon, labelKey }) => (
+        <DimRow key={key} icon={icon} label={t(labelKey, lang)} score={dims[key] as number} />
+      ))}
+    </Card>
+  );
+};
+
+// ── Relationship Compatibility Card ────────────────────────────────────────────
+const RelationshipCard = ({ dims, lang }: DimensionsCardProps) => {
+  const relDims: { key: keyof TwinsDimensions; icon: string; labelKey: string }[] = [
+    { key: 'romantic_compat',  icon: '💑', labelKey: 'twins.romantic_compat' },
+    { key: 'social_compat',    icon: '🤝', labelKey: 'twins.social_compat' },
+    { key: 'teamwork_compat',  icon: '🎯', labelKey: 'twins.teamwork_compat' },
+  ];
+  return (
+    <Card style={dStyles.card}>
+      {relDims.map(({ key, icon, labelKey }) => (
+        <DimRow key={key} icon={icon} label={t(labelKey, lang)} score={dims[key] as number} />
+      ))}
+    </Card>
+  );
+};
+
+// ── Traits Section ─────────────────────────────────────────────────────────────
+interface TraitsSectionProps { dims: TwinsDimensions; lang: string; }
+const TraitsSection = ({ dims, lang }: TraitsSectionProps) => {
+  const hasPositive = (dims.positive_shared?.length ?? 0) > 0;
+  const hasGrowth   = (dims.negative_shared?.length ?? 0) > 0;
+  if (!hasPositive && !hasGrowth) return null;
+  return (
+    <Card style={dStyles.card}>
+      {hasPositive && (
+        <>
+          <View style={dStyles.traitHeader}>
+            <Text style={dStyles.traitIcon}>✅</Text>
+            <Text style={dStyles.sectionTitle}>{t('twins.positive_shared_title', lang)}</Text>
+          </View>
+          <TagsRow items={dims.positive_shared} color="#4caf7d" bgColor="rgba(76,175,125,0.12)" />
+        </>
+      )}
+      {hasGrowth && (
+        <>
+          <View style={[dStyles.traitHeader, hasPositive && { marginTop: spacing.md }]}>
+            <Text style={dStyles.traitIcon}>🌱</Text>
+            <Text style={dStyles.sectionTitle}>{t('twins.growth_areas_title', lang)}</Text>
+          </View>
+          <TagsRow items={dims.negative_shared} color="#e8a44a" bgColor="rgba(232,164,74,0.12)" />
+        </>
+      )}
+    </Card>
+  );
+};
+
+// ── Activities Card ─────────────────────────────────────────────────────────────
+interface ActivitiesCardProps { suggestions: string[]; lang: string; }
+const ActivitiesCard = ({ suggestions, lang }: ActivitiesCardProps) => {
+  if (!suggestions?.length) return null;
+  return (
+    <Card style={dStyles.card}>
+      {suggestions.map((act, i) => (
+        <View key={i} style={dStyles.actRow}>
+          <Text style={dStyles.actBullet}>◆</Text>
+          <Text style={dStyles.actText}>{act}</Text>
+        </View>
+      ))}
+    </Card>
+  );
+};
+
+// ── Community Card ──────────────────────────────────────────────────────────────
+interface CommunityCardProps { communityType: string; lang: string; onExplore: () => void; }
+const CommunityCard = ({ communityType, lang, onExplore }: CommunityCardProps) => (
+  <Card variant="gold" style={dStyles.communityCard}>
+    <Text style={dStyles.communityType}>{communityType}</Text>
+    <Text style={dStyles.communityDesc}>{t('twins.community_desc', lang)}</Text>
+    <TouchableOpacity style={dStyles.communityBadge} onPress={onExplore} activeOpacity={0.85}>
+      <Text style={dStyles.communityBadgeText}>{t('twins.community_join', lang)} →</Text>
+    </TouchableOpacity>
+  </Card>
+);
+
 const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const { lang } = useLanguage();
   const [photos,  setPhotos]  = useState<string[]>([]);
   const [result,  setResult]  = useState<TwinsResult | null>(null);
@@ -43,6 +171,7 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
     try {
       const data = await AnalysisAPI.analyzeTwins(photos, lang);
       setResult(data);
+      dispatch(markModuleUsed('twins'));
     } catch (e: any) {
       Alert.alert(t('common.error', lang), e.response?.data?.detail || t('twins.error_generic', lang));
     } finally { setLoading(false); }
@@ -109,6 +238,34 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
               </Text>
             </Card>
 
+            {result.dimensions && (
+              <>
+                <SectionLabel>{t('twins.dimensions', lang)}</SectionLabel>
+                <DimensionsCard dims={result.dimensions} lang={lang} />
+
+                <SectionLabel>{t('twins.relationship_compat', lang)}</SectionLabel>
+                <RelationshipCard dims={result.dimensions} lang={lang} />
+
+                {(result.dimensions.activity_suggestions?.length ?? 0) > 0 && (
+                  <>
+                    <SectionLabel>{t('twins.activities_title', lang)}</SectionLabel>
+                    <ActivitiesCard suggestions={result.dimensions.activity_suggestions} lang={lang} />
+                  </>
+                )}
+
+                {result.dimensions.community_type && (
+                  <>
+                    <SectionLabel>{t('twins.community_title', lang)}</SectionLabel>
+                    <CommunityCard
+                      communityType={result.dimensions.community_type}
+                      lang={lang}
+                      onExplore={() => navigation.navigate('Communities', { communityType: result.dimensions!.community_type })}
+                    />
+                  </>
+                )}
+              </>
+            )}
+
             {result.pair_scores && Object.entries(result.pair_scores).map(([pair, score]) => {
               const [a, b] = pair.split('-').map(Number);
               return (
@@ -128,6 +285,12 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
                 </Card>
               );
             })}
+
+            <GoldButton
+              title={lang.startsWith('tr') ? '🤖 AI ile Konuş' : '🤖 Chat with AI'}
+              onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
+              style={styles.aiChatBtn}
+            />
 
             <GoldButton
               title={t('twins.reset', lang)}
@@ -185,9 +348,38 @@ const styles = StyleSheet.create({
   pairRow:    { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 12 },
   pairImgRow: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 4 },
   flex1:      { flex: 1 },
-  resetBtn:   { marginTop: spacing.xl },
+  aiChatBtn:  { marginTop: spacing.lg },
+  resetBtn:   { marginTop: spacing.md },
   spacer:       { width: 40 },
   removeBtnIcon:{ color: '#fff', fontSize: 10, fontWeight: '700' as const },
+});
+
+const dStyles = StyleSheet.create({
+  card:            { marginBottom: spacing.md, padding: spacing.md },
+  dimRow:          { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
+  dimIcon:         { fontSize: 18, width: 26 },
+  dimMid:          { flex: 1, marginHorizontal: spacing.sm },
+  dimLabel:        { ...typography.caption, marginBottom: 4 },
+  barBg:           { height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.1)' },
+  barFill:         { height: 6, borderRadius: 3 },
+  dimScore:        { ...typography.goldLabel, width: 36, textAlign: 'right' as const },
+  sectionTitle:    { ...typography.caption, color: colors.gold, marginTop: spacing.sm, marginBottom: spacing.sm },
+  tags:            { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  tag:             { borderWidth: 1, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 },
+  tagText:         { ...typography.caption, fontSize: 11 },
+  traitHeader:     { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  traitIcon:       { fontSize: 14 },
+  actRow:          { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 8 },
+  actBullet:       { color: colors.gold, fontSize: 8, marginTop: 5 },
+  actText:         { ...typography.body, flex: 1, fontSize: 13 },
+  communityCard:   { marginBottom: spacing.md, padding: spacing.lg, alignItems: 'center' as const },
+  communityType:   { ...typography.h2, fontSize: 20, textAlign: 'center' as const, marginBottom: spacing.sm },
+  communityDesc:   { ...typography.caption, textAlign: 'center' as const, color: colors.textWarm, marginBottom: spacing.md },
+  communityBadge:  {
+    borderWidth: 1, borderColor: colors.gold, borderRadius: 20,
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.sm,
+  },
+  communityBadgeText: { ...typography.goldLabel, fontSize: 12 },
 });
 
 export default TwinsScreen;

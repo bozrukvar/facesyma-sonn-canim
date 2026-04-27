@@ -3,11 +3,12 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, FlatList,
   StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
-  Dimensions, Animated,
+  Dimensions, Animated, ScrollView,
 } from 'react-native';
 import { ChatAPI } from '../services/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { CHAT_MIN_MODULES } from '../store/authSlice';
 import theme from '../utils/theme';
 const { colors, spacing, typography, radius, shadow } = theme;
 const AnimatedView = Animated.View;
@@ -24,6 +25,84 @@ interface Message {
   content: string;
   timestamp: number;
 }
+
+const TEST_MARKER = '[TEST_QUESTIONS]';
+
+interface TestQuestion {
+  q_id: string;
+  order: number;
+  text: string;
+  scale?: { min: number; max: number; labels: Record<string, string> };
+}
+interface TestData {
+  type: string;
+  test_type: string;
+  session_id: string;
+  questions: TestQuestion[];
+}
+
+const SCALE_LABELS: Record<string, Record<string, string>> = {
+  tr: { '1': 'Hiç katılmıyorum', '2': 'Katılmıyorum', '3': 'Kararsızım', '4': 'Katılıyorum', '5': 'Kesinlikle' },
+  en: { '1': 'Strongly Disagree', '2': 'Disagree', '3': 'Neutral', '4': 'Agree', '5': 'Strongly Agree' },
+};
+
+const TestQuestionsCard = ({
+  data, lang, onSubmit,
+}: { data: TestData; lang: string; onSubmit: (text: string) => void }) => {
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const labels = SCALE_LABELS[lang] || SCALE_LABELS.en;
+  const questions = data.questions || [];
+  const allAnswered = questions.length > 0 && questions.every(q => answers[q.q_id] !== undefined);
+
+  const handleSubmit = () => {
+    const lines = questions.map(q => `${q.order}. ${q.text} → ${answers[q.q_id]}`).join('\n');
+    onSubmit(lang === 'tr' ? `Test cevaplarım:\n${lines}` : `My answers:\n${lines}`);
+  };
+
+  return (
+    <View style={tStyles.card}>
+      {/* Scale legend */}
+      <View style={tStyles.legend}>
+        {[1,2,3,4,5].map(n => (
+          <View key={n} style={tStyles.legendItem}>
+            <View style={tStyles.legendDot}><Text style={tStyles.legendNum}>{n}</Text></View>
+            <Text style={tStyles.legendLabel} numberOfLines={2}>{labels[String(n)]}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Questions */}
+      {questions.map(q => (
+        <View key={q.q_id} style={tStyles.qRow}>
+          <Text style={tStyles.qText}>{q.order}. {q.text}</Text>
+          <View style={tStyles.btnRow}>
+            {[1,2,3,4,5].map(n => {
+              const selected = answers[q.q_id] === n;
+              return (
+                <TouchableOpacity
+                  key={n}
+                  style={[tStyles.optBtn, selected && tStyles.optBtnSel]}
+                  onPress={() => setAnswers(prev => ({ ...prev, [q.q_id]: n }))}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[tStyles.optNum, selected && tStyles.optNumSel]}>{n}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      ))}
+
+      {allAnswered && (
+        <TouchableOpacity style={tStyles.submitBtn} onPress={handleSubmit}>
+          <Text style={tStyles.submitText}>
+            {lang === 'tr' ? 'Sonuçları Gör →' : 'See Results →'}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
 
 const keyExtractor = (m: Message) => m.id;
 
@@ -70,8 +149,9 @@ const TypingIndicator = () => {
 };
 
 // ── Mesaj balonu ─────────────────────────────────────────────────────────────
-const MessageBubble = ({ item }: { item: Message }) => {
+const MessageBubble = ({ item, onTestSubmit }: { item: Message; onTestSubmit?: (text: string) => void }) => {
   const isUser = item.role === 'user';
+  const { lang } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(12)).current;
 
@@ -82,32 +162,43 @@ const MessageBubble = ({ item }: { item: Message }) => {
     ]).start();
   }, []);
 
+  const isTestMessage = !isUser && item.content.startsWith(TEST_MARKER);
+  let testData: TestData | null = null;
+  if (isTestMessage) {
+    try { testData = JSON.parse(item.content.slice(TEST_MARKER.length)); } catch {}
+  }
+
   return (
-    <AnimatedView style={{
-      opacity: fadeAnim,
-      transform: [{ translateY: slideAnim }],
-    }}>
-      <View style={isUser ? styles.msgRowUser : styles.msgRowAI}>
-        {!isUser && (
+    <AnimatedView style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      {isTestMessage && testData ? (
+        <View style={styles.msgRowAI}>
           <View style={styles.aiAvatar}><Text style={styles.aiAvatarIcon}>✨</Text></View>
-        )}
-        <View style={[
-          isUser ? styles.bubbleUser : styles.bubbleAI,
-          isUser && shadow.gold,
-        ]}>
-          <Text style={isUser ? styles.bubbleUserText : styles.bubbleAIText}>
-            {item.content}
-          </Text>
+          <TestQuestionsCard data={testData} lang={lang} onSubmit={onTestSubmit ?? (() => {})} />
         </View>
-      </View>
+      ) : (
+        <View style={isUser ? styles.msgRowUser : styles.msgRowAI}>
+          {!isUser && (
+            <View style={styles.aiAvatar}><Text style={styles.aiAvatarIcon}>✨</Text></View>
+          )}
+          <View style={[
+            isUser ? styles.bubbleUser : styles.bubbleAI,
+            isUser && shadow.gold,
+          ]}>
+            <Text style={isUser ? styles.bubbleUserText : styles.bubbleAIText}>
+              {item.content}
+            </Text>
+          </View>
+        </View>
+      )}
     </AnimatedView>
   );
 };
 
 // ── Ana ekran ────────────────────────────────────────────────────────────────
 const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
-  const insets = useSafeAreaInsets();
-  const user           = useSelector((s: RootState) => s.auth.user);
+  const insets      = useSafeAreaInsets();
+  const user        = useSelector((s: RootState) => s.auth.user);
+  const modulesUsed = useSelector((s: RootState) => s.auth.modulesUsed);
   const analysisResult = route.params?.analysisResult ?? {};
   const { lang }       = useLanguage();
   const QUICK_QUESTIONS = useMemo(() => getQuickQuestions(lang), [lang]);
@@ -119,6 +210,7 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
   const [initializing, setInitializing] = useState(true);
   const [error,        setError]        = useState('');
   const [showQuick,    setShowQuick]    = useState(true);
+  const [chatUsage,    setChatUsage]    = useState<{used: number; limit: number; plan: string} | null>(null);
 
   const listRef = useRef<FlatList>(null);
 
@@ -141,9 +233,12 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
         content:   data.assistant_message,
         timestamp: Date.now(),
       }]);
+      if (data.usage?.daily_limit) {
+        setChatUsage({ used: data.usage.daily_used ?? 1, limit: data.usage.daily_limit, plan: data.usage.plan ?? 'free' });
+      }
       setShowQuick(true);
-    } catch {
-      setError(t('chat.error_init', lang));
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || t('chat.error_init', lang));
     } finally {
       setInitializing(false);
     }
@@ -173,8 +268,12 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
         content:   data.assistant_message,
         timestamp: Date.now(),
       }]);
-    } catch {
-      setError(t('chat.error_response', lang));
+      if (data.usage?.daily_limit) {
+        setChatUsage({ used: data.usage.daily_used ?? 0, limit: data.usage.daily_limit, plan: data.usage.plan ?? 'free' });
+      }
+    } catch (e: any) {
+      const detail = e?.response?.data?.detail || '';
+      setError(detail || t('chat.error_response', lang));
       setMessages(prev => prev.filter(m => m.id !== userMsg.id));
       setInput(msg);
     } finally {
@@ -182,6 +281,56 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
       scrollToEnd();
     }
   }, [input, loading, convId, lang]);
+
+  // ── Modül kapısı ────────────────────────────────────────────────────────────
+  if (modulesUsed.length < CHAT_MIN_MODULES) {
+    const remaining = CHAT_MIN_MODULES - modulesUsed.length;
+    const MODULE_LIST = [
+      { key: 'face_analysis', icon: '🔍', label: lang.startsWith('tr') ? 'Yüz Analizi'   : 'Face Analysis' },
+      { key: 'astrology',     icon: '⭐', label: lang.startsWith('tr') ? 'Astroloji'      : 'Astrology'     },
+      { key: 'twins',         icon: '👥', label: lang.startsWith('tr') ? 'İkizler'        : 'Twins'         },
+      { key: 'art_match',     icon: '🎨', label: lang.startsWith('tr') ? 'Sanat Eşleşme'  : 'Art Match'     },
+      { key: 'assessment',    icon: '📋', label: lang.startsWith('tr') ? 'Değerlendirme'  : 'Assessment'    },
+      { key: 'fashion',       icon: '👗', label: lang.startsWith('tr') ? 'Moda'           : 'Fashion'       },
+      { key: 'daily',         icon: '🌟', label: lang.startsWith('tr') ? 'Günlük Mesaj'   : 'Daily Message' },
+    ];
+    return (
+      <View style={[gateStyles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <TouchableOpacity style={gateStyles.backBtn} onPress={() => navigation.goBack()}>
+          <Text style={gateStyles.backText}>←</Text>
+        </TouchableOpacity>
+        <Text style={gateStyles.lockIcon}>🔒</Text>
+        <Text style={gateStyles.title}>
+          {lang.startsWith('tr') ? 'AI Sohbet Kilitli' : 'AI Chat Locked'}
+        </Text>
+        <Text style={gateStyles.subtitle}>
+          {lang.startsWith('tr')
+            ? `Chat'i açmak için ${remaining} modül daha dene`
+            : `Try ${remaining} more module${remaining > 1 ? 's' : ''} to unlock chat`}
+        </Text>
+        {/* İlerleme */}
+        <View style={gateStyles.progressRow}>
+          {Array.from({ length: CHAT_MIN_MODULES }).map((_, i) => (
+            <View key={i} style={[gateStyles.progressDot, i < modulesUsed.length && gateStyles.progressDotDone]} />
+          ))}
+        </View>
+        <Text style={gateStyles.progressLabel}>{modulesUsed.length} / {CHAT_MIN_MODULES}</Text>
+        {/* Modül listesi */}
+        <View style={gateStyles.moduleList}>
+          {MODULE_LIST.map(m => {
+            const done = modulesUsed.includes(m.key);
+            return (
+              <View key={m.key} style={[gateStyles.moduleRow, done && gateStyles.moduleRowDone]}>
+                <Text style={gateStyles.moduleIcon}>{m.icon}</Text>
+                <Text style={[gateStyles.moduleLabel, done && gateStyles.moduleLabelDone]}>{m.label}</Text>
+                <Text style={gateStyles.moduleTick}>{done ? '✓' : ''}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
 
   // ── Yükleniyor ──────────────────────────────────────────────────────────────
   if (initializing) {
@@ -212,10 +361,17 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
           <View style={styles.headerAvatar}><Text style={styles.headerAvatarIcon}>✨</Text></View>
           <View>
             <Text style={styles.headerTitle}>{t('chat.assistant', lang)}</Text>
-            <View style={styles.onlinePill}>
-              <View style={styles.onlineDot} />
-              <Text style={styles.onlineText}>{t('chat.online', lang)}</Text>
-            </View>
+            {chatUsage ? (
+              <View style={styles.usagePill}>
+                <View style={[styles.usageBar, { width: Math.round((chatUsage.used / chatUsage.limit) * 52) }]} />
+                <Text style={styles.usageText}>{chatUsage.used}/{chatUsage.limit}</Text>
+              </View>
+            ) : (
+              <View style={styles.onlinePill}>
+                <View style={styles.onlineDot} />
+                <Text style={styles.onlineText}>{t('chat.online', lang)}</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -232,7 +388,7 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
         ref={listRef}
         data={messages}
         keyExtractor={keyExtractor}
-        renderItem={({ item }) => <MessageBubble item={item} />}
+        renderItem={({ item }) => <MessageBubble item={item} onTestSubmit={sendMessage} />}
         contentContainerStyle={styles.msgList}
         onLayout={scrollToEnd}
         ListFooterComponent={loading ? <TypingIndicator /> : null}
@@ -293,6 +449,59 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
   );
 };
 
+const tStyles = StyleSheet.create({
+  card: {
+    maxWidth: width * 0.82,
+    backgroundColor: colors.aiBubble,
+    borderWidth: 1,
+    borderColor: colors.aiBubbleBorder,
+    borderRadius: radius.lg,
+    borderBottomLeftRadius: radius.xs,
+    padding: 12,
+    gap: 10,
+  },
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  legendItem: { alignItems: 'center', flex: 1 },
+  legendDot: {
+    width: 24, height: 24, borderRadius: 12,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth: 1, borderColor: `${colors.warmAmber}50`,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 3,
+  },
+  legendNum: { fontSize: 11, fontWeight: '700', color: colors.gold },
+  legendLabel: { fontSize: 8, color: colors.textMuted, textAlign: 'center' },
+  qRow: { gap: 6 },
+  qText: { fontSize: 13, color: colors.aiBubbleText, lineHeight: 18 },
+  btnRow: { flexDirection: 'row', gap: 6, paddingLeft: 2 },
+  optBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5, borderColor: colors.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  optBtnSel: {
+    backgroundColor: colors.gold,
+    borderColor: colors.gold,
+  },
+  optNum: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
+  optNumSel: { color: '#060F14' },
+  submitBtn: {
+    marginTop: 4,
+    backgroundColor: colors.gold,
+    borderRadius: radius.full,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  submitText: { fontSize: 13, fontWeight: '700', color: '#060F14' },
+});
+
 const styles = StyleSheet.create({
   container: { flex:1, backgroundColor: colors.background },
   containerCenter: { flex:1, backgroundColor: colors.background, alignItems:'center' as const, justifyContent:'center' as const, gap:16 },
@@ -319,6 +528,13 @@ const styles = StyleSheet.create({
   onlinePill:  { flexDirection:'row', alignItems:'center', gap:4, marginTop:2 },
   onlineDot:   { width:6, height:6, borderRadius:3, backgroundColor: colors.success },
   onlineText:  { ...typography.caption, color: colors.success, fontSize:10 },
+  usagePill: {
+    flexDirection: 'row', alignItems: 'center', marginTop: 3,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 8,
+    paddingHorizontal: 6, paddingVertical: 2, gap: 5,
+  },
+  usageBar: { height: 3, borderRadius: 2, backgroundColor: colors.gold, maxWidth: 52 },
+  usageText: { ...typography.caption, fontSize: 9, color: colors.textMuted },
   newBtn: {
     paddingHorizontal:12, paddingVertical:6,
     borderRadius: radius.full,
@@ -449,6 +665,30 @@ const styles = StyleSheet.create({
   loadingOrbIcon: { fontSize: 32 },
   headerAvatarIcon: { fontSize: 18 },
   typingDots: { flexDirection: 'row' as const, gap: 5, paddingVertical: 2, paddingHorizontal: 4 },
+});
+
+const gateStyles = StyleSheet.create({
+  container:      { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+  backBtn:        { position: 'absolute' as const, top: spacing.lg, left: spacing.lg, padding: spacing.sm },
+  backText:       { ...typography.h2, color: colors.gold },
+  lockIcon:       { fontSize: 64, marginBottom: spacing.md },
+  title:          { ...typography.h1, color: colors.textPrimary, textAlign: 'center' as const, marginBottom: spacing.sm },
+  subtitle:       { ...typography.body, color: colors.textMuted, textAlign: 'center' as const, marginBottom: spacing.lg },
+  progressRow:    { flexDirection: 'row', gap: 12, marginBottom: spacing.xs },
+  progressDot:    { width: 16, height: 16, borderRadius: 8, backgroundColor: colors.border },
+  progressDotDone:{ backgroundColor: colors.gold },
+  progressLabel:  { ...typography.caption, color: colors.gold, marginBottom: spacing.xl, fontWeight: '700' as const },
+  moduleList:     { width: '100%', gap: spacing.sm },
+  moduleRow:      {
+    flexDirection: 'row' as const, alignItems: 'center', gap: spacing.md,
+    padding: spacing.md, borderRadius: radius.md,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+  },
+  moduleRowDone:  { borderColor: colors.gold, backgroundColor: colors.goldGlow },
+  moduleIcon:     { fontSize: 20, width: 28, textAlign: 'center' as const },
+  moduleLabel:    { ...typography.body, color: colors.textMuted, flex: 1 },
+  moduleLabelDone:{ color: colors.gold, fontWeight: '700' as const },
+  moduleTick:     { ...typography.body, color: colors.gold, fontWeight: '700' as const },
 });
 
 export default ChatScreen;
