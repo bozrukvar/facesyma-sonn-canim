@@ -449,19 +449,43 @@ class TwinsView(View):
                 return JsonResponse({'detail': msg}, status=400)
 
             _load_engine()
+            # per-person sifat scores extracted within twins() using x/y from Match()
+            _p1_scores: dict = {}
+            _p2_scores: dict = {}
             try:
                 from database_twins import twins
-                result = twins(*images, lang)
+                twins_raw = twins(*images, lang)
             except Exception:
-                # Fallback: engine not available or crashed
-                result = generate_compatibility_placeholder(images, lang)
+                twins_raw = generate_compatibility_placeholder(images, lang)
 
-            if isinstance(result, str):
+            # twins() now returns a structured dict; fall back to plain string for old versions
+            if isinstance(twins_raw, dict) and 'text_result' in twins_raw:
+                _p1_scores = twins_raw.get('person1_sifat_scores', {})
+                _p2_scores = twins_raw.get('person2_sifat_scores', {})
+                raw = twins_raw['text_result'].strip()
+                if '#text' in raw:
+                    parts = raw.split('#text', 1)
+                    try:
+                        score = round(float(parts[0].strip()))
+                    except ValueError:
+                        score = 75
+                    description = parts[1].strip() if len(parts) > 1 else ''
+                    result = {
+                        'group_score': score,
+                        'overall_harmony': score,
+                        'person_count': len(images),
+                        'details': description,
+                        'pair_scores': {},
+                        'recommendations': [],
+                    }
+                else:
+                    result = {'group_score': 75, 'overall_harmony': 75,
+                              'person_count': len(images), 'pair_scores': {}, 'recommendations': []}
+            elif isinstance(twins_raw, str):
                 try:
-                    result = json.loads(result)
+                    result = json.loads(twins_raw)
                 except Exception:
-                    # Format: "97.88#textDescription..." — parse score and text
-                    raw = result.strip()
+                    raw = twins_raw.strip()
                     if '#text' in raw:
                         parts = raw.split('#text', 1)
                         try:
@@ -479,31 +503,32 @@ class TwinsView(View):
                         }
                     else:
                         result = {'result': raw}
+            else:
+                result = twins_raw  # already a plain dict (e.g. placeholder)
 
-            # Multi-dimension analysis: run enhanced_character mode on each photo
-            # (enhanced_databases returns structured dict with sifat_scores; plain
-            # databases() returns a text string which cannot be used for scoring)
-            analyses = []
-            for img_path in images:
-                try:
-                    person_data = _run_analysis(img_path, 'enhanced_character', lang)
-                    if isinstance(person_data, str):
-                        try:
-                            person_data = json.loads(person_data)
-                        except Exception:
-                            person_data = {}
-                    if isinstance(person_data, dict):
-                        log.info(f'Twins per-person keys: {list(person_data.keys())}, sifat_scores count: {len(person_data.get("sifat_scores", {}))}')
-                    else:
-                        log.warning(f'Twins per-person unexpected type: {type(person_data)}')
-                    analyses.append(person_data if isinstance(person_data, dict) else {})
-                except Exception as e:
-                    log.warning(f'Per-person twins analysis failed: {e}', exc_info=True)
-                    analyses.append({})
+            # Build analyses list for dimension calculation.
+            # Prefer per-person data from twins() (no extra face detection needed).
+            if _p1_scores and _p2_scores:
+                analyses = [{'sifat_scores': _p1_scores}, {'sifat_scores': _p2_scores}]
+                for i in range(2, len(images)):
+                    analyses.append({})  # no per-person data for >2 people
+            else:
+                # Fallback: run enhanced_character on each image individually
+                analyses = []
+                for img_path in images:
+                    try:
+                        person_data = _run_analysis(img_path, 'enhanced_character', lang)
+                        if isinstance(person_data, str):
+                            try:
+                                person_data = json.loads(person_data)
+                            except Exception:
+                                person_data = {}
+                        analyses.append(person_data if isinstance(person_data, dict) else {})
+                    except Exception as e:
+                        log.warning(f'Per-person twins analysis failed: {e}')
+                        analyses.append({})
 
-            log.info(f'Twins analyses count={len(analyses)}, non-empty={sum(1 for a in analyses if a)}')
             dimensions = _calculate_twins_dimensions(analyses, lang)
-            log.info(f'Twins dimensions keys: {list(dimensions.keys()) if dimensions else "EMPTY"}')
 
             if isinstance(result, dict):
                 if dimensions:
