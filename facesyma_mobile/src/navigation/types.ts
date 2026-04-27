@@ -6,6 +6,7 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 export type RootStackParamList = {
   Onboarding:        undefined;
   Auth:              undefined;
+  ProfileSetup:      undefined;
   Main:              undefined;
   Chat:              { analysisResult?: unknown; lang?: string } | undefined;
   Twins:             undefined;
@@ -14,7 +15,12 @@ export type RootStackParamList = {
   Daily:             undefined;
   Assessment:        undefined;
   AssessmentHistory: undefined;
+  Account:           undefined;
   Fashion:           { analysisResult?: unknown; lang?: string } | undefined;
+  Communities:       { communityType?: string } | undefined;
+  PeerChatList:      undefined;
+  PeerChatRequest:   { requestId?: string; toUserId?: number; toUsername?: string; compatScore?: number; source?: string };
+  PeerChat:          { roomId: string; otherUserId: number; otherUsername: string; compatScore?: number };
 };
 
 export type TabParamList = {

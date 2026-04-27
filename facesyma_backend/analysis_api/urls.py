@@ -4,7 +4,7 @@ from .views import (
     AnalyzeView, AnalyzeModulesView, AnalyzeGoldenView,
     AnalyzeFaceTypeView, AnalyzeArtView, AnalyzeAstrologyView,
     AnalyzeEnhancedView, AnalyzeGoldenTransformView,
-    TwinsView, HistoryView, DailyView,
+    TwinsView, HistoryView, HistoryDeleteView, HistoryDeleteAllView, DailyView,
 )
 from .assessment_views import (
     AssessmentQuestionsView, AssessmentSubmitView,
@@ -16,6 +16,11 @@ from .compatibility_views import (
     ListCommunitiesView, JoinCommunityView, ListCommunityMembersView,
     ApproveCommunityInvitationView, ListPendingInvitationsView,
     SubscriptionStatusView, SubscriptionUpgradeView, SubscriptionCancelView,
+)
+from .peer_chat_views import (
+    SendChatRequestView, RespondChatRequestView, PendingRequestsView,
+    ChatRoomsView, ChatMessagesView, MarkReadView, LeaveChatRoomView,
+    UploadChatFileView,
 )
 
 urlpatterns = [
@@ -30,6 +35,8 @@ urlpatterns = [
     path('analyze/similarity/',  SimilarityAnalyzeView.as_view(),         name='analyze-similarity'),
     path('twins/',               TwinsView.as_view(),                     name='twins'),
     path('history/',             HistoryView.as_view(),                   name='history'),
+    path('history/all/',         HistoryDeleteAllView.as_view(),          name='history-delete-all'),
+    path('history/<str:record_id>/', HistoryDeleteView.as_view(),         name='history-delete'),
     path('daily/',               DailyView.as_view(),                     name='daily'),
 
     # ── Compatibility & Communities (Phase 1) ──────────────────────────────────
@@ -46,6 +53,16 @@ urlpatterns = [
     path('subscription/status/',   SubscriptionStatusView.as_view(),   name='subscription-status'),
     path('subscription/upgrade/',  SubscriptionUpgradeView.as_view(),  name='subscription-upgrade'),
     path('subscription/cancel/',   SubscriptionCancelView.as_view(),   name='subscription-cancel'),
+
+    # ── P2P Peer Chat ────────────────────────────────────────────────────────────
+    path('peer-chat/request/',                              SendChatRequestView.as_view(),     name='peer-chat-request'),
+    path('peer-chat/request/pending/',                      PendingRequestsView.as_view(),     name='peer-chat-pending'),
+    path('peer-chat/request/<str:request_id>/respond/',     RespondChatRequestView.as_view(),  name='peer-chat-respond'),
+    path('peer-chat/rooms/',                                ChatRoomsView.as_view(),           name='peer-chat-rooms'),
+    path('peer-chat/rooms/<str:room_id>/messages/',         ChatMessagesView.as_view(),        name='peer-chat-messages'),
+    path('peer-chat/rooms/<str:room_id>/read/',             MarkReadView.as_view(),            name='peer-chat-read'),
+    path('peer-chat/rooms/<str:room_id>/',                  LeaveChatRoomView.as_view(),       name='peer-chat-leave'),
+    path('peer-chat/upload/',                               UploadChatFileView.as_view(),      name='peer-chat-upload'),
 
     # ── Assessment & Questionnaires (Phase 5) ──────────────────────────────────
     path('assessment/questions/<str:test_type>/', AssessmentQuestionsView.as_view(), name='assessment-questions'),

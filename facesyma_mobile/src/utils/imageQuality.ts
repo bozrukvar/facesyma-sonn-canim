@@ -13,7 +13,6 @@
  */
 
 import { Image } from 'react-native';
-import * as FileSystem from 'expo-file-system';
 import { t } from './i18n';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -76,7 +75,7 @@ async function resolveMetadata(
         ()     => resolve({ width: 480, height: 640 })   // safe fallback
       );
     }),
-    FileSystem.getInfoAsync(uri, { size: true }).catch(() => ({ size: 0 })),
+    Promise.resolve({ size: 0 }),
   ]);
 
   return {

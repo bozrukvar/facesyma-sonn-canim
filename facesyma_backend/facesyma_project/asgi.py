@@ -19,9 +19,10 @@ django_asgi_app = get_asgi_application()
 # Import routing after Django initialization
 from gamification.routing import websocket_urlpatterns as gamification_ws
 from admin_api.routing import websocket_urlpatterns as admin_ws
+from analysis_api.routing import websocket_urlpatterns as chat_ws
 
 # Combine all WebSocket patterns
-all_ws_patterns = gamification_ws + admin_ws
+all_ws_patterns = gamification_ws + admin_ws + chat_ws
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,

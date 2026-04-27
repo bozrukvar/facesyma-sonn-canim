@@ -8,18 +8,25 @@ import theme from '../utils/theme';
 const { colors, spacing, typography } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
 
 const DailyScreen = ({ navigation, route }: ScreenProps<'Daily'>) => {
-  const insets = useSafeAreaInsets();
+  const insets   = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const [daily,   setDaily]   = useState<string>('');
   const [loading, setLoading] = useState(true);
   const { lang } = useLanguage();
 
   useEffect(() => {
     AnalysisAPI.getDailyMotivation(lang)
-      .then(d => setDaily(d?.message || d?.daily || ''))
+      .then(d => {
+        setDaily(d?.message || d?.daily || '');
+        dispatch(markModuleUsed('daily'));
+      })
       .catch(() => setDaily(t('common.generic_error', lang)))
       .finally(() => setLoading(false));
   }, [lang]);

@@ -10,11 +10,15 @@ const { colors, spacing, typography, radius } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import type { ScreenProps } from '../navigation/types';
 import type { ArtMatchResult } from '../types/api';
 
 const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [result,   setResult]   = useState<ArtMatchResult | null>(null);
   const [loading,  setLoading]  = useState(false);
@@ -30,6 +34,7 @@ const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
     try {
       const data = await AnalysisAPI.analyzeArt(imageUri, lang);
       setResult(data);
+      dispatch(markModuleUsed('art_match'));
     } catch (e: any) {
       Alert.alert(
         t('common.error', lang),

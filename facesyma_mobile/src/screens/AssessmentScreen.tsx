@@ -9,6 +9,9 @@ import { AssessmentAPI } from '../services/api';
 import { Card, GoldButton, SectionLabel, Badge } from '../components/ui';
 import theme from '../utils/theme';
 const { colors } = theme;
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import type { ScreenProps } from '../navigation/types';
@@ -94,6 +97,7 @@ interface SubmissionResponse {
 
 const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const [step, setStep] = useState<AssessmentStep>('select');
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const { lang, setLang } = useLanguage();
@@ -161,6 +165,7 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
 
         setResult(data);
         setStep('results');
+        dispatch(markModuleUsed('assessment'));
       } else {
         Alert.alert(errTitle, errGeneric);
       }

@@ -9,11 +9,15 @@ const { colors, spacing, typography, radius } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { markModuleUsed } from '../store/authSlice';
 import type { ScreenProps } from '../navigation/types';
 import type { AstrologyResult } from '../types/api';
 
 const AstrologyScreen = ({ navigation, route }: ScreenProps<'Astrology'>) => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
   const [result,    setResult]    = useState<AstrologyResult | null>(null);
@@ -35,6 +39,7 @@ const AstrologyScreen = ({ navigation, route }: ScreenProps<'Astrology'>) => {
     try {
       const data = await CoachAPI.birthAnalysis(birthDate, birthTime || undefined, lang);
       setResult(data);
+      dispatch(markModuleUsed('astrology'));
     } catch (e: any) {
       Alert.alert(
         errTitle,

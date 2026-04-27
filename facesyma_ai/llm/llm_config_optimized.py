@@ -91,7 +91,7 @@ class LLMConfig:
         """Local CPU configuration"""
         return {
             "model": {
-                "name": "phi-2",  # Lighter model for CPU
+                "name": "phi",  # Lighter model for CPU
                 "quantization": "q8_0",
                 "gpu_memory": 0,
                 "num_gpu": 0

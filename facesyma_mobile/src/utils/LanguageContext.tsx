@@ -1,4 +1,6 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { NativeModules, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AVAILABLE_LANGS = [
   { code: 'tr', flag: '🇹🇷', name: 'Türkçe' },
@@ -21,6 +23,26 @@ export const AVAILABLE_LANGS = [
   { code: 'pl', flag: '🇵🇱', name: 'Polski' },
 ];
 
+const LANG_STORAGE_KEY = '@facesyma_lang';
+const SUPPORTED = new Set(AVAILABLE_LANGS.map(l => l.code));
+
+const getDeviceLang = (): string => {
+  try {
+    let raw = '';
+    if (Platform.OS === 'ios') {
+      raw = NativeModules.SettingsManager?.settings?.AppleLocale
+        || (NativeModules.SettingsManager?.settings?.AppleLanguages ?? [])[0]
+        || '';
+    } else {
+      raw = NativeModules.I18nManager?.localeIdentifier || '';
+    }
+    const code = raw.split(/[-_]/)[0].toLowerCase();
+    return SUPPORTED.has(code) ? code : 'en';
+  } catch {
+    return 'en';
+  }
+};
+
 interface LanguageContextType {
   lang: string;
   setLang: (lang: string) => void;
@@ -28,17 +50,26 @@ interface LanguageContextType {
 }
 
 export const LanguageContext = createContext<LanguageContextType>({
-  lang: 'tr',
+  lang: 'en',
   setLang: () => {},
   availableLangs: AVAILABLE_LANGS,
 });
 
-interface LanguageProviderProps {
-  children: ReactNode;
-}
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Synchronous initial value from device locale (no flash)
+  const [lang, setLangState] = useState<string>(getDeviceLang);
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [lang, setLang] = useState<string>('tr');
+  useEffect(() => {
+    // Override with saved preference if it exists
+    AsyncStorage.getItem(LANG_STORAGE_KEY).then(saved => {
+      if (saved && SUPPORTED.has(saved)) setLangState(saved);
+    }).catch(() => {});
+  }, []);
+
+  const setLang = (code: string) => {
+    setLangState(code);
+    AsyncStorage.setItem(LANG_STORAGE_KEY, code).catch(() => {});
+  };
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, availableLangs: AVAILABLE_LANGS }}>
@@ -49,8 +80,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
 export const useLanguage = () => {
   const context = React.useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within LanguageProvider');
-  }
+  if (!context) throw new Error('useLanguage must be used within LanguageProvider');
   return context;
 };
