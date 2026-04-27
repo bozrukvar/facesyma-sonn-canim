@@ -88,7 +88,7 @@ def twins(img1, img2, lang):
     _sget = static.get
     get_values = _get_pos_neg()
 
-    _r0 = _r0; _r1 = _r1; _r2 = _r2; _r3 = _r3; _r4 = _r4
+    _r0 = result[0]; _r1 = result[1]; _r2 = result[2]; _r3 = result[3]; _r4 = result[4]
     _MEASURE_KEYS = [
         ("eyes_distance",          _r0["eyes_distance"]),
         ("eyes_size",              _r0["eyes_size"]),
@@ -175,4 +175,39 @@ def twins(img1, img2, lang):
     total_text = ''.join(map(str, total_text))
     result_text = " " + str(result_att) + "#text" + total_text
 
-    return result_text
+    # Extract per-person sifatlar from x (person 1) and y (person 2)
+    # x[0..4] and y[0..4] are per-person measurement category dicts from Cal1/Cal2
+    _PERSON_KEYS = [
+        ("eyes_distance",          0, "eyes_distance"),
+        ("eyes_size",              0, "eyes_size"),
+        ("eyes_compare",           0, "eyes_compare"),
+        ("eyebrows_eyes_distance", 1, "eyebrows_eyes_distance"),
+        ("lips_width",             2, "lips_width"),
+        ("lips_thickness",         2, "lips_thickness"),
+        ("lips_height_compare",    2, "lips_height_compare"),
+        ("nose_size",              3, "nose_size"),
+        ("nose_length",            3, "nose_length"),
+        ("nose_width",             3, "nose_width"),
+        ("forehead_distance",      4, "forehead_distance"),
+    ]
+
+    def _person_scores(person):
+        sm = {}
+        for doc_id, idx, key in _PERSON_KEYS:
+            try:
+                category = person[idx].get(key, '')
+            except Exception:
+                continue
+            if not category or category == 'not_defined':
+                continue
+            series = _sget(doc_id, {})
+            for sifat in series.get(category, {}):
+                sm[sifat] = 70.0
+        return sm
+
+    return {
+        'text_result': result_text,
+        'similarity_score': result_att,
+        'person1_sifat_scores': _person_scores(x),
+        'person2_sifat_scores': _person_scores(y),
+    }
