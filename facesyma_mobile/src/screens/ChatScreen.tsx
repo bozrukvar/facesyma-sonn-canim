@@ -199,8 +199,9 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
   const insets      = useSafeAreaInsets();
   const user        = useSelector((s: RootState) => s.auth.user);
   const modulesUsed = useSelector((s: RootState) => s.auth.modulesUsed);
-  const analysisResult = route.params?.analysisResult ?? {};
-  const { lang }       = useLanguage();
+  const analysisResult    = route.params?.analysisResult ?? {};
+  const hasAnalysisResult = route.params?.analysisResult != null;
+  const { lang }          = useLanguage();
   const QUICK_QUESTIONS = useMemo(() => getQuickQuestions(lang), [lang]);
 
   const [messages,     setMessages]     = useState<Message[]>([]);
@@ -282,8 +283,8 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
     }
   }, [input, loading, convId, lang]);
 
-  // ── Modül kapısı ────────────────────────────────────────────────────────────
-  if (modulesUsed.length < CHAT_MIN_MODULES) {
+  // ── Modül kapısı — analiz sonucuyla gelinince bypass ────────────────────────
+  if (!hasAnalysisResult && modulesUsed.length < CHAT_MIN_MODULES) {
     const remaining = CHAT_MIN_MODULES - modulesUsed.length;
     const MODULE_LIST = [
       { key: 'face_analysis', icon: '🔍', label: lang.startsWith('tr') ? 'Yüz Analizi'   : 'Face Analysis' },
