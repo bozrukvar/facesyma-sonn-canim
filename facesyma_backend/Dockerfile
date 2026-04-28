@@ -18,9 +18,9 @@ RUN echo "assessment views updated"
 # Media klasörü
 RUN mkdir -p media/tmp
 
+# Entrypoint
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8000
 
-CMD ["gunicorn", "facesyma_project.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "2", \
-     "--timeout", "120"]
+CMD ["/app/entrypoint.sh"]

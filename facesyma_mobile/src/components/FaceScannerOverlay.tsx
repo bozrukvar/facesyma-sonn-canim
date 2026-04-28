@@ -1,268 +1,311 @@
-/**
- * FaceScannerOverlay.tsx
- * ========================
- * Mistik biyometrik yüz tarama animasyonu
- *
- * Features:
- * - 27 facial landmark noktası (bölgeye göre renkli, cascading)
- * - Her noktadan sonar ripple halkası
- * - Altın köşe hedefleme parantezleri
- * - Neon mavi tarama dalgası (üç katmanlı)
- * - Mavi ↔ altın arasında nefes alan border
- * - Dramatik mistik ilerleme mesajları
- */
-
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Image,
-  Animated,
-  Dimensions,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Image, Animated, Dimensions, StyleSheet, Text } from 'react-native';
 import theme from '../utils/theme';
 const { colors } = theme;
 import { t } from '../utils/i18n';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface FaceScannerPoint {
-  id: string;
-  x: number;       // 0-1 (width yüzdesi)
-  y: number;       // 0-1 (height yüzdesi)
-  region: string;
-  delay: number;   // ms
-}
-
 interface Props {
   imageUri: string;
-  progress?: number;    // 0-100
-  scanDuration?: number;
+  progress?: number;
+  scanDuration?: number;  // toplam tarama süresi ms — dalga hızını buna göre ayarlar
   lang?: string;
+  faceCenter?: { cx: number; cy: number; fw?: number; fh?: number } | null;
+  imageSize?: { width: number; height: number };
 }
 
 const { width: screenWidth } = Dimensions.get('window');
 
-// ── Landmark Noktaları ────────────────────────────────────────────────────────
+// ── Dönen Yay (Rotating Arc) ──────────────────────────────────────────────────
 
-const FACIAL_LANDMARKS: FaceScannerPoint[] = [
-  // Alın (suspense start)
-  { id: 'forehead_left',        x: 0.35, y: 0.15, region: 'forehead', delay: 200 },
-  { id: 'forehead_right',       x: 0.65, y: 0.15, region: 'forehead', delay: 400 },
+const RotatingArc: React.FC<{
+  size: number;
+  cx: number;
+  cy: number;
+  color: string;
+  duration: number;
+  clockwise?: boolean;
+  delay?: number;
+  thickness?: number;
+  gap?: 'lr' | 'tb' | 'none';
+  opacity?: number;
+}> = ({ size, cx, cy, color, duration, clockwise = true, delay = 0, thickness = 1.2, gap = 'lr', opacity = 0.75 }) => {
+  const rotAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Gözler (gizemli açılış)
-  { id: 'eye_left_1',           x: 0.30, y: 0.35, region: 'eye', delay: 600 },
-  { id: 'eye_left_2',           x: 0.35, y: 0.33, region: 'eye', delay: 700 },
-  { id: 'eye_left_3',           x: 0.40, y: 0.35, region: 'eye', delay: 800 },
-  { id: 'eye_left_4',           x: 0.35, y: 0.38, region: 'eye', delay: 900 },
-  { id: 'eye_right_1',          x: 0.60, y: 0.35, region: 'eye', delay: 1000 },
-  { id: 'eye_right_2',          x: 0.65, y: 0.33, region: 'eye', delay: 1100 },
-  { id: 'eye_right_3',          x: 0.70, y: 0.35, region: 'eye', delay: 1200 },
-  { id: 'eye_right_4',          x: 0.65, y: 0.38, region: 'eye', delay: 1300 },
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: opacity, duration: 700, delay, useNativeDriver: true,
+    }).start();
+    Animated.loop(
+      Animated.timing(rotAnim, { toValue: 1, duration, useNativeDriver: true })
+    ).start();
+  }, []);
 
-  // Yanaklar (dışa yayılma)
-  { id: 'cheek_left_1',         x: 0.20, y: 0.40, region: 'cheek', delay: 1400 },
-  { id: 'cheek_left_2',         x: 0.15, y: 0.50, region: 'cheek', delay: 1600 },
-  { id: 'cheek_right_1',        x: 0.80, y: 0.40, region: 'cheek', delay: 1500 },
-  { id: 'cheek_right_2',        x: 0.85, y: 0.50, region: 'cheek', delay: 1700 },
+  const rotate = rotAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: clockwise ? ['0deg', '360deg'] : ['0deg', '-360deg'],
+  });
 
-  // Burun (merkez dramatik duraklama)
-  { id: 'nose_1',               x: 0.50, y: 0.40, region: 'nose', delay: 1800 },
-  { id: 'nose_2',               x: 0.48, y: 0.45, region: 'nose', delay: 2000 },
-  { id: 'nose_3',               x: 0.52, y: 0.45, region: 'nose', delay: 2200 },
-  { id: 'nose_4',               x: 0.50, y: 0.50, region: 'nose', delay: 2400 },
-
-  // Ağız (alt yüz sırrı)
-  { id: 'mouth_1',              x: 0.45, y: 0.55, region: 'mouth', delay: 2600 },
-  { id: 'mouth_2',              x: 0.50, y: 0.58, region: 'mouth', delay: 2800 },
-  { id: 'mouth_3',              x: 0.55, y: 0.55, region: 'mouth', delay: 3000 },
-  { id: 'mouth_4',              x: 0.48, y: 0.60, region: 'mouth', delay: 3200 },
-  { id: 'mouth_5',              x: 0.52, y: 0.60, region: 'mouth', delay: 3400 },
-
-  // Çene (final çerçeveleme)
-  { id: 'jaw_left',             x: 0.25, y: 0.62, region: 'jawline', delay: 3600 },
-  { id: 'jaw_center_left',      x: 0.40, y: 0.68, region: 'jawline', delay: 3900 },
-  { id: 'jaw_center_right',     x: 0.60, y: 0.68, region: 'jawline', delay: 4100 },
-  { id: 'jaw_right',            x: 0.75, y: 0.62, region: 'jawline', delay: 4400 },
-];
-
-const REGION_COLORS: Record<string, string> = {
-  eye:      '#5A9AE0',   // Elektrik mavi
-  nose:     '#5CB87A',   // Yeşil
-  mouth:    '#D95F5F',   // Sıcak kırmızı
-  cheek:    '#D4619A',   // Pembe
-  jawline:  '#D4853A',   // Amber/turuncu
-  forehead: '#9B59B6',   // Mor
-};
-
-// ── Corner Bracket (Hedefleme Parantezi) ─────────────────────────────────────
-
-const CornerBracket: React.FC<{
-  corner: 'tl' | 'tr' | 'bl' | 'br';
-  opacity: Animated.Value;
-}> = ({ corner, opacity }) => {
-  const SIZE = 22;
-  const OFFSET = 9;
-  const isTop  = corner[0] === 't';
-  const isLeft = corner[1] === 'l';
-
-  const edgeV: { top?: number; bottom?: number } = isTop  ? { top: OFFSET }  : { bottom: OFFSET };
-  const edgeH: { left?: number; right?: number } = isLeft ? { left: OFFSET } : { right: OFFSET };
+  const transparent = 'transparent';
+  const borderStyle =
+    gap === 'lr' ? { borderLeftColor: transparent, borderRightColor: transparent } :
+    gap === 'tb' ? { borderTopColor: transparent,  borderBottomColor: transparent } :
+    {};
 
   return (
     <Animated.View
       pointerEvents="none"
-      style={{ position: 'absolute', ...edgeV, ...edgeH, width: SIZE, height: SIZE, opacity }}
-    >
-      {/* Yatay çizgi */}
-      <View style={{
+      style={{
         position: 'absolute',
-        ...(isTop ? { top: 0 } : { bottom: 0 }),
-        ...(isLeft ? { left: 0 } : { right: 0 }),
-        width: SIZE, height: 2.5,
-        backgroundColor: colors.gold,
-        shadowColor: colors.gold,
-        shadowRadius: 5, shadowOpacity: 1,
+        left: cx - size / 2,
+        top:  cy - size / 2,
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: thickness,
+        borderColor: color,
+        ...borderStyle,
+        opacity: fadeAnim,
+        transform: [{ rotate }],
+      }}
+    />
+  );
+};
+
+// ── Altın Oran Overlay — yüze oransal (yüz bbox varsa) ───────────────────────
+
+// Orijinal görüntü koordinatlarındaki yüz bbox'ını frame koordinatlarına çevirir
+function toFaceFrameRect(
+  cx: number, cy: number, fw: number, fh: number,
+  imgW: number, imgH: number,
+): { left: number; top: number; width: number; height: number } {
+  const scale   = Math.max(FRAME_W / imgW, FRAME_H / imgH);
+  const offsetX = (FRAME_W - imgW * scale) / 2;
+  const offsetY = (FRAME_H - imgH * scale) / 2;
+  const left    = (cx - fw / 2) * imgW * scale + offsetX;
+  const top     = (cy - fh / 2) * imgH * scale + offsetY;
+  const width   = fw * imgW * scale;
+  const height  = fh * imgH * scale;
+  return { left, top, width, height };
+}
+
+const GoldenRatioOverlay: React.FC<{
+  faceRect: { left: number; top: number; width: number; height: number } | null;
+  progress: number;
+}> = ({ faceRect, progress }) => {
+  const outerOp    = useRef(new Animated.Value(0)).current;
+  const eyeLineOp  = useRef(new Animated.Value(0)).current;
+  const noseLineOp = useRef(new Animated.Value(0)).current;
+  const eyeBoxOp   = useRef(new Animated.Value(0)).current;
+  const goldenBoxOp = useRef(new Animated.Value(0)).current;
+  const thirdOp    = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const anim = (val: Animated.Value) =>
+      Animated.timing(val, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    if (progress >= 18) anim(outerOp);
+    if (progress >= 32) anim(eyeLineOp);
+    if (progress >= 46) anim(noseLineOp);
+    if (progress >= 60) anim(eyeBoxOp);
+    if (progress >= 72) anim(goldenBoxOp);
+    if (progress >= 84) anim(thirdOp);
+  }, [progress]);
+
+  // Yüz yoksa frame'e sabit fallback çizgiler
+  if (!faceRect) {
+    const CYAN = 'rgba(80, 210, 240, 1.0)';
+    const GOLD = 'rgba(201, 168, 76, 1.0)';
+    return (
+      <>
+        <Animated.View pointerEvents="none" style={{
+          position: 'absolute', left: 0, top: FRAME_H * 0.34,
+          width: FRAME_W, height: 2.8, backgroundColor: CYAN, opacity: eyeLineOp,
+        }} />
+        <Animated.View pointerEvents="none" style={{
+          position: 'absolute', left: 0, top: FRAME_H * 0.52,
+          width: FRAME_W, height: 2.8, backgroundColor: CYAN, opacity: noseLineOp,
+        }} />
+        <Animated.View pointerEvents="none" style={{
+          position: 'absolute', left: FRAME_W * 0.5 - 1.4, top: 0,
+          width: 2.8, height: FRAME_H, backgroundColor: CYAN, opacity: eyeLineOp,
+        }} />
+        <Animated.View pointerEvents="none" style={{
+          position: 'absolute', left: 0, top: FRAME_H * 0.618,
+          width: FRAME_W, height: 2.8, backgroundColor: GOLD, opacity: goldenBoxOp,
+        }} />
+      </>
+    );
+  }
+
+  const { left, top, width, height } = faceRect;
+  const φ = 1.618;
+
+  // Yatay referans çizgiler (yüz yüksekliğinin oranları)
+  const eyeY    = top + height * 0.36;  // göz hizası
+  const noseY   = top + height * 0.60;  // burun tabanı
+  const mouthY  = top + height * 0.76;  // ağız hizası
+
+  // Altın oran dikdörtgeni: genişlik = yükseklik / φ, ortalanmış
+  const goldenW    = height / φ;
+  const goldenLeft = left + (width - goldenW) / 2;
+
+  // Yatay üçler (alın / orta yüz / alt yüz)
+  const thirdH = height / 3;
+
+  // Göz kutuları: her göz yüz genişliğinin ~%22'si
+  const eyeW     = width * 0.23;
+  const eyeH     = height * 0.13;
+  const leftEyeX  = left + width * 0.14;
+  const rightEyeX = left + width * 0.63;
+  const eyeBoxTop = top + height * 0.28;
+
+  const GOLD    = 'rgba(201, 168, 76, 1.0)';
+  const CYAN    = 'rgba(80, 210, 240, 1.0)';
+  const GREEN   = 'rgba(80, 220, 130, 1.0)';
+  const MAGENTA = 'rgba(220, 100, 210, 1.0)';
+  const WHITE   = 'rgba(255, 255, 255, 0.90)';
+  const LINE    = 2.8;
+  const BOX     = 2.6;
+
+  return (
+    <>
+      {/* Dış yüz çerçevesi */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top, width, height,
+        borderWidth: LINE, borderColor: GOLD, opacity: outerOp,
       }} />
-      {/* Dikey çizgi */}
+
+      {/* Dikey merkez çizgisi */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left: left + width / 2 - 0.75, top,
+        width: LINE, height, backgroundColor: CYAN, opacity: eyeLineOp,
+      }} />
+
+      {/* Göz yatay çizgisi */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top: eyeY,
+        width, height: LINE, backgroundColor: CYAN, opacity: eyeLineOp,
+      }} />
+
+      {/* Burun tabanı çizgisi */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top: noseY,
+        width, height: LINE, backgroundColor: CYAN, opacity: noseLineOp,
+      }} />
+
+      {/* Ağız çizgisi */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top: mouthY,
+        width, height: LINE, backgroundColor: CYAN, opacity: thirdOp,
+      }} />
+
+      {/* Altın oran dikdörtgeni (φ proportional) */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left: goldenLeft, top, width: goldenW, height,
+        borderWidth: BOX, borderColor: GREEN, opacity: goldenBoxOp,
+      }} />
+
+      {/* Yatay üç bölge (alın/orta/alt) */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top: top + thirdH,
+        width, height: LINE, backgroundColor: WHITE, opacity: thirdOp,
+      }} />
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left, top: top + thirdH * 2,
+        width, height: LINE, backgroundColor: WHITE, opacity: thirdOp,
+      }} />
+
+      {/* Sol göz kutusu */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left: leftEyeX, top: eyeBoxTop,
+        width: eyeW, height: eyeH,
+        borderWidth: BOX, borderColor: MAGENTA, opacity: eyeBoxOp,
+      }} />
+
+      {/* Sağ göz kutusu */}
+      <Animated.View pointerEvents="none" style={{
+        position: 'absolute', left: rightEyeX, top: eyeBoxTop,
+        width: eyeW, height: eyeH,
+        borderWidth: BOX, borderColor: MAGENTA, opacity: eyeBoxOp,
+      }} />
+    </>
+  );
+};
+
+// ── Merkez Nişangah ───────────────────────────────────────────────────────────
+
+const CenterReticle: React.FC<{ cx: number; cy: number; progress: number }> = ({
+  cx, cy, progress,
+}) => {
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (progress < 15) return;
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1400, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0, duration: 1400, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [progress >= 15]);
+
+  const scaleVal = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.15] });
+  const glowOp   = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.15, 0.5] });
+
+  const R = 14;
+  return (
+    <Animated.View pointerEvents="none" style={{
+      position: 'absolute', left: cx - R, top: cy - R,
+      width: R * 2, height: R * 2, opacity: fadeAnim,
+    }}>
+      <Animated.View style={{
+        position: 'absolute', left: 0, top: 0, width: R * 2, height: R * 2,
+        borderRadius: R, backgroundColor: colors.gold,
+        opacity: glowOp, transform: [{ scale: scaleVal }],
+      }} />
       <View style={{
-        position: 'absolute',
-        ...(isTop ? { top: 0 } : { bottom: 0 }),
-        ...(isLeft ? { left: 0 } : { right: 0 }),
-        width: 2.5, height: SIZE,
+        position: 'absolute', left: R - 3, top: R - 3,
+        width: 6, height: 6, borderRadius: 3,
         backgroundColor: colors.gold,
-        shadowColor: colors.gold,
-        shadowRadius: 5, shadowOpacity: 1,
+        shadowColor: colors.gold, shadowRadius: 6, shadowOpacity: 1,
       }} />
     </Animated.View>
   );
 };
 
-// ── Animated Point (Ripple'lı Landmark Noktası) ───────────────────────────────
+// ── Scan Dalgası ─────────────────────────────────────────────────────────────
 
-const AnimatedPoint: React.FC<{
-  point: FaceScannerPoint;
-  imageWidth: number;
-  imageHeight: number;
-}> = ({ point, imageWidth, imageHeight }) => {
-  const scaleAnim     = useRef(new Animated.Value(0)).current;
-  const opacityAnim   = useRef(new Animated.Value(0)).current;
-  const glowAnim      = useRef(new Animated.Value(0)).current;
-  const rippleScale   = useRef(new Animated.Value(1)).current;
-  const rippleOpacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Nokta belirir (spring ile daha canlı)
-    Animated.sequence([
-      Animated.delay(point.delay),
-      Animated.parallel([
-        Animated.spring(scaleAnim, {
-          toValue: 1, friction: 5, tension: 220, useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 1, duration: 220, useNativeDriver: true,
-        }),
-      ]),
-    ]).start(() => {
-      // Sonar ripple — nokta belirdikten hemen sonra
-      rippleOpacity.setValue(0.9);
-      Animated.parallel([
-        Animated.timing(rippleScale, {
-          toValue: 4.5, duration: 750, useNativeDriver: true,
-        }),
-        Animated.timing(rippleOpacity, {
-          toValue: 0, duration: 750, useNativeDriver: true,
-        }),
-      ]).start();
-    });
-
-    // Sürekli glow nabız
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 950, useNativeDriver: false }),
-        Animated.timing(glowAnim, { toValue: 0, duration: 950, useNativeDriver: false }),
-      ])
-    ).start();
-  }, []);
-
-  const color  = REGION_COLORS[point.region] || '#5A9AE0';
-  const px     = point.x * imageWidth;
-  const py     = point.y * imageHeight;
-
-  const glowSize    = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [5, 15] });
-  const glowOpacity = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.12, 0.45] });
-
-  return (
-    <View style={[styles.pointWrap, { left: px - 12, top: py - 12 }]}>
-      {/* Ripple halkası */}
-      <Animated.View style={[styles.ripple, {
-        borderColor: color,
-        opacity: rippleOpacity,
-        transform: [{ scale: rippleScale }],
-      }]} />
-
-      {/* Glow halo */}
-      <Animated.View style={[styles.glowBg, {
-        width: glowSize, height: glowSize,
-        backgroundColor: color,
-        opacity: glowOpacity,
-      }]} />
-
-      {/* Merkez nokta */}
-      <Animated.View style={[styles.dot, {
-        backgroundColor: color,
-        transform: [{ scale: scaleAnim }],
-        opacity: opacityAnim,
-        shadowColor: color,
-      }]} />
-    </View>
-  );
-};
-
-// ── Scan Wave (Neon Tarama Çizgisi) ──────────────────────────────────────────
-
-const ScanningWave: React.FC<{ imageHeight: number }> = ({ imageHeight }) => {
+const ScanningWave: React.FC<{ imageHeight: number; sweepDuration?: number }> = ({
+  imageHeight,
+  sweepDuration = 2167,
+}) => {
   const waveAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
-      Animated.sequence([
-        Animated.timing(waveAnim, {
-          toValue: 1, duration: 1700, useNativeDriver: true,
-        }),
-        Animated.delay(700),
-      ])
+      Animated.timing(waveAnim, { toValue: 1, duration: sweepDuration, useNativeDriver: true })
     ).start();
   }, []);
 
   const translateY = waveAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [-15, imageHeight + 15],
+    outputRange: [-10, imageHeight + 10],
   });
 
   return (
     <Animated.View
       pointerEvents="none"
-      style={[StyleSheet.absoluteFill, {
-        transform: [{ translateY }],
-        borderRadius: 12,
-        overflow: 'hidden',
-      }]}
+      style={[StyleSheet.absoluteFill, { transform: [{ translateY }] }]}
     >
-      {/* Parlak önce gelen çizgi */}
-      <View style={styles.waveLine} />
-      {/* Dalga gövdesi üst */}
-      <View style={styles.waveBodyTop} />
-      {/* Dalga gövdesi alt (sönük) */}
-      <View style={styles.waveBodyBot} />
-      {/* Altın iz */}
-      <View style={styles.waveTrail} />
+      <View style={{ height: 3.5, backgroundColor: 'rgba(201, 168, 76, 1.0)', shadowColor: colors.gold, shadowRadius: 8, shadowOpacity: 1 }} />
+      <View style={{ height: 55,  backgroundColor: 'rgba(201, 168, 76, 0.13)' }} />
     </Animated.View>
   );
 };
 
-// ── Pulsing Border (Nefes Alan Kenar) ────────────────────────────────────────
+// ── Nefes Alan Kenar ─────────────────────────────────────────────────────────
 
 const PulsingBorder: React.FC = () => {
   const pulseAnim = useRef(new Animated.Value(0)).current;
@@ -270,8 +313,8 @@ const PulsingBorder: React.FC = () => {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1, duration: 1800, useNativeDriver: false }),
-        Animated.timing(pulseAnim, { toValue: 0, duration: 1800, useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 2200, useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 0, duration: 2200, useNativeDriver: false }),
       ])
     ).start();
   }, []);
@@ -279,25 +322,54 @@ const PulsingBorder: React.FC = () => {
   const borderColor = pulseAnim.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [
-      'rgba(90, 154, 224, 0.70)',
-      'rgba(201, 168, 76, 0.95)',
-      'rgba(90, 154, 224, 0.70)',
+      'rgba(80, 200, 230, 0.80)',
+      'rgba(201, 168, 76, 1.0)',
+      'rgba(80, 200, 230, 0.80)',
     ],
   });
 
   return (
     <Animated.View
       pointerEvents="none"
-      style={[StyleSheet.absoluteFill, {
-        borderRadius: 12,
-        borderWidth: 1.5,
-        borderColor,
-      }]}
+      style={[StyleSheet.absoluteFill, { borderRadius: 12, borderWidth: 2.2, borderColor }]}
     />
   );
 };
 
-// ── İlerleme Mesajları ─────────────────────────────────────────────────────────
+// ── Köşe Parantezi ────────────────────────────────────────────────────────────
+
+const CornerBracket: React.FC<{ corner: 'tl' | 'tr' | 'bl' | 'br'; opacity: Animated.Value }> = ({
+  corner, opacity,
+}) => {
+  const SIZE = 22, OFFSET = 9;
+  const isTop  = corner[0] === 't';
+  const isLeft = corner[1] === 'l';
+  const edgeV = isTop  ? { top: OFFSET }    : { bottom: OFFSET };
+  const edgeH = isLeft ? { left: OFFSET }   : { right: OFFSET };
+  return (
+    <Animated.View pointerEvents="none"
+      style={{ position: 'absolute', ...edgeV, ...edgeH, width: SIZE, height: SIZE, opacity }}>
+      <View style={{
+        position: 'absolute',
+        ...(isTop ? { top: 0 } : { bottom: 0 }),
+        ...(isLeft ? { left: 0 } : { right: 0 }),
+        width: SIZE, height: 3,
+        backgroundColor: colors.gold,
+        shadowColor: colors.gold, shadowRadius: 5, shadowOpacity: 1,
+      }} />
+      <View style={{
+        position: 'absolute',
+        ...(isTop ? { top: 0 } : { bottom: 0 }),
+        ...(isLeft ? { left: 0 } : { right: 0 }),
+        width: 3, height: SIZE,
+        backgroundColor: colors.gold,
+        shadowColor: colors.gold, shadowRadius: 4, shadowOpacity: 1,
+      }} />
+    </Animated.View>
+  );
+};
+
+// ── İlerleme Mesajı ───────────────────────────────────────────────────────────
 
 function getProgressMsg(p: number, lang: string): string {
   if (p <= 12) return t('scanner.msg_0', lang);
@@ -310,96 +382,113 @@ function getProgressMsg(p: number, lang: string): string {
 
 // ── Ana Bileşen ───────────────────────────────────────────────────────────────
 
+// Sabit çerçeve boyutu — her fotoğraf aynı büyüklükte görünür
+const FRAME_W = screenWidth * 0.88;
+const FRAME_H = FRAME_W * 1.22;   // yaklaşık 4:5 portrait oranı
+
+/**
+ * resizeMode="cover" ile gösterilen orijinal bir görüntüdeki
+ * (cx, cy) koordinatlarını frame koordinatlarına dönüştürür.
+ */
+function toFrameCoords(
+  cx: number, cy: number,
+  imgW: number, imgH: number,
+): { x: number; y: number } {
+  if (!imgW || !imgH) return { x: FRAME_W / 2, y: FRAME_H * 0.38 };
+  // cover: iki eksenden büyük olanı frame'e tam sığdırır
+  const scale   = Math.max(FRAME_W / imgW, FRAME_H / imgH);
+  const offsetX = (FRAME_W - imgW * scale) / 2;
+  const offsetY = (FRAME_H - imgH * scale) / 2;
+  return {
+    x: Math.max(FRAME_W * 0.15, Math.min(cx * imgW * scale + offsetX, FRAME_W * 0.85)),
+    y: Math.max(FRAME_H * 0.10, Math.min(cy * imgH * scale + offsetY, FRAME_H * 0.70)),
+  };
+}
+
 export const FaceScannerOverlay: React.FC<Props> = ({
   imageUri,
   progress = 0,
-  scanDuration = 5000,
+  scanDuration = 6500,
   lang = 'tr',
+  faceCenter,
+  imageSize,
 }) => {
-  const animValue      = useRef(new Animated.Value(0)).current;
-  const cornerOpacity  = useRef(new Animated.Value(0)).current;
-  const headerOpacity  = useRef(new Animated.Value(0)).current;
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const animValue     = useRef(new Animated.Value(0)).current;
+  const cornerOpacity = useRef(new Animated.Value(0)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Image.getSize(imageUri, (w, h) => {
-      if (w <= 0 || h <= 0) return;
-      const scale = Math.min((screenWidth * 0.88) / w, 380 / h);
-      setImageDimensions({ width: w * scale, height: h * scale });
-    });
-
-    // Giriş animasyonları
-    Animated.stagger(120, [
-      Animated.timing(headerOpacity, { toValue: 1, duration: 450, useNativeDriver: true }),
-      Animated.timing(cornerOpacity, { toValue: 1, duration: 450, useNativeDriver: false }),
+    Animated.stagger(150, [
+      Animated.timing(headerOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(cornerOpacity, { toValue: 1, duration: 500, useNativeDriver: false }),
     ]).start();
-  }, [imageUri]);
+  }, []);
 
   useEffect(() => {
-    Animated.timing(animValue, {
-      toValue: progress, duration: 250, useNativeDriver: false,
-    }).start();
+    Animated.timing(animValue, { toValue: progress, duration: 300, useNativeDriver: false }).start();
   }, [progress]);
 
-  const progressWidth = animValue.interpolate({
-    inputRange: [0, 100],
-    outputRange: ['0%', '100%'],
-  });
-
+  const progressWidth = animValue.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] });
   const p = Math.round(progress);
-  const { width: imgW, height: imgH } = imageDimensions;
+
+  // Yüz merkezi: backend'den gelen koordinat varsa kullan, yoksa varsayılan
+  const { x: faceCX, y: faceCY } = faceCenter && imageSize?.width
+    ? toFrameCoords(faceCenter.cx, faceCenter.cy, imageSize.width, imageSize.height)
+    : { x: FRAME_W / 2, y: FRAME_H * 0.38 };
+
+  // Yüz bbox: fw/fh varsa frame koordinatlarına çevir (altın oran overlay için)
+  const faceRect = (faceCenter?.fw && faceCenter?.fh && imageSize?.width)
+    ? toFaceFrameRect(faceCenter.cx, faceCenter.cy, faceCenter.fw, faceCenter.fh, imageSize.width, imageSize.height)
+    : null;
 
   return (
     <View style={styles.container}>
-      {/* Başlık */}
       <Animated.Text style={[styles.scanHeader, { opacity: headerOpacity }]}>
         ◈  FACESYMA  SCAN  ◈
       </Animated.Text>
 
-      {/* Tarayıcı çerçeve */}
-      <View style={[
-        styles.frame,
-        {
-          width:  imgW || screenWidth * 0.88,
-          height: imgH || 300,
-        },
-      ]}>
-        {/* Fotoğraf */}
-        {imgW > 0 && (
-          <Image
-            source={{ uri: imageUri }}
-            style={{
-              width: imgW,
-              height: imgH,
-              borderRadius: 12,
-            }}
-          />
-        )}
+      <View style={[styles.frame, { width: FRAME_W, height: FRAME_H }]}>
+        {/* Fotoğraf — cover ile çerçeveyi tam doldurur */}
+        <Image
+          source={{ uri: imageUri }}
+          style={[StyleSheet.absoluteFill, { borderRadius: 12 }]}
+          resizeMode="cover"
+        />
 
-        {/* Karanlık mistik overlay */}
+        {/* Hafif karartma */}
         <View style={[StyleSheet.absoluteFill, styles.overlay]} />
 
-        {/* Neon tarama dalgası */}
-        {imgH > 0 && (
-          <ScanningWave imageHeight={imgH} />
-        )}
+        {/* Tarama dalgası — 3 tam geçiş = scanDuration */}
+        <ScanningWave imageHeight={FRAME_H} sweepDuration={Math.round(scanDuration / 3)} />
 
-        {/* Landmark noktaları */}
-        {imgW > 0 && FACIAL_LANDMARKS.map((point) => (
-          <AnimatedPoint
-            key={point.id}
-            point={point}
-            imageWidth={imgW}
-            imageHeight={imgH}
-          />
-        ))}
+        {/* Dönen halkalar — 3 katman */}
+        <RotatingArc
+          size={FRAME_W * 0.82} cx={faceCX} cy={faceCY}
+          color="rgba(80, 210, 240, 1.0)"
+          duration={18000} clockwise thickness={2.6} gap="lr" delay={300}
+        />
+        <RotatingArc
+          size={FRAME_W * 0.58} cx={faceCX} cy={faceCY}
+          color="rgba(201, 168, 76, 1.0)"
+          duration={11000} clockwise={false} thickness={3.2} gap="tb" delay={600}
+        />
+        <RotatingArc
+          size={FRAME_W * 0.35} cx={faceCX} cy={faceCY}
+          color="rgba(200, 160, 255, 1.0)"
+          duration={7000} clockwise thickness={2.4} gap="none" delay={900}
+        />
+
+        {/* Altın oran / yüz oranı overlay */}
+        <GoldenRatioOverlay faceRect={faceRect} progress={progress} />
+
+        {/* Merkez nişangah */}
+        <CenterReticle cx={faceCX} cy={faceCY} progress={progress} />
 
         {/* Köşe parantezleri */}
         {(['tl', 'tr', 'bl', 'br'] as const).map(c => (
           <CornerBracket key={c} corner={c} opacity={cornerOpacity} />
         ))}
 
-        {/* Nefes alan kenar */}
         <PulsingBorder />
       </View>
 
@@ -411,117 +500,43 @@ export const FaceScannerOverlay: React.FC<Props> = ({
         <Text style={styles.progressMsg}>{getProgressMsg(p, lang)}</Text>
       </View>
 
-      {/* Durum satırı */}
       <View style={styles.statusRow}>
-        <Text style={styles.statusEmoji}>
-          {p <= 30 ? '✨' : p <= 65 ? '🌟' : '💫'}
-        </Text>
+        <Text style={styles.statusEmoji}>{p <= 30 ? '✨' : p <= 65 ? '🌟' : '💫'}</Text>
         <Text style={styles.statusText}>{p}%  {t('scanner.status', lang)}</Text>
       </View>
     </View>
   );
 };
 
-// ── Stiller ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    gap: 16,
-    paddingVertical: 20,
-  },
+  container: { alignItems: 'center', gap: 16, paddingVertical: 20 },
   scanHeader: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 4,
-    color: colors.gold,
-    textAlign: 'center',
+    fontSize: 10, fontWeight: '700', letterSpacing: 4,
+    color: colors.gold, textAlign: 'center',
   },
   frame: {
-    position: 'relative',
-    overflow: 'hidden',
-    borderRadius: 12,
-    // Hafif dış gölge
-    shadowColor: colors.gold,
-    shadowRadius: 16,
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
+    position: 'relative', overflow: 'hidden', borderRadius: 12,
+    shadowColor: colors.gold, shadowRadius: 18, shadowOpacity: 0.30,
+    shadowOffset: { width: 0, height: 0 }, elevation: 8,
   },
-  overlay: {
-    backgroundColor: 'rgba(0, 4, 18, 0.28)',
-    borderRadius: 12,
-  },
-  pointWrap: {
-    position: 'absolute',
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ripple: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1.5,
-  },
-  glowBg: {
-    position: 'absolute',
-    borderRadius: 8,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.95,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  progressWrap: {
-    width: '100%',
-    paddingHorizontal: 20,
-    gap: 8,
-  },
+  overlay: { backgroundColor: 'rgba(0, 4, 18, 0.22)', borderRadius: 12 },
+  progressWrap: { width: '100%', paddingHorizontal: 20, gap: 8 },
   progressTrack: {
-    height: 5,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
-    borderRadius: 3,
-    overflow: 'hidden',
+    height: 4, backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    borderRadius: 2, overflow: 'hidden',
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: colors.gold,
-    borderRadius: 3,
-    shadowColor: colors.gold,
-    shadowRadius: 4,
-    shadowOpacity: 0.6,
+    height: '100%', backgroundColor: colors.gold, borderRadius: 2,
+    shadowColor: colors.gold, shadowRadius: 4, shadowOpacity: 0.7,
     shadowOffset: { width: 0, height: 0 },
   },
   progressMsg: {
-    fontSize: 12,
-    color: colors.textWarm,
-    textAlign: 'center',
-    fontWeight: '600',
-    letterSpacing: 0.3,
+    fontSize: 12, color: colors.textWarm, textAlign: 'center',
+    fontWeight: '600', letterSpacing: 0.3,
   },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  statusEmoji: {
-    fontSize: 20,
-  },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  statusEmoji: { fontSize: 20 },
   statusText: {
-    fontSize: 13,
-    color: colors.gold,
-    fontWeight: '700',
-    letterSpacing: 2,
+    fontSize: 13, color: colors.gold, fontWeight: '700', letterSpacing: 2,
   },
-  waveLine:    { height: 2.5, backgroundColor: 'rgba(80, 190, 255, 0.95)' },
-  waveBodyTop: { height: 45,  backgroundColor: 'rgba(70, 150, 255, 0.10)' },
-  waveBodyBot: { height: 35,  backgroundColor: 'rgba(70, 150, 255, 0.04)' },
-  waveTrail:   { height: 1,   backgroundColor: 'rgba(201, 168, 76, 0.55)' },
 });

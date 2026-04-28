@@ -5,6 +5,7 @@ from .views import (
     AnalyzeFaceTypeView, AnalyzeArtView, AnalyzeAstrologyView,
     AnalyzeEnhancedView, AnalyzeGoldenTransformView,
     TwinsView, HistoryView, HistoryDeleteView, HistoryDeleteAllView, DailyView,
+    FaceDetectView,
 )
 from .assessment_views import (
     AssessmentQuestionsView, AssessmentSubmitView,
@@ -24,6 +25,7 @@ from .peer_chat_views import (
 )
 
 urlpatterns = [
+    path('detect-face/',         FaceDetectView.as_view(),                name='detect-face'),
     path('analyze/',             AnalyzeView.as_view(),                   name='analyze'),
     path('analyze/enhanced/',    AnalyzeEnhancedView.as_view(),           name='analyze-enhanced'),
     path('analyze/modules/',     AnalyzeModulesView.as_view(),            name='analyze-modules'),

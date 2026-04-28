@@ -1,8 +1,8 @@
 // src/screens/AnalysisScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Dimensions, ActivityIndicator, Alert, Image,
+  Dimensions, ActivityIndicator, Alert, Image, Animated, PanResponder,
 } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useDispatch } from 'react-redux';
@@ -22,6 +22,7 @@ import type { AnalysisResult } from '../types/api';
 import type { AnalysisNavProp } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
+const MIN_SCAN_MS = 6500;
 
 type AnalysisStep = 'pick' | 'quality_check' | 'preview' | 'result';
 
@@ -34,12 +35,195 @@ interface AnalysisState {
   lang: string;
 }
 
+// ── Preview ekranı — PanResponder ile ham multi-touch (pinch/pan/rotate) ──
+const PreviewScreen: React.FC<{
+  imageUri: string | null;
+  loading: boolean;
+  scanProgress: number;
+  lang: string;
+  insetsTop: number;
+  faceCenter: { cx: number; cy: number } | null;
+  imageSize: { width: number; height: number } | null;
+  onReset: () => void;
+  onAnalyze: () => void;
+}> = ({ imageUri, loading, scanProgress, lang, insetsTop, faceCenter, imageSize, onReset, onAnalyze }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const rotAnim   = useRef(new Animated.Value(0)).current;
+  const txAnim    = useRef(new Animated.Value(0)).current;
+  const tyAnim    = useRef(new Animated.Value(0)).current;
+
+  const rotStr = rotAnim.interpolate({
+    inputRange: [-31.4, 31.4],
+    outputRange: ['-31.4rad', '31.4rad'],
+  });
+
+  // Current displayed transform state
+  const cur   = useRef({ scale: 1, rot: 0, x: 0, y: 0 });
+  // Snapshot at gesture start
+  const saved = useRef({ scale: 1, rot: 0, x: 0, y: 0 });
+  // Reference points when gesture started
+  const init  = useRef({ dist: 0, angle: 0, cx: 0, cy: 0, tx: 0, ty: 0, twoFinger: false });
+  const lastTap = useRef(0);
+
+  const getTouchDist = (t1: any, t2: any) => {
+    const dx = t1.pageX - t2.pageX, dy = t1.pageY - t2.pageY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+  const getTouchAngle = (t1: any, t2: any) =>
+    Math.atan2(t2.pageY - t1.pageY, t2.pageX - t1.pageX);
+
+  const resetTransform = () => {
+    cur.current = { scale: 1, rot: 0, x: 0, y: 0 };
+    saved.current = { scale: 1, rot: 0, x: 0, y: 0 };
+    scaleAnim.setValue(1);
+    rotAnim.setValue(0);
+    txAnim.setValue(0);
+    tyAnim.setValue(0);
+  };
+
+  const pr = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder:  () => true,
+
+      onPanResponderGrant: (evt) => {
+        const touches = evt.nativeEvent.touches;
+        if (touches.length === 1) {
+          const now = Date.now();
+          if (now - lastTap.current < 280) { resetTransform(); return; }
+          lastTap.current = now;
+        }
+        saved.current = { ...cur.current };
+        if (touches.length >= 2) {
+          init.current = {
+            dist:      getTouchDist(touches[0], touches[1]),
+            angle:     getTouchAngle(touches[0], touches[1]),
+            cx:        (touches[0].pageX + touches[1].pageX) / 2,
+            cy:        (touches[0].pageY + touches[1].pageY) / 2,
+            tx: 0, ty: 0, twoFinger: true,
+          };
+        } else {
+          init.current = {
+            dist: 0, angle: 0, cx: 0, cy: 0,
+            tx: touches[0].pageX,
+            ty: touches[0].pageY,
+            twoFinger: false,
+          };
+        }
+      },
+
+      onPanResponderMove: (evt) => {
+        const touches = evt.nativeEvent.touches;
+        if (touches.length >= 2) {
+          if (!init.current.twoFinger) {
+            saved.current = { ...cur.current };
+            init.current = {
+              dist:  getTouchDist(touches[0], touches[1]),
+              angle: getTouchAngle(touches[0], touches[1]),
+              cx:    (touches[0].pageX + touches[1].pageX) / 2,
+              cy:    (touches[0].pageY + touches[1].pageY) / 2,
+              tx: 0, ty: 0, twoFinger: true,
+            };
+            return;
+          }
+          const newDist  = getTouchDist(touches[0], touches[1]);
+          const newAngle = getTouchAngle(touches[0], touches[1]);
+          const cx = (touches[0].pageX + touches[1].pageX) / 2;
+          const cy = (touches[0].pageY + touches[1].pageY) / 2;
+
+          cur.current.scale = Math.max(0.3, Math.min(saved.current.scale * (newDist / init.current.dist), 5));
+          cur.current.rot   = saved.current.rot + (newAngle - init.current.angle);
+          cur.current.x     = saved.current.x + (cx - init.current.cx);
+          cur.current.y     = saved.current.y + (cy - init.current.cy);
+
+          scaleAnim.setValue(cur.current.scale);
+          rotAnim.setValue(cur.current.rot);
+          txAnim.setValue(cur.current.x);
+          tyAnim.setValue(cur.current.y);
+        } else if (touches.length === 1 && !init.current.twoFinger) {
+          cur.current.x = saved.current.x + (touches[0].pageX - init.current.tx);
+          cur.current.y = saved.current.y + (touches[0].pageY - init.current.ty);
+          txAnim.setValue(cur.current.x);
+          tyAnim.setValue(cur.current.y);
+        }
+      },
+
+      onPanResponderRelease: () => {
+        saved.current = { ...cur.current };
+        init.current.twoFinger = false;
+      },
+    })
+  ).current;
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
+        <TouchableOpacity onPress={onReset}><Text style={styles.back}>←</Text></TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('analysis.preview', lang)}</Text>
+        <View style={styles.spacer} />
+      </View>
+
+      <View style={styles.previewBody}>
+        {imageUri && !loading && (
+          <View style={styles.previewImgWrap} {...pr.panHandlers}>
+            <Animated.View style={{
+              transform: [
+                { translateX: txAnim },
+                { translateY: tyAnim },
+                { scale: scaleAnim },
+                { rotate: rotStr },
+              ],
+            }}>
+              <Image source={{ uri: imageUri }} style={styles.previewImg} />
+            </Animated.View>
+          </View>
+        )}
+
+        {loading && imageUri && (
+          <View style={styles.scannerWrap}>
+            <FaceScannerOverlay
+              imageUri={imageUri}
+              progress={Math.min(scanProgress, 95)}
+              scanDuration={MIN_SCAN_MS}
+              lang={lang}
+              faceCenter={faceCenter}
+              imageSize={imageSize ?? undefined}
+            />
+          </View>
+        )}
+
+        {!loading && (
+          <Text style={styles.gestureHint}>
+            {lang.startsWith('tr')
+              ? '👆 Sürükle · Sıkıştır · Döndür · 2x sıfırla'
+              : '👆 Drag · Pinch · Rotate · 2x to reset'}
+          </Text>
+        )}
+
+        <View style={styles.previewBtns}>
+          <TouchableOpacity style={styles.changeBtn} onPress={onReset} disabled={loading}>
+            <Text style={styles.changeBtnText}>{t('analysis.change', lang)}</Text>
+          </TouchableOpacity>
+          <GoldButton
+            title={loading ? '' : t('analysis.analyze', lang)}
+            onPress={onAnalyze}
+            loading={loading}
+            style={styles.flex1}
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
 const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation }) => {
   const insets     = useSafeAreaInsets();
   const insetsTop  = insets.top;
   const dispatch = useDispatch<AppDispatch>();
   const { lang, setLang, availableLangs } = useLanguage();
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
+  const [faceCenter, setFaceCenter] = useState<{ cx: number; cy: number; fw?: number; fh?: number } | null>(null);
   const [qualityResult, setQualityResult] = useState<ImageQualityResult | null>(null);
   const [result,   setResult]   = useState<AnalysisResult | null>(null);
   const [loading,  setLoading]  = useState(false);
@@ -52,15 +236,25 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
     fn(opts, async (res) => {
       if (res.assets?.[0]?.uri) {
         const asset = res.assets[0];
-        setImageUri(asset.uri ?? null);
+        const uri = asset.uri ?? '';
+        setImageUri(uri);
+        setImageSize({ width: asset.width ?? 0, height: asset.height ?? 0 });
+        setFaceCenter(null);
         setResult(null);
         setLoading(true);
         try {
-          const quality = await validateImageQuality(asset.uri ?? '', {
-            width:    asset.width,
-            height:   asset.height,
-            fileSize: asset.fileSize,
-          }, lang);
+          // Kalite kontrolü ve yüz tespiti paralel çalışır
+          const [quality] = await Promise.all([
+            validateImageQuality(uri, {
+              width:    asset.width,
+              height:   asset.height,
+              fileSize: asset.fileSize,
+            }, lang),
+            // Yüz tespiti arka planda, sonucu state'e yazar
+            AnalysisAPI.detectFace(uri).then(fc => {
+              if (fc.found) setFaceCenter({ cx: fc.cx, cy: fc.cy, fw: fc.fw, fh: fc.fh });
+            }).catch(() => {}),
+          ]);
           setQualityResult(quality);
           setStep('quality_check');
         } catch (e: any) {
@@ -76,8 +270,13 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
   const startAnalysis = async () => {
     if (!imageUri) return;
     setLoading(true);
+    const t0 = Date.now();
     try {
       const data = await AnalysisAPI.analyze(imageUri, lang);
+      const elapsed = Date.now() - t0;
+      if (elapsed < MIN_SCAN_MS) {
+        await new Promise<void>(r => setTimeout(r, MIN_SCAN_MS - elapsed));
+      }
       setResult(data);
       dispatch(setAnalysisResult({ result: data, imageUri }));
       dispatch(markModuleUsed('face_analysis'));
@@ -89,7 +288,7 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
     }
   };
 
-  const reset = () => { setImageUri(null); setQualityResult(null); setResult(null); setStep('pick'); setScanProgress(0); };
+  const reset = () => { setImageUri(null); setImageSize(null); setFaceCenter(null); setQualityResult(null); setResult(null); setStep('pick'); setScanProgress(0); };
 
   // Simulate scan progress during analysis (5 second duration for mystery/intrigue)
   useEffect(() => {
@@ -141,14 +340,18 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
 
           {/* Genel Kalite Skoru */}
           <Card style={[styles.scoreCard, { backgroundColor: qmColor + '20', borderColor: qmColor }]}>
-            <Text style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>{qualityMsg.emoji}</Text>
-            <Text style={[styles.scoreTitle, { color: qmColor }]}>
-              {Math.round(qualityResult.overall_score)}%
-            </Text>
-            <Text style={[styles.scoreSubtitle, { color: qmColor }]}>
-              {qualityMsg.title}
-            </Text>
-            <Text style={styles.recommendationNote}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Text style={{ fontSize: 22 }}>{qualityMsg.emoji}</Text>
+              <View>
+                <Text style={[styles.scoreTitle, { color: qmColor }]}>
+                  {Math.round(qualityResult.overall_score)}%
+                </Text>
+                <Text style={[styles.scoreSubtitle, { color: qmColor }]}>
+                  {qualityMsg.title}
+                </Text>
+              </View>
+            </View>
+            <Text style={[styles.recommendationNote, { fontSize: 11, marginTop: 6 }]}>
               {qualityResult.recommendation}
             </Text>
           </Card>
@@ -297,39 +500,17 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
 
   // ── Ekran: Önizleme ──────────────────────────────────────────────────────
   if (step === 'preview') return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
-        <TouchableOpacity onPress={reset}><Text style={styles.back}>←</Text></TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('analysis.preview', lang)}</Text>
-        <View style={styles.spacer} />
-      </View>
-      <View style={styles.previewBody}>
-        {imageUri && (
-          <Image source={{ uri: imageUri }} style={styles.previewImg} />
-        )}
-        <View style={styles.previewBtns}>
-          <TouchableOpacity style={styles.changeBtn} onPress={reset} disabled={loading}>
-            <Text style={styles.changeBtnText}>{t('analysis.change', lang)}</Text>
-          </TouchableOpacity>
-          <GoldButton
-            title={loading ? '' : t('analysis.analyze', lang)}
-            onPress={startAnalysis}
-            loading={loading}
-            style={styles.flex1}
-          />
-        </View>
-        {loading && imageUri && (
-          <View style={styles.scannerWrap}>
-            <FaceScannerOverlay
-              imageUri={imageUri}
-              progress={Math.min(scanProgress, 95)}
-              scanDuration={5000}
-              lang={lang}
-            />
-          </View>
-        )}
-      </View>
-    </View>
+    <PreviewScreen
+      imageUri={imageUri}
+      loading={loading}
+      scanProgress={scanProgress}
+      lang={lang}
+      insetsTop={insetsTop}
+      faceCenter={faceCenter}
+      imageSize={imageSize}
+      onReset={reset}
+      onAnalyze={startAnalysis}
+    />
   );
 
   // ── Ekran: Sonuçlar ──────────────────────────────────────────────────────
@@ -342,15 +523,23 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Fotoğraf + skor */}
+        {/* Fotoğraf + Talk to Assistant yan yana */}
         <View style={styles.resultTop}>
           {imageUri && (
             <Image source={{ uri: imageUri }} style={styles.resultImg} />
           )}
           <View style={styles.scoreCol}>
             {result?.golden_ratio != null && (
-              <ScoreRing score={Math.round(result.golden_ratio)} label={t('analysis.golden_ratio', lang)} size={80} />
+              <ScoreRing score={Math.round(result.golden_ratio)} label={t('analysis.golden_ratio', lang)} size={72} />
             )}
+            <TouchableOpacity
+              style={styles.chatInlineBtn}
+              onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
+              activeOpacity={0.82}
+            >
+              <Text style={styles.chatInlineIcon}>✨</Text>
+              <Text style={styles.chatInlineText}>{t('analysis.chat_btn', lang)}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -367,40 +556,17 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
           )}
         </View>
 
-        {/* AI Asistanla konuş — ÖNE ÇIKAR */}
-        <Card variant="warm" style={styles.chatCTA}>
-          <View style={styles.chatCTARow}>
-            <View style={styles.chatCTAIcon}><Text style={{ fontSize:22 }}>✨</Text></View>
-            <View style={styles.ctaFlex1}>
-              <Text style={styles.chatCTATitle}>{t('analysis.chat_title', lang)}</Text>
-              <Text style={styles.chatCTADesc}>{t('analysis.chat_desc', lang)}</Text>
-            </View>
-          </View>
-          <GoldButton
-            title={t('analysis.chat_btn', lang)}
-            variant="warm"
-            onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
-            style={styles.ctaBtn}
-          />
-        </Card>
-
-        {/* Giyim Önerileri */}
-        <Card style={styles.fashionCTA}>
-          <View style={styles.fashionCTARow}>
-            <View style={styles.fashionCTAIcon}><Text style={{ fontSize:22 }}>👗</Text></View>
-            <View style={styles.ctaFlex1}>
-              <Text style={styles.fashionCTATitle}>{t('analysis.fashion_title', lang)}</Text>
-              <Text style={styles.fashionCTADesc}>{t('analysis.fashion_desc', lang)}</Text>
-            </View>
-          </View>
-          <GoldButton
-            title={t('analysis.fashion_btn', lang)}
-            variant="outline"
-            icon="👗"
-            onPress={() => navigation.navigate('Fashion', { analysisResult: result, lang })}
-            style={styles.ctaBtn}
-          />
-        </Card>
+        {/* Kişilik Metni — düz metin sonucu */}
+        {result?.result && typeof result.result === 'string' && result.result.trim().length > 0 && (
+          <>
+            <SectionLabel>{t('analysis.characteristics', lang)}</SectionLabel>
+            <Card style={styles.attrCard}>
+              {(result.result as string).split('.').filter(s => s.trim().length > 2).map((sentence, i) => (
+                <Text key={i} style={[styles.attrDesc, { marginBottom: 6 }]}>• {sentence.trim()}.</Text>
+              ))}
+            </Card>
+          </>
+        )}
 
         {/* Özellikler */}
         {(result?.attributes?.length ?? 0) > 0 && result && (
@@ -422,6 +588,13 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
           </>
         )}
 
+        {result?.kisilik && typeof result.kisilik === 'string' && (
+          <>
+            <SectionLabel>{lang.startsWith('tr') ? 'KİŞİLİK' : 'PERSONALITY'}</SectionLabel>
+            <Card variant="warm"><Text style={styles.moduleText}>{result.kisilik as string}</Text></Card>
+          </>
+        )}
+
         {result?.kariyer && (
           <>
             <SectionLabel>{t('analysis.career', lang)}</SectionLabel>
@@ -433,6 +606,13 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
           <>
             <SectionLabel>{t('analysis.leadership', lang)}</SectionLabel>
             <Card><Text style={styles.moduleText}>{result.liderlik}</Text></Card>
+          </>
+        )}
+
+        {result?.sosyal && typeof result.sosyal === 'string' && (
+          <>
+            <SectionLabel>{lang.startsWith('tr') ? 'SOSYAL' : 'SOCIAL'}</SectionLabel>
+            <Card><Text style={styles.moduleText}>{result.sosyal as string}</Text></Card>
           </>
         )}
 
@@ -496,10 +676,22 @@ const styles = StyleSheet.create({
   tip:       { ...typography.caption, marginBottom:4, fontSize:12, color: colors.textWarm },
 
   // Preview
-  previewImg: {
+  previewImgWrap: {
     width:  width - spacing.xl * 2,
     height: width - spacing.xl * 2,
+  },
+  previewImg: {
+    width:  '100%',
+    height: '100%',
     borderRadius: radius.xl,
+  },
+  gestureHint: {
+    ...typography.caption,
+    fontSize: 11,
+    color: colors.textMuted,
+    textAlign: 'center' as const,
+    marginTop: 10,
+    marginBottom: 4,
   },
   changeBtn: {
     height:52, paddingHorizontal: spacing.lg,
@@ -511,10 +703,22 @@ const styles = StyleSheet.create({
   analyzingText: { ...typography.bodyWarm },
 
   // Result
-  resultTop: { flexDirection:'row', gap: spacing.lg, alignItems:'center', marginBottom: spacing.md },
-  resultImg: { width:90, height:90, borderRadius: radius.lg },
+  resultTop: { flexDirection:'row', gap: spacing.md, alignItems:'center', marginBottom: spacing.md },
+  resultImg: { width:100, height:100, borderRadius: radius.lg },
+  chatInlineBtn: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.warmAmber,
+    borderRadius: radius.md,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  chatInlineIcon: { fontSize: 14 },
+  chatInlineText: { ...typography.label, color: '#000', fontSize: 11, fontWeight: '700' as const },
 
-  // Chat CTA
+  // Chat CTA (kept for reference, no longer rendered)
   chatCTA:    { marginBottom: spacing.md },
   chatCTARow: { flexDirection:'row', alignItems:'center', gap:12 },
   chatCTAIcon:{
@@ -548,61 +752,65 @@ const styles = StyleSheet.create({
   // Quality Check
   qualityImg: {
     width: width - spacing.xl * 2,
-    height: width - spacing.xl * 2,
-    borderRadius: radius.xl,
-    marginBottom: spacing.lg,
+    height: (width - spacing.xl * 2) * 0.65,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
+    resizeMode: 'contain' as const,
+    backgroundColor: colors.surface,
   },
   scoreCard: {
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-    borderWidth: 2,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1.5,
     alignItems: 'center',
   },
   scoreTitle: {
     ...typography.h1,
-    fontSize: 32,
+    fontSize: 18,
   },
   scoreSubtitle: {
     ...typography.h3,
-    fontSize: 14,
-    marginTop: 4,
+    fontSize: 11,
+    marginTop: 1,
   },
   recommendation: {
     ...typography.body,
     textAlign: 'center',
   },
   metricCard: {
-    marginBottom: spacing.md,
+    marginBottom: 6,
+    padding: spacing.sm,
   },
   metricHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   metricLabel: {
     ...typography.label,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
   },
   metricValue: {
     ...typography.caption,
-    fontSize: 11,
+    fontSize: 9,
     color: colors.textMuted,
   },
   progressContainer: {
-    height: 6,
+    height: 3,
     backgroundColor: colors.border,
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: 3,
   },
   progressBar: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 2,
   },
   metricScore: {
     ...typography.caption,
-    fontSize: 10,
+    fontSize: 9,
     color: colors.textMuted,
   },
   retakeBtn: {
@@ -634,7 +842,7 @@ const styles = StyleSheet.create({
   mt10:              { marginTop: 10 },
   mt16:              { marginTop: 16 },
   mtXl:              { marginTop: spacing.xl },
-  recommendationNote:{ ...typography.body, textAlign: 'center' as const, color: colors.textWarm, marginTop: 8 },
+  recommendationNote:{ ...typography.caption, fontSize: 10, textAlign: 'center' as const, color: colors.textWarm, marginTop: 4 },
   moduleTextDaily:   { ...typography.bodyWarm, lineHeight:22, fontSize:13, fontStyle: 'italic' as const, color: colors.textWarm },
 });
 

@@ -400,8 +400,130 @@ class AnalyzeBaseView(View):
             return JsonResponse({'detail': 'Analysis failed. Please try again.'}, status=500)
 
 
+def _build_structured_result(plain_text: str, lang: str) -> dict:
+    """
+    Takes the plain-text character analysis output and enriches it with
+    structured career / leadership / social / personality categories by
+    looking up the database_categories collection in MongoDB.
+    """
+    try:
+        from admin_api.utils.mongo import _get_main_client
+        mongo = _get_main_client()
+        col = mongo['database_categories']['traits']
+
+        # Determine language suffix
+        lang_base = lang.split('-')[0].lower()
+        suf = 'tr' if lang_base == 'tr' else 'en'
+        kariyer_key   = f'kariyer_{suf}'
+        liderlik_key  = f'liderlik_{suf}'
+        sosyal_key    = f'sosyal_{suf}'
+        kisilik_key   = f'kisilik_{suf}'
+
+        # Fetch all category sentence docs
+        docs = list(col.find({}, {'_id': 1, kariyer_key: 1, liderlik_key: 1, sosyal_key: 1, kisilik_key: 1}))
+        if not docs:
+            return {'result': plain_text}
+
+        # Pick 3-5 random docs and extract sentences for each category
+        picked = random.sample(docs, min(5, len(docs)))
+        kariyer_sentences  = [d[kariyer_key]  for d in picked if kariyer_key  in d]
+        liderlik_sentences = [d[liderlik_key] for d in picked if liderlik_key in d]
+        sosyal_sentences   = [d[sosyal_key]   for d in picked if sosyal_key   in d]
+        kisilik_sentences  = [d[kisilik_key]  for d in picked if kisilik_key  in d]
+
+        result: dict = {'result': plain_text}
+        if kariyer_sentences:
+            result['kariyer'] = ' '.join(kariyer_sentences[:2])
+        if liderlik_sentences:
+            result['liderlik'] = ' '.join(liderlik_sentences[:2])
+        if sosyal_sentences:
+            result['sosyal'] = ' '.join(sosyal_sentences[:2])
+        if kisilik_sentences:
+            result['kisilik'] = ' '.join(kisilik_sentences[:2])
+        return result
+    except Exception as e:
+        log.warning(f'_build_structured_result failed: {e}')
+        return {'result': plain_text}
+
+
+def _detect_face_center(img_path: str) -> dict:
+    """OpenCV Haar cascade ile yüz merkezi tespiti. Fallback: merkez."""
+    try:
+        import cv2
+        img = cv2.imread(img_path)
+        if img is None:
+            return {'cx': 0.50, 'cy': 0.38, 'found': False}
+        h, w = img.shape[:2]
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.equalizeHist(gray)
+        cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+        )
+        faces = cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=4,
+            minSize=(int(w * 0.12), int(h * 0.08)),
+        )
+        if not isinstance(faces, tuple) and len(faces) > 0:
+            fx, fy, fw, fh = max(faces, key=lambda f: f[2] * f[3])
+            return {
+                'cx':    round((fx + fw / 2) / w, 4),
+                'cy':    round((fy + fh / 2) / h, 4),
+                'fw':    round(fw / w, 4),
+                'fh':    round(fh / h, 4),
+                'found': True,
+            }
+    except Exception as e:
+        log.warning(f'Face detect error: {e}')
+    return {'cx': 0.50, 'cy': 0.38, 'found': False}
+
+
+class FaceDetectView(View):
+    """Hızlı yüz merkezi tespiti — koordinatları döndürür, kayıt yapmaz."""
+
+    def post(self, request):
+        img_path = None
+        try:
+            if 'image' not in request.FILES:
+                return JsonResponse({'cx': 0.50, 'cy': 0.38, 'found': False})
+            img_path = _save_upload(request.FILES['image'])
+            result = _detect_face_center(img_path)
+            return JsonResponse({'success': True, **result})
+        except Exception as e:
+            log.warning(f'FaceDetectView error: {e}')
+            return JsonResponse({'cx': 0.50, 'cy': 0.38, 'found': False})
+        finally:
+            if img_path:
+                try:
+                    os.remove(img_path)
+                except Exception:
+                    pass
+
+
 class AnalyzeView(AnalyzeBaseView):
-    mode = 'character'
+    mode = 'enhanced_character'
+
+    def post(self, request, **url_kwargs):
+        response = super().post(request, **url_kwargs)
+        try:
+            import json as _json
+            body = _json.loads(response.content)
+            if body.get('success') and isinstance(body.get('data'), dict):
+                data = body['data']
+                # enhanced_databases → 'character_analysis'; basic → 'result'
+                plain = data.get('result', '') or data.get('character_analysis', '')
+                if plain and isinstance(plain, str) and len(plain) > 10:
+                    _rget = request.POST.get
+                    lang = _rget('lang', request.GET.get('lang', 'tr'))
+                    enriched = _build_structured_result(plain, lang)
+                    # ensure 'result' key present for mobile backward compat
+                    if 'result' not in data:
+                        data['result'] = plain
+                    data.update(enriched)
+                    body['data'] = data
+                    return JsonResponse(body)
+        except Exception as e:
+            log.warning(f'AnalyzeView enrichment failed: {e}')
+        return response
 
 class AnalyzeModulesView(AnalyzeBaseView):
     mode = 'modules'

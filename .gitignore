@@ -51,3 +51,8 @@ logs/
 # Local development
 START_PHASE_2B.sh
 quick_setup.md
+
+# Android build artifacts and ADB binary
+facesyma_mobile/android/
+facesyma_mobile/adb
+facesyma_mobile/adb.exe

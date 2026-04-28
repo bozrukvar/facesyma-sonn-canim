@@ -34,7 +34,7 @@ _PROJ_COMMUNITY_BRIEF = {'name': 1, 'type': 1, 'trait_name': 1}
 _USER_COMPAT_PROJ    = {'_id': 0, 'id': 1, 'username': 1, 'golden_ratio': 1, 'top_sifats': 1, 'modules': 1}
 _COMMUNITY_LIST_PROJ = {'_id': 1, 'name': 1, 'type': 1, 'trait_name': 1, 'member_count': 1,
                         'description': 1, 'created_at': 1, 'is_active': 1}
-_MEMBER_PROJ         = {'_id': 0, 'user_id': 1, 'harmony_level': 1, 'joined_at': 1, 'is_mod': 1}
+_MEMBER_PROJ         = {'_id': 0, 'user_id': 1, 'harmony_level': 1, 'joined_at': 1, 'is_mod': 1, 'status': 1}
 _SUB_STATUS_PROJ     = {'_id': 0, 'user_id': 1, 'tier': 1, 'status': 1, 'renews_at': 1}
 _JWT_SECRET: str = settings.JWT_SECRET
 

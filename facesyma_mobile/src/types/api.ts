@@ -7,15 +7,19 @@ export interface AnalysisAttribute {
 }
 
 export interface AnalysisResult {
+  result?: string;          // Plain text personality trait summary
   golden_ratio?: number;
   age_group?: string;
   gender?: string;
   attributes?: AnalysisAttribute[];
+  kisilik?: string;
   kariyer?: string;
   liderlik?: string;
+  sosyal?: string;
   daily?: string;
   face_shape?: string;
   sifatlar?: Array<{ sifat: string; score: number }>;
+  image_quality?: Record<string, unknown>;
   [key: string]: unknown; // backend may add new fields
 }
 

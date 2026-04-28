@@ -223,7 +223,22 @@ export const AnalysisAPI = {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     });
-    return res.data;
+    return res.data?.data ?? res.data;
+  },
+
+  // Yüz merkezi tespiti — scanner overlay konumlandırması için
+  detectFace: async (imageUri: string): Promise<{ cx: number; cy: number; fw?: number; fh?: number; found: boolean }> => {
+    try {
+      const formData = new FormData();
+      formData.append('image', { uri: imageUri, name: 'face.jpg', type: 'image/jpeg' } as unknown as Blob);
+      const res = await analysisClient.post('/detect-face/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 8000,
+      });
+      return res.data;
+    } catch {
+      return { cx: 0.50, cy: 0.38, found: false };
+    }
   },
 
   // Astroloji analizi

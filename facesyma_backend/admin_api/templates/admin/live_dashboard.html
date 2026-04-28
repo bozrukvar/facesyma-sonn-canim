@@ -219,7 +219,7 @@
     function connectWS() {
         try {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const adminToken = localStorage.getItem('adminToken') || '';
+            const adminToken = localStorage.getItem('admin_token') || '';
             ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin/live/?token=${encodeURIComponent(adminToken)}`);
 
             ws.onopen = function() {

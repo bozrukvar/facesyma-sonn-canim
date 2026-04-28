@@ -127,6 +127,29 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
           ))}
         </View>
 
+        {/* Sosyal */}
+        <Text style={styles.sectionLabel}>{lang.startsWith('tr') ? 'SOSYAL' : 'SOCIAL'}</Text>
+        <View style={styles.socialRow}>
+          <TouchableOpacity
+            style={styles.socialCard}
+            onPress={() => navigation.navigate('Communities' as any)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.socialIcon}>🏘️</Text>
+            <Text style={styles.socialTitle}>{lang.startsWith('tr') ? 'Topluluklar' : 'Communities'}</Text>
+            <Text style={styles.socialDesc}>{lang.startsWith('tr') ? 'Benzer kişilerle tanış' : 'Meet similar people'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.socialCard}
+            onPress={() => navigation.navigate('PeerChatList' as any)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.socialIcon}>💬</Text>
+            <Text style={styles.socialTitle}>{lang.startsWith('tr') ? 'Sohbetler' : 'Chats'}</Text>
+            <Text style={styles.socialDesc}>{lang.startsWith('tr') ? 'Aktif P2P sohbetlerin' : 'Your P2P chats'}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Son analizler */}
         <Text style={styles.sectionLabel}>{t('home.recent_results', lang)}</Text>
         <TouchableOpacity
@@ -240,6 +263,20 @@ const styles = StyleSheet.create({
   analyzeBody: { marginLeft: spacing.md, flex: 1 },
   featureIcon: { fontSize: 22 },
   historyIcon: { fontSize: 24, marginBottom: 6 },
+  socialRow:  { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
+  socialCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    alignItems: 'center',
+    gap: 4,
+  },
+  socialIcon:  { fontSize: 28 },
+  socialTitle: { ...typography.h3, fontSize: 13, textAlign: 'center' as const },
+  socialDesc:  { ...typography.caption, fontSize: 11, color: colors.textMuted, textAlign: 'center' as const },
 });
 
 export default HomeScreen;
