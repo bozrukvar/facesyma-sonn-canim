@@ -234,6 +234,35 @@ def get_compatibility(user1_id: int, user2_id: int) -> dict | None:
         return None
 
 
+_ASSESSMENT_PROJ = {
+    '_id': 0, 'test_type': 1, 'overall_score': 1, 'overall_level_tr': 1,
+    'breakdown': 1, 'created_at': 1,
+}
+
+
+def get_assessment_context(user_id: int) -> list:
+    """
+    Kullanıcının en güncel psikolojik test sonuçlarını MongoDB'den al.
+
+    Returns:
+        List of {test_type, overall_score, overall_level_tr, breakdown} dicts
+        (en fazla 10, en yeniden en eskiye sıralı)
+    """
+    try:
+        from admin_api.utils.mongo import get_assessment_results_col
+        col = get_assessment_results_col()
+        results = list(col.find(
+            {'user_id': user_id},
+            _ASSESSMENT_PROJ,
+            sort=[('created_at', -1)],
+        ).limit(10))
+        log.info(f'Assessment context loaded: user_id={user_id}, count={len(results)}')
+        return results
+    except Exception as e:
+        log.warning(f'Assessment context fetch failed: {e}')
+        return []
+
+
 # ── Main Context Builder ───────────────────────────────────────────────────────
 
 def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None = None) -> dict:
@@ -245,6 +274,7 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
         'user': {...analysis_result...},
         'partner': {...analysis_result...} (eğer var),
         'compatibility': {...uyum...} (eğer var),
+        'assessments': [...test_results...] (eğer var),
         'context_built_at': timestamp
     }
 
@@ -265,7 +295,8 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
             'context_built_at': _built_at,
             'user': None,
             'partner': None,
-            'compatibility': None
+            'compatibility': None,
+            'assessments': [],
         }
 
         # 1. User'ın analysisResult'ını al
@@ -303,6 +334,9 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
                     }
                     _info(f'Compatibility loaded: {user_id} ↔ {partner_id}')
 
+        # 5. Psikolojik test sonuçları
+        context['assessments'] = get_assessment_context(user_id)
+
         return context
 
     except Exception as e:
@@ -314,6 +348,7 @@ def build_ollama_context(user_id: int, lang: str = 'tr', partner_id: int | None 
             'user': None,
             'partner': None,
             'compatibility': None,
+            'assessments': [],
             'error': 'Context unavailable.',
         }
 

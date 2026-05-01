@@ -24,75 +24,129 @@ _REC_SKIP_MARKERS = (':', '**', '##', 'Assessment', 'Score', 'Domain')
 _TEST_NAMES: dict = {
         'tr': {
             'skills': 'Beceri', 'hr': 'İK Yetkinliği', 'personality': 'Kişilik (Big Five)',
-            'career': 'Kariyer Yeteneği', 'relationship': 'İlişki Dinamiği', 'vocation': 'Meslek Uyumu (Holland RIASEC)'
+            'career': 'Kariyer Yeteneği', 'relationship': 'İlişki Dinamiği', 'vocation': 'Meslek Uyumu (Holland RIASEC)',
+            'attachment': 'Bağlanma Stili', 'grit': 'Azim ve Kararlılık', 'growth_mindset': 'Büyüme Zihniyeti',
+            'life_satisfaction': 'Yaşam Doyumu', 'self_compassion': 'Öz-Şefkat',
+            'body_image': 'Beden İmgesi', 'self_efficacy': 'Öz-Yeterlik', 'stress': 'Algılanan Stres',
         },
         'en': {
             'skills': 'Skills Assessment', 'hr': 'HR Competencies', 'personality': 'Personality (Big Five)',
-            'career': 'Career Aptitude', 'relationship': 'Relationship Dynamics', 'vocation': 'Vocational Fit (Holland RIASEC)'
+            'career': 'Career Aptitude', 'relationship': 'Relationship Dynamics', 'vocation': 'Vocational Fit (Holland RIASEC)',
+            'attachment': 'Attachment Style', 'grit': 'Grit & Perseverance', 'growth_mindset': 'Growth Mindset',
+            'life_satisfaction': 'Life Satisfaction', 'self_compassion': 'Self-Compassion',
+            'body_image': 'Body Image', 'self_efficacy': 'Self-Efficacy', 'stress': 'Perceived Stress',
         },
         'de': {
             'skills': 'Fähigkeitentest', 'hr': 'HR-Kompetenzen', 'personality': 'Persönlichkeit (Big Five)',
-            'career': 'Karrierefähigkeit', 'relationship': 'Beziehungsdynamik', 'vocation': 'Berufliche Eignung'
+            'career': 'Karrierefähigkeit', 'relationship': 'Beziehungsdynamik', 'vocation': 'Berufliche Eignung',
+            'attachment': 'Bindungsstil', 'grit': 'Beharrlichkeit und Leidenschaft', 'growth_mindset': 'Wachstumsorientierung',
+            'life_satisfaction': 'Lebenszufriedenheit', 'self_compassion': 'Selbstmitgefühl',
+            'body_image': 'Körperbild', 'self_efficacy': 'Selbstwirksamkeit', 'stress': 'Wahrgenommener Stress',
         },
         'ru': {
             'skills': 'Оценка навыков', 'hr': 'HR компетенции', 'personality': 'Личность (Big Five)',
-            'career': 'Карьерный потенциал', 'relationship': 'Динамика отношений', 'vocation': 'Профессиональное соответствие'
+            'career': 'Карьерный потенциал', 'relationship': 'Динамика отношений', 'vocation': 'Профессиональное соответствие',
+            'attachment': 'Стиль привязанности', 'grit': 'Настойчивость и увлечённость', 'growth_mindset': 'Установка на рост',
+            'life_satisfaction': 'Удовлетворённость жизнью', 'self_compassion': 'Самосострадание',
+            'body_image': 'Образ тела', 'self_efficacy': 'Самоэффективность', 'stress': 'Воспринимаемый стресс',
         },
         'ar': {
             'skills': 'تقييم المهارات', 'hr': 'كفاءات الموارد البشرية', 'personality': 'الشخصية (Big Five)',
-            'career': 'القدرة المهنية', 'relationship': 'ديناميكية العلاقات', 'vocation': 'التوافق الوظيفي'
+            'career': 'القدرة المهنية', 'relationship': 'ديناميكية العلاقات', 'vocation': 'التوافق الوظيفي',
+            'attachment': 'نمط التعلق', 'grit': 'المثابرة والشغف', 'growth_mindset': 'عقلية النمو',
+            'life_satisfaction': 'الرضا عن الحياة', 'self_compassion': 'الرحمة بالذات',
+            'body_image': 'صورة الجسم', 'self_efficacy': 'الكفاءة الذاتية', 'stress': 'الضغط المُدرَك',
         },
         'es': {
             'skills': 'Evaluación de habilidades', 'hr': 'Competencias RR.HH.', 'personality': 'Personalidad (Big Five)',
-            'career': 'Aptitud profesional', 'relationship': 'Dinámicas relacionales', 'vocation': 'Ajuste vocacional'
+            'career': 'Aptitud profesional', 'relationship': 'Dinámicas relacionales', 'vocation': 'Ajuste vocacional',
+            'attachment': 'Estilo de apego', 'grit': 'Perseverancia y Pasión', 'growth_mindset': 'Mentalidad de Crecimiento',
+            'life_satisfaction': 'Satisfacción con la Vida', 'self_compassion': 'Autocompasión',
+            'body_image': 'Imagen Corporal', 'self_efficacy': 'Autoeficacia', 'stress': 'Estrés Percibido',
         },
         'ko': {
             'skills': '기술 평가', 'hr': 'HR 역량', 'personality': '성격 (Big Five)',
-            'career': '커리어 적성', 'relationship': '관계 역학', 'vocation': '직업 적합성'
+            'career': '커리어 적성', 'relationship': '관계 역학', 'vocation': '직업 적합성',
+            'attachment': '애착 유형', 'grit': '근성과 열정', 'growth_mindset': '성장 마인드셋',
+            'life_satisfaction': '삶의 만족도', 'self_compassion': '자기 자비',
+            'body_image': '신체 이미지', 'self_efficacy': '자기효능감', 'stress': '지각된 스트레스',
         },
         'ja': {
             'skills': 'スキル評価', 'hr': 'HR能力', 'personality': '性格（Big Five）',
-            'career': 'キャリア適性', 'relationship': '関係ダイナミクス', 'vocation': '職業適合性'
+            'career': 'キャリア適性', 'relationship': '関係ダイナミクス', 'vocation': '職業適合性',
+            'attachment': '愛着スタイル', 'grit': '粘り強さと情熱', 'growth_mindset': 'グロースマインドセット',
+            'life_satisfaction': '生活満足度', 'self_compassion': 'セルフ・コンパッション',
+            'body_image': 'ボディイメージ', 'self_efficacy': '自己効力感', 'stress': '知覚されたストレス',
         },
         'zh': {
             'skills': '技能评估', 'hr': '人力资源能力', 'personality': '性格（Big Five）',
-            'career': '职业能力', 'relationship': '关系动态', 'vocation': '职业适配度'
+            'career': '职业能力', 'relationship': '关系动态', 'vocation': '职业适配度',
+            'attachment': '依恋风格', 'grit': '坚毅与激情', 'growth_mindset': '成长型思维',
+            'life_satisfaction': '生活满意度', 'self_compassion': '自我同情',
+            'body_image': '身体意象', 'self_efficacy': '自我效能', 'stress': '感知压力',
         },
         'hi': {
             'skills': 'कौशल मूल्यांकन', 'hr': 'HR क्षमता', 'personality': 'व्यक्तित्व (Big Five)',
-            'career': 'करियर योग्यता', 'relationship': 'संबंध गतिशीलता', 'vocation': 'व्यावसायिक फिट'
+            'career': 'करियर योग्यता', 'relationship': 'संबंध गतिशीलता', 'vocation': 'व्यावसायिक फिट',
+            'attachment': 'अटैचमेंट शैली', 'grit': 'दृढ़ता और जुनून', 'growth_mindset': 'विकास मानसिकता',
+            'life_satisfaction': 'जीवन संतुष्टि', 'self_compassion': 'आत्म-करुणा',
+            'body_image': 'शारीरिक छवि', 'self_efficacy': 'आत्म-प्रभावकारिता', 'stress': 'अनुभवित तनाव',
         },
         'fr': {
             'skills': 'Évaluation des compétences', 'hr': 'Compétences RH', 'personality': 'Personnalité (Big Five)',
-            'career': 'Aptitude professionnelle', 'relationship': 'Dynamiques relationnelles', 'vocation': 'Adéquation professionnelle'
+            'career': 'Aptitude professionnelle', 'relationship': 'Dynamiques relationnelles', 'vocation': 'Adéquation professionnelle',
+            'attachment': 'Style d\'attachement', 'grit': 'Persévérance et Passion', 'growth_mindset': 'État d\'esprit de croissance',
+            'life_satisfaction': 'Satisfaction de vie', 'self_compassion': 'Auto-compassion',
+            'body_image': 'Image corporelle', 'self_efficacy': 'Auto-efficacité', 'stress': 'Stress perçu',
         },
         'pt': {
             'skills': 'Avaliação de habilidades', 'hr': 'Competências RH', 'personality': 'Personalidade (Big Five)',
-            'career': 'Aptidão profissional', 'relationship': 'Dinâmica de relacionamento', 'vocation': 'Adequação profissional'
+            'career': 'Aptidão profissional', 'relationship': 'Dinâmica de relacionamento', 'vocation': 'Adequação profissional',
+            'attachment': 'Estilo de apego', 'grit': 'Persistência e Paixão', 'growth_mindset': 'Mentalidade de Crescimento',
+            'life_satisfaction': 'Satisfação com a Vida', 'self_compassion': 'Autocompaixão',
+            'body_image': 'Imagem Corporal', 'self_efficacy': 'Autoeficácia', 'stress': 'Estresse Percebido',
         },
         'bn': {
             'skills': 'দক্ষতা মূল্যায়ন', 'hr': 'এইচআর দক্ষতা', 'personality': 'ব্যক্তিত্ব (Big Five)',
-            'career': 'ক্যারিয়ার যোগ্যতা', 'relationship': 'সম্পর্ক গতিশীলতা', 'vocation': 'পেশাদার ফিট'
+            'career': 'ক্যারিয়ার যোগ্যতা', 'relationship': 'সম্পর্ক গতিশীলতা', 'vocation': 'পেশাদার ফিট',
+            'attachment': 'সংযুক্তি শৈলী', 'grit': 'অধ্যবসায় ও আবেগ', 'growth_mindset': 'বৃদ্ধির মানসিকতা',
+            'life_satisfaction': 'জীবন সন্তুষ্টি', 'self_compassion': 'আত্ম-করুণা',
+            'body_image': 'শরীরের ছবি', 'self_efficacy': 'আত্ম-কার্যকারিতা', 'stress': 'অনুভূত চাপ',
         },
         'id': {
             'skills': 'Penilaian Keterampilan', 'hr': 'Kompetensi HR', 'personality': 'Kepribadian (Big Five)',
-            'career': 'Aptitude Karir', 'relationship': 'Dinamika Hubungan', 'vocation': 'Kesesuaian Vokasional'
+            'career': 'Aptitude Karir', 'relationship': 'Dinamika Hubungan', 'vocation': 'Kesesuaian Vokasional',
+            'attachment': 'Gaya Kelekatan', 'grit': 'Ketekunan dan Semangat', 'growth_mindset': 'Pola Pikir Berkembang',
+            'life_satisfaction': 'Kepuasan Hidup', 'self_compassion': 'Kasih Sayang Diri',
+            'body_image': 'Citra Tubuh', 'self_efficacy': 'Efikasi Diri', 'stress': 'Stres yang Dirasakan',
         },
         'ur': {
             'skills': 'مہارت کی تشخیص', 'hr': 'HR صلاحیتیں', 'personality': 'شخصیت (Big Five)',
-            'career': 'کیریئر کی صلاحیت', 'relationship': 'تعلق کی حرکیات', 'vocation': 'پیشہ ورانہ فٹ'
+            'career': 'کیریئر کی صلاحیت', 'relationship': 'تعلق کی حرکیات', 'vocation': 'پیشہ ورانہ فٹ',
+            'attachment': 'لگاؤ کا انداز', 'grit': 'استقامت اور جذبہ', 'growth_mindset': 'ترقی کی ذہنیت',
+            'life_satisfaction': 'زندگی کا اطمینان', 'self_compassion': 'خود پر رحم',
+            'body_image': 'جسمانی تصویر', 'self_efficacy': 'خود اعتمادی', 'stress': 'محسوس شدہ تناؤ',
         },
         'it': {
             'skills': 'Valutazione delle competenze', 'hr': 'Competenze RH', 'personality': 'Personalità (Big Five)',
-            'career': 'Attitudine professionale', 'relationship': 'Dinamiche relazionali', 'vocation': 'Adeguatezza vocazionale'
+            'career': 'Attitudine professionale', 'relationship': 'Dinamiche relazionali', 'vocation': 'Adeguatezza vocazionale',
+            'attachment': 'Stile di attaccamento', 'grit': 'Perseveranza e Passione', 'growth_mindset': 'Mentalità di Crescita',
+            'life_satisfaction': 'Soddisfazione di Vita', 'self_compassion': 'Autocompassione',
+            'body_image': 'Immagine Corporea', 'self_efficacy': 'Autoefficacia', 'stress': 'Stress Percepito',
         },
         'vi': {
             'skills': 'Đánh giá kỹ năng', 'hr': 'Năng lực HR', 'personality': 'Tính cách (Big Five)',
-            'career': 'Năng khiếu nghề nghiệp', 'relationship': 'Động lực quan hệ', 'vocation': 'Phù hợp nghề'
+            'career': 'Năng khiếu nghề nghiệp', 'relationship': 'Động lực quan hệ', 'vocation': 'Phù hợp nghề',
+            'attachment': 'Phong cách gắn bó', 'grit': 'Kiên trì và Đam mê', 'growth_mindset': 'Tư duy phát triển',
+            'life_satisfaction': 'Sự hài lòng cuộc sống', 'self_compassion': 'Lòng tự trắc ẩn',
+            'body_image': 'Hình ảnh cơ thể', 'self_efficacy': 'Tự hiệu quả', 'stress': 'Căng thẳng cảm nhận',
         },
         'pl': {
             'skills': 'Ocena umiejętności', 'hr': 'Kompetencje HR', 'personality': 'Osobowość (Big Five)',
-            'career': 'Uzdolnienie zawodowe', 'relationship': 'Dynamika relacji', 'vocation': 'Dopasowanie zawodowe'
+            'career': 'Uzdolnienie zawodowe', 'relationship': 'Dynamika relacji', 'vocation': 'Dopasowanie zawodowe',
+            'attachment': 'Styl przywiązania', 'grit': 'Wytrwałość i Pasja', 'growth_mindset': 'Nastawienie na Wzrost',
+            'life_satisfaction': 'Satysfakcja z Życia', 'self_compassion': 'Samowspółczucie',
+            'body_image': 'Obraz Ciała', 'self_efficacy': 'Poczucie Własnej Skuteczności', 'stress': 'Postrzegany Stres',
         },
 }
 
@@ -387,6 +441,36 @@ Pisz w ciepłym, profesjonalnym tonie. Maks 15 słów na zdanie. Zacznij od "•
 }
 
 
+_ATTACHMENT_STYLES: dict = {
+    'tr': {
+        'secure':   'Güvenli Bağlanma — ilişkilerde rahat, güvenen, dengeli',
+        'anxious':  'Kaygılı Bağlanma — terk edilme kaygısı, onay ihtiyacı yüksek',
+        'avoidant': 'Kaçıngan Bağlanma — duygusal mesafe, bağımsızlık ön planda',
+        'fearful':  'Korkulu Bağlanma — hem yakınlık istiyor hem de korkuyor',
+    },
+    'en': {
+        'secure':   'Secure Attachment — comfortable with intimacy, trusting, balanced',
+        'anxious':  'Anxious Attachment — fear of abandonment, high need for reassurance',
+        'avoidant': 'Avoidant Attachment — emotional distance, prioritizes independence',
+        'fearful':  'Fearful Attachment — desires closeness but fears it simultaneously',
+    },
+}
+
+
+def _classify_attachment(breakdown: Dict) -> str:
+    """Classify attachment style from anxiety + avoidance subscale scores."""
+    anxiety  = breakdown.get('anxiety',  {}).get('score', 3.0)
+    avoidance = breakdown.get('avoidance', {}).get('score', 3.0)
+    if anxiety <= 2.5 and avoidance <= 2.5:
+        return 'secure'
+    elif anxiety > 3.0 and avoidance <= 2.5:
+        return 'anxious'
+    elif avoidance > 3.0 and anxiety <= 2.5:
+        return 'avoidant'
+    else:
+        return 'fearful'
+
+
 def _generate_prompt(test_type: str, breakdown: Dict, overall_score: float, lang: str = 'tr') -> str:
     """Generate prompt for Ollama — 18 language support"""
 
@@ -395,11 +479,24 @@ def _generate_prompt(test_type: str, breakdown: Dict, overall_score: float, lang
     test_names = _TEST_NAMES.get(lang, _TEST_NAMES['en'])
     test_name = test_names.get(test_type, test_type)
 
-    # Get domains text - use 'level' for all langs, fallback to 'level_tr' if exists
-    domains_text = "\n".join([
-        f"• {domain}: {(_sg := scores.get)('score', 0):.2f}/5.0 ({_sg('level', _sg('level_tr', ''))})"
-        for domain, scores in breakdown.items()
-    ])
+    # Attachment style: two-dimensional classification
+    if test_type == 'attachment':
+        style_key = _classify_attachment(breakdown)
+        styles    = _ATTACHMENT_STYLES.get(lang, _ATTACHMENT_STYLES['en'])
+        style_str = styles.get(style_key, style_key)
+        anxiety_score  = breakdown.get('anxiety',  {}).get('score', 0)
+        avoidance_score = breakdown.get('avoidance', {}).get('score', 0)
+        domains_text = (
+            f"• anxiety (terk kaygısı): {anxiety_score:.2f}/5.0\n"
+            f"• avoidance (yakınlıktan kaçış): {avoidance_score:.2f}/5.0\n"
+            f"• Belirlenen bağlanma stili: {style_str}"
+        )
+    else:
+        # Get domains text - use 'level' for all langs, fallback to 'level_tr' if exists
+        domains_text = "\n".join([
+            f"• {domain}: {(_sg := scores.get)('score', 0):.2f}/5.0 ({_sg('level', _sg('level_tr', ''))})"
+            for domain, scores in breakdown.items()
+        ])
 
     prompt_template = _PROMPTS.get(lang, _PROMPTS['en'])
     return prompt_template.format(test_name=test_name, overall_score=overall_score, domains_text=domains_text)
@@ -464,15 +561,18 @@ def generate_recommendations(test_type: str, breakdown: Dict, overall_score: flo
     Generate personalized recommendations for assessment results using local Ollama.
 
     Args:
-        test_type: Type of assessment (skills, hr, personality, career, relationship, vocation)
+        test_type: Type of assessment (skills, hr, personality, career, relationship, vocation, attachment)
         breakdown: Domain scores breakdown
         overall_score: Overall assessment score
-        lang: Language for recommendations (tr, en)
+        lang: Language for recommendations (18 languages supported)
 
     Returns:
         Dict with recommendations or fallback if Ollama unavailable
     """
     try:
+        # Attachment style classification (two-dimensional)
+        attachment_style = _classify_attachment(breakdown) if test_type == 'attachment' else None
+
         # Generate prompt
         prompt = _generate_prompt(test_type, breakdown, overall_score, lang)
 
@@ -482,41 +582,53 @@ def generate_recommendations(test_type: str, breakdown: Dict, overall_score: flo
         if not response_text:
             log.info('Ollama unavailable, using fallback recommendations')
             fallback = get_fallback_recommendations(test_type, lang)
-            return {
+            result = {
                 'status': 'fallback',
                 'recommendations': fallback,
                 'count': len(fallback),
                 'note': 'Ollama not available, using template recommendations'
             }
+            if attachment_style:
+                result['attachment_style'] = attachment_style
+            return result
 
         # Parse recommendations
         recommendations = _parse_recommendations(response_text)
 
         if recommendations:
-            return {
+            result = {
                 'status': 'success',
                 'recommendations': recommendations,
                 'count': len(recommendations)
             }
+            if attachment_style:
+                result['attachment_style'] = attachment_style
+            return result
         else:
             # If parsing failed, use fallback
             fallback = get_fallback_recommendations(test_type, lang)
-            return {
+            result = {
                 'status': 'fallback',
                 'recommendations': fallback,
                 'count': len(fallback),
                 'note': 'Ollama response parsing failed, using template'
             }
+            if attachment_style:
+                result['attachment_style'] = attachment_style
+            return result
 
     except Exception as e:
         log.error(f'Error generating recommendations: {e}')
         fallback = get_fallback_recommendations(test_type, lang)
-        return {
+        result = {
             'status': 'fallback',
             'recommendations': fallback,
             'count': len(fallback),
             'error': 'Recommendation generation failed.'
         }
+        if test_type == 'attachment':
+            result['attachment_style'] = _classify_attachment(breakdown)
+        return result
 
 
 # Fallback recommendations if Ollama unavailable — 18 languages
@@ -527,7 +639,14 @@ FALLBACK_RECOMMENDATIONS = {
         'personality': ["Kişiliğinizin güçlü yönlerini hedef belirlemede kullanın.", "Farklı kişilik tiplerini anlamaya çalışarak empati geliştirin.", "İç dengeyi sağlayan faaliyetleri keşfetmeye zaman ayırın.", "Kendini tanıma yolculuğunda sabırlı ve öz-sempatik olun."],
         'career': ["En ilgi duyduğunuz kariyer alanına yönelik projelerde çalışın.", "Zayıf yönlerinizi geliştirmek için eğitim kaynaklarını araştırın.", "Mentorlük ve networking fırsatlarından yararlanın.", "Düzenli olarak kariyer hedeflerinizi gözden geçirin."],
         'relationship': ["İlişkilerinizde açık ve dürüst iletişimi temel alın.", "Duygusal zeka becerilerinizi pratik hayatta uygulamaya çalışın.", "Bağlılık tarzınızı anlamak gelişim için önemlidir.", "Sağlıklı ilişki dinamikleri hakkında bilgi edinmeye yatırım yapın."],
-        'vocation': ["En uyumlu meslekler listesini araştırarak deneyim kazanın.", "Çalışma alanlarında gözlemlik veya stajlık fırsatlarını keşfedin.", "Sektör profesyonelleriyle bağlantı kurup deneyim paylaşmalarını dinleyin.", "Mesleki gelişim yolunuzu tarih belirlemeden sabırla ilerleyin."]
+        'vocation': ["En uyumlu meslekler listesini araştırarak deneyim kazanın.", "Çalışma alanlarında gözlemlik veya stajlık fırsatlarını keşfedin.", "Sektör profesyonelleriyle bağlantı kurup deneyim paylaşmalarını dinleyin.", "Mesleki gelişim yolunuzu tarih belirlemeden sabırla ilerleyin."],
+        'grit': ["Zorluklarla karşılaştığınızda vazgeçmeden devam etme kasınızı güçlendirin.", "Uzun vadeli hedeflerinize olan bağlılığınızı somut adımlarla pekiştirin.", "İlgi alanlarınızı derinleştirerek tutarlılık ve odak geliştirin.", "Her küçük ilerlemeyi kutlayarak azim motivasyonunuzu canlı tutun."],
+        'growth_mindset': ["Başarısızlıkları öğrenme fırsatı olarak yeniden çerçevelendirin.", "Zor görevlerde 'Henüz yapamıyorum' yerine 'Henüz öğrenmiyorum' deyin.", "Çaba ve strateji odaklı geri bildirimlere açık olun.", "Yeteneklerin geliştirilebilir olduğunu hatırlatacak günlük uygulamalar deneyin."],
+        'life_satisfaction': ["Hayatınızdaki olumlu yönleri fark etmek için minnet günlüğü tutun.", "Gerçek hedeflerinizle mevcut yaşamınız arasındaki boşluğu kapatacak küçük adımlar atın.", "Değerlerinize uygun aktivitelere daha fazla zaman ayırın.", "Anlamlı ilişkilere ve deneyimlere yatırım yaparak doyum artırın."],
+        'self_compassion': ["Kendinize bir arkadaşınıza davrandığınız gibi şefkatle yaklaşın.", "Hatalarınızı insanlığın ortak deneyimi olarak görmeyi pratik edin.", "Zor anlarda kendinizi rahatlatıcı bir ses tonuyla destekleyin.", "Duyguları bastırmak yerine farkındalıkla gözlemlemeyi alışkanlık haline getirin."],
+        'body_image': ["Vücudunuzu performansı ve sağlığı açısından değerlendirmeyi deneyin.", "Sosyal medyada gerçekçi olmayan standartlara maruz kalmayı sınırlayın.", "Bedeninizle barışık olmanızı destekleyen hareketlere odaklanın.", "Görünüm yerine güçlü yönlerinize odaklanarak öz-değer geliştirin."],
+        'self_efficacy': ["Küçük zorlukları başarıyla aştıkça öz-güveninizi kademeli artırın.", "Geçmişte üstesinden geldiğiniz zorluklara düzenli olarak bakın.", "Kendinize güvendiğiniz bir mentorun veya rol modelinin yaklaşımını benimseyin.", "Belirsiz durumlarda adım adım aksiyon planı yaparak kontrol duygusu geliştirin."],
+        'stress': ["Nefes egzersizleri ve kısa meditasyon pratiklerini günlük rutininize ekleyin.", "Stres kaynaklarını belirleyerek hangilerini kontrol edebileceğinize odaklanın.", "Fiziksel aktivite ve kaliteli uyku stres yönetiminin temel taşlarıdır.", "Duygusal destek için güvenilir kişilerle bağlantıda kalmayı ihmal etmeyin."],
     },
     'en': {
         'skills': ["Strengthen problem-solving skills through practical projects.", "Don't hesitate to seek support in your weakest areas.", "Maintain your rapid learning pace for new skills.", "Reinforce what you learn by sharing with others."],
@@ -535,7 +654,14 @@ FALLBACK_RECOMMENDATIONS = {
         'personality': ["Use your personality strengths for goal-setting and planning.", "Build empathy by understanding different personality types.", "Invest time finding activities that bring inner balance.", "Be patient and self-compassionate in self-discovery."],
         'career': ["Pursue projects in your most interesting career fields.", "Research educational resources for weak career areas.", "Leverage mentoring and networking opportunities.", "Review career goals regularly for alignment."],
         'relationship': ["Base relationships on open and honest communication.", "Apply emotional intelligence skills in everyday interactions.", "Understanding attachment style supports personal growth.", "Invest in learning about healthy relationship dynamics."],
-        'vocation': ["Research compatible professions and gain practical experience.", "Explore internship and shadowing opportunities in sectors.", "Network with professionals and learn from their experiences.", "Advance your career path patiently without rushing."]
+        'vocation': ["Research compatible professions and gain practical experience.", "Explore internship and shadowing opportunities in sectors.", "Network with professionals and learn from their experiences.", "Advance your career path patiently without rushing."],
+        'grit': ["Build the habit of persisting through difficulties without giving up.", "Reinforce commitment to long-term goals with concrete milestones.", "Deepen your interests to develop consistency and focus.", "Celebrate every small progress to keep your motivation alive."],
+        'growth_mindset': ["Reframe setbacks as learning opportunities rather than failures.", "Replace 'I can't do this' with 'I can't do this yet.'", "Welcome feedback focused on effort and strategy.", "Practice daily reminders that abilities can be developed with work."],
+        'life_satisfaction': ["Keep a gratitude journal to notice the positives in your life.", "Take small steps to close the gap between your values and current life.", "Spend more time on activities aligned with your core values.", "Invest in meaningful relationships and experiences to boost fulfillment."],
+        'self_compassion': ["Speak to yourself with the same kindness you'd offer a good friend.", "Practice seeing your mistakes as part of the shared human experience.", "In difficult moments, comfort yourself with a supportive inner voice.", "Observe emotions mindfully instead of suppressing them."],
+        'body_image': ["Try evaluating your body for its performance and health, not appearance.", "Limit exposure to unrealistic standards on social media.", "Focus on movements and activities that help you feel at home in your body.", "Build self-worth around your strengths, not your appearance."],
+        'self_efficacy': ["Gradually increase self-confidence by mastering small challenges first.", "Regularly reflect on past difficulties you have successfully overcome.", "Adopt the approach of a mentor or role model you trust.", "In uncertain situations, build control by making step-by-step action plans."],
+        'stress': ["Add breathing exercises and short meditation to your daily routine.", "Identify stress sources and focus on those within your control.", "Physical activity and quality sleep are cornerstones of stress management.", "Stay connected with trusted people for emotional support."],
     },
     'de': {
         'skills': ["Stärke deine Problemlösungsfähigkeiten durch praktische Projekte.", "Zögere nicht, Unterstützung in deinen schwächsten Bereichen zu suchen.", "Behalte dein schnelles Lerntempo bei.", "Verstärke das Gelernte durch Teilen mit anderen."],

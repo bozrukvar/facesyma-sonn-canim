@@ -48,6 +48,95 @@ GOLDEN_RATIO_MAP = [
     (0.00, 0.70, "Güçlü kişisel ifade — unutulmaz görünüm"),
 ]
 
+# ── Assessment Section ─────────────────────────────────────────────────────────
+
+_ASSESSMENT_HEADERS = {
+    'tr': 'PSİKOLOJİK TEST SONUÇLARI',
+    'en': 'PSYCHOLOGICAL TEST RESULTS',
+    'de': 'PSYCHOLOGISCHE TESTERGEBNISSE',
+    'ru': 'РЕЗУЛЬТАТЫ ПСИХОЛОГИЧЕСКИХ ТЕСТОВ',
+    'ar': 'نتائج الاختبارات النفسية',
+    'es': 'RESULTADOS DE PRUEBAS PSICOLÓGICAS',
+    'ko': '심리 테스트 결과',
+    'ja': '心理テスト結果',
+    'zh': '心理测试结果',
+    'hi': 'मनोवैज्ञानिक परीक्षण परिणाम',
+    'fr': 'RÉSULTATS DES TESTS PSYCHOLOGIQUES',
+    'pt': 'RESULTADOS DE TESTES PSICOLÓGICOS',
+    'bn': 'মনস্তাত্ত্বিক পরীক্ষার ফলাফল',
+    'id': 'HASIL TES PSIKOLOGIS',
+    'ur': 'نفسیاتی ٹیسٹ کے نتائج',
+    'it': 'RISULTATI DEI TEST PSICOLOGICI',
+    'vi': 'KẾT QUẢ KIỂM TRA TÂM LÝ',
+    'pl': 'WYNIKI TESTÓW PSYCHOLOGICZNYCH',
+}
+
+# Test display names (TR + EN; other langs fall back to EN)
+_ASSESSMENT_TEST_NAMES = {
+    'tr': {
+        'skills': 'Beceri Profili', 'hr': 'İK & Liderlik', 'personality': 'Kişilik (Big Five)',
+        'career': 'Kariyer Eğilimi', 'relationship': 'İlişki Stili', 'vocation': 'Meslek (RIASEC)',
+        'attachment': 'Bağlanma Stili', 'grit': 'Azim ve Kararlılık', 'growth_mindset': 'Büyüme Zihniyeti',
+        'life_satisfaction': 'Yaşam Doyumu', 'self_compassion': 'Öz-Şefkat',
+        'body_image': 'Beden İmgesi', 'self_efficacy': 'Öz-Yeterlik', 'stress': 'Algılanan Stres',
+    },
+    'en': {
+        'skills': 'Skill Profile', 'hr': 'HR & Leadership', 'personality': 'Personality (Big Five)',
+        'career': 'Career Orientation', 'relationship': 'Relationship Style', 'vocation': 'Vocation (RIASEC)',
+        'attachment': 'Attachment Style', 'grit': 'Grit & Perseverance', 'growth_mindset': 'Growth Mindset',
+        'life_satisfaction': 'Life Satisfaction', 'self_compassion': 'Self-Compassion',
+        'body_image': 'Body Image', 'self_efficacy': 'Self-Efficacy', 'stress': 'Perceived Stress',
+    },
+}
+
+_ASSESSMENT_GUIDANCE = {
+    'tr': (
+        "Bu test sonuçlarını kişiyle konuşurken referans olarak kullan. "
+        "Düşük alan varsa nazikçe gelişim öner; yüksek alan varsa güçlü yön olarak vurgula."
+    ),
+    'en': (
+        "Reference these test results when talking with the user. "
+        "For low scores, gently suggest growth; for high scores, highlight as a strength."
+    ),
+}
+
+
+def _format_assessments_section(assessments: list, lang: str = 'tr') -> str:
+    """Assessment sonuçlarını sistem prompt'una eklenebilir formata çevir."""
+    if not assessments:
+        return ''
+
+    _lang_key = lang if lang in _ASSESSMENT_TEST_NAMES else 'en'
+    _name_map = _ASSESSMENT_TEST_NAMES.get(_lang_key, _ASSESSMENT_TEST_NAMES['en'])
+    header = _ASSESSMENT_HEADERS.get(lang, _ASSESSMENT_HEADERS['en'])
+    guidance = _ASSESSMENT_GUIDANCE.get(lang, _ASSESSMENT_GUIDANCE['en'])
+
+    lines = [f'\n{header}', '──────────────────────────────────────────']
+
+    for a in assessments[:8]:
+        _aget = a.get
+        test_type = _aget('test_type', '')
+        overall = _aget('overall_score', 0) or 0
+        level_tr = _aget('overall_level_tr', '')
+
+        test_name = _name_map.get(test_type) or test_type.replace('_', ' ').title()
+        lines.append(f'• {test_name}: {overall:.1f}/5 ({level_tr})')
+
+        # En yüksek ve en düşük domain (max 2 satır)
+        breakdown = _aget('breakdown', {}) or {}
+        if breakdown:
+            sorted_bd = sorted(breakdown.items(), key=lambda x: x[1].get('score', 0), reverse=True)
+            top = sorted_bd[0]
+            bot = sorted_bd[-1] if len(sorted_bd) > 1 else None
+            top_name = top[0].replace('_', ' ').title()
+            lines.append(f'  ↑ {top_name}: {top[1].get("score", 0):.1f}')
+            if bot and bot[0] != top[0]:
+                bot_name = bot[0].replace('_', ' ').title()
+                lines.append(f'  ↓ {bot_name}: {bot[1].get("score", 0):.1f}')
+
+    lines.append(f'\n{guidance}')
+    return '\n'.join(lines) + '\n'
+
 
 def get_system_prompt(lang: str = 'tr', context: dict = None) -> str:
     """
@@ -67,7 +156,14 @@ def get_system_prompt(lang: str = 'tr', context: dict = None) -> str:
     # Normalize lang (remove region suffix)
     base_lang = lang.split('-')[0].lower()
     prompt_func = _LANG_MAP.get(base_lang, _get_english_prompt)
-    return prompt_func(context)
+    prompt = prompt_func(context)
+
+    # Append psychological assessment results if available (all 18 languages)
+    assessments = context.get('assessments', [])
+    if assessments:
+        prompt += _format_assessments_section(assessments, base_lang)
+
+    return prompt
 
 
 def _get_turkish_prompt(context: dict) -> str:

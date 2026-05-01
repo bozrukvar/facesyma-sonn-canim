@@ -40,13 +40,20 @@ _ASSESSMENT_HISTORY_PROJ = {'_id': 1, 'test_type': 1, 'overall_score': 1,
                              'overall_level_tr': 1, 'created_at': 1, 'responses_counted': 1}
 
 # Supported test types
-VALID_TESTS = frozenset({'skills', 'hr', 'personality', 'career', 'relationship', 'vocation'})
+VALID_TESTS = frozenset({
+    'skills', 'hr', 'personality', 'career', 'relationship', 'vocation',
+    'attachment', 'grit', 'growth_mindset', 'life_satisfaction',
+    'self_compassion', 'body_image', 'self_efficacy', 'stress',
+})
 
 _QUESTIONS_DIR = Path(settings.BASE_DIR) / 'questions'
 
 _DOMAIN_KEY_MAP: dict = {
     'skills': 'domain', 'hr': 'domain', 'personality': 'domain',
     'career': 'domain', 'relationship': 'subscale', 'vocation': 'domain',
+    'attachment': 'subscale', 'grit': 'domain', 'growth_mindset': 'domain',
+    'life_satisfaction': 'domain', 'self_compassion': 'subscale',
+    'body_image': 'domain', 'self_efficacy': 'domain', 'stress': 'domain',
 }
 
 

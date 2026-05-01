@@ -29,12 +29,20 @@ const getLocale = (lang: string): string => {
 };
 
 const TEST_TYPE_NAMES: Record<string, { key: string; emoji: string }> = {
-  'skills':       { key: 'assessment.skills',       emoji: '🎯' },
-  'hr':           { key: 'assessment.hr',            emoji: '👥' },
-  'personality':  { key: 'assessment.personality',   emoji: '🧠' },
-  'career':       { key: 'assessment.career',        emoji: '💼' },
-  'relationship': { key: 'assessment.relationship',  emoji: '❤️' },
-  'vocation':     { key: 'assessment.vocation',      emoji: '🏢' },
+  'skills':            { key: 'assessment.skills',            emoji: '🎯' },
+  'hr':                { key: 'assessment.hr',                emoji: '👥' },
+  'personality':       { key: 'assessment.personality',       emoji: '🧠' },
+  'career':            { key: 'assessment.career',            emoji: '💼' },
+  'relationship':      { key: 'assessment.relationship',      emoji: '❤️' },
+  'vocation':          { key: 'assessment.vocation',          emoji: '🏢' },
+  'attachment':        { key: 'assessment.attachment',        emoji: '🔗' },
+  'grit':              { key: 'assessment.grit',              emoji: '💪' },
+  'growth_mindset':    { key: 'assessment.growth_mindset',    emoji: '🌱' },
+  'life_satisfaction': { key: 'assessment.life_satisfaction', emoji: '😊' },
+  'self_compassion':   { key: 'assessment.self_compassion',   emoji: '🌸' },
+  'body_image':        { key: 'assessment.body_image',        emoji: '🪞' },
+  'self_efficacy':     { key: 'assessment.self_efficacy',     emoji: '⚡' },
+  'stress':            { key: 'assessment.stress',            emoji: '🧘' },
 };
 
 const LEVEL_COLORS: Record<string, string> = {

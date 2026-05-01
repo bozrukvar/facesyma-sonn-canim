@@ -42,12 +42,20 @@ const AVAILABLE_LANGUAGES = [
 
 // Test types with i18n keys
 const TEST_TYPES = [
-  { id: 'skills', key: 'assessment.skills', key_desc: 'assessment.skills_desc', emoji: '🎯' },
-  { id: 'hr', key: 'assessment.hr', key_desc: 'assessment.hr_desc', emoji: '👥' },
-  { id: 'personality', key: 'assessment.personality', key_desc: 'assessment.personality_desc', emoji: '🧠' },
-  { id: 'career', key: 'assessment.career', key_desc: 'assessment.career_desc', emoji: '💼' },
-  { id: 'relationship', key: 'assessment.relationship', key_desc: 'assessment.relationship_desc', emoji: '❤️' },
-  { id: 'vocation', key: 'assessment.vocation', key_desc: 'assessment.vocation_desc', emoji: '🏢' },
+  { id: 'skills',           key: 'assessment.skills',           key_desc: 'assessment.skills_desc',           emoji: '🎯' },
+  { id: 'hr',               key: 'assessment.hr',               key_desc: 'assessment.hr_desc',               emoji: '👥' },
+  { id: 'personality',      key: 'assessment.personality',      key_desc: 'assessment.personality_desc',      emoji: '🧠' },
+  { id: 'career',           key: 'assessment.career',           key_desc: 'assessment.career_desc',           emoji: '💼' },
+  { id: 'relationship',     key: 'assessment.relationship',     key_desc: 'assessment.relationship_desc',     emoji: '❤️' },
+  { id: 'vocation',         key: 'assessment.vocation',         key_desc: 'assessment.vocation_desc',         emoji: '🏢' },
+  { id: 'attachment',       key: 'assessment.attachment',       key_desc: 'assessment.attachment_desc',       emoji: '🔗' },
+  { id: 'grit',             key: 'assessment.grit',             key_desc: 'assessment.grit_desc',             emoji: '💪' },
+  { id: 'growth_mindset',   key: 'assessment.growth_mindset',   key_desc: 'assessment.growth_mindset_desc',   emoji: '🌱' },
+  { id: 'life_satisfaction',key: 'assessment.life_satisfaction',key_desc: 'assessment.life_satisfaction_desc',emoji: '😊' },
+  { id: 'self_compassion',  key: 'assessment.self_compassion',  key_desc: 'assessment.self_compassion_desc',  emoji: '🌸' },
+  { id: 'body_image',       key: 'assessment.body_image',       key_desc: 'assessment.body_image_desc',       emoji: '🪞' },
+  { id: 'self_efficacy',    key: 'assessment.self_efficacy',    key_desc: 'assessment.self_efficacy_desc',    emoji: '⚡' },
+  { id: 'stress',           key: 'assessment.stress',           key_desc: 'assessment.stress_desc',           emoji: '🧘' },
 ];
 
 const getLikertLabels = (lang: string) => [
