@@ -43,6 +43,91 @@ SOURCE_DB  = "facesyma-backend"          # ← sadece okunur
 ALL_LANGS = ["tr","en","de","ru","ar","es","ko","ja",
              "zh","hi","fr","pt","bn","id","ur","it","vi","pl"]
 
+# generate_coach_sifatlar.py koleksiyon adlarına uygun (ja→jp, ko→kr, es→sp)
+_LANG_COL_MAP = {"ja": "jp", "ko": "kr", "es": "sp"}
+
+# Yüz analizi sıfatları (PascalCase, pos_neg DB) → coach arketipi (küçük harf)
+# Negatif sıfatlar için büyüme çerçevesi: zayıflık → gelişim fırsatı
+FACE_SIFAT_ARCHETYPE: dict[str, str] = {
+    # ── Pozitif (42) ────────────────────────────────────────────────────────────
+    "Acele_karar_vermeyen":                         "dikkatli",
+    "Acik_sozlu":                                   "açık_kalpli",
+    "Aile_duskunu_ve_ailesine_onem_veren":          "hassas",
+    "Anlayisli":                                    "açık_kalpli",
+    "Arkadas_canlisi":                              "sosyal",
+    "Bagimsiz_yasamayi_seven":                      "kararlı",
+    "Buyuk_resme_odaklanir":                        "lider",
+    "Cok_calismaktan_korkmayan":                    "güçlü",
+    "Comert":                                       "açık_kalpli",
+    "Dengeli_karakter_sahibi":                      "dengeli",
+    "Detayci":                                      "analitik",
+    "Dominant":                                     "lider",
+    "Eglenceye_duskun":                             "enerjik",
+    "Etkileyici":                                   "çekici",
+    "Gercekci":                                     "pratik",
+    "Ikna_edici":                                   "cazip",
+    "Ileri_goruslu":                                "lider",
+    "Is_ortamini_kontrol_edebilen":                 "lider",
+    "Isle_ilgili_kontrol_kendisinde_oldugunda_iyi_calisan": "odaklı",
+    "Iyi_kalpli":                                   "açık_kalpli",
+    "Kibar":                                        "zarif",
+    "Kisa_ve_oz_sozlu":                             "pratik",
+    "Kontrolu_elinde_tutma_isteklisi_otoriter":     "lider",
+    "Lukse_duskun":                                 "zarif",
+    "Motive_edildiginde_basarili_olan":             "odaklı",
+    "Mukemmeliyetci":                               "dikkatli",
+    "Objektif":                                     "analitik",
+    "Odaklanmis":                                   "odaklı",
+    "Ongorulu":                                     "analitik",
+    "Paylasmayi_seven":                             "sosyal",
+    "Planlari_kendisi_yapan":                       "kararlı",
+    "Planli":                                       "dikkatli",
+    "Samimi_yapiya_sahip":                          "açık_kalpli",
+    "Saygili":                                      "zarif",
+    "Secici":                                       "dikkatli",
+    "Sevdiklerini_koruyucu_ve_sahiplenici":         "hassas",
+    "Sistematik":                                   "analitik",
+    "Temkinli":                                     "dikkatli",
+    "Uretken":                                      "güçlü",
+    "Verimli":                                      "odaklı",
+    "Zeki":                                         "analitik",
+    "İnsanlarin_ruhuna_bakan":                      "sezgisel",
+    # ── Negatif → büyüme arketipi (25) ─────────────────────────────────────────
+    "Ani_karar_veren":                              "kararlı",    # dürtüsel → kararlı
+    "Anlayissiz":                                   "hassas",     # anlayışsız → duyarlılık gelişimi
+    "Bencil":                                       "lider",      # öz-odaklı → liderlik büyümesi
+    "Cabuk_sinirlenen":                             "güçlü",      # öfkeli → gücü kanalize et
+    "Cahil":                                        "yaratıcı",   # bilgisiz → merak/yaratıcılık
+    "Dusuncelere_dalip_giden":                      "sezgisel",   # hayalci → sezgisel
+    "Duygularini_dusuncelerinin_onunde_tutan":      "hassas",     # duygusal → empati büyümesi
+    "Gosteris_meraklisi":                           "cazip",      # gösterişçi → özgün çekicilik
+    "Guven_vermeyen":                               "güvenilir",  # güvensiz → güvenilirlik büyümesi
+    "Hazci":                                        "enerjik",    # hazcu → enerjiyi yönlendir
+    "Iskolik":                                      "odaklı",     # iş bağımlısı → dengeli odak
+    "Kaba":                                         "kararlı",    # kaba → doğrudanlık büyümesi
+    "Kiskanc":                                      "kararlı",    # kıskanç → hırsı yönlendir
+    "Kolay_kontrol_edilen":                         "dengeli",    # manipüle edilebilir → denge büyümesi
+    "Korkak_davranmaya_egilimli":                   "güçlü",      # korkak → cesaret büyümesi
+    "Kural_disina_cikmaya_yatkin":                  "yaratıcı",   # kural karşıtı → yaratıcılık
+    "Oyuncudan_cok_izleyici":                       "güçlü",      # pasif → aktif büyüme
+    "Sabirsiz":                                     "enerjik",    # sabırsız → enerjiyi kanalize et
+    "Simarik":                                      "zarif",      # şımarık → takdir/zarafet büyümesi
+    "Sonuc_odakli":                                 "odaklı",     # sonuç odaklı → odaklı
+    "Supheci":                                      "analitik",   # şüpheci → analize dönüştür
+    "Tepeden_bakan":                                "lider",      # küçümseyen → gerçek liderlik
+    "Uyusuk":                                       "enerjik",    # tembel → enerji aktivasyonu
+    "Zamani_iyi_yonetemeyen":                       "dikkatli",   # zaman yönetememe → dikkatli büyüme
+    "Zayif_karakterli":                             "güçlü",      # zayıf karakter → güç büyümesi
+    # ── Tarafsız (1) ────────────────────────────────────────────────────────────
+    "Denetimsiz":                                   "dengeli",    # kontrolsüz → denge büyümesi
+}
+
+def _normalize_sifat(sifat: str) -> str:
+    """Yüz analizi sıfatını (PascalCase) coach arketipine çevirir.
+    Eşleşme yoksa küçük harfe dönüştürür (21 arketiple direkt eşleşme için).
+    """
+    return FACE_SIFAT_ARCHETYPE.get(sifat, sifat.lower())
+
 _RE_SIFAT = re.compile(r'^[a-zA-ZçğıöşüÇĞİÖŞÜ0-9 _-]{1,100}$')
 
 COACH_MODULES = [
@@ -50,6 +135,12 @@ COACH_MODULES = [
     "iliski_yonetimi", "iletisim_becerileri", "stres_yonetimi", "ozguven",
     "zaman_yonetimi", "kisisel_hedefler", "astroloji_harita", "dogum_analizi",
     "yas_koc_ozet", "vucut_dil",
+    # Tip A — text modüller
+    "etkinlik_tavsiye", "spor_aktivite", "kariyer_yolu",
+    "insan_kaynaklari", "duygusal_ruhsal", "meditasyon_egzersiz",
+    # Tip B — dict/JSON modüller
+    "kitap_tavsiye", "film_tavsiye", "muzik_tavsiye",
+    "podcast_tavsiye", "seyahat_tavsiye", "gunluk_afirasyon", "saglik_tavsiye",
 ]
 
 EXISTING_MODULES = [
@@ -93,9 +184,54 @@ _COACH_MODULE_DESCRIPTIONS = {
     "kisisel_hedefler":    "Kişisel Gelişim Hedefleri",
     "astroloji_harita":    "Astroloji Haritası & Yorumları",
     "dogum_analizi":       "Doğum Tarihi/Saati Analizi",
-    "yas_koc_ozet":        "Yaşam Koçu Genel Özeti",
-    "vucut_dil":           "Beden Dili Analizi",
+    "yas_koc_ozet":          "Yaşam Koçu Genel Özeti",
+    "vucut_dil":             "Beden Dili Analizi",
+    "etkinlik_tavsiye":      "Etkinlik ve Aktivite Tavsiyeleri",
+    "spor_aktivite":         "Spor ve Fiziksel Aktivite",
+    "kariyer_yolu":          "Kariyer Yolu Profili",
+    "insan_kaynaklari":      "İnsan Kaynakları ve Takım Dinamiği",
+    "duygusal_ruhsal":       "Duygusal ve Ruhsal Gelişim",
+    "meditasyon_egzersiz":   "Meditasyon ve Mindfulness",
+    "kitap_tavsiye":         "Kitap Tavsiyeleri",
+    "film_tavsiye":          "Film ve Dizi Tavsiyeleri",
+    "muzik_tavsiye":         "Müzik Tavsiyeleri",
+    "podcast_tavsiye":       "Podcast Tavsiyeleri",
+    "seyahat_tavsiye":       "Seyahat Tavsiyeleri",
+    "gunluk_afirasyon":      "Günlük Afirmasyonlar",
+    "saglik_tavsiye":        "Sağlık Tavsiyeleri (Yapılandırılmış)",
 }
+
+# Sağlık onayı gerektiren modüller
+HEALTH_MODULES = frozenset({
+    "saglik_tavsiye", "saglik_esenwlik", "meditasyon_egzersiz", "spor_aktivite",
+})
+
+# 18 dil medikal sorumluluk reddi + GDPR veri işleme bildirimi
+_HEALTH_DISCLAIMER = {
+    "tr": "Bu içerik yalnızca bilgilendirme amaçlıdır ve tıbbi tavsiye yerine geçmez. Kişilik analizinizden türetilen bu öneriler yapay zeka tarafından oluşturulmuştur. Sağlık kararları için lütfen bir sağlık uzmanına danışın.",
+    "en": "This content is for informational purposes only and does not constitute medical advice. These recommendations are AI-generated based on your personality analysis. Please consult a healthcare professional for medical decisions.",
+    "de": "Dieser Inhalt dient nur zu Informationszwecken und stellt keine medizinische Beratung dar. Diese Empfehlungen wurden von einer KI basierend auf Ihrer Persönlichkeitsanalyse erstellt. Bitte konsultieren Sie einen Arzt für medizinische Entscheidungen.",
+    "ru": "Этот контент предназначен только для информационных целей и не является медицинской консультацией. Эти рекомендации созданы ИИ на основе анализа вашей личности. Пожалуйста, проконсультируйтесь с врачом по медицинским вопросам.",
+    "ar": "هذا المحتوى لأغراض إعلامية فقط ولا يُعدّ نصيحة طبية. هذه التوصيات مُولَّدة بالذكاء الاصطناعي بناءً على تحليل شخصيتك. يُرجى استشارة متخصص رعاية صحية لاتخاذ القرارات الطبية.",
+    "es": "Este contenido es solo informativo y no constituye asesoramiento médico. Estas recomendaciones son generadas por IA basándose en tu análisis de personalidad. Consulta a un profesional de la salud para decisiones médicas.",
+    "ko": "이 콘텐츠는 정보 제공 목적으로만 제공되며 의료 조언을 대체하지 않습니다. 이 권장 사항은 귀하의 성격 분석을 기반으로 AI가 생성했습니다. 의료 결정을 위해 의료 전문가와 상담하십시오.",
+    "ja": "このコンテンツは情報提供のみを目的としており、医療上のアドバイスの代わりにはなりません。これらの推奨事項はあなたの性格分析に基づいてAIが生成したものです。医療上の判断については医療専門家にご相談ください。",
+    "zh": "本内容仅供参考，不构成医疗建议。这些建议由人工智能根据您的性格分析生成。请咨询医疗专业人员以作出医疗决定。",
+    "hi": "यह सामग्री केवल सूचना के उद्देश्य से है और चिकित्सा सलाह का विकल्प नहीं है। ये सिफारिशें आपके व्यक्तित्व विश्लेषण के आधार पर AI द्वारा उत्पन्न की गई हैं। चिकित्सा निर्णयों के लिए कृपया किसी स्वास्थ्य पेशेवर से परामर्श करें।",
+    "fr": "Ce contenu est uniquement à titre informatif et ne constitue pas un avis médical. Ces recommandations sont générées par IA sur la base de votre analyse de personnalité. Veuillez consulter un professionnel de santé pour toute décision médicale.",
+    "pt": "Este conteúdo é apenas para fins informativos e não constitui aconselhamento médico. Estas recomendações são geradas por IA com base na sua análise de personalidade. Consulte um profissional de saúde para decisões médicas.",
+    "bn": "এই বিষয়বস্তু শুধুমাত্র তথ্যমূলক উদ্দেশ্যে এবং চিকিৎসা পরামর্শের বিকল্প নয়। এই সুপারিশগুলি আপনার ব্যক্তিত্ব বিশ্লেষণের উপর ভিত্তি করে AI দ্বারা তৈরি। চিকিৎসা সিদ্ধান্তের জন্য একজন স্বাস্থ্যসেবা পেশাদারের সাথে পরামর্শ করুন।",
+    "id": "Konten ini hanya untuk tujuan informasi dan bukan merupakan saran medis. Rekomendasi ini dihasilkan oleh AI berdasarkan analisis kepribadian Anda. Konsultasikan dengan profesional kesehatan untuk keputusan medis.",
+    "ur": "یہ مواد صرف معلوماتی مقاصد کے لیے ہے اور طبی مشورے کا متبادل نہیں ہے۔ یہ تجاویز آپ کی شخصیت کے تجزیے کی بنیاد پر AI نے تیار کی ہیں۔ طبی فیصلوں کے لیے براہ کرم کسی صحت پیشہ ور سے مشورہ کریں۔",
+    "it": "Questo contenuto è solo a scopo informativo e non costituisce un consiglio medico. Queste raccomandazioni sono generate dall'IA in base alla tua analisi della personalità. Si prega di consultare un professionista sanitario per le decisioni mediche.",
+    "vi": "Nội dung này chỉ mang tính chất thông tin và không thay thế lời khuyên y tế. Các khuyến nghị này được AI tạo ra dựa trên phân tích tính cách của bạn. Vui lòng tham khảo ý kiến chuyên gia y tế để đưa ra quyết định về sức khỏe.",
+    "pl": "Ta treść służy wyłącznie celom informacyjnym i nie stanowi porady medycznej. Te zalecenia są generowane przez AI na podstawie analizy Twojej osobowości. Skonsultuj się z pracownikiem służby zdrowia w sprawie decyzji medycznych.",
+}
+_HEALTH_DISCLAIMER_VERSION = "v1"
+
+def _get_disclaimer(lang: str) -> dict:
+    text = _HEALTH_DISCLAIMER.get(lang) or _HEALTH_DISCLAIMER["en"]
+    return {"text": text, "version": _HEALTH_DISCLAIMER_VERSION, "requires_consent": True}
 
 # ── DB bağlantıları ────────────────────────────────────────────────────────────
 _mongo_client: Optional[MongoClient] = None
@@ -141,6 +277,7 @@ class BirthAnalysisRequest(BaseModel):
     birth_date:     str             # YYYY-MM-DD zorunlu
     birth_time:     Optional[str]  = None
     birth_city:     Optional[str]  = None
+    name:           Optional[str]  = None   # İsim analizi için (opsiyonel)
     lang:           str            = "tr"
 
 class GoalRequest(BaseModel):
@@ -154,6 +291,7 @@ class AnalyzeRequest(BaseModel):
     analysis_result: dict           # Facesyma analiz çıktısı
     lang:            str = "tr"
     include_modules: List[str] = Field(default_factory=lambda: COACH_MODULES)
+    test_scores:     Optional[dict] = None   # {test_type: {domain: score 0-100}}
 
 class GiyimRequest(BaseModel):
     analysis_result: dict           # /analyze/enhanced/ çıktısı
@@ -161,6 +299,63 @@ class GiyimRequest(BaseModel):
     mevsim:          Optional[str] = None    # ilkbahar|yaz|sonbahar|kis
     kategori:        Optional[str] = None    # gunluk|spor|resmi|davet
     top_n:           int = 3
+
+_TEST_MODULE_HINTS: list[tuple[str, str, float, str]] = [
+    # (test_type, domain, threshold, suggested_module)   — threshold: score triggers hint
+    ("personality", "neuroticism",        65.0, "stres_yonetimi"),
+    ("personality", "conscientiousness",  65.0, "zaman_yonetimi"),
+    ("personality", "extraversion",       40.0, "iletisim_becerileri"),  # < threshold
+    ("eq",          "empathy",            40.0, "iliski_yonetimi"),       # < threshold
+    ("eq",          "self_awareness",     40.0, "ozguven"),               # < threshold
+    ("eq",          "self_regulation",    40.0, "stres_yonetimi"),        # < threshold
+    ("stress",      "depression",         40.0, "duygusal_ruhsal"),
+    ("stress",      "anxiety",            40.0, "stres_yonetimi"),
+    ("stress",              "depression",             60.0, "meditasyon_egzersiz"),
+    # Nonverbal tests
+    ("emotion_recognition", "overall",                60.0, "iletisim_becerileri"),
+    ("emotion_recognition", "overall",                60.0, "iliski_yonetimi"),
+    ("stroop",              "cognitive_flexibility",  50.0, "stres_yonetimi"),
+    ("stroop",              "cognitive_flexibility",  50.0, "zaman_yonetimi"),
+]
+
+# Domains where LOW score triggers the hint (below threshold)
+_LOW_SCORE_DOMAINS = {
+    "extraversion", "empathy", "self_awareness", "self_regulation",
+    "overall",               # emotion_recognition
+    "cognitive_flexibility", # stroop
+}
+
+
+def _test_scores_to_insights(test_scores: dict) -> tuple[list[str], dict]:
+    """Puan eşiklerinden koç modülü önerileri ve içgörüler üretir."""
+    suggested: list[str] = []
+    insights: dict = {}
+
+    for ttype, domain, threshold, module in _TEST_MODULE_HINTS:
+        scores = test_scores.get(ttype, {})
+        if domain not in scores:
+            continue
+        score = scores[domain]
+        triggered = (score < threshold) if domain in _LOW_SCORE_DOMAINS else (score > threshold)
+        if triggered:
+            if module not in suggested:
+                suggested.append(module)
+            insights.setdefault(ttype, {})[domain] = {
+                "score": score, "suggested_module": module,
+                "direction": "low" if domain in _LOW_SCORE_DOMAINS else "high",
+            }
+
+    # Crisis/severe stress: force duygusal_ruhsal + meditasyon_egzersiz
+    stress_details = test_scores.get("stress_details", {})
+    if isinstance(stress_details, dict):
+        severity = stress_details.get("depression_severity", "")
+        if severity in ("moderate", "moderately_severe", "severe"):
+            for m in ("duygusal_ruhsal", "meditasyon_egzersiz"):
+                if m not in suggested:
+                    suggested.append(m)
+
+    return suggested, insights
+
 
 # ── Endpoint: Modül listesi ────────────────────────────────────────────────────
 @app.get("/coach/modules")
@@ -240,51 +435,104 @@ async def coach_analyze(body: AnalyzeRequest, authorization: Optional[str] = Hea
     """
     _bl = body.lang
     lang = _bl if _bl in ALL_LANGS else "en"
+    lang_col = _LANG_COL_MAP.get(lang, lang)
     db   = get_backup()
-    col  = db[f"coach_attributes_{lang}"]
+    col  = db[f"coach_attributes_{lang_col}"]
 
-    # Analiz sonucundaki attribute'lardan dominant sıfatları çıkar
+    # Analiz sonucundan dominant sıfatları çıkar — 3 format desteklenir:
+    # 1) attributes: [{name, score}]  — eski format
+    # 2) top_sifatlar: [{sifat, score}] — enhanced_databases çıktısı
+    # 3) sifat_scores: {name: float}  — enhanced_databases dict çıktısı
     _ar = body.analysis_result
     _arget = _ar.get
-    attrs = _arget("attributes", [])
-    dominant = [
-        a["name"] for a in sorted(attrs, key=_KEY_SCORE, reverse=True)
-        if a.get("name")
-    ][:5]
+    attrs = _arget("attributes") or _arget("top_sifatlar", [])
+    dominant_raw: list[str] = []
+    if attrs:
+        dominant_raw = [
+            a.get("name") or a.get("sifat", "")
+            for a in sorted(attrs, key=_KEY_SCORE, reverse=True)
+            if a.get("name") or a.get("sifat")
+        ][:5]
+    else:
+        ss = _arget("sifat_scores", {})
+        if ss:
+            dominant_raw = [k for k, _ in sorted(ss.items(), key=lambda x: -x[1])][:5]
 
-    if not dominant:
-        raise HTTPException(400, "Analiz sonucunda attribute bulunamadı.")
+    if not dominant_raw:
+        raise HTTPException(400, "Analiz sonucunda sıfat bulunamadı (attributes/top_sifatlar/sifat_scores).")
 
-    # Batch fetch all dominant sıfat docs once (avoids N+1)
+    # Dual-lookup: her sıfat için önce PascalCase (Track B), yoksa archetype (Track A)
     valid_modules = [m for m in body.include_modules if m in COACH_MODULES]
     projection = {"_id": 1, **{m: 1 for m in valid_modules}}
-    sifat_docs = {
+
+    # Sıfat → DB key eşlemesi: Track B varsa direkt, yoksa archetype
+    raw_keys    = [s for s in dominant_raw if s]
+    pascal_hits = {
         doc["_id"]: doc
-        for doc in col.find({"_id": {"$in": dominant}}, projection)
+        for doc in col.find({"_id": {"$in": raw_keys}}, projection)
     }
+    sifat_key_map: dict[str, str] = {}   # orijinal_sifat → DB _id
+    archetype_lookups: list[str] = []
+    for s in raw_keys:
+        if s in pascal_hits:
+            sifat_key_map[s] = s          # Track B direkt
+        else:
+            arch = _normalize_sifat(s)
+            sifat_key_map[s] = arch
+            archetype_lookups.append(arch)
+
+    arch_docs = {
+        doc["_id"]: doc
+        for doc in col.find({"_id": {"$in": archetype_lookups}}, projection)
+    } if archetype_lookups else {}
+    sifat_docs = {**pascal_hits, **arch_docs}
+
+    dominant = list(dict.fromkeys(sifat_key_map[s] for s in raw_keys))
 
     coach_output = {}
     for mod in valid_modules:
-        mod_data = [
-            {"sifat": sifat, "data": sifat_docs[sifat][mod]}
-            for sifat in dominant
-            if sifat in sifat_docs and mod in sifat_docs[sifat]
-        ]
+        mod_data = []
+        for s in raw_keys:
+            db_key = sifat_key_map[s]
+            if db_key in sifat_docs and mod in sifat_docs[db_key]:
+                mod_data.append({"sifat": s, "archetype": db_key, "data": sifat_docs[db_key][mod]})
         if mod_data:
             coach_output[mod] = mod_data
+
+    # Psikolojik test skorlarından ek modül önerileri
+    test_based_insights: dict = {}
+    if body.test_scores:
+        suggested_mods, test_based_insights = _test_scores_to_insights(body.test_scores)
+        # Force-inject suggested modules that aren't already in coach_output
+        for extra_mod in suggested_mods:
+            if extra_mod not in coach_output and extra_mod in COACH_MODULES:
+                extra_data = []
+                for s in raw_keys:
+                    db_key = sifat_key_map[s]
+                    if db_key in sifat_docs and extra_mod in sifat_docs[db_key]:
+                        extra_data.append({"sifat": s, "archetype": db_key, "data": sifat_docs[db_key][extra_mod]})
+                if extra_data:
+                    coach_output[extra_mod] = extra_data
 
     # Ek analiz verileri
     golden = _arget("golden_ratio", 0)
     face_type = _arget("face_type", "")
 
-    return {
-        "dominant_sifatlar": dominant,
-        "golden_ratio":      golden,
-        "face_type":         face_type,
-        "lang":              lang,
-        "coach_modules":     coach_output,
-        "generated_at":      datetime.now().isoformat(),
+    has_health = bool(HEALTH_MODULES.intersection(coach_output.keys()))
+    result = {
+        "dominant_sifatlar":  dominant_raw,
+        "archetypes_used":    dominant,
+        "golden_ratio":       golden,
+        "face_type":          face_type,
+        "lang":               lang,
+        "coach_modules":      coach_output,
+        "generated_at":       datetime.now().isoformat(),
     }
+    if test_based_insights:
+        result["test_based_insights"] = test_based_insights
+    if has_health:
+        result["health_disclaimer"] = _get_disclaimer(lang)
+    return result
 
 
 # ── Endpoint: Tek sıfat + modül ───────────────────────────────────────────────
@@ -296,14 +544,25 @@ async def get_sifat_module(sifat: str, module: str, lang: str = "tr"):
         raise HTTPException(400, f"Geçersiz modül. İzin verilenler: {', '.join(COACH_MODULES)}")
     if lang not in ALL_LANGS:
         lang = "tr"
+    lang_col = _LANG_COL_MAP.get(lang, lang)
     db  = get_backup()
-    col = db[f"coach_attributes_{lang}"]
+    col = db[f"coach_attributes_{lang_col}"]
+
+    # Dual-lookup: Track B direkt kaydı önce, yoksa archetype proxy
     doc = col.find_one({"_id": sifat}, {module: 1, "_id": 0})
+    if doc:
+        resolved_key = sifat          # Track B direkt eşleşme
+    else:
+        resolved_key = _normalize_sifat(sifat)
+        doc = col.find_one({"_id": resolved_key}, {module: 1, "_id": 0})
     if not doc:
-        raise HTTPException(404, f"'{sifat}' sıfatı bulunamadı.")
+        raise HTTPException(404, f"'{sifat}' → '{resolved_key}' bulunamadı.")
     if module not in doc:
         raise HTTPException(404, f"'{module}' modülü bu sıfat için mevcut değil.")
-    return {"sifat": sifat, "module": module, "data": doc[module], "lang": lang}
+    response = {"sifat": sifat, "archetype": resolved_key, "module": module, "data": doc[module], "lang": lang}
+    if module in HEALTH_MODULES:
+        response["disclaimer"] = _get_disclaimer(lang)
+    return response
 
 
 # ── Endpoint: Giyim tavsiyesi ─────────────────────────────────────────────────
@@ -317,24 +576,38 @@ async def coach_giyim(body: GiyimRequest, authorization: Optional[str] = Header(
         raise HTTPException(401, "Kimlik doğrulama gerekli.")
     _bl = body.lang
     lang = _bl if _bl in ALL_LANGS else "tr"
+    lang_col = _LANG_COL_MAP.get(lang, lang)
     db = get_backup()
-    col = db[f"coach_attributes_{lang}"]
+    col = db[f"coach_attributes_{lang_col}"]
 
-    # Dominant sıfatları çıkar
+    # Dominant sıfatları çıkar (3 format: attributes / top_sifatlar / sifat_scores)
     _ar = body.analysis_result
     _arget = _ar.get
-    attrs = _arget("attributes", [])
-    dominant = [
-        a["name"] for a in sorted(attrs, key=_KEY_SCORE, reverse=True)
-        if a.get("name")
-    ][:body.top_n]
+    attrs = _arget("attributes") or _arget("top_sifatlar", [])
+    dominant_raw: list[str] = []
+    if attrs:
+        dominant_raw = [
+            a.get("name") or a.get("sifat", "")
+            for a in sorted(attrs, key=_KEY_SCORE, reverse=True)
+            if a.get("name") or a.get("sifat")
+        ][:body.top_n]
+    else:
+        ss = _arget("sifat_scores", {})
+        if ss:
+            dominant_raw = [k for k, _ in sorted(ss.items(), key=lambda x: -x[1])][:body.top_n]
 
-    if not dominant:
-        raise HTTPException(400, "Analiz sonucunda attribute bulunamadı.")
+    if not dominant_raw:
+        raise HTTPException(400, "Analiz sonucunda sıfat bulunamadı.")
+
+    # Dual-lookup: Track B direkt, yoksa archetype
+    pascal_docs = {doc["_id"]: doc for doc in col.find({"_id": {"$in": dominant_raw}, "giyim": {"$exists": True}}, {"giyim": 1})}
+    arch_keys   = list(dict.fromkeys(_normalize_sifat(s) for s in dominant_raw if s not in pascal_docs))
+    dominant    = ([s for s in dominant_raw if s in pascal_docs] + arch_keys) or arch_keys
 
     # Batch fetch giyim data for all dominant sifats (avoids N+1)
     giyim_base = None
-    for doc in col.find({"_id": {"$in": dominant}, "giyim": {"$exists": True}}, {"giyim": 1}):
+    merged_docs = {**pascal_docs, **{doc["_id"]: doc for doc in col.find({"_id": {"$in": arch_keys}, "giyim": {"$exists": True}}, {"giyim": 1})}}
+    for doc in (merged_docs[k] for k in dominant if k in merged_docs):
         if doc.get("giyim"):
             giyim_base = doc["giyim"]
             break
@@ -423,13 +696,15 @@ async def birth_analysis(
     astro    = _calculate_basic_astrology(_bd, _bbt, lang)
     numerology = _calculate_numerology(_bd, lang)
 
-    result = {
+    result: dict = {
         "birth_date":  _bd,
         "birth_time":  _bbt,
         "astrology":   astro,
         "numerology":  numerology,
         "lang":        lang,
     }
+    if body.name:
+        result["name_numerology"] = _calculate_name_numerology(body.name, lang)
 
     # Kullanıcı giriş yapmışsa backup DB'ye kaydet
     if user_id:
@@ -710,6 +985,20 @@ _NUMEROLOGY_MEANINGS = {
     "pl": {1:"Lider, pionier, niezależny", 2:"Dyplomata, harmonijny, wspierający", 3:"Kreatywny, ekspresyjny, społeczny", 4:"Praktyczny, niezawodny, zdyscyplinowany", 5:"Miłośnik wolności, awanturnik, adaptacyjny", 6:"Opiekun, odpowiedzialny, harmonijny", 7:"Analityk, mistyczny, introwertyzm", 8:"Moc, sukcesy materialne, autorytet", 9:"Humanitarny, idealistyczny, kreatywny", 11:"Mistrz intuicji", 22:"Mistrz architektury", 33:"Mistrz uzdrawiania"},
 }
 
+@lru_cache(maxsize=256)
+def _get_sign_idx(month: int, day: int) -> int:
+    """Return zodiac sign index (0–11) for a given birth month and day."""
+    signs_dates = [
+        ((1,20),(2,18),0),   ((2,19),(3,20),1),   ((3,21),(4,19),2),   ((4,20),(5,20),3),
+        ((5,21),(6,20),4),   ((6,21),(7,22),5),   ((7,23),(8,22),6),   ((8,23),(9,22),7),
+        ((9,23),(10,22),8),  ((10,23),(11,21),9), ((11,22),(12,21),10),((12,22),(1,19),11),
+    ]
+    for (sm,sd),(em,ed),idx in signs_dates:
+        if (month == sm and day >= sd) or (month == em and day <= ed):
+            return idx
+    return 11  # Default Capricorn
+
+
 def _calculate_basic_astrology(birth_date_str: str, birth_time_str: Optional[str] = None, lang: str = "tr") -> dict:
     """
     Basic astrology calculation — zodiac, element, quality from birth date.
@@ -723,9 +1012,10 @@ def _calculate_basic_astrology(birth_date_str: str, birth_time_str: Optional[str
 
     _bdm = bd.month
     _bdd = bd.day
+    sign_idx = _get_sign_idx(_bdm, _bdd)
     sun_sign = _get_sun_sign(_bdm, _bdd, lang)
-    element  = _get_element(sun_sign, lang)
-    quality  = _get_quality(sun_sign, lang)
+    element  = _get_element(sign_idx, lang)
+    quality  = _get_quality(sign_idx, lang)
 
     result = {
         "sun_sign":      sun_sign,
@@ -808,8 +1098,51 @@ def _get_time_energy(hour: int, lang: str = "tr") -> str:
         return energy_dict[(0,0)]
 
 
+_MASTER_NUMBERS = {
+    "tr": {11: "Usta Sayı — Yüksek Sezgi", 22: "Usta Sayı — Büyük Mimar", 33: "Usta Sayı — Evrensel Şifacı"},
+    "en": {11: "Master Number — High Intuition", 22: "Master Number — Great Architect", 33: "Master Number — Universal Healer"},
+    "de": {11: "Meisterzahl — Hohe Intuition", 22: "Meisterzahl — Großer Architekt", 33: "Meisterzahl — Universeller Heiler"},
+    "ru": {11: "Мастер-число — Высокая интуиция", 22: "Мастер-число — Великий архитектор", 33: "Мастер-число — Универсальный целитель"},
+    "ar": {11: "رقم رئيسي — حدس عالٍ", 22: "رقم رئيسي — المعماري العظيم", 33: "رقم رئيسي — المعالج الكوني"},
+    "es": {11: "Número maestro — Alta intuición", 22: "Número maestro — Gran arquitecto", 33: "Número maestro — Sanador universal"},
+    "ko": {11: "마스터 넘버 — 높은 직관", 22: "마스터 넘버 — 위대한 건축가", 33: "마스터 넘버 — 우주적 치유자"},
+    "ja": {11: "マスターナンバー — 高い直感", 22: "マスターナンバー — 偉大な建築家", 33: "マスターナンバー — 宇宙のヒーラー"},
+    "zh": {11: "主数 — 高度直觉", 22: "主数 — 伟大建筑师", 33: "主数 — 宇宙治愈者"},
+    "hi": {11: "मास्टर नंबर — उच्च अंतर्ज्ञान", 22: "मास्टर नंबर — महान वास्तुकार", 33: "मास्टर नंबर — सार्वभौमिक उपचारक"},
+    "fr": {11: "Nombre maître — Haute intuition", 22: "Nombre maître — Grand architecte", 33: "Nombre maître — Guérisseur universel"},
+    "pt": {11: "Número mestre — Alta intuição", 22: "Número mestre — Grande arquiteto", 33: "Número mestre — Curador universal"},
+    "bn": {11: "মাস্টার সংখ্যা — উচ্চ অন্তর্দৃষ্টি", 22: "মাস্টার সংখ্যা — মহান স্থপতি", 33: "মাস্টার সংখ্যা — সার্বজনীন নিরাময়কারী"},
+    "id": {11: "Angka master — Intuisi tinggi", 22: "Angka master — Arsitek agung", 33: "Angka master — Penyembuh universal"},
+    "ur": {11: "ماسٹر نمبر — اعلی وجدان", 22: "ماسٹر نمبر — عظیم معمار", 33: "ماسٹر نمبر — آفاقی شفاء دینے والا"},
+    "it": {11: "Numero maestro — Alta intuizione", 22: "Numero maestro — Grande architetto", 33: "Numero maestro — Guaritore universale"},
+    "vi": {11: "Số chủ — Trực giác cao", 22: "Số chủ — Kiến trúc sư vĩ đại", 33: "Số chủ — Người chữa bệnh vũ trụ"},
+    "pl": {11: "Liczba mistrzowska — Wysoka intuicja", 22: "Liczba mistrzowska — Wielki architekt", 33: "Liczba mistrzowska — Uzdrowiciel uniwersalny"},
+}
+
+_PERSONAL_YEAR_LABELS = {
+    "tr": "Kişisel Yıl Sayısı",
+    "en": "Personal Year Number",
+    "de": "Persönliche Jahreszahl",
+    "ru": "Личный год",
+    "ar": "رقم السنة الشخصية",
+    "es": "Número de Año Personal",
+    "ko": "개인 연도 번호",
+    "ja": "パーソナルイヤーナンバー",
+    "zh": "个人年数",
+    "hi": "व्यक्तिगत वर्ष संख्या",
+    "fr": "Nombre de l'Année Personnelle",
+    "pt": "Número do Ano Pessoal",
+    "bn": "ব্যক্তিগত বছর সংখ্যা",
+    "id": "Angka Tahun Pribadi",
+    "ur": "ذاتی سال نمبر",
+    "it": "Numero dell'Anno Personale",
+    "vi": "Số Năm Cá Nhân",
+    "pl": "Liczba Roku Osobistego",
+}
+
+
 def _calculate_numerology(birth_date_str: str, lang: str = "tr") -> dict:
-    """Basic numerology calculation — supports 18 languages"""
+    """Numerology calculation — life path, personal year, master number flag."""
     try:
         bd = datetime.strptime(birth_date_str, "%Y-%m-%d")
     except ValueError:
@@ -820,17 +1153,152 @@ def _calculate_numerology(birth_date_str: str, lang: str = "tr") -> dict:
             n = sum(int(d) for d in str(n))
         return n
 
+    def reduce_no_master(n: int) -> int:
+        while n > 9:
+            n = sum(int(d) for d in str(n))
+        return n
+
     day   = reduce(bd.day)
     month = reduce(bd.month)
     year  = reduce(sum(int(d) for d in str(bd.year)))
     life  = reduce(day + month + year)
 
+    current_year = datetime.now().year
+    cur_year_digits = reduce_no_master(sum(int(d) for d in str(current_year)))
+    personal_year = reduce_no_master(bd.day + bd.month + cur_year_digits)
+    if personal_year == 0:
+        personal_year = 9
+
     meaning_dict = _NUMEROLOGY_MEANINGS.get(lang, _NUMEROLOGY_MEANINGS["en"])
+    master_dict  = _MASTER_NUMBERS.get(lang, _MASTER_NUMBERS["en"])
+
+    result = {
+        "life_path_number":    life,
+        "life_path_meaning":   meaning_dict.get(life, ""),
+        "day_number":          day,
+        "month_number":        month,
+        "year_number":         year,
+        "personal_year_number": personal_year,
+        "personal_year_meaning": meaning_dict.get(personal_year, ""),
+        "personal_year_label": _PERSONAL_YEAR_LABELS.get(lang, _PERSONAL_YEAR_LABELS["en"]),
+        "current_year":        current_year,
+        "is_master_number":    life in (11, 22, 33),
+    }
+    if life in (11, 22, 33):
+        result["master_label"] = master_dict.get(life, "")
+    return result
+
+
+# Pythagorean letter → number mapping (ASCII + Turkish chars)
+_PYTHAGOREAN: dict[str, int] = {
+    'a':1,'b':2,'c':3,'d':4,'e':5,'f':6,'g':7,'h':8,'i':9,
+    'j':1,'k':2,'l':3,'m':4,'n':5,'o':6,'p':7,'q':8,'r':9,
+    's':1,'t':2,'u':3,'v':4,'w':5,'x':6,'y':7,'z':8,
+    # Turkish extras
+    'ç':3,'ğ':7,'ı':9,'İ':9,'ö':6,'ş':1,'ü':3,
+}
+_VOWELS = set('aeıioöuüAEIİOÖUÜ')
+
+_NAME_LABELS = {
+    "tr": {"title":"İsim Analizi","expression":"İfade Sayısı","soul_urge":"Ruh İtkisi","personality":"Kişilik Sayısı","ebced_title":"Ebced Analizi","kabala_title":"Kabala Analizi","total":"Toplam","reduced":"Sayısal Değer"},
+    "en": {"title":"Name Analysis","expression":"Expression Number","soul_urge":"Soul Urge","personality":"Personality Number","ebced_title":"Abjad Analysis","kabala_title":"Kabbalah Analysis","total":"Total","reduced":"Reduced Number"},
+    "de": {"title":"Namensanalyse","expression":"Ausdruckszahl","soul_urge":"Seelenimpuls","personality":"Persönlichkeitszahl","ebced_title":"Abjad-Analyse","kabala_title":"Kabbala-Analyse","total":"Gesamt","reduced":"Reduzierte Zahl"},
+    "ru": {"title":"Анализ имени","expression":"Число выражения","soul_urge":"Число душевного стремления","personality":"Число личности","ebced_title":"Абджад-анализ","kabala_title":"Каббала-анализ","total":"Сумма","reduced":"Сведённое число"},
+    "ar": {"title":"تحليل الاسم","expression":"رقم التعبير","soul_urge":"رقم النفس","personality":"رقم الشخصية","ebced_title":"تحليل الأبجد","kabala_title":"تحليل القبالاه","total":"المجموع","reduced":"العدد المختزل"},
+    "es": {"title":"Análisis de Nombre","expression":"Número de Expresión","soul_urge":"Impulso del Alma","personality":"Número de Personalidad","ebced_title":"Análisis Abyad","kabala_title":"Análisis Cabalístico","total":"Total","reduced":"Número Reducido"},
+    "ko": {"title":"이름 분석","expression":"표현 숫자","soul_urge":"영혼 충동","personality":"성격 숫자","ebced_title":"아브자드 분석","kabala_title":"카발라 분석","total":"합계","reduced":"환원 숫자"},
+    "ja": {"title":"名前の分析","expression":"表現数","soul_urge":"魂の衝動","personality":"個性数","ebced_title":"アブジャド分析","kabala_title":"カバラ分析","total":"合計","reduced":"縮約数"},
+    "zh": {"title":"姓名分析","expression":"表达数","soul_urge":"灵魂冲动","personality":"个性数","ebced_title":"阿布贾德分析","kabala_title":"卡巴拉分析","total":"总计","reduced":"归约数"},
+    "hi": {"title":"नाम विश्लेषण","expression":"अभिव्यक्ति संख्या","soul_urge":"आत्मा आवेग","personality":"व्यक्तित्व संख्या","ebced_title":"अब्जद विश्लेषण","kabala_title":"कबाला विश्लेषण","total":"कुल","reduced":"न्यूनीकृत संख्या"},
+    "fr": {"title":"Analyse du Prénom","expression":"Nombre d'Expression","soul_urge":"Élan de l'Âme","personality":"Nombre de Personnalité","ebced_title":"Analyse Abjad","kabala_title":"Analyse Kabbalistique","total":"Total","reduced":"Nombre Réduit"},
+    "pt": {"title":"Análise do Nome","expression":"Número de Expressão","soul_urge":"Impulso da Alma","personality":"Número de Personalidade","ebced_title":"Análise Abjad","kabala_title":"Análise Cabalística","total":"Total","reduced":"Número Reduzido"},
+    "bn": {"title":"নাম বিশ্লেষণ","expression":"প্রকাশ সংখ্যা","soul_urge":"আত্মার আকাঙ্ক্ষা","personality":"ব্যক্তিত্ব সংখ্যা","ebced_title":"আবজাদ বিশ্লেষণ","kabala_title":"কাবালা বিশ্লেষণ","total":"মোট","reduced":"হ্রাসকৃত সংখ্যা"},
+    "id": {"title":"Analisis Nama","expression":"Angka Ekspresi","soul_urge":"Dorongan Jiwa","personality":"Angka Kepribadian","ebced_title":"Analisis Abjad","kabala_title":"Analisis Kabbalah","total":"Total","reduced":"Angka Reduksi"},
+    "ur": {"title":"نام کا تجزیہ","expression":"اظہار نمبر","soul_urge":"روحانی خواہش","personality":"شخصیت نمبر","ebced_title":"ابجد تجزیہ","kabala_title":"کبالہ تجزیہ","total":"کل","reduced":"تخفیفی عدد"},
+    "it": {"title":"Analisi del Nome","expression":"Numero di Espressione","soul_urge":"Impulso dell'Anima","personality":"Numero di Personalità","ebced_title":"Analisi Abjad","kabala_title":"Analisi Kabbalistica","total":"Totale","reduced":"Numero Ridotto"},
+    "vi": {"title":"Phân Tích Tên","expression":"Số Biểu Đạt","soul_urge":"Số Ham Muốn Tâm Hồn","personality":"Số Nhân Cách","ebced_title":"Phân Tích Abjad","kabala_title":"Phân Tích Kabbalah","total":"Tổng","reduced":"Số Rút Gọn"},
+    "pl": {"title":"Analiza Imienia","expression":"Liczba Ekspresji","soul_urge":"Impuls Duszy","personality":"Liczba Osobowości","ebced_title":"Analiza Abjad","kabala_title":"Analiza Kabalistyczna","total":"Suma","reduced":"Liczba Zredukowana"},
+}
+
+# Ebced (Arabic Abjad) — traditional Islamic letter-number values mapped to Latin/Turkish
+_EBCED_MAP: dict[str, int] = {
+    'a':1,   'b':2,   'c':3,   'ç':3,   'd':4,   'e':5,   'f':80,
+    'g':3,   'ğ':1000,'h':8,   'ı':10,  'i':10,  'j':3,   'k':20,
+    'l':30,  'm':40,  'n':50,  'o':70,  'ö':70,  'p':80,  'q':100,
+    'r':200, 's':60,  'ş':300, 't':400, 'u':6,   'ü':6,   'v':6,
+    'w':6,   'x':60,  'y':10,  'z':7,
+}
+
+# Kabala (Hebrew Gematria — Mispar Hechrachi) mapped to Latin/Turkish letters
+_KABALA_MAP: dict[str, int] = {
+    'a':1,   'b':2,   'c':20,  'ç':3,   'd':4,   'e':5,   'f':80,
+    'g':3,   'ğ':3,   'h':8,   'ı':10,  'i':10,  'j':3,   'k':20,
+    'l':30,  'm':40,  'n':50,  'o':70,  'ö':70,  'p':80,  'q':100,
+    'r':200, 's':300, 'ş':300, 't':400, 'u':6,   'ü':6,   'v':6,
+    'w':6,   'x':60,  'y':10,  'z':7,
+}
+
+
+def _calculate_name_numerology(name: str, lang: str = "tr") -> dict:
+    """Pythagorean + Ebced + Kabala name numerology."""
+    clean = name.strip()
+    if not clean:
+        return {}
+
+    def reduce_master(n: int) -> int:
+        while n > 9 and n not in (11, 22, 33):
+            n = sum(int(d) for d in str(n))
+        return n
+
+    def reduce_simple(n: int) -> int:
+        while n > 9:
+            n = sum(int(d) for d in str(n))
+        return n or 9
+
+    low = clean.lower()
+
+    # — Pythagorean —
+    letters    = [ch for ch in low if ch in _PYTHAGOREAN]
+    vowels     = [ch for ch in low if ch in _VOWELS and ch in _PYTHAGOREAN]
+    consonants = [ch for ch in low if ch in _PYTHAGOREAN and ch not in _VOWELS]
+
+    if not letters:
+        return {}
+
+    expression  = reduce_master(sum(_PYTHAGOREAN[ch] for ch in letters))
+    soul_urge   = reduce_master(sum(_PYTHAGOREAN[ch] for ch in vowels))   if vowels   else 0
+    personality = reduce_master(sum(_PYTHAGOREAN[ch] for ch in consonants)) if consonants else 0
+
+    # — Ebced (Arabic Abjad) —
+    ebced_letters = [ch for ch in low if ch in _EBCED_MAP]
+    ebced_total   = sum(_EBCED_MAP[ch] for ch in ebced_letters)
+    ebced_reduced = reduce_simple(ebced_total)
+
+    # — Kabala (Hebrew Gematria) —
+    kab_letters   = [ch for ch in low if ch in _KABALA_MAP]
+    kabala_total  = sum(_KABALA_MAP[ch] for ch in kab_letters)
+    kabala_reduced = reduce_simple(kabala_total)
+
+    meaning_dict = _NUMEROLOGY_MEANINGS.get(lang, _NUMEROLOGY_MEANINGS["en"])
+    labels = _NAME_LABELS.get(lang, _NAME_LABELS["en"])
 
     return {
-        "life_path_number": life,
-        "life_path_meaning": meaning_dict.get(life, ""),
-        "day_number":   day,
-        "month_number": month,
-        "year_number":  year,
+        "name":               clean,
+        "expression_number":  expression,
+        "expression_meaning": meaning_dict.get(expression, ""),
+        "soul_urge_number":   soul_urge,
+        "soul_urge_meaning":  meaning_dict.get(soul_urge, ""),
+        "personality_number": personality,
+        "personality_meaning":meaning_dict.get(personality, ""),
+        "ebced": {
+            "total":   ebced_total,
+            "reduced": ebced_reduced,
+            "meaning": meaning_dict.get(ebced_reduced, ""),
+        },
+        "kabala": {
+            "total":   kabala_total,
+            "reduced": kabala_reduced,
+            "meaning": meaning_dict.get(kabala_reduced, ""),
+        },
+        "labels": labels,
     }

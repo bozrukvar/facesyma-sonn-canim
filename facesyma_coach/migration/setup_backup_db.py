@@ -69,43 +69,51 @@ def get_backup_db():
 
 def create_indexes(db):
     """Her koleksiyon için gerekli index'leri oluştur."""
-    _cidx = col.create_index
     print("Index'ler oluşturuluyor...")
 
     # 1. coach_attributes_{lang} — sıfat araması
     for lang in ALL_LANGS:
         col = db[f"coach_attributes_{lang}"]
-        _cidx([("_id", ASCENDING)])                          # sıfat adı
-        _cidx([("$**", TEXT)], name="fulltext_search")       # tam metin arama
+        col.create_index([("_id", ASCENDING)])                          # sıfat adı
+        col.create_index([("$**", TEXT)], name="fulltext_search")       # tam metin arama
         print(f"  coach_attributes_{lang} ✓")
 
     # 2. coach_users — kullanıcı koçluk profili
     col = db["coach_users"]
-    _cidx([("user_id",    ASCENDING)], unique=True)
-    _cidx([("birth_date", ASCENDING)])
-    _cidx([("lang",       ASCENDING)])
-    _cidx([("updated_at", DESCENDING)])
+    col.create_index([("user_id",    ASCENDING)], unique=True)
+    col.create_index([("birth_date", ASCENDING)])
+    col.create_index([("lang",       ASCENDING)])
+    col.create_index([("updated_at", DESCENDING)])
+    # compound indexes
+    col.create_index([("user_id", ASCENDING), ("lang", ASCENDING)])
+    col.create_index([("user_id", ASCENDING), ("updated_at", DESCENDING)])
     print("  coach_users ✓")
 
     # 3. coach_birth_data — astroloji cache
     col = db["coach_birth_data"]
-    _cidx([("user_id",    ASCENDING)], unique=True)
-    _cidx([("birth_date", ASCENDING)])
-    _cidx([("sun_sign",   ASCENDING)])
+    col.create_index([("user_id",    ASCENDING)], unique=True)
+    col.create_index([("birth_date", ASCENDING)])
+    col.create_index([("sun_sign",   ASCENDING)])
     print("  coach_birth_data ✓")
 
     # 4. coach_sessions — koç oturumları
     col = db["coach_sessions"]
-    _cidx([("user_id",    ASCENDING)])
-    _cidx([("session_date", DESCENDING)])
-    _cidx([("module",     ASCENDING)])
+    col.create_index([("user_id",      ASCENDING)])
+    col.create_index([("session_date", DESCENDING)])
+    col.create_index([("module",       ASCENDING)])
+    # compound indexes
+    col.create_index([("user_id", ASCENDING), ("module", ASCENDING)])
+    col.create_index([("user_id", ASCENDING), ("session_date", DESCENDING)])
     print("  coach_sessions ✓")
 
     # 5. coach_goals — kişisel hedef takibi
     col = db["coach_goals"]
-    _cidx([("user_id",  ASCENDING)])
-    _cidx([("status",   ASCENDING)])
-    _cidx([("due_date", ASCENDING)])
+    col.create_index([("user_id",  ASCENDING)])
+    col.create_index([("status",   ASCENDING)])
+    col.create_index([("due_date", ASCENDING)])
+    # compound indexes
+    col.create_index([("user_id", ASCENDING), ("status", ASCENDING)])
+    col.create_index([("user_id", ASCENDING), ("due_date", ASCENDING)])
     print("  coach_goals ✓")
 
     print("\nTüm index'ler oluşturuldu ✓")
@@ -237,8 +245,8 @@ def print_schema():
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
-    _addarg = p.add_argument
     p = argparse.ArgumentParser(description="Backup DB kurulum ve migrasyon")
+    _addarg = p.add_argument
     _addarg("--create-indexes", action="store_true")
     _addarg("--migrate",        action="store_true")
     _addarg("--all-langs",      action="store_true")

@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 _redis_client: Optional[redis.Redis] = None
+_redis_unavailable: bool = False  # sentinel: True once we confirmed Redis is down
 
 
 def get_redis() -> Optional[redis.Redis]:
@@ -43,7 +44,9 @@ def get_redis() -> Optional[redis.Redis]:
     Returns:
         redis.Redis instance or None if Redis is down
     """
-    global _redis_client
+    global _redis_client, _redis_unavailable
+    if _redis_unavailable:
+        return None
     if _redis_client is None:
         try:
             _redis_client = redis.Redis.from_url(
@@ -51,7 +54,7 @@ def get_redis() -> Optional[redis.Redis]:
                 decode_responses=False,  # raw bytes for pickle serialization
                 socket_connect_timeout=2,
                 socket_timeout=2,
-                retry_on_timeout=True,
+                retry_on_timeout=False,
                 health_check_interval=30,
             )
             # Verify connection
@@ -59,7 +62,8 @@ def get_redis() -> Optional[redis.Redis]:
             log.info(f"✓ Redis connected: {REDIS_URL}")
         except Exception as e:
             log.warning(f"⚠ Redis unavailable ({REDIS_URL}): {e}. Caching disabled.")
-            _redis_client = None  # Mark as unavailable but don't crash
+            _redis_client = None
+            _redis_unavailable = True  # stop retrying
 
     return _redis_client
 
