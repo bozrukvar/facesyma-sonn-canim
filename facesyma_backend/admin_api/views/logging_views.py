@@ -68,8 +68,8 @@ class LogAggregationView(View):
                 'ERROR':    [{'$match': {'level': 'ERROR',    'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
                 'CRITICAL': [{'$match': {'level': 'CRITICAL', 'timestamp': {'$gte': start_date}}}, {'$count': 'n'}],
             }}]), {})
-            stats = {lvl: (_ls.get(lvl, [{}])[0] or {}).get('n', 0) for lvl in ('INFO', 'WARNING', 'ERROR', 'CRITICAL')}
-            total_logs = (_ls.get('total', [{}])[0] or {}).get('n', 0)
+            stats = {lvl: (_ls.get(lvl, []) or [{}])[0].get('n', 0) for lvl in ('INFO', 'WARNING', 'ERROR', 'CRITICAL')}
+            total_logs = (_ls.get('total', []) or [{}])[0].get('n', 0)
 
             return JsonResponse({
                 'success': True,
@@ -182,7 +182,7 @@ class LogExportView(View):
                 query['level'] = level
 
             logs = list(log_col.find(query).sort('timestamp', -1).limit(10000))
-            _now_fmt = _now_fmt
+            _now_fmt = _now.strftime('%Y%m%d_%H%M%S')
 
             if format_type == 'csv':
                 output = StringIO()

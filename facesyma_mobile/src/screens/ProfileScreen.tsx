@@ -43,7 +43,7 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
   );
 
   const MENU = [
-    { icon:'👤', label: 'Hesabım',                          screen:'Account' },
+    { icon:'👤', label: t('profile.my_account', lang),       screen:'Account' },
     { icon:'📊', label: t('profile.my_analysis', lang),    screen:'History' },
     { icon:'💬', label: t('profile.my_chat', lang),        screen:'ChatHistory' },
     { icon:'🌍', label: t('profile.language', lang),       screen:'Language' },

@@ -71,7 +71,10 @@ class PushNotificationCampaignView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             db = _get_db()
             campaign_col = db['push_campaigns']
@@ -104,6 +107,83 @@ class PushNotificationCampaignView(View):
 
         except Exception as e:
             log.exception(f'Campaign creation error: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)
+
+    def patch(self, request):
+        """Send a push campaign. Body: {campaign_id, action: 'send'}"""
+        try:
+            _require_admin(request)
+        except ValueError as e:
+            return JsonResponse({'detail': str(e)}, status=401)
+        except PermissionError as e:
+            return JsonResponse({'detail': str(e)}, status=403)
+
+        try:
+            data = json.loads(request.body) if request.body else {}
+        except (json.JSONDecodeError, ValueError):
+            return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
+
+        campaign_id = (data.get('campaign_id') or '').strip()
+        action      = (data.get('action') or '').strip()
+
+        if not campaign_id or action != 'send':
+            return JsonResponse({'detail': 'campaign_id and action="send" required.'}, status=400)
+
+        try:
+            db           = _get_db()
+            campaign_col = db['push_campaigns']
+            users_col    = db['appfaceapi_myuser']
+
+            campaign = campaign_col.find_one({'campaign_id': campaign_id})
+            if not campaign:
+                return JsonResponse({'detail': 'Campaign not found.'}, status=404)
+            if campaign.get('status') == 'sent':
+                return JsonResponse({'detail': 'Campaign already sent.'}, status=400)
+
+            title          = campaign.get('title', '')
+            body           = campaign.get('body', '')
+            target_segment = campaign.get('target_segment', 'all')
+
+            # Build user query based on segment
+            user_query: dict = {'device_token': {'$exists': True, '$ne': None, '$ne': ''}}
+            if target_segment == 'premium':
+                user_query['plan'] = 'premium'
+            elif target_segment == 'free':
+                user_query['plan'] = 'free'
+
+            tokens = [
+                u['device_token']
+                for u in users_col.find(user_query, {'device_token': 1, '_id': 0})
+                if u.get('device_token')
+            ]
+
+            from facesyma_revize.push_service import send_multicast_chunked
+            result = send_multicast_chunked(tokens, title, body)
+
+            now_iso = datetime.utcnow().isoformat()
+            campaign_col.update_one(
+                {'campaign_id': campaign_id},
+                {'$set': {
+                    'status':           'sent',
+                    'sent_at':          now_iso,
+                    'target_count':     len(tokens),
+                    'stats.sent':       result['success'],
+                }},
+            )
+
+            log.info('Campaign %s sent: %s success, %s failure', campaign_id, result['success'], result['failure'])
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'campaign_id': campaign_id,
+                    'tokens_targeted': len(tokens),
+                    'sent':    result['success'],
+                    'failed':  result['failure'],
+                },
+            })
+
+        except Exception as e:
+            log.exception('Campaign send error: %s', e)
             return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
@@ -145,7 +225,10 @@ class NotificationTemplateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             db = _get_db()
             template_col = db['notification_templates']
@@ -217,7 +300,10 @@ class EmailCampaignView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             db = _get_db()
             email_col = db['email_campaigns']

@@ -403,15 +403,15 @@ class ModerationStatsView(View):
                 'resolved': [{'$match': {'created_at': {'$gte': start_date}, 'status': 'resolved'}}, {'$count': 'n'}],
             }}]), {})
             _rfget = _rf.get
-            total_reports    = (_rfget('total',    [{}])[0] or {}).get('n', 0)
-            pending_reports  = (_rfget('pending',  [{}])[0] or {}).get('n', 0)
-            resolved_reports = (_rfget('resolved', [{}])[0] or {}).get('n', 0)
+            total_reports    = (_rfget('total',    []) or [{}])[0].get('n', 0)
+            pending_reports  = (_rfget('pending',  []) or [{}])[0].get('n', 0)
+            resolved_reports = (_rfget('resolved', []) or [{}])[0].get('n', 0)
 
             _af = next(action_col.aggregate([{'$facet': {
                 action_type: [{'$match': {'created_at': {'$gte': start_date}, 'action': action_type}}, {'$count': 'n'}]
                 for action_type in _VALID_MOD_ACTIONS
             }}]), {})
-            actions = {at: (_af.get(at, [{}])[0] or {}).get('n', 0) for at in _VALID_MOD_ACTIONS}
+            actions = {at: (_af.get(at, []) or [{}])[0].get('n', 0) for at in _VALID_MOD_ACTIONS}
 
             return JsonResponse({
                 'success': True,

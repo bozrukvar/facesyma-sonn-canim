@@ -69,11 +69,11 @@ class LiveStatsView(View):
                                              'date_joined': {'$gte': today_start_iso}}},          {'$count': 'n'}],
             }}]), {})
             _luget = _u.get
-            active_users_5min       = (_luget('active5m',     [{}])[0] or {}).get('n', 0)
-            new_registrations_today = (_luget('reg_today',    [{}])[0] or {}).get('n', 0)
-            premium_users           = (_luget('premium',      [{}])[0] or {}).get('n', 0)
-            web_users_today         = (_luget('web_today',    [{}])[0] or {}).get('n', 0)
-            mobile_users_today      = (_luget('mobile_today', [{}])[0] or {}).get('n', 0)
+            active_users_5min       = (_luget('active5m',     []) or [{}])[0].get('n', 0)
+            new_registrations_today = (_luget('reg_today',    []) or [{}])[0].get('n', 0)
+            premium_users           = (_luget('premium',      []) or [{}])[0].get('n', 0)
+            web_users_today         = (_luget('web_today',    []) or [{}])[0].get('n', 0)
+            mobile_users_today      = (_luget('mobile_today', []) or [{}])[0].get('n', 0)
             mrr = premium_users * 9.99
 
             _h = next(history_col.aggregate([{'$facet': {
@@ -82,9 +82,9 @@ class LiveStatsView(View):
                 'mobile_analyses':  [{'$match': {'app_source': {'$ne': 'web'}, 'created_at': {'$gte': today_start_ts}}}, {'$count': 'n'}],
             }}]), {})
             _hget = _h.get
-            analyses_today       = (_hget('analyses_today',  [{}])[0] or {}).get('n', 0)
-            web_analyses_today   = (_hget('web_analyses',    [{}])[0] or {}).get('n', 0)
-            mobile_analyses_today= (_hget('mobile_analyses', [{}])[0] or {}).get('n', 0)
+            analyses_today        = (_hget('analyses_today',  []) or [{}])[0].get('n', 0)
+            web_analyses_today    = (_hget('web_analyses',    []) or [{}])[0].get('n', 0)
+            mobile_analyses_today = (_hget('mobile_analyses', []) or [{}])[0].get('n', 0)
 
             kpis = {
                 'active_users_5min': active_users_5min,
@@ -145,8 +145,8 @@ class LiveStatsView(View):
                 }}
             ]), {})
             _erget = _er.get
-            total_requests = (_erget('total',  [{}])[0] or {}).get('n', 0)
-            error_requests = (_erget('errors', [{}])[0] or {}).get('n', 0)
+            total_requests = (_erget('total',  []) or [{}])[0].get('n', 0)
+            error_requests = (_erget('errors', []) or [{}])[0].get('n', 0)
             rate_pct = round((error_requests / total_requests) * 100, 2) if total_requests else 0.0
 
             return {'total_requests': total_requests, 'errors': error_requests, 'rate_pct': rate_pct}
@@ -167,7 +167,7 @@ class LiveStatsView(View):
                 {'$group': {'_id': {'$floor': {'$divide': [{'$subtract': ['$created_at', today_start_ts]}, 3600]}},
                             'count': {'$sum': 1}}},
             ])
-            if isinstance((_id := doc['_id']), (int, float))
+            if isinstance(doc['_id'], (int, float))
         }
 
         reg_agg = {

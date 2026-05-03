@@ -26,6 +26,9 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Any
 
+# Add parent dir so 'core' package is importable when run directly
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 try:
     import chromadb
     from chromadb.config import Settings
@@ -33,7 +36,7 @@ except ImportError:
     print("ERROR: chromadb not installed. Run: pip install chromadb")
     sys.exit(1)
 
-from embedder import embed_text
+from rag.embedder import embed_text, embed_texts_batch
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -41,7 +44,8 @@ logging.basicConfig(
     format='%(asctime)s | %(levelname)s | %(message)s'
 )
 
-CHROMA_PATH = os.environ.get("CHROMA_PATH", "./chroma_db")
+_DEFAULT_CHROMA_PATH = str(Path(__file__).parent.parent / "chroma_db")
+CHROMA_PATH = os.environ.get("CHROMA_PATH", _DEFAULT_CHROMA_PATH)
 DATA_PATH = Path(__file__).parent / "data"
 
 
@@ -91,39 +95,33 @@ def populate_sifat_profiles(lang: str = "tr"):
         metadata={"description": f"Sifat profiles in {lang}"}
     )
 
-    # Add sifatlar
+    # Collect then batch-embed
     sifatlar = data.get("sifatlar", [])
     total = len(sifatlar)
 
+    ids, docs, metas = [], [], []
     for idx, sifat in enumerate(sifatlar, 1):
+        _sget = sifat.get
+        sifat_name = _sget("name", f"sifat_{idx}")
+        description = _sget("description", "")
+        if not description:
+            continue
+        ids.append(sifat_name)
+        docs.append(description)
+        metas.append({"sifat": sifat_name, "lang": lang, "type": "sifat_profile"})
+
+    BATCH = 50
+    for start in range(0, len(ids), BATCH):
+        b_ids  = ids[start:start+BATCH]
+        b_docs = docs[start:start+BATCH]
+        b_meta = metas[start:start+BATCH]
+        embs = embed_texts_batch(b_docs)
+        collection.add(ids=b_ids, documents=b_docs, embeddings=embs, metadatas=b_meta)
         try:
-            _sget = sifat.get
-            sifat_name = _sget("name", f"sifat_{idx}")
-            description = _sget("description", "")
-
-            if not description:
-                continue
-
-            # Generate embedding
-            embedding = embed_text(description)
-
-            # Add to collection
-            collection.add(
-                ids=[sifat_name],
-                documents=[description],
-                embeddings=[embedding],
-                metadatas=[{
-                    "sifat": sifat_name,
-                    "lang": lang,
-                    "type": "sifat_profile"
-                }]
-            )
-
-            if idx % 50 == 0:
-                _info(f"  → Processed {idx}/{total} sifatlar...")
-
-        except Exception as e:
-            log.error(f"Error processing sifat {sifat_name}: {e}")
+            collection.query(query_embeddings=[embs[0]], n_results=1, include=[])
+        except Exception:
+            pass
+        _info(f"  → Processed {min(start+BATCH, len(ids))}/{len(ids)} sifatlar...")
 
     _info(f"✓ Loaded {total} sifat profiles into {collection_name}")
 
@@ -154,38 +152,29 @@ def populate_celebrities():
         metadata={"description": "Celebrity and historical figure profiles"}
     )
 
-    # Add profiles
+    # Collect then batch-embed
     profiles = data.get("profiles", [])
     total = len(profiles)
 
+    ids, docs, metas = [], [], []
     for idx, profile in enumerate(profiles, 1):
-        try:
-            _pget = profile.get
-            name = _pget("name", f"profile_{idx}")
-            description = _pget("description", "")
+        _pget = profile.get
+        name = _pget("name", f"profile_{idx}")
+        description = _pget("description", "")
+        if not description:
+            descs = _pget("descriptions", {})
+            if isinstance(descs, dict):
+                description = descs.get("en") or descs.get("tr") or next(iter(descs.values()), "")
+            else:
+                description = str(descs)
+        if not description:
+            continue
+        ids.append(name)
+        docs.append(description)
+        metas.append({"name": name, "category": _pget("category", "celebrity"), "type": "celebrity_profile"})
 
-            if not description:
-                continue
-
-            embedding = embed_text(description)
-
-            collection.add(
-                ids=[name],
-                documents=[description],
-                embeddings=[embedding],
-                metadatas=[{
-                    "name": name,
-                    "category": _pget("category", "celebrity"),
-                    "type": "celebrity_profile"
-                }]
-            )
-
-            if idx % 10 == 0:
-                _info(f"  → Processed {idx}/{total} profiles...")
-
-        except Exception as e:
-            log.error(f"Error processing {name}: {e}")
-
+    embs = embed_texts_batch(docs)
+    collection.add(ids=ids, documents=docs, embeddings=embs, metadatas=metas)
     _info(f"✓ Loaded {total} celebrity profiles")
 
 
@@ -215,36 +204,32 @@ def populate_golden_ratio_guide():
         metadata={"description": "Golden ratio score interpretations"}
     )
 
-    # Add ranges
+    # Collect then batch-embed
     ranges = data.get("ranges", [])
     total = len(ranges)
 
+    ids, docs, metas = [], [], []
     for idx, range_item in enumerate(ranges, 1):
-        try:
-            _riget = range_item.get
-            range_id = f"ratio_{idx}"
-            description = _riget("description", "")
+        _riget = range_item.get
+        descriptions   = _riget("descriptions", {})
+        interpretations = _riget("interpretations", {})
+        description  = " | ".join(v for v in descriptions.values() if v) if isinstance(descriptions, dict) else str(descriptions)
+        interp_text  = " | ".join(v for v in interpretations.values() if v) if isinstance(interpretations, dict) else str(interpretations)
+        full_text = f"{interp_text} {description}".strip()
+        if not full_text:
+            continue
+        ids.append(f"ratio_{idx}")
+        docs.append(full_text)
+        metas.append({
+            "min": _riget("min", 0),
+            "max": _riget("max", 1),
+            "interpretation_en": interpretations.get("en", "") if isinstance(interpretations, dict) else "",
+            "interpretation_tr": interpretations.get("tr", "") if isinstance(interpretations, dict) else "",
+            "type": "golden_ratio_range"
+        })
 
-            if not description:
-                continue
-
-            embedding = embed_text(description)
-
-            collection.add(
-                ids=[range_id],
-                documents=[description],
-                embeddings=[embedding],
-                metadatas=[{
-                    "min": _riget("min", 0),
-                    "max": _riget("max", 1),
-                    "interpretation": _riget("interpretation", ""),
-                    "type": "golden_ratio_range"
-                }]
-            )
-
-        except Exception as e:
-            log.error(f"Error processing golden ratio range: {e}")
-
+    embs = embed_texts_batch(docs)
+    collection.add(ids=ids, documents=docs, embeddings=embs, metadatas=metas)
     _info(f"✓ Loaded {total} golden ratio ranges")
 
 
@@ -274,38 +259,39 @@ def populate_personality_types():
         metadata={"description": "Sifat to personality type mappings"}
     )
 
-    # Add mappings
-    mappings = data.get("mappings", [])
+    # Collect then batch-embed
+    mappings = data.get("personality_types", data.get("mappings", []))
     total = len(mappings)
 
+    ids, docs, metas = [], [], []
     for idx, mapping in enumerate(mappings, 1):
+        _mapget = mapping.get
+        sifat = _mapget("sifat_tr", _mapget("sifat", f"sifat_{idx}"))
+        description = _mapget("description", "")
+        if not description:
+            continue
+        ids.append(sifat)
+        docs.append(description)
+        metas.append({
+            "sifat": sifat,
+            "sifat_en": _mapget("sifat_en", sifat),
+            "mbti": _mapget("mbti", "") if isinstance(_mapget("mbti", ""), str) else str(_mapget("mbti", "")),
+            "big_five": json.dumps(_mapget("big_five", ""), ensure_ascii=False) if isinstance(_mapget("big_five", ""), dict) else str(_mapget("big_five", "")),
+            "type": "personality_mapping"
+        })
+
+    BATCH = 50
+    for start in range(0, len(ids), BATCH):
+        b_ids  = ids[start:start+BATCH]
+        b_docs = docs[start:start+BATCH]
+        b_meta = metas[start:start+BATCH]
+        embs = embed_texts_batch(b_docs)
+        collection.add(ids=b_ids, documents=b_docs, embeddings=embs, metadatas=b_meta)
         try:
-            _mapget = mapping.get
-            sifat = _mapget("sifat", f"sifat_{idx}")
-            description = _mapget("description", "")
-
-            if not description:
-                continue
-
-            embedding = embed_text(description)
-
-            collection.add(
-                ids=[sifat],
-                documents=[description],
-                embeddings=[embedding],
-                metadatas=[{
-                    "sifat": sifat,
-                    "mbti": _mapget("mbti", ""),
-                    "big_five": _mapget("big_five", ""),
-                    "type": "personality_mapping"
-                }]
-            )
-
-            if idx % 50 == 0:
-                _info(f"  → Processed {idx}/{total} mappings...")
-
-        except Exception as e:
-            log.error(f"Error processing {sifat}: {e}")
+            collection.query(query_embeddings=[embs[0]], n_results=1, include=[])
+        except Exception:
+            pass
+        _info(f"  → Processed {min(start+BATCH, len(ids))}/{len(ids)} mappings...")
 
     _info(f"✓ Loaded {total} personality type mappings")
 
@@ -344,43 +330,35 @@ def populate_sifat_characteristics(lang: str = "tr"):
         metadata={"description": f"Sifat characteristic sentences in {lang}"}
     )
 
-    # Add sifatlar with their sentences
+    # Collect all sentences then batch-embed in chunks of 50
     sifatlar = data.get("sifatlar", [])
     total_sifatlar = len(sifatlar)
-    total_documents = 0
 
+    ids, docs, metas = [], [], []
     for sifat_idx, sifat in enumerate(sifatlar, 1):
+        _sget = sifat.get
+        sifat_name = _sget("name", f"sifat_{sifat_idx}")
+        for sentence_no, sentence in enumerate(_sget("cumleler", []), 1):
+            if not sentence or not isinstance(sentence, str):
+                continue
+            ids.append(f"{sifat_name}_{sentence_no}")
+            docs.append(sentence)
+            metas.append({"sifat": sifat_name, "lang": lang, "sentence_no": sentence_no, "type": "characteristic"})
+
+    total_documents = len(ids)
+    BATCH = 50
+    for start in range(0, total_documents, BATCH):
+        b_ids  = ids[start:start+BATCH]
+        b_docs = docs[start:start+BATCH]
+        b_meta = metas[start:start+BATCH]
+        embs = embed_texts_batch(b_docs)
+        collection.add(ids=b_ids, documents=b_docs, embeddings=embs, metadatas=b_meta)
         try:
-            _sget = sifat.get
-            sifat_name = _sget("name", f"sifat_{sifat_idx}")
-            cumleler = _sget("cumleler", [])
-
-            # Each sentence is a separate document for semantic search
-            for sentence_no, sentence in enumerate(cumleler, 1):
-                if not sentence or not isinstance(sentence, str):
-                    continue
-
-                doc_id = f"{sifat_name}_{sentence_no}"
-                embedding = embed_text(sentence)
-
-                collection.add(
-                    ids=[doc_id],
-                    documents=[sentence],
-                    embeddings=[embedding],
-                    metadatas=[{
-                        "sifat": sifat_name,
-                        "lang": lang,
-                        "sentence_no": sentence_no,
-                        "type": "characteristic"
-                    }]
-                )
-                total_documents += 1
-
-            if sifat_idx % 50 == 0:
-                _info(f"  → Processed {sifat_idx}/{total_sifatlar} sifatlar...")
-
-        except Exception as e:
-            log.error(f"Error processing sifat {sifat_name}: {e}")
+            collection.query(query_embeddings=[embs[0]], n_results=1, include=[])
+        except Exception:
+            pass
+        if start % 500 == 0:
+            _info(f"  → Embedded {min(start+BATCH, total_documents)}/{total_documents} sentences...")
 
     _info(f"✓ Loaded {total_sifatlar} sifatlar with {total_documents} characteristic sentences into {collection_name}")
 

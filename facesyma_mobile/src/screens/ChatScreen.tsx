@@ -5,6 +5,7 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
   Dimensions, Animated, ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ChatAPI } from '../services/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -15,7 +16,7 @@ const AnimatedView = Animated.View;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { ScreenProps } from '../navigation/types';
+import type { ScreenProps, AppNavProp } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +27,14 @@ interface Message {
   timestamp: number;
 }
 
-const TEST_MARKER = '[TEST_QUESTIONS]';
+const TEST_MARKER    = '[TEST_QUESTIONS]';
+const NAVIGATE_RE    = /\[NAVIGATE:([A-Za-z]+)\]([\s\S]+)$/;
+
+interface NavAction {
+  screen: string;
+  params: Record<string, unknown>;
+  label:  string;
+}
 
 interface TestQuestion {
   q_id: string;
@@ -56,7 +64,7 @@ const TestQuestionsCard = ({
 
   const handleSubmit = () => {
     const lines = questions.map(q => `${q.order}. ${q.text} → ${answers[q.q_id]}`).join('\n');
-    onSubmit(lang === 'tr' ? `Test cevaplarım:\n${lines}` : `My answers:\n${lines}`);
+    onSubmit(`${t('chat.test_answers_prefix', lang)}\n${lines}`);
   };
 
   return (
@@ -96,7 +104,7 @@ const TestQuestionsCard = ({
       {allAnswered && (
         <TouchableOpacity style={tStyles.submitBtn} onPress={handleSubmit}>
           <Text style={tStyles.submitText}>
-            {lang === 'tr' ? 'Sonuçları Gör →' : 'See Results →'}
+            {t('chat.see_results', lang)}
           </Text>
         </TouchableOpacity>
       )}
@@ -104,7 +112,111 @@ const TestQuestionsCard = ({
   );
 };
 
+// ── Navigasyon aksiyon kartı ──────────────────────────────────────────────────
+const ActionCard = ({ screen, params, label }: NavAction) => {
+  const nav = useNavigation<AppNavProp>();
+  return (
+    <TouchableOpacity
+      style={acStyles.card}
+      onPress={() => (nav as any).navigate(screen, params)}
+      activeOpacity={0.8}
+    >
+      <Text style={acStyles.label}>{label}</Text>
+      <Text style={acStyles.arrow}>→</Text>
+    </TouchableOpacity>
+  );
+};
+
+const acStyles = StyleSheet.create({
+  card: {
+    marginTop: 6,
+    maxWidth: Dimensions.get('window').width * 0.72,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth: 1,
+    borderColor: `${colors.warmAmber}60`,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.sm,
+  },
+  label: { ...typography.label, color: colors.textWarm, flex: 1, fontSize: 13 },
+  arrow: { fontSize: 16, color: colors.gold, fontWeight: '700' as const },
+});
+
 const keyExtractor = (m: Message) => m.id;
+
+// ── Modül hızlı erişim menüsü ─────────────────────────────────────────────────
+interface ModuleItem {
+  emoji: string;
+  labelKey: string;
+  triggers: Record<string, string>;
+}
+
+const MODULE_QUICK_ITEMS: ModuleItem[] = [
+  { emoji: '🎭', labelKey: 'similarity.discover',  triggers: { tr: 'Benzerlerimi görmek istiyorum',   en: 'Show me my character matches'  } },
+  { emoji: '🍽', labelKey: 'features.diet',          triggers: { tr: 'Diyet planımı görmek istiyorum', en: 'Show my diet plan'              } },
+  { emoji: '👥', labelKey: 'features.twins',        triggers: { tr: 'Ruhsal ikizim kimdir?',           en: 'Who are my character twins?'   } },
+  { emoji: '📋', labelKey: 'features.assessment',  triggers: { tr: 'Test geçmişimi görmek istiyorum', en: 'Show my assessment history'    } },
+  { emoji: '🏆', labelKey: 'features.leaderboard', triggers: { tr: 'Sıralamamı görmek istiyorum',     en: 'Show leaderboard'              } },
+  { emoji: '🎯', labelKey: 'features.missions',    triggers: { tr: 'Görevlerimi görmek istiyorum',    en: 'Show my missions'              } },
+  { emoji: '🌟', labelKey: 'features.daily',       triggers: { tr: 'Günlük mesajımı almak istiyorum', en: 'Give me my daily message'      } },
+  { emoji: '🎨', labelKey: 'features.art',         triggers: { tr: 'Bana yakın sanat eserini göster', en: 'Show my art match'             } },
+  { emoji: '👗', labelKey: 'features.fashion',     triggers: { tr: 'Tarz önerisi istiyorum',           en: 'Give me style advice'          } },
+  { emoji: '🤝', labelKey: 'features.communities', triggers: { tr: 'Topluluk alanını aç',              en: 'Open communities'              } },
+  { emoji: '🏅', labelKey: 'features.badges',      triggers: { tr: 'Rozetlerimi görmek istiyorum',    en: 'Show my badges'                } },
+  { emoji: '💰', labelKey: 'features.coinWallet',  triggers: { tr: 'Coin cüzdanımı görmek istiyorum', en: 'Show my coin wallet'           } },
+];
+
+const ModuleMenuBar = ({
+  lang,
+  onSelect,
+}: { lang: string; onSelect: (trigger: string) => void }) => (
+  <View style={mmStyles.wrap}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={mmStyles.row}>
+      {MODULE_QUICK_ITEMS.map(item => {
+        const label = t(item.labelKey as any, lang) || item.labelKey;
+        const trigger = item.triggers[lang] ?? item.triggers.en;
+        return (
+          <TouchableOpacity
+            key={item.labelKey}
+            style={mmStyles.chip}
+            onPress={() => onSelect(trigger)}
+            activeOpacity={0.75}
+          >
+            <Text style={mmStyles.chipEmoji}>{item.emoji}</Text>
+            <Text style={mmStyles.chipLabel} numberOfLines={1}>{label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+);
+
+const mmStyles = StyleSheet.create({
+  wrap: {
+    borderTopWidth: 1,
+    borderTopColor: `${colors.gold}20`,
+    backgroundColor: colors.background,
+    paddingVertical: spacing.xs,
+  },
+  row: { paddingHorizontal: spacing.md, gap: spacing.sm },
+  chip: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 5,
+    backgroundColor: colors.warmAmberGlow,
+    borderWidth: 1,
+    borderColor: `${colors.warmAmber}40`,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  chipEmoji: { fontSize: 14 },
+  chipLabel: { ...typography.caption, color: colors.textWarm, fontSize: 11, maxWidth: 80 },
+});
 
 const getQuickQuestions = (lang: string) => [
   t('chat.quick_question_1', lang),
@@ -168,6 +280,24 @@ const MessageBubble = ({ item, onTestSubmit }: { item: Message; onTestSubmit?: (
     try { testData = JSON.parse(item.content.slice(TEST_MARKER.length)); } catch {}
   }
 
+  // Parse navigate action marker
+  let navAction: NavAction | null = null;
+  let displayContent = item.content;
+  if (!isUser && !isTestMessage) {
+    const navMatch = NAVIGATE_RE.exec(item.content);
+    if (navMatch) {
+      try {
+        const parsed = JSON.parse(navMatch[2].trim());
+        navAction = {
+          screen: navMatch[1],
+          params: parsed.params ?? {},
+          label:  parsed.label  ?? `→ ${navMatch[1]}`,
+        };
+        displayContent = item.content.replace(navMatch[0], '').trim();
+      } catch {}
+    }
+  }
+
   return (
     <AnimatedView style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
       {isTestMessage && testData ? (
@@ -180,13 +310,22 @@ const MessageBubble = ({ item, onTestSubmit }: { item: Message; onTestSubmit?: (
           {!isUser && (
             <View style={styles.aiAvatar}><Text style={styles.aiAvatarIcon}>✨</Text></View>
           )}
-          <View style={[
-            isUser ? styles.bubbleUser : styles.bubbleAI,
-            isUser && shadow.gold,
-          ]}>
-            <Text style={isUser ? styles.bubbleUserText : styles.bubbleAIText}>
-              {item.content}
-            </Text>
+          <View style={styles.bubbleColWrap}>
+            <View style={[
+              isUser ? styles.bubbleUser : styles.bubbleAI,
+              isUser && shadow.gold,
+            ]}>
+              <Text style={isUser ? styles.bubbleUserText : styles.bubbleAIText}>
+                {displayContent}
+              </Text>
+            </View>
+            {navAction && (
+              <ActionCard
+                screen={navAction.screen}
+                params={navAction.params}
+                label={navAction.label}
+              />
+            )}
           </View>
         </View>
       )}
@@ -204,14 +343,15 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
   const { lang }          = useLanguage();
   const QUICK_QUESTIONS = useMemo(() => getQuickQuestions(lang), [lang]);
 
-  const [messages,     setMessages]     = useState<Message[]>([]);
-  const [input,        setInput]        = useState('');
-  const [convId,       setConvId]       = useState<string | null>(null);
-  const [loading,      setLoading]      = useState(false);
-  const [initializing, setInitializing] = useState(true);
-  const [error,        setError]        = useState('');
-  const [showQuick,    setShowQuick]    = useState(true);
-  const [chatUsage,    setChatUsage]    = useState<{used: number; limit: number; plan: string} | null>(null);
+  const [messages,       setMessages]       = useState<Message[]>([]);
+  const [input,          setInput]          = useState('');
+  const [convId,         setConvId]         = useState<string | null>(null);
+  const [loading,        setLoading]        = useState(false);
+  const [initializing,   setInitializing]   = useState(true);
+  const [error,          setError]          = useState('');
+  const [showQuick,      setShowQuick]      = useState(true);
+  const [showModuleMenu, setShowModuleMenu] = useState(false);
+  const [chatUsage,      setChatUsage]      = useState<{used: number; limit: number; plan: string} | null>(null);
 
   const listRef = useRef<FlatList>(null);
 
@@ -287,13 +427,13 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
   if (!hasAnalysisResult && modulesUsed.length < CHAT_MIN_MODULES) {
     const remaining = CHAT_MIN_MODULES - modulesUsed.length;
     const MODULE_LIST = [
-      { key: 'face_analysis', icon: '🔍', label: lang.startsWith('tr') ? 'Yüz Analizi'   : 'Face Analysis' },
-      { key: 'astrology',     icon: '⭐', label: lang.startsWith('tr') ? 'Astroloji'      : 'Astrology'     },
-      { key: 'twins',         icon: '👥', label: lang.startsWith('tr') ? 'İkizler'        : 'Twins'         },
-      { key: 'art_match',     icon: '🎨', label: lang.startsWith('tr') ? 'Sanat Eşleşme'  : 'Art Match'     },
-      { key: 'assessment',    icon: '📋', label: lang.startsWith('tr') ? 'Değerlendirme'  : 'Assessment'    },
-      { key: 'fashion',       icon: '👗', label: lang.startsWith('tr') ? 'Moda'           : 'Fashion'       },
-      { key: 'daily',         icon: '🌟', label: lang.startsWith('tr') ? 'Günlük Mesaj'   : 'Daily Message' },
+      { key: 'face_analysis', icon: '🔍', label: t('features.analysis', lang)   },
+      { key: 'astrology',     icon: '⭐', label: t('features.astrology', lang)  },
+      { key: 'twins',         icon: '👥', label: t('features.twins', lang)      },
+      { key: 'art_match',     icon: '🎨', label: t('features.art', lang)        },
+      { key: 'assessment',    icon: '📋', label: t('features.assessment', lang) },
+      { key: 'fashion',       icon: '👗', label: t('features.fashion', lang)    },
+      { key: 'daily',         icon: '🌟', label: t('features.daily', lang)      },
     ];
     return (
       <View style={[gateStyles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
@@ -302,12 +442,10 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
         </TouchableOpacity>
         <Text style={gateStyles.lockIcon}>🔒</Text>
         <Text style={gateStyles.title}>
-          {lang.startsWith('tr') ? 'AI Sohbet Kilitli' : 'AI Chat Locked'}
+          {t('chat.gate_title', lang)}
         </Text>
         <Text style={gateStyles.subtitle}>
-          {lang.startsWith('tr')
-            ? `Chat'i açmak için ${remaining} modül daha dene`
-            : `Try ${remaining} more module${remaining > 1 ? 's' : ''} to unlock chat`}
+          {t('chat.gate_subtitle', lang).replace('{n}', String(remaining))}
         </Text>
         {/* İlerleme */}
         <View style={gateStyles.progressRow}>
@@ -376,12 +514,20 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={startConversation}
-          style={styles.newBtn}
-        >
-          <Text style={styles.newBtnText}>{t('chat.new', lang)}</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => setShowModuleMenu(v => !v)}
+            style={[styles.newBtn, showModuleMenu && styles.newBtnActive]}
+          >
+            <Text style={styles.newBtnText}>{showModuleMenu ? '✕' : '⊞'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={startConversation}
+            style={styles.newBtn}
+          >
+            <Text style={styles.newBtnText}>{t('chat.new', lang)}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Mesajlar */}
@@ -396,8 +542,19 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
         showsVerticalScrollIndicator={false}
       />
 
+      {/* Modül menüsü */}
+      {showModuleMenu && !loading && (
+        <ModuleMenuBar
+          lang={lang}
+          onSelect={(trigger) => {
+            setShowModuleMenu(false);
+            sendMessage(trigger);
+          }}
+        />
+      )}
+
       {/* Hızlı sorular */}
-      {showQuick && messages.length <= 1 && !loading && (
+      {showQuick && messages.length <= 1 && !loading && !showModuleMenu && (
         <View style={styles.quickWrap}>
           <Text style={styles.quickLabel}>{t('chat.quick_ask', lang)}</Text>
           <View style={styles.quickRow}>
@@ -536,12 +693,14 @@ const styles = StyleSheet.create({
   },
   usageBar: { height: 3, borderRadius: 2, backgroundColor: colors.gold, maxWidth: 52 },
   usageText: { ...typography.caption, fontSize: 9, color: colors.textMuted },
+  headerActions: { flexDirection: 'row' as const, gap: spacing.xs },
   newBtn: {
     paddingHorizontal:12, paddingVertical:6,
     borderRadius: radius.full,
     borderWidth:1, borderColor: colors.border,
     width:44, alignItems:'center',
   },
+  newBtnActive: { borderColor: colors.gold, backgroundColor: colors.warmAmberGlow },
   newBtnText: { ...typography.caption, color: colors.textMuted, fontSize:11 },
 
   // Mesajlar
@@ -550,8 +709,9 @@ const styles = StyleSheet.create({
     paddingVertical:   spacing.md,
     gap: spacing.sm,
   },
-  msgRowUser: { flexDirection:'row-reverse', marginBottom:8 },
-  msgRowAI:   { flexDirection:'row', alignItems:'flex-end', gap:8, marginBottom:8 },
+  msgRowUser:    { flexDirection:'row-reverse', marginBottom:8 },
+  msgRowAI:      { flexDirection:'row', alignItems:'flex-end', gap:8, marginBottom:8 },
+  bubbleColWrap: { flexDirection:'column' as const, alignItems:'flex-start' as const, gap:0 },
 
   aiAvatar: {
     width:30, height:30, borderRadius:15,

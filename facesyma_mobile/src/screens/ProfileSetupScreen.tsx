@@ -17,12 +17,12 @@ import type { ScreenProps } from '../navigation/types';
 const { width } = Dimensions.get('window');
 
 const CURRENT_YEAR = new Date().getFullYear();
-const BIRTH_YEARS  = Array.from({ length: CURRENT_YEAR - 1924 }, (_, i) => CURRENT_YEAR - 13 - i); // 13+ yaş
+const BIRTH_YEARS  = Array.from({ length: CURRENT_YEAR - 1924 }, (_, i) => CURRENT_YEAR - 13 - i);
 
 const GENDERS = [
-  { key: 'female',            icon: '♀',  label: 'Kadın' },
-  { key: 'male',              icon: '♂',  label: 'Erkek' },
-  { key: 'prefer_not_to_say', icon: '—', label: 'Belirtmek istemiyorum' },
+  { key: 'female',            icon: '♀'  },
+  { key: 'male',              icon: '♂'  },
+  { key: 'prefer_not_to_say', icon: '—' },
 ];
 
 const SKIN_TONES = [
@@ -35,36 +35,34 @@ const SKIN_TONES = [
 ];
 
 const HAIR_COLORS = [
-  { key: 'black',      color: '#111111', label: 'Siyah' },
-  { key: 'brown',      color: '#6B3A2A', label: 'Kahve' },
-  { key: 'blonde',     color: '#F5D76E', label: 'Sarı' },
-  { key: 'red',        color: '#C0392B', label: 'Kızıl' },
-  { key: 'white_gray', color: '#CCCCCC', label: 'Gri/Beyaz' },
-  { key: 'other',      color: '#9B59B6', label: 'Diğer' },
+  { key: 'black',      color: '#111111' },
+  { key: 'brown',      color: '#6B3A2A' },
+  { key: 'blonde',     color: '#F5D76E' },
+  { key: 'red',        color: '#C0392B' },
+  { key: 'white_gray', color: '#CCCCCC' },
+  { key: 'other',      color: '#9B59B6' },
 ];
 
 const EYE_COLORS = [
-  { key: 'brown',      color: '#6B3A2A', label: 'Kahve' },
-  { key: 'black',      color: '#111111', label: 'Siyah' },
-  { key: 'blue',       color: '#2E86C1', label: 'Mavi' },
-  { key: 'green',      color: '#1E8449', label: 'Yeşil' },
-  { key: 'hazel',      color: '#7D6608', label: 'Ela' },
-  { key: 'gray',       color: '#808B96', label: 'Gri' },
+  { key: 'brown', color: '#6B3A2A' },
+  { key: 'black', color: '#111111' },
+  { key: 'blue',  color: '#2E86C1' },
+  { key: 'green', color: '#1E8449' },
+  { key: 'hazel', color: '#7D6608' },
+  { key: 'gray',  color: '#808B96' },
 ];
 
 const GOALS = [
-  { key: 'self_discovery', icon: '🔮', label: 'Kendimi keşfet' },
-  { key: 'style',          icon: '👗', label: 'Stil & Moda' },
-  { key: 'career',         icon: '💼', label: 'Kariyer' },
-  { key: 'fun',            icon: '🎉', label: 'Eğlence' },
+  { key: 'self_discovery', icon: '🔮' },
+  { key: 'style',          icon: '👗' },
+  { key: 'career',         icon: '💼' },
+  { key: 'fun',            icon: '🎉' },
 ];
 
 const COUNTRIES: { code: string; flag: string; name: string }[] = [
-  // Türkçe
   { code: 'TR', flag: '🇹🇷', name: 'Türkiye' },
   { code: 'AZ', flag: '🇦🇿', name: 'Azerbaycan' },
   { code: 'CY', flag: '🇨🇾', name: 'Kıbrıs' },
-  // İngilizce
   { code: 'US', flag: '🇺🇸', name: 'United States' },
   { code: 'GB', flag: '🇬🇧', name: 'United Kingdom' },
   { code: 'CA', flag: '🇨🇦', name: 'Canada' },
@@ -77,20 +75,17 @@ const COUNTRIES: { code: string; flag: string; name: string }[] = [
   { code: 'GH', flag: '🇬🇭', name: 'Ghana' },
   { code: 'PH', flag: '🇵🇭', name: 'Philippines' },
   { code: 'SG', flag: '🇸🇬', name: 'Singapore' },
-  // Almanca
   { code: 'DE', flag: '🇩🇪', name: 'Germany' },
   { code: 'AT', flag: '🇦🇹', name: 'Austria' },
   { code: 'CH', flag: '🇨🇭', name: 'Switzerland' },
   { code: 'LU', flag: '🇱🇺', name: 'Luxembourg' },
   { code: 'LI', flag: '🇱🇮', name: 'Liechtenstein' },
-  // Rusça
   { code: 'RU', flag: '🇷🇺', name: 'Russia' },
   { code: 'UA', flag: '🇺🇦', name: 'Ukraine' },
   { code: 'BY', flag: '🇧🇾', name: 'Belarus' },
   { code: 'KZ', flag: '🇰🇿', name: 'Kazakhstan' },
   { code: 'KG', flag: '🇰🇬', name: 'Kyrgyzstan' },
   { code: 'TJ', flag: '🇹🇯', name: 'Tajikistan' },
-  // Arapça
   { code: 'SA', flag: '🇸🇦', name: 'Saudi Arabia' },
   { code: 'EG', flag: '🇪🇬', name: 'Egypt' },
   { code: 'AE', flag: '🇦🇪', name: 'UAE' },
@@ -113,7 +108,6 @@ const COUNTRIES: { code: string; flag: string; name: string }[] = [
   { code: 'SO', flag: '🇸🇴', name: 'Somalia' },
   { code: 'DJ', flag: '🇩🇯', name: 'Djibouti' },
   { code: 'KM', flag: '🇰🇲', name: 'Comoros' },
-  // İspanyolca
   { code: 'ES', flag: '🇪🇸', name: 'Spain' },
   { code: 'MX', flag: '🇲🇽', name: 'Mexico' },
   { code: 'CO', flag: '🇨🇴', name: 'Colombia' },
@@ -133,19 +127,14 @@ const COUNTRIES: { code: string; flag: string; name: string }[] = [
   { code: 'NI', flag: '🇳🇮', name: 'Nicaragua' },
   { code: 'CR', flag: '🇨🇷', name: 'Costa Rica' },
   { code: 'PA', flag: '🇵🇦', name: 'Panama' },
-  // Korece
   { code: 'KR', flag: '🇰🇷', name: 'South Korea' },
-  // Japonca
   { code: 'JP', flag: '🇯🇵', name: 'Japan' },
-  // Çince
   { code: 'CN', flag: '🇨🇳', name: 'China' },
   { code: 'TW', flag: '🇹🇼', name: 'Taiwan' },
   { code: 'HK', flag: '🇭🇰', name: 'Hong Kong' },
-  // Hintçe / Urduca / Bengalce
   { code: 'IN', flag: '🇮🇳', name: 'India' },
   { code: 'PK', flag: '🇵🇰', name: 'Pakistan' },
   { code: 'BD', flag: '🇧🇩', name: 'Bangladesh' },
-  // Fransızca
   { code: 'FR', flag: '🇫🇷', name: 'France' },
   { code: 'BE', flag: '🇧🇪', name: 'Belgium' },
   { code: 'MC', flag: '🇲🇨', name: 'Monaco' },
@@ -167,7 +156,6 @@ const COUNTRIES: { code: string; flag: string; name: string }[] = [
   { code: 'HT', flag: '🇭🇹', name: 'Haiti' },
   { code: 'GA', flag: '🇬🇦', name: 'Gabon' },
   { code: 'CF', flag: '🇨🇫', name: 'Cent. African Rep.' },
-  // Portekizce
   { code: 'PT', flag: '🇵🇹', name: 'Portugal' },
   { code: 'BR', flag: '🇧🇷', name: 'Brazil' },
   { code: 'AO', flag: '🇦🇴', name: 'Angola' },
@@ -175,22 +163,34 @@ const COUNTRIES: { code: string; flag: string; name: string }[] = [
   { code: 'CV', flag: '🇨🇻', name: 'Cape Verde' },
   { code: 'GW', flag: '🇬🇼', name: 'Guinea-Bissau' },
   { code: 'TL', flag: '🇹🇱', name: 'Timor-Leste' },
-  // Endonezce
   { code: 'ID', flag: '🇮🇩', name: 'Indonesia' },
-  // Vietnamca
   { code: 'VN', flag: '🇻🇳', name: 'Vietnam' },
-  // İtalyanca
   { code: 'IT', flag: '🇮🇹', name: 'Italy' },
   { code: 'SM', flag: '🇸🇲', name: 'San Marino' },
-  // Lehçe
   { code: 'PL', flag: '🇵🇱', name: 'Poland' },
-  // Diğer
   { code: 'OTHER', flag: '🌍', name: 'Other' },
 ];
 
-type Step = 'birth_year' | 'gender' | 'country' | 'skin_tone' | 'hair_color' | 'eye_color' | 'goal';
-const STEPS: Step[] = ['birth_year', 'gender', 'country', 'skin_tone', 'hair_color', 'eye_color', 'goal'];
-const REQUIRED_STEPS = 3; // birth_year, gender, country zorunlu
+const INTERESTS: { key: string; icon: string }[] = [
+  { key: 'music',      icon: '🎵' }, { key: 'film',        icon: '🎬' },
+  { key: 'sport',      icon: '🏃' }, { key: 'travel',      icon: '✈️' },
+  { key: 'food',       icon: '🍽️' }, { key: 'art',         icon: '🎨' },
+  { key: 'tech',       icon: '💻' }, { key: 'nature',      icon: '🌿' },
+  { key: 'fashion',    icon: '👗' }, { key: 'gaming',      icon: '🎮' },
+  { key: 'literature', icon: '📚' }, { key: 'health',      icon: '🏥' },
+];
+
+const LIFESTYLES: { key: string; icon: string }[] = [
+  { key: 'vegan',        icon: '🥗' }, { key: 'athlete',      icon: '🏋️' },
+  { key: 'meditation',   icon: '🧘' }, { key: 'freelancer',   icon: '💼' },
+  { key: 'parent',       icon: '👨‍👩‍👧' }, { key: 'student',      icon: '🎓' },
+  { key: 'digital_nomad', icon: '🌍' }, { key: 'minimalist',  icon: '🪴' },
+];
+
+type Lang = string;
+type Step = 'birth_year' | 'gender' | 'country' | 'interests' | 'lifestyle' | 'skin_tone' | 'hair_color' | 'eye_color' | 'goal';
+const STEPS: Step[] = ['birth_year', 'gender', 'country', 'interests', 'lifestyle', 'skin_tone', 'hair_color', 'eye_color', 'goal'];
+const REQUIRED_STEPS = 5;
 
 const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
   const insets   = useSafeAreaInsets();
@@ -202,6 +202,8 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
   const [birthYear,  setBirthYear]  = useState<number | null>(null);
   const [gender,     setGender]     = useState<string | null>(null);
   const [country,    setCountry]    = useState<string | null>(null);
+  const [interests,  setInterests]  = useState<string[]>([]);
+  const [lifestyle,  setLifestyle]  = useState<string[]>([]);
   const [skinTone,   setSkinTone]   = useState<string | null>(null);
   const [hairColor,  setHairColor]  = useState<string | null>(null);
   const [eyeColor,   setEyeColor]   = useState<string | null>(null);
@@ -215,7 +217,9 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
     if (step === 'birth_year') return birthYear !== null;
     if (step === 'gender')     return gender !== null;
     if (step === 'country')    return country !== null;
-    return true; // optional steps always passable
+    if (step === 'interests')  return interests.length >= 1;
+    if (step === 'lifestyle')  return lifestyle.length >= 1;
+    return true;
   };
 
   const handleNext = async () => {
@@ -234,33 +238,33 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
 
   const handleFinish = async () => {
     const payload: Record<string, unknown> = { onboarding_completed: true };
-    if (birthYear)  payload.birth_year  = birthYear;
-    if (gender)     payload.gender      = gender;
-    if (country)    payload.country     = country;
-    if (skinTone)   payload.skin_tone   = skinTone;
-    if (hairColor)  payload.hair_color  = hairColor;
-    if (eyeColor)   payload.eye_color   = eyeColor;
-    if (goal)       payload.goal        = goal;
+    if (birthYear)         payload.birth_year  = birthYear;
+    if (gender)            payload.gender      = gender;
+    if (country)           payload.country     = country;
+    if (interests.length)  payload.interests   = interests;
+    if (lifestyle.length)  payload.lifestyle   = lifestyle;
+    if (skinTone)          payload.skin_tone   = skinTone;
+    if (hairColor)         payload.hair_color  = hairColor;
+    if (eyeColor)          payload.eye_color   = eyeColor;
+    if (goal)              payload.goal        = goal;
 
     const r = await dispatch(updateProfile(payload));
     if (updateProfile.fulfilled.match(r)) {
       navigation.replace('Main');
     } else {
-      Alert.alert('Hata', 'Bilgiler kaydedilemedi. Daha sonra profilden tamamlayabilirsiniz.');
+      Alert.alert('', t('profile_setup.error', lang));
       navigation.replace('Main');
     }
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Başlık */}
       <View style={styles.header}>
-        <Text style={styles.title}>Seni tanıyalım ✨</Text>
+        <Text style={styles.title}>{t('profile_setup.title', lang)}</Text>
         <Text style={styles.subtitle}>
           {stepIdx + 1} / {STEPS.length}
-          {isOptionalStep ? '  (isteğe bağlı)' : ''}
+          {isOptionalStep ? `  ${t('profile_setup.optional', lang)}` : ''}
         </Text>
-        {/* İlerleme çubuğu */}
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${((stepIdx + 1) / STEPS.length) * 100}%` }]} />
         </View>
@@ -272,33 +276,38 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
         showsVerticalScrollIndicator={false}
       >
         {step === 'birth_year' && (
-          <StepBirthYear value={birthYear} onChange={setBirthYear} />
+          <StepBirthYear value={birthYear} onChange={setBirthYear} lang={lang} />
         )}
         {step === 'gender' && (
-          <StepGender value={gender} onChange={setGender} />
+          <StepGender value={gender} onChange={setGender} lang={lang} />
         )}
         {step === 'country' && (
-          <StepCountry value={country} onChange={setCountry} />
+          <StepCountry value={country} onChange={setCountry} lang={lang} />
+        )}
+        {step === 'interests' && (
+          <StepInterests value={interests} onChange={setInterests} lang={lang} />
+        )}
+        {step === 'lifestyle' && (
+          <StepLifestyle value={lifestyle} onChange={setLifestyle} lang={lang} />
         )}
         {step === 'skin_tone' && (
-          <StepSkinTone value={skinTone} onChange={setSkinTone} />
+          <StepSkinTone value={skinTone} onChange={setSkinTone} lang={lang} />
         )}
         {step === 'hair_color' && (
-          <StepHairColor value={hairColor} onChange={setHairColor} />
+          <StepHairColor value={hairColor} onChange={setHairColor} lang={lang} />
         )}
         {step === 'eye_color' && (
-          <StepEyeColor value={eyeColor} onChange={setEyeColor} />
+          <StepEyeColor value={eyeColor} onChange={setEyeColor} lang={lang} />
         )}
         {step === 'goal' && (
-          <StepGoal value={goal} onChange={setGoal} />
+          <StepGoal value={goal} onChange={setGoal} lang={lang} />
         )}
       </ScrollView>
 
-      {/* Alt butonlar */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
         {isOptionalStep && (
           <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
-            <Text style={styles.skipText}>Atla</Text>
+            <Text style={styles.skipText}>{t('profile_setup.skip', lang)}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -310,7 +319,9 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
           {isLoading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text style={styles.nextText}>{isLast ? 'Başla 🚀' : 'Devam Et'}</Text>
+            <Text style={styles.nextText}>
+              {isLast ? t('profile_setup.start', lang) : t('profile_setup.continue', lang)}
+            </Text>
           )}
         </TouchableOpacity>
       </View>
@@ -320,10 +331,12 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
 
 // ── Step bileşenleri ──────────────────────────────────────────────────────────
 
-const StepBirthYear = ({ value, onChange }: { value: number | null; onChange: (v: number) => void }) => (
+const StepBirthYear = ({
+  value, onChange, lang,
+}: { value: number | null; onChange: (v: number) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Doğum yılın nedir?</Text>
-    <Text style={styles.stepHint}>Kişiselleştirilmiş analizler için kullanılır.</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.birth_year_title', lang)}</Text>
+    <Text style={styles.stepHint}>{t('profile_setup.birth_year_hint', lang)}</Text>
     <ScrollView style={styles.yearScroll} showsVerticalScrollIndicator={false}>
       {BIRTH_YEARS.map(y => (
         <TouchableOpacity
@@ -339,9 +352,11 @@ const StepBirthYear = ({ value, onChange }: { value: number | null; onChange: (v
   </View>
 );
 
-const StepGender = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => (
+const StepGender = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Cinsiyetin nedir?</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.gender_title', lang)}</Text>
     <View style={styles.genderGrid}>
       {GENDERS.map(g => (
         <TouchableOpacity
@@ -351,14 +366,18 @@ const StepGender = ({ value, onChange }: { value: string | null; onChange: (v: s
           activeOpacity={0.8}
         >
           <Text style={styles.genderIcon}>{g.icon}</Text>
-          <Text style={[styles.cardLabel, value === g.key && styles.cardLabelSelected]}>{g.label}</Text>
+          <Text style={[styles.cardLabel, value === g.key && styles.cardLabelSelected]}>
+            {t(`profile_setup.gender_${g.key}` as any, lang)}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>
   </View>
 );
 
-const StepCountry = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => {
+const StepCountry = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
 
@@ -368,18 +387,16 @@ const StepCountry = ({ value, onChange }: { value: string | null; onChange: (v: 
     ) : COUNTRIES,
   [q]);
 
-  // If user typed something not matched by any country code, show custom option
-  const hasExact = filtered.some(c => c.code === value);
   const customCode = `CUSTOM:${query.trim()}`;
   const showCustom = q.length >= 2 && filtered.length === 0;
 
   return (
     <View>
-      <Text style={styles.stepTitle}>Hangi ülkedesin?</Text>
-      <Text style={styles.stepHint}>Bölgeye özgü içerikler için kullanılır.</Text>
+      <Text style={styles.stepTitle}>{t('profile_setup.country_title', lang)}</Text>
+      <Text style={styles.stepHint}>{t('profile_setup.country_hint', lang)}</Text>
       <TextInput
         style={styles.countrySearch}
-        placeholder="Ülke ara..."
+        placeholder={t('profile_setup.country_search', lang)}
         placeholderTextColor={colors.textMuted}
         value={query}
         onChangeText={setQuery}
@@ -415,10 +432,12 @@ const StepCountry = ({ value, onChange }: { value: string | null; onChange: (v: 
   );
 };
 
-const StepSkinTone = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => (
+const StepSkinTone = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Cilt tonun hangisi?</Text>
-    <Text style={styles.stepHint}>Renk analizi ve makyaj önerileri için kullanılır.</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.skin_tone_title', lang)}</Text>
+    <Text style={styles.stepHint}>{t('profile_setup.skin_tone_hint', lang)}</Text>
     <View style={styles.skinGrid}>
       {SKIN_TONES.map(s => (
         <TouchableOpacity
@@ -439,9 +458,11 @@ const StepSkinTone = ({ value, onChange }: { value: string | null; onChange: (v:
   </View>
 );
 
-const StepHairColor = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => (
+const StepHairColor = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Saç rengin nedir?</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.hair_color_title', lang)}</Text>
     <View style={styles.skinGrid}>
       {HAIR_COLORS.map(h => (
         <TouchableOpacity
@@ -456,16 +477,20 @@ const StepHairColor = ({ value, onChange }: { value: string | null; onChange: (v
     </View>
     <View style={styles.skinLabels}>
       {HAIR_COLORS.map(h => (
-        <Text key={h.key} style={[styles.skinLabel, value === h.key && { color: colors.gold }]}>{h.label}</Text>
+        <Text key={h.key} style={[styles.skinLabel, value === h.key && { color: colors.gold }]}>
+          {t(`profile_setup.hair_${h.key}` as any, lang)}
+        </Text>
       ))}
     </View>
   </View>
 );
 
-const StepEyeColor = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => (
+const StepEyeColor = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Göz rengin nedir?</Text>
-    <Text style={styles.stepHint}>Renk analizi ve makyaj önerileri için kullanılır.</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.eye_color_title', lang)}</Text>
+    <Text style={styles.stepHint}>{t('profile_setup.eye_color_hint', lang)}</Text>
     <View style={styles.skinGrid}>
       {EYE_COLORS.map(e => (
         <TouchableOpacity
@@ -480,15 +505,19 @@ const StepEyeColor = ({ value, onChange }: { value: string | null; onChange: (v:
     </View>
     <View style={styles.skinLabels}>
       {EYE_COLORS.map(e => (
-        <Text key={e.key} style={[styles.skinLabel, value === e.key && { color: colors.gold }]}>{e.label}</Text>
+        <Text key={e.key} style={[styles.skinLabel, value === e.key && { color: colors.gold }]}>
+          {t(`profile_setup.eye_${e.key}` as any, lang)}
+        </Text>
       ))}
     </View>
   </View>
 );
 
-const StepGoal = ({ value, onChange }: { value: string | null; onChange: (v: string) => void }) => (
+const StepGoal = ({
+  value, onChange, lang,
+}: { value: string | null; onChange: (v: string) => void; lang: Lang }) => (
   <View>
-    <Text style={styles.stepTitle}>Facesyma'yı ne için kullanacaksın?</Text>
+    <Text style={styles.stepTitle}>{t('profile_setup.goal_title', lang)}</Text>
     <View style={styles.goalGrid}>
       {GOALS.map(g => (
         <TouchableOpacity
@@ -498,12 +527,86 @@ const StepGoal = ({ value, onChange }: { value: string | null; onChange: (v: str
           activeOpacity={0.8}
         >
           <Text style={styles.goalIcon}>{g.icon}</Text>
-          <Text style={[styles.cardLabel, value === g.key && styles.cardLabelSelected]}>{g.label}</Text>
+          <Text style={[styles.cardLabel, value === g.key && styles.cardLabelSelected]}>
+            {t(`profile_setup.goal_${g.key}` as any, lang)}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>
   </View>
 );
+
+const StepInterests = ({
+  value, onChange, lang,
+}: { value: string[]; onChange: (v: string[]) => void; lang: Lang }) => {
+  const toggle = (key: string) => {
+    if (value.includes(key)) {
+      onChange(value.filter(k => k !== key));
+    } else if (value.length < 3) {
+      onChange([...value, key]);
+    }
+  };
+  return (
+    <View>
+      <Text style={styles.stepTitle}>{t('profile_setup.interests_title', lang)}</Text>
+      <Text style={styles.stepHint}>{t('profile_setup.interests_desc', lang)}</Text>
+      <View style={styles.chipGrid}>
+        {INTERESTS.map(item => {
+          const selected = value.includes(item.key);
+          return (
+            <TouchableOpacity
+              key={item.key}
+              style={[styles.chipItem, selected && styles.chipItemSelected]}
+              onPress={() => toggle(item.key)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.chipEmoji}>{item.icon}</Text>
+              <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
+                {t(`interest.${item.key}` as any, lang) !== `interest.${item.key}` ? t(`interest.${item.key}` as any, lang) : item.key}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+const StepLifestyle = ({
+  value, onChange, lang,
+}: { value: string[]; onChange: (v: string[]) => void; lang: Lang }) => {
+  const toggle = (key: string) => {
+    if (value.includes(key)) {
+      onChange(value.filter(k => k !== key));
+    } else if (value.length < 3) {
+      onChange([...value, key]);
+    }
+  };
+  return (
+    <View>
+      <Text style={styles.stepTitle}>{t('profile_setup.lifestyle_title', lang)}</Text>
+      <Text style={styles.stepHint}>{t('profile_setup.lifestyle_desc', lang)}</Text>
+      <View style={styles.chipGrid}>
+        {LIFESTYLES.map(item => {
+          const selected = value.includes(item.key);
+          return (
+            <TouchableOpacity
+              key={item.key}
+              style={[styles.chipItem, selected && styles.chipItemSelected]}
+              onPress={() => toggle(item.key)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.chipEmoji}>{item.icon}</Text>
+              <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
+                {t(`lifestyle.${item.key}` as any, lang) !== `lifestyle.${item.key}` ? t(`lifestyle.${item.key}` as any, lang) : item.key.replace('_', ' ')}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
 
 // ── Stiller ───────────────────────────────────────────────────────────────────
 
@@ -532,7 +635,6 @@ const styles = StyleSheet.create({
   skipText:    { ...typography.caption, color: colors.textMuted },
   stepTitle:   { ...typography.h2, fontSize: 18, color: colors.textPrimary, marginTop: spacing.lg, marginBottom: spacing.sm },
   stepHint:    { ...typography.caption, color: colors.textMuted, marginBottom: spacing.lg },
-  // Yıl seçici
   yearScroll:  { maxHeight: 300 },
   yearItem:    {
     height: 48, justifyContent: 'center', paddingHorizontal: spacing.md,
@@ -541,7 +643,6 @@ const styles = StyleSheet.create({
   yearItemSelected: { backgroundColor: colors.goldGlow, borderWidth: 1, borderColor: colors.gold },
   yearText:         { ...typography.body, color: colors.textMuted, fontSize: 16 },
   yearTextSelected: { color: colors.gold, fontWeight: '700' as const },
-  // Cinsiyet
   genderGrid:  { gap: spacing.sm, marginTop: spacing.md },
   genderCard:  {
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
@@ -552,7 +653,6 @@ const styles = StyleSheet.create({
   cardSelected:    { borderColor: colors.gold, backgroundColor: colors.goldGlow },
   cardLabel:       { ...typography.body, color: colors.textMuted },
   cardLabelSelected: { color: colors.gold, fontWeight: '700' as const },
-  // Ülke
   countrySearch: {
     height: 44, backgroundColor: colors.surface,
     borderRadius: radius.md, borderWidth: 1, borderColor: colors.border,
@@ -570,7 +670,6 @@ const styles = StyleSheet.create({
   chipSelected: { borderColor: colors.gold, backgroundColor: colors.goldGlow },
   chipText:     { ...typography.caption, color: colors.textMuted, fontSize: 12 },
   chipTextSelected: { color: colors.gold, fontWeight: '700' as const },
-  // Cilt tonu & saç rengi
   skinGrid:    { flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl, justifyContent: 'center' },
   skinCircle:  {
     width: 52, height: 52, borderRadius: 26,
@@ -581,7 +680,6 @@ const styles = StyleSheet.create({
   skinCheck:   { color: '#fff', fontSize: 18, fontWeight: '900' as const, textShadowColor: '#0008', textShadowRadius: 4 },
   skinLabels:  { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm, justifyContent: 'center' },
   skinLabel:   { ...typography.caption, color: colors.textMuted, fontSize: 10, width: 52, textAlign: 'center' as const },
-  // Hedef
   goalGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.md },
   goalCard: {
     width: (width - spacing.lg * 2 - spacing.md) / 2,
@@ -590,6 +688,17 @@ const styles = StyleSheet.create({
     alignItems: 'center', gap: spacing.sm,
   },
   goalIcon: { fontSize: 36 },
+  chipGrid:          { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: spacing.md },
+  chipItem:          {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderRadius: radius.full, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  chipItemSelected:  { borderColor: colors.gold, backgroundColor: colors.goldGlow },
+  chipEmoji:         { fontSize: 18 },
+  chipLabel:         { ...typography.caption, color: colors.textMuted, fontSize: 13 },
+  chipLabelSelected: { color: colors.gold, fontWeight: '700' as const },
 });
 
 export default ProfileSetupScreen;

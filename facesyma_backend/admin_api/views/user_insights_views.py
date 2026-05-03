@@ -205,7 +205,7 @@ class UserModuleUsageView(View):
         _frget2 = facet_result.get
         by_mode        = {(doc['_id'] or 'unknown'): doc['count'] for doc in _frget2('by_mode', [])}
         top_users_list = [{'user_id': doc['_id'], 'analysis_count': doc['count']} for doc in _frget2('top_users', [])]
-        total_analyses = (_frget2('total', [{}])[0] or {}).get('n', 0)
+        total_analyses = (_frget2('total', []) or [{}])[0].get('n', 0)
         trend_by_date  = {doc['_id']: doc['count'] for doc in _frget2('trend_7d', [])}
 
         mode_trend_7d = {}

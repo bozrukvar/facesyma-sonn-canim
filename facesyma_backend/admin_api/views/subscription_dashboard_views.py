@@ -58,12 +58,12 @@ class SubscriptionMetricsView(View):
                 ],
             }}]), {})
             _smget = _sm.get
-            active_count  = (_smget('active',   [{}])[0] or {}).get('n', 0)
-            cancelled_30d = (_smget('cancel30', [{}])[0] or {}).get('n', 0)
-            new_7d        = (_smget('new7d',    [{}])[0] or {}).get('n', 0)
+            active_count  = (_smget('active',   []) or [{}])[0].get('n', 0)
+            cancelled_30d = (_smget('cancel30', []) or [{}])[0].get('n', 0)
+            new_7d        = (_smget('new7d',    []) or [{}])[0].get('n', 0)
             by_tier       = _smget('by_tier', [])
 
-            mrr = sum((_tg := tier.get)('count', 0) * _tg('avg_price', 0) for tier in by_tier) if by_tier else 0
+            mrr = sum(tier.get('count', 0) * tier.get('avg_price', 0) for tier in by_tier) if by_tier else 0
             churn_rate = (cancelled_30d / active_count * 100) if active_count > 0 else 0
 
             return JsonResponse({
@@ -77,9 +77,9 @@ class SubscriptionMetricsView(View):
                 },
                 'by_tier': [
                     {
-                        'tier': (_tg := tier.get)('_id', 'unknown'),
-                        'count': (_tc := _tg('count', 0)),
-                        'estimated_mrr': round(_tc * _tg('avg_price', 0), 2)
+                        'tier': tier.get('_id', 'unknown'),
+                        'count': tier.get('count', 0),
+                        'estimated_mrr': round(tier.get('count', 0) * tier.get('avg_price', 0), 2)
                     }
                     for tier in by_tier
                 ]
@@ -164,7 +164,10 @@ class UserSubscriptionDetailView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'error': 'Invalid JSON.'}, status=400)
             _admin_email = admin_payload.get('email', 'admin')
             _now = datetime.utcnow()
             _now_iso = _now.isoformat()

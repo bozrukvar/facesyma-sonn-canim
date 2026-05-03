@@ -37,7 +37,10 @@ class BulkUserUpdateView(View):
         """Birden fazla kullanıcının plan/status'ünü güncelle"""
         try:
             _require_admin(request)
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             user_ids = _dget('user_ids', [])
             plan = _dget('plan')
@@ -130,7 +133,10 @@ class BulkUserDeleteView(View):
             if payload.get('role') != 'superadmin':
                 return JsonResponse({'detail': 'Bulk delete requires superadmin role.'}, status=403)
 
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             user_ids = data.get('user_ids', [])
 
             if not user_ids:
@@ -143,9 +149,9 @@ class BulkUserDeleteView(View):
                 return JsonResponse({'detail': 'Maximum 50 users per bulk delete.'}, status=400)
 
             # MongoDB delete
-            db = _get_db()
-            users_col = db['appfaceapi_myuser']
-            analysis_col = db['analysis_history']
+            users_col = get_users_col()
+            from admin_api.utils.mongo import get_history_col
+            analysis_col = get_history_col()
 
             # Delete users
             user_result = users_col.delete_many({'id': {'$in': user_ids}})

@@ -57,9 +57,9 @@ class BackupManagementView(View):
                 'failed':  [{'$match': {'status': 'failed'}},  {'$count': 'n'}],
             }}]), {})
             _bget = _bs.get
-            total_backups = (_bget('total',   [{}])[0] or {}).get('n', 0)
-            successful    = (_bget('success', [{}])[0] or {}).get('n', 0)
-            failed        = (_bget('failed',  [{}])[0] or {}).get('n', 0)
+            total_backups = (_bget('total',   []) or [{}])[0].get('n', 0)
+            successful    = (_bget('success', []) or [{}])[0].get('n', 0)
+            failed        = (_bget('failed',  []) or [{}])[0].get('n', 0)
 
             return JsonResponse({
                 'success': True,
@@ -85,7 +85,10 @@ class BackupManagementView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                data = {}
             backup_type = str(data.get('backup_type', 'full'))
             if backup_type not in ('full', 'incremental'):
                 backup_type = 'full'
@@ -138,7 +141,10 @@ class RestoreView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             backup_id = _dget('backup_id')
             target_collections = _dget('target_collections', 'all')
@@ -229,7 +235,10 @@ class BackupScheduleView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                data = {}
             backup_db = _get_backup_db()
             schedule_col = backup_db['backup_schedules']
 

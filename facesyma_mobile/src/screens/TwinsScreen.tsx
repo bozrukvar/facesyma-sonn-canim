@@ -287,7 +287,7 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
             })}
 
             <GoldButton
-              title={lang.startsWith('tr') ? '🤖 AI ile Konuş' : '🤖 Chat with AI'}
+              title={t('twins.chat_with_ai', lang)}
               onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
               style={styles.aiChatBtn}
             />

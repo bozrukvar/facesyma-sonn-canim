@@ -10,6 +10,7 @@ Two-phase detection:
 
 import json
 import logging
+import os
 import requests
 import re
 from typing import Optional, Dict
@@ -17,7 +18,7 @@ from ..modules import get_registry
 
 log = logging.getLogger(__name__)
 
-OLLAMA_URL = "http://ollama:11434"
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://ollama:11434")
 _RE_JSON_BLOCK = re.compile(r'\{.*\}', re.DOTALL)
 _RE_DATE_YMD = re.compile(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})')
 _RE_DATE_DMY = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})')

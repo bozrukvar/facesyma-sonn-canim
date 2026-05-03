@@ -40,20 +40,22 @@ const getToken = async (): Promise<string | null> => {
 // ── Servis URL'leri ────────────────────────────────────────────────────────────
 // Tek Django backend — tüm endpoint'ler /api/v1/ altında
 const SERVICES = {
-  analysis: 'https://api.facesyma.com/api/v1/analysis',
-  auth:     'https://api.facesyma.com/api/v1/auth',
-  chat:     'https://api.facesyma.com/api/v1/chat',
-  twins:    'https://api.facesyma.com/api/v1/analysis',
-  art:      'https://api.facesyma.com/api/v1/analysis',
+  analysis:      'https://api.facesyma.com/api/v1/analysis',
+  auth:          'https://api.facesyma.com/api/v1/auth',
+  chat:          'https://api.facesyma.com/api/v1/chat',
+  twins:         'https://api.facesyma.com/api/v1/analysis',
+  art:           'https://api.facesyma.com/api/v1/analysis',
+  gamification:  'https://api.facesyma.com/api/v1/gamification',
 };
 
 // Geliştirme ortamı (local)
 const DEV_SERVICES = {
-  analysis: 'http://10.0.2.2/api/v1/analysis',  // Android emülatör → nginx port 80
-  auth:     'http://10.0.2.2/api/v1/auth',
-  chat:     'http://10.0.2.2/api/v1/chat',
-  twins:    'http://10.0.2.2/api/v1/analysis',
-  art:      'http://10.0.2.2/api/v1/analysis',
+  analysis:      'http://10.0.2.2/api/v1/analysis',  // Android emülatör → nginx port 80
+  auth:          'http://10.0.2.2/api/v1/auth',
+  chat:          'http://10.0.2.2/api/v1/chat',
+  twins:         'http://10.0.2.2/api/v1/analysis',
+  art:           'http://10.0.2.2/api/v1/analysis',
+  gamification:  'http://10.0.2.2/api/v1/gamification',
 };
 
 const IS_DEV = __DEV__;
@@ -159,6 +161,15 @@ export const AuthAPI = {
     return res.data;
   },
 
+  // Şifre sıfırlama onayı (e-postadan alınan token + yeni şifre)
+  confirmResetPassword: async (token: string, newPassword: string) => {
+    const res = await authClient.post('/password/reset/confirm/', {
+      token,
+      new_password: newPassword,
+    });
+    return res.data;
+  },
+
   // Şifre değiştir (authenticated — eski şifre gerekli)
   changePassword: async (oldPassword: string, newPassword: string) => {
     const res = await authClient.post('/password/change/', {
@@ -204,6 +215,18 @@ export const AuthAPI = {
     } catch {
       return null;
     }
+  },
+
+  // FCM push token kaydet / güncelle
+  registerDeviceToken: async (token: string, platform: 'ios' | 'android' | string) => {
+    const res = await authClient.post('/device-token/', { device_token: token, platform });
+    return res.data;
+  },
+
+  // FCM push token kaldır (logout'ta çağrılır)
+  removeDeviceToken: async () => {
+    const res = await authClient.delete('/device-token/');
+    return res.data;
   },
 };
 
@@ -253,7 +276,7 @@ export const AnalysisAPI = {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     });
-    return res.data;
+    return res.data?.data ?? res.data;
   },
 
   // Twins analizi
@@ -282,7 +305,7 @@ export const AnalysisAPI = {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     });
-    return res.data;
+    return res.data?.data ?? res.data;
   },
 
   // Sonuç geçmişi
@@ -307,6 +330,39 @@ export const AnalysisAPI = {
   getDailyMotivation: async (lang = 'tr') => {
     const res = await analysisClient.get('/daily/', { params: { lang } });
     return res.data;
+  },
+
+  // Altın oran overlay (annotated face image + measurements)
+  analyzeGoldenOverlay: async (imageUri: string, lang = 'tr') => {
+    const formData = new FormData();
+    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
+    formData.append('lang', lang);
+    const res = await analysisClient.post('/analyze/golden/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
+    });
+    return res.data?.data ?? res.data;
+  },
+
+  // Altın oran before/after transform (gerçek ölçümler ile)
+  analyzeGoldenTransform: async (imageUri: string, lang = 'tr', realMeasurements?: any[]) => {
+    const formData = new FormData();
+    formData.append('image', { uri: imageUri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
+    formData.append('lang', lang);
+    if (realMeasurements) formData.append('real_measurements', JSON.stringify(realMeasurements));
+    const res = await analysisClient.post('/analyze/golden/transform/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
+    });
+    return res.data?.data ?? res.data;
+  },
+
+  // Karakter benzerliği — arketip sistemi
+  getSimilarities: async (sifatlar: string[], lang = 'tr') => {
+    const res = await analysisClient.post('/analyze/similarity/', { sifatlar, lang }, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return res.data?.data ?? res.data;
   },
 
   // Topluluklar
@@ -579,8 +635,8 @@ export const CoachAPI = {
   getProfile: async (userId: number) => (await coachAxios.get(`/coach/profile/${encodeURIComponent(userId)}`)).data,
   analyzeWithCoach: async (analysisResult: object, lang = 'tr', modules?: string[]) =>
     (await coachAxios.post('/coach/analyze', { analysis_result: analysisResult, lang, include_modules: modules })).data,
-  birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr') =>
-    (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang })).data,
+  birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr', name?: string) =>
+    (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang, name: name || undefined })).data,
   getGoals: async (userId: number, status?: string) =>
     (await coachAxios.get(`/coach/goals/${encodeURIComponent(userId)}`, { params: status ? { status } : {} })).data,
   addGoal: async (data: { title: string; module?: string; target_date?: string; priority?: string }) =>
@@ -599,4 +655,470 @@ export const CoachAPI = {
     kategori,
     top_n: 3,
   })).data,
+};
+
+// ── Diet Coaching API (FastAPI :8002, routed through nginx /diet/) ───────────
+// Serves meal recommendations per country (120 ISO-3166 country codes)
+const dietAxios = axios.create({ baseURL: AI_CHAT_BASE, timeout: 30000 });
+dietAxios.interceptors.request.use(async (cfg) => {
+  const token = await AsyncStorage.getItem('access_token');
+  if (token) cfg.headers.Authorization = `Bearer ${token}`;
+  return cfg;
+});
+dietAxios.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const cfg = error.config;
+    if (error.response?.status === 401 && !cfg._retried) {
+      cfg._retried = true;
+      try {
+        const refresh = await AsyncStorage.getItem('refresh_token');
+        if (refresh) {
+          const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
+          const newToken = res.data.access;
+          await AsyncStorage.setItem('access_token', newToken);
+          cfg.headers.Authorization = `Bearer ${newToken}`;
+          return dietAxios(cfg);
+        }
+      } catch {
+        await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+        _logoutHandler?.();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export interface DietSifat { sifat: string; score: number; }
+export interface DietRecommendationRequest {
+  user_id: number;
+  country_code: string;
+  country?: string;
+  language_code?: string;
+  sifats: DietSifat[];
+  vegetarian?: boolean;
+  vegan?: boolean;
+  gluten_free?: boolean;
+}
+
+export const DietAPI = {
+  getRecommendation: async (req: DietRecommendationRequest) => {
+    const res = await dietAxios.post('/diet/recommendation/', req);
+    return res.data as {
+      status: string;
+      data: {
+        date: string;
+        breakfast: { name: string; description?: string; reason: string; nutrition?: object; prep_time_min?: number };
+        lunch:     { name: string; description?: string; reason: string; nutrition?: object; prep_time_min?: number };
+        dinner:    { name: string; description?: string; reason: string; nutrition?: object; prep_time_min?: number };
+        user_sifats: string[];
+      };
+      nutrition?: object;
+      explanation?: string;
+    };
+  },
+
+  getAlternatives: async (req: DietRecommendationRequest & { meal_type: string; count?: number }) => {
+    const res = await dietAxios.post('/diet/alternatives/', req);
+    return res.data as { status: string; meal_type: string; alternatives: object[]; count: number };
+  },
+
+  getMeals: async (country_code: string, meal_type?: string) => {
+    const params: Record<string, string> = { country_code };
+    if (meal_type) params.meal_type = meal_type;
+    const res = await dietAxios.get('/diet/meals/', { params });
+    return res.data as { status: string; country: string; meal_type: string; meals: object[]; count: number };
+  },
+
+  getCountries: async () => {
+    const res = await dietAxios.get('/diet/countries/');
+    return res.data as { status: string; countries: { name: string; country_code: string; meal_count: number }[]; count: number };
+  },
+
+  submitFeedback: async (userId: number, mealId: string, date: string, mealType: string, feedback: 'liked' | 'disliked' | 'neutral') => {
+    const res = await dietAxios.post('/diet/feedback/', { user_id: userId, meal_id: mealId, date, meal_type: mealType, feedback });
+    return res.data as { status: string; message: string };
+  },
+};
+
+// ── Test Module API (FastAPI :8004, routed through nginx /test/) ─────────────
+const TEST_BASE = __DEV__ ? 'http://10.0.2.2' : 'https://api.facesyma.com';
+
+const testAxios = axios.create({ baseURL: TEST_BASE, timeout: 30000 });
+testAxios.interceptors.request.use(async (cfg) => {
+  const token = await AsyncStorage.getItem('access_token');
+  if (token) cfg.headers.Authorization = `Bearer ${token}`;
+  return cfg;
+});
+testAxios.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const cfg = error.config;
+    if (error.response?.status === 401 && !cfg._retried) {
+      cfg._retried = true;
+      try {
+        const refresh = await AsyncStorage.getItem('refresh_token');
+        if (refresh) {
+          const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
+          const newToken = res.data.access;
+          await AsyncStorage.setItem('access_token', newToken);
+          cfg.headers.Authorization = `Bearer ${newToken}`;
+          return testAxios(cfg);
+        }
+      } catch {
+        await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+        _logoutHandler?.();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export interface TestQuestion {
+  q_id: string;
+  order: number;
+  text: string;
+  scale: { min: number; max: number; labels: string[] };
+}
+
+export interface StressDetails {
+  depression_severity: string;
+  anxiety_severity: string;
+  crisis_flag: boolean;
+  crisis_resource?: string;
+}
+
+export interface NonverbalDetails {
+  congruent_accuracy?: number;
+  incongruent_accuracy?: number;
+  interference_effect?: number;
+  avg_reaction_ms?: number;
+  [key: string]: number | undefined;
+}
+
+export interface NonverbalAnswer {
+  q_id: string;
+  score: number;
+  selected_option?: string;
+  response_time_ms?: number;
+}
+
+export interface TestSubmitResponse {
+  result_id: string;
+  test_type: string;
+  domain_scores: Record<string, number>;
+  ai_interpretation: string;
+  pdf_url?: string;
+  stress_details?: StressDetails;
+  nonverbal_details?: NonverbalDetails | null;
+}
+
+export const TestAPI = {
+  startTest: async (testType: string, lang = 'tr') => {
+    const res = await testAxios.post('/test/start', { test_type: testType, lang });
+    return res.data as {
+      session_id: string;
+      test_type: string;
+      lang: string;
+      questions: TestQuestion[];
+      requires_health_consent?: boolean;
+      is_clinical?: boolean;
+      disclaimer?: string;
+    };
+  },
+
+  submitTest: async (
+    sessionId: string,
+    testType: string,
+    lang: string,
+    answers: Array<NonverbalAnswer>
+  ): Promise<TestSubmitResponse> => {
+    const res = await testAxios.post('/test/submit', {
+      session_id: sessionId,
+      test_type: testType,
+      lang,
+      answers,
+    });
+    return res.data;
+  },
+
+  getHistory: async (userId: number) => {
+    const res = await testAxios.get(`/test/results/${encodeURIComponent(userId)}`);
+    return res.data as { results: object[] };
+  },
+};
+
+// ── Community Chat API ────────────────────────────────────────────────────────
+export interface CommunityMessage {
+  _id: string;
+  community_id: string;
+  sender_id: number;
+  sender_username: string;
+  content: string;
+  type: 'text' | 'image' | 'file';
+  file_url: string | null;
+  file_name: string | null;
+  file_size_bytes: number | null;
+  created_at: number;
+  read_by: number[];
+}
+
+export const CommunityChatAPI = {
+  getMessages: async (communityId: string, before?: number, limit = 50) => {
+    const params: Record<string, unknown> = { limit };
+    if (before) params.before = before;
+    const res = await analysisClient.get(
+      `/communities/${encodeURIComponent(communityId)}/chat/messages/`,
+      { params }
+    );
+    return res.data as { success: boolean; data: CommunityMessage[]; count: number; has_more: boolean };
+  },
+
+  sendMessage: async (communityId: string, content: string) => {
+    const res = await analysisClient.post(
+      `/communities/${encodeURIComponent(communityId)}/chat/messages/`,
+      { content }
+    );
+    return res.data as { success: boolean; message: CommunityMessage };
+  },
+
+  markRead: async (communityId: string) => {
+    await analysisClient.post(`/communities/${encodeURIComponent(communityId)}/chat/read/`);
+  },
+
+  getWsUrl: (communityId: string, token: string): string => {
+    const host = IS_DEV ? '10.0.2.2' : 'api.facesyma.com';
+    const protocol = IS_DEV ? 'ws' : 'wss';
+    return `${protocol}://${host}/ws/community/${communityId}/chat/?token=${token}`;
+  },
+};
+
+// ── Gamification API (Django backend /api/v1/gamification/) ──────────────────
+const gamAxios = createClient(BASE.gamification);
+
+export interface CoinTransaction {
+  transaction_id: string;
+  amount: number;
+  reason: string;
+  created_at: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: number;
+  username: string;
+  avatar?: string;
+  coins: number;
+  total_earned?: number;
+}
+
+export interface Badge {
+  badge_id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon_emoji: string;
+  tiers: Array<{ tier: string; threshold: number; label: string }>;
+  coin_reward_per_tier: number;
+}
+
+export interface UserBadge {
+  badge_id: string;
+  current_tier: string;
+  current_progress: number;
+  unlocked_at: string;
+  tier_unlocks: Record<string, string>;
+  total_coins_earned: number;
+}
+
+export interface Challenge {
+  challenge_id: string;
+  title: string;
+  description?: string;
+  status: string;
+  max_participants: number;
+  start_time: string;
+  end_time: string;
+  coin_reward: number;
+  participants?: Array<{ user_id: number; username: string; score: number }>;
+}
+
+export interface CommunityMission {
+  mission_id: string;
+  title: string;
+  description?: string;
+  status: string;
+  target_value: number;
+  total_contributed: number;
+  end_time: string;
+  participants?: Array<{ user_id: number; username: string; contributed: number }>;
+}
+
+export interface MealItem {
+  id: string;
+  name: string;
+  description?: string;
+  calories?: number;
+  coin_cost?: number;
+}
+
+export interface DiscoveryQuestion {
+  question_id: string;
+  text_en: string;
+  text_tr: string;
+  choices_en: string[];
+  choices_tr: string[];
+  correct_index: number;
+  time_limit_seconds: number;
+}
+
+export const GamificationAPI = {
+  // ── Coin ──────────────────────────────────────────────────────────────────
+  getCoinBalance: async () => {
+    const res = await gamAxios.get('/coins/balance/');
+    return res.data as { balance: number; total_earned: number; daily_quest_coins: number };
+  },
+
+  getCoinHistory: async (limit = 20, offset = 0) => {
+    const res = await gamAxios.get('/coins/history/', { params: { limit, offset } });
+    return res.data as { transactions: CoinTransaction[]; total: number };
+  },
+
+  claimDailyQuest: async () => {
+    const res = await gamAxios.post('/coins/daily-quest/');
+    return res.data as { coins_earned: number; message: string; balance: number };
+  },
+
+  // ── Leaderboard ───────────────────────────────────────────────────────────
+  getLeaderboard: async (type = 'global', limit = 50, offset = 0) => {
+    const res = await gamAxios.get('/leaderboard/', { params: { type, limit, offset } });
+    return res.data as { entries: LeaderboardEntry[]; total: number; user_rank?: number };
+  },
+
+  getTrendingUsers: async (days = 7, limit = 20) => {
+    const res = await gamAxios.get('/leaderboard/trending/', { params: { days, limit } });
+    return res.data as { trending: Array<{ user_id: number; username: string; rank_improvement: number; coins_gained: number; current_rank: number }> };
+  },
+
+  getUserTrend: async (days = 30) => {
+    const res = await gamAxios.get('/leaderboard/trend/', { params: { days } });
+    return res.data as { rank_change: number; coins_gained: number; current_rank: number; current_coins: number };
+  },
+
+  // ── Badges ────────────────────────────────────────────────────────────────
+  getAllBadges: async () => {
+    const res = await gamAxios.get('/badges/');
+    return res.data as { badges: Badge[] };
+  },
+
+  getUserBadges: async () => {
+    const res = await gamAxios.get('/badges/user/');
+    return res.data as { badges: Record<string, UserBadge> };
+  },
+
+  getBadgeLeaderboard: async (badgeId: string, limit = 50) => {
+    const res = await gamAxios.get(`/badges/${encodeURIComponent(badgeId)}/leaderboard/`, { params: { limit } });
+    return res.data as { entries: Array<{ rank: number; user_id: number; username: string; current_tier: string; current_progress: number }> };
+  },
+
+  // ── Challenges ────────────────────────────────────────────────────────────
+  getActiveChallenges: async (limit = 20) => {
+    const res = await gamAxios.get('/challenges/', { params: { limit } });
+    return res.data as { challenges: Challenge[]; total: number };
+  },
+
+  createChallenge: async (data: { title: string; description?: string; max_participants?: number; duration_hours?: number; coin_reward?: number }) => {
+    const res = await gamAxios.post('/challenges/create/', data);
+    return res.data as { challenge_id: string; challenge: Challenge };
+  },
+
+  joinChallenge: async (challengeId: string) => {
+    const res = await gamAxios.post(`/challenges/${encodeURIComponent(challengeId)}/join/`);
+    return res.data as { success: boolean; challenge: Challenge };
+  },
+
+  updateScore: async (challengeId: string, score: number) => {
+    const res = await gamAxios.post(`/challenges/${encodeURIComponent(challengeId)}/score/`, { score });
+    return res.data as { success: boolean; new_score: number };
+  },
+
+  getChallengeLeaderboard: async (challengeId: string) => {
+    const res = await gamAxios.get(`/challenges/${encodeURIComponent(challengeId)}/leaderboard/`);
+    return res.data as { entries: Array<{ rank: number; user_id: number; username: string; score: number }> };
+  },
+
+  abandonChallenge: async (challengeId: string) => {
+    const res = await gamAxios.post(`/challenges/${encodeURIComponent(challengeId)}/abandon/`);
+    return res.data as { success: boolean; penalty: number };
+  },
+
+  // ── Community Missions ────────────────────────────────────────────────────
+  getActiveMissions: async (limit = 10) => {
+    const res = await gamAxios.get('/missions/', { params: { limit } });
+    return res.data as { missions: CommunityMission[] };
+  },
+
+  joinMission: async (missionId: string) => {
+    const res = await gamAxios.post(`/missions/${encodeURIComponent(missionId)}/join/`);
+    return res.data as { success: boolean; mission: CommunityMission };
+  },
+
+  contributeMission: async (missionId: string, amount: number) => {
+    const res = await gamAxios.post(`/missions/${encodeURIComponent(missionId)}/contribute/`, { contribution: amount });
+    return res.data as { new_progress: number; progress_percent: number; is_complete: boolean; coins_earned?: number };
+  },
+
+  getMissionLeaderboard: async (missionId: string) => {
+    const res = await gamAxios.get(`/missions/${encodeURIComponent(missionId)}/leaderboard/`);
+    return res.data as { entries: Array<{ rank: number; user_id: number; username: string; contributed: number }> };
+  },
+
+  // ── Meal Game ─────────────────────────────────────────────────────────────
+  getWeeklyMeals: async (countryCode?: string) => {
+    const res = await gamAxios.get('/meal-game/weekly/', { params: countryCode ? { country: countryCode } : {} });
+    return res.data as { country: string; country_code: string; meals: MealItem[]; week_key: string };
+  },
+
+  selectMeal: async (mealId: string, countryCode: string) => {
+    const res = await gamAxios.post('/meal-game/select/', { meal_id: mealId, country: countryCode });
+    return res.data as { success: boolean; new_balance: number; transaction_id: string };
+  },
+
+  guessSifat: async (mealId: string, countryCode: string, guess: string) => {
+    const res = await gamAxios.post('/meal-game/guess-sifat/', { meal_id: mealId, country: countryCode, guess });
+    return res.data as { correct: boolean; coins_earned: number; correct_sifat?: string; new_balance: number };
+  },
+
+  getMealLeaderboard: async (countryCode?: string, limit = 20) => {
+    const res = await gamAxios.get('/meal-game/leaderboard/', { params: { country: countryCode, limit } });
+    return res.data as { entries: Array<{ rank: number; user_id: number; username: string; coins_earned: number; accuracy_percent: number }> };
+  },
+
+  // ── Discovery Games ───────────────────────────────────────────────────────
+  getGameTypes: async () => {
+    const res = await gamAxios.get('/discovery/types/');
+    return res.data as { game_types: Array<{ game_type_id: string; name: string; description: string; coin_reward_play: number; coin_reward_win: number }> };
+  },
+
+  startGame: async (gameType: string, difficulty = 'normal', language = 'en') => {
+    const res = await gamAxios.post('/discovery/start/', { game_type: gameType, difficulty, language });
+    return res.data as { session_id: string; game_type_id: string; current_question: DiscoveryQuestion | null; total_questions: number };
+  },
+
+  submitAnswer: async (sessionId: string, questionId: string, answer: number) => {
+    const res = await gamAxios.post('/discovery/answer/', { session_id: sessionId, question_id: questionId, answer });
+    return res.data as {
+      correct: boolean;
+      next_question?: DiscoveryQuestion;
+      completed?: boolean;
+      accuracy_percent?: number;
+      coins_earned?: number;
+      insights?: string;
+    };
+  },
+
+  abandonGame: async (sessionId: string) => {
+    const res = await gamAxios.post('/discovery/abandon/', { session_id: sessionId });
+    return res.data as { success: boolean };
+  },
 };

@@ -26,7 +26,7 @@ GoogleSignin.configure({
   webClientId: 'YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com',
 });
 
-type Mode = 'login' | 'register';
+type Mode = 'login' | 'register' | 'reset';
 
 const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
   const insets   = useSafeAreaInsets();
@@ -41,8 +41,14 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
   const [confirm,       setConfirm]       = useState('');
   const [localErr,      setLocalErr]      = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  // Reset mode state
+  const [resetToken,    setResetToken]    = useState('');
+  const [resetLoading,  setResetLoading]  = useState(false);
 
-  const switchMode = (m: Mode) => { setMode(m); dispatch(clearError()); setLocalErr(''); setTermsAccepted(false); };
+  const switchMode = (m: Mode) => {
+    setMode(m); dispatch(clearError()); setLocalErr('');
+    setTermsAccepted(false); setResetToken(''); setPassword(''); setConfirm('');
+  };
 
   const handleForgotPassword = async () => {
     if (!email.trim()) {
@@ -50,13 +56,41 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
       return;
     }
     const fpTitle = t('auth.forgot_password', lang);
-    const fpMsg   = t('auth.forgot_sent', lang);
     try {
       await AuthAPI.forgotPassword(email.trim().toLowerCase());
-      Alert.alert(fpTitle, fpMsg);
     } catch {
-      Alert.alert(fpTitle, fpMsg);
-      // Backend henüz email göndermese de UI'da başarılı gibi göster (güvenlik)
+      // same response regardless — security
+    }
+    Alert.alert(
+      fpTitle,
+      t('auth.forgot_sent', lang),
+      [
+        { text: t('auth.enter_reset_code', lang), onPress: () => switchMode('reset') },
+        { text: t('common.cancel', lang), style: 'cancel' },
+      ],
+    );
+  };
+
+  const handleResetConfirm = async () => {
+    setLocalErr('');
+    if (!resetToken.trim()) { setLocalErr(t('auth.reset_code_required', lang)); return; }
+    if (!password)           { setLocalErr(t('auth.error_email_password', lang)); return; }
+    if (password.length < 6) { setLocalErr(t('auth.error_password_min', lang)); return; }
+    if (password !== confirm) { setLocalErr(t('common.generic_error', lang)); return; }
+
+    setResetLoading(true);
+    try {
+      await AuthAPI.confirmResetPassword(resetToken.trim(), password);
+      Alert.alert(
+        t('auth.reset_success_title', lang),
+        t('auth.reset_success_msg', lang),
+        [{ text: 'OK', onPress: () => switchMode('login') }],
+      );
+    } catch (e: any) {
+      const msg = e?.response?.data?.detail || t('common.generic_error', lang);
+      setLocalErr(msg);
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -93,6 +127,67 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
 
   const displayErr = localErr || error;
 
+  // ── Reset Password Mode ────────────────────────────────────────────────────
+  if (mode === 'reset') {
+    return (
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.xl }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.logoWrap}>
+            <Text style={styles.resetIcon}>🔑</Text>
+            <Text style={styles.logoName}>{t('auth.reset_title', lang)}</Text>
+            <Text style={styles.logoSub}>{t('auth.reset_subtitle', lang)}</Text>
+          </View>
+
+          {displayErr ? <ErrorBanner message={displayErr} /> : null}
+
+          <InputField
+            label={t('auth.reset_code', lang)}
+            placeholder={t('auth.reset_code_placeholder', lang)}
+            value={resetToken}
+            onChangeText={setResetToken}
+            autoCapitalize="none"
+            icon="🔐"
+          />
+          <InputField
+            label={t('auth.password', lang)}
+            placeholder={t('auth.error_password_min', lang)}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            icon="🔒"
+          />
+          <InputField
+            label={t('auth.password_confirm', lang)}
+            placeholder={t('auth.password', lang).toLowerCase()}
+            value={confirm}
+            onChangeText={setConfirm}
+            secureTextEntry
+            icon="🔒"
+          />
+
+          <GoldButton
+            title={t('auth.reset_confirm_btn', lang)}
+            onPress={handleResetConfirm}
+            loading={resetLoading}
+            style={styles.submitBtn}
+          />
+
+          <TouchableOpacity style={styles.backToLogin} onPress={() => switchMode('login')}>
+            <Text style={styles.forgotText}>← {t('auth.sign_in', lang)}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+
+  // ── Login / Register Mode ──────────────────────────────────────────────────
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -224,7 +319,6 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
           <Text style={styles.googleText}>{t('auth.google', lang)}</Text>
         </TouchableOpacity>
       </ScrollView>
-
     </KeyboardAvoidingView>
   );
 };
@@ -243,6 +337,7 @@ const styles = StyleSheet.create({
     height: 80,
     marginBottom: spacing.md,
   },
+  resetIcon: { fontSize: 52, marginBottom: spacing.sm },
   logoTextRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
   logoName:  { fontFamily: 'Georgia', fontSize: 22, fontWeight: '700' as const, letterSpacing: 1, color: colors.gold },
   aiBadge: {
@@ -264,6 +359,7 @@ const styles = StyleSheet.create({
   tabTextActive: { color: colors.textPrimary },
   forgotBtn: { alignSelf:'flex-end', marginBottom: spacing.md, marginTop:-spacing.sm },
   forgotText:{ ...typography.caption, color: colors.gold, fontSize:12 },
+  backToLogin: { alignSelf:'center', marginTop: spacing.lg },
   googleBtn: {
     height:54, backgroundColor: colors.surface,
     borderRadius: radius.lg,

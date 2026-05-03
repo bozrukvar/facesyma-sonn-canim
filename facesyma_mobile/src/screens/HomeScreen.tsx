@@ -28,6 +28,8 @@ const getFeatures = (lang: string) => {
     { id:'assessment',emoji:'📋', title: t('features.assessment', lang), desc: t('features.assessment_desc', lang), screen:'Assessment', accent:'#E0A17A', badge: reqBadge },
     { id:'fashion',  emoji:'👗', title: t('features.fashion', lang), desc: t('features.fashion_desc', lang), screen:'Fashion', accent:'#9B5DE5', badge: reqBadge },
     { id:'chat',     emoji:'💬', title: t('features.chat', lang), desc: t('features.chat_desc', lang), screen:'Chat', accent: colors.warmAmber, badge: reqBadge },
+    { id:'diet',     emoji:'🥗', title: t('features.diet', lang), desc: t('features.diet_desc', lang), screen:'Diet', accent:'#7AE07A' },
+    { id:'coach',    emoji:'🧠', title: t('coach.hub_title', lang), desc: t('coach.hub_desc', lang), screen:'CoachHub', accent:'#C07AE0' },
   ];
 };
 
@@ -128,7 +130,7 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
         </View>
 
         {/* Sosyal */}
-        <Text style={styles.sectionLabel}>{lang.startsWith('tr') ? 'SOSYAL' : 'SOCIAL'}</Text>
+        <Text style={styles.sectionLabel}>{t('home.social', lang)}</Text>
         <View style={styles.socialRow}>
           <TouchableOpacity
             style={styles.socialCard}
@@ -136,8 +138,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
             activeOpacity={0.85}
           >
             <Text style={styles.socialIcon}>🏘️</Text>
-            <Text style={styles.socialTitle}>{lang.startsWith('tr') ? 'Topluluklar' : 'Communities'}</Text>
-            <Text style={styles.socialDesc}>{lang.startsWith('tr') ? 'Benzer kişilerle tanış' : 'Meet similar people'}</Text>
+            <Text style={styles.socialTitle}>{t('community.title', lang)}</Text>
+            <Text style={styles.socialDesc}>{t('home.communities_desc', lang)}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.socialCard}
@@ -145,10 +147,32 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
             activeOpacity={0.85}
           >
             <Text style={styles.socialIcon}>💬</Text>
-            <Text style={styles.socialTitle}>{lang.startsWith('tr') ? 'Sohbetler' : 'Chats'}</Text>
-            <Text style={styles.socialDesc}>{lang.startsWith('tr') ? 'Aktif P2P sohbetlerin' : 'Your P2P chats'}</Text>
+            <Text style={styles.socialTitle}>{t('home.chats', lang)}</Text>
+            <Text style={styles.socialDesc}>{t('home.chats_desc', lang)}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Gamification */}
+        <Text style={styles.sectionLabel}>{t('gamification.title', lang)}</Text>
+        <TouchableOpacity
+          style={styles.gamificationBanner}
+          onPress={() => (navigation.navigate as any)('Gamification')}
+          activeOpacity={0.85}
+        >
+          <View style={styles.gamRow}>
+            <Text style={styles.gamEmoji}>🏆</Text>
+            <View style={styles.gamBody}>
+              <Text style={styles.gamTitle}>{t('gamification.hub_title', lang)}</Text>
+              <Text style={styles.gamDesc}>{t('gamification.hub_desc', lang)}</Text>
+            </View>
+            <Text style={styles.gamArrow}>→</Text>
+          </View>
+          <View style={styles.gamChips}>
+            {(['🪙', '🎖️', '⚔️', '🍽️', '🔍'].map((em, i) => (
+              <View key={i} style={styles.gamChip}><Text style={styles.gamChipText}>{em}</Text></View>
+            )))}
+          </View>
+        </TouchableOpacity>
 
         {/* Son analizler */}
         <Text style={styles.sectionLabel}>{t('home.recent_results', lang)}</Text>
@@ -277,6 +301,25 @@ const styles = StyleSheet.create({
   socialIcon:  { fontSize: 28 },
   socialTitle: { ...typography.h3, fontSize: 13, textAlign: 'center' as const },
   socialDesc:  { ...typography.caption, fontSize: 11, color: colors.textMuted, textAlign: 'center' as const },
+
+  // Gamification banner
+  gamificationBanner: {
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    borderWidth: 1, borderColor: `${colors.gold}30`,
+    padding: spacing.md, marginBottom: spacing.xl,
+  },
+  gamRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
+  gamEmoji: { fontSize: 28, marginRight: spacing.sm },
+  gamBody: { flex: 1 },
+  gamTitle: { ...typography.h3, fontSize: 14, marginBottom: 2 },
+  gamDesc: { ...typography.caption, color: colors.textMuted, fontSize: 11 },
+  gamArrow: { fontSize: 18, color: colors.gold },
+  gamChips: { flexDirection: 'row', gap: 8 },
+  gamChip: {
+    backgroundColor: `${colors.gold}15`, borderRadius: 8,
+    width: 32, height: 32, alignItems: 'center', justifyContent: 'center',
+  },
+  gamChipText: { fontSize: 16 },
 });
 
 export default HomeScreen;

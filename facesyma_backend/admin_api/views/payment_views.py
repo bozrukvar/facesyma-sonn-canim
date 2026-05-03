@@ -175,13 +175,13 @@ class PaymentStatsView(View):
                 'apple_pay':  [{'$match': {'created_at': {'$gte': start_date}, 'status': 'success', 'provider': 'apple_pay'}},  {'$count': 'n'}],
             }}]), {})
             _tfget = _tf.get
-            total_trans   = (_tfget('total',      [{}])[0] or {}).get('n', 0)
-            successful    = (_tfget('successful', [{}])[0] or {}).get('n', 0)
-            failed        = (_tfget('failed',     [{}])[0] or {}).get('n', 0)
-            total_revenue = (_tfget('revenue',    [{}])[0] or {}).get('total', 0) or 0
+            total_trans   = (_tfget('total',      []) or [{}])[0].get('n', 0)
+            successful    = (_tfget('successful', []) or [{}])[0].get('n', 0)
+            failed        = (_tfget('failed',     []) or [{}])[0].get('n', 0)
+            total_revenue = (_tfget('revenue',    []) or [{}])[0].get('total', 0) or 0
             provider_stats = {
-                'google_pay': (_tfget('google_pay', [{}])[0] or {}).get('n', 0),
-                'apple_pay':  (_tfget('apple_pay',  [{}])[0] or {}).get('n', 0),
+                'google_pay': (_tfget('google_pay', []) or [{}])[0].get('n', 0),
+                'apple_pay':  (_tfget('apple_pay',  []) or [{}])[0].get('n', 0),
                 # vakifbank_vpp: TODO — ileriki versiyon
             }
 

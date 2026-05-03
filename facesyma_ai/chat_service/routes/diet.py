@@ -4,11 +4,11 @@ routes/diet.py
 Beslenme Koçluğu API Endpoints
 
 Endpoints:
-  POST   /api/v1/diet/recommendation/   → Günlük tavsiye al
-  GET    /api/v1/diet/alternatives/     → Alternatif tavsiyeleri al
-  POST   /api/v1/diet/feedback/         → Feedback kaydet
-  GET    /api/v1/diet/countries/        → Ülkeleri listele
-  GET    /api/v1/diet/meals/            → Yemekleri getir
+  POST   /diet/recommendation/   → Günlük tavsiye al
+  POST   /diet/alternatives/     → Alternatif tavsiyeleri al
+  POST   /diet/feedback/         → Feedback kaydet
+  GET    /diet/countries/        → Ülkeleri listele
+  GET    /diet/meals/            → Yemekleri getir
 """
 
 import logging
@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 _VALID_FEEDBACKS  = frozenset({'liked', 'disliked', 'neutral'})
 _VALID_MEAL_TYPES = frozenset({'breakfast', 'lunch', 'dinner'})
 
-router = APIRouter(prefix="/api/v1/diet", tags=["diet_coaching"])
+router = APIRouter(prefix="/diet", tags=["diet_coaching"])
 
 
 # ── Request Models ─────────────────────────────────────────────────────────
@@ -47,8 +47,9 @@ router = APIRouter(prefix="/api/v1/diet", tags=["diet_coaching"])
 class RecommendationRequest(BaseModel):
     """Tavsiye isteği"""
     user_id: int
-    country: str = Field(default="Turkey", description="Ülke adı")
-    language_code: str = Field(default="tr", description="Dil kodu")
+    country_code: str = Field(default="TR", description="ISO 3166-1 alpha-2 ülke kodu (TR, US, MX, SA, …)")
+    country: str = Field(default="Turkey", description="Görüntüleme için ülke adı")
+    language_code: str = Field(default="tr", description="Mesaj dili")
     sifats: List[dict] = Field(..., description="[{sifat: str, score: float}, ...]")
     vegetarian: bool = False
     vegan: bool = False
@@ -58,6 +59,7 @@ class RecommendationRequest(BaseModel):
 class AlternativesRequest(BaseModel):
     """Alternatif tavsiyeleri isteği"""
     user_id: int
+    country_code: str = Field(default="TR", description="ISO 3166-1 alpha-2 ülke kodu")
     country: str = Field(default="Turkey")
     language_code: str = Field(default="tr")
     sifats: List[dict]
@@ -140,6 +142,7 @@ async def get_recommendation(request: RecommendationRequest):
         _rlc = request.language_code
         user_profile = UserProfile(
             user_id=request.user_id,
+            country_code=request.country_code,
             country=request.country,
             language_code=_rlc,
             sifats=user_sifats,
@@ -198,6 +201,7 @@ async def get_alternatives(request: AlternativesRequest):
 
         user_profile = UserProfile(
             user_id=request.user_id,
+            country_code=request.country_code,
             country=request.country,
             language_code=request.language_code,
             sifats=user_sifats,
@@ -290,8 +294,8 @@ async def list_countries():
 
 @router.get("/meals/", response_model=MealsResponse)
 async def get_meals(
-    country: str = Query("Turkey", description="Ülke adı"),
-    language_code: str = Query("tr", description="Dil kodu"),
+    country_code: str = Query("TR", description="ISO 3166-1 alpha-2 ülke kodu"),
+    country: str = Query("Turkey", description="Görüntüleme için ülke adı"),
     meal_type: Optional[str] = Query(None, description="breakfast, lunch, dinner"),
 ):
     """
@@ -302,10 +306,10 @@ async def get_meals(
     _lerr = log.error
     try:
         db = get_database()
-        country_data = db.get_country_meals(language_code)
+        country_data = db.get_country_meals(country_code)
 
         if not country_data:
-            raise ValueError(f"Country not found: {language_code}")
+            raise ValueError(f"Country not found: {country_code}")
 
         # Öğün tipine göre filtrele
         _gmbt = db.get_meals_by_type
@@ -313,13 +317,12 @@ async def get_meals(
             if meal_type not in _VALID_MEAL_TYPES:
                 raise ValueError("meal_type must be 'breakfast', 'lunch', or 'dinner'")
 
-            meals = _gmbt(language_code, meal_type)
+            meals = _gmbt(country_code, meal_type)
             meals_list = [meal.dict() for meal in meals]
         else:
-            # Tüm yemekleri döndür
             meals_list = []
             for mt in _VALID_MEAL_TYPES:
-                meals = _gmbt(language_code, mt)
+                meals = _gmbt(country_code, mt)
                 meals_list.extend([meal.dict() for meal in meals])
             meal_type = "all"
 

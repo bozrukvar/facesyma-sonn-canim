@@ -463,7 +463,7 @@ class GetAssessmentHistoryView(View):
                     'test_type': _rget('test_type'),
                     'overall_score': _rget('overall_score'),
                     'overall_level_tr': _rget('overall_level_tr'),
-                    'created_at': _cat.isoformat() if _cat else None,
+                    'created_at': (_cat.isoformat() if hasattr(_cat, 'isoformat') else _cat) if _cat else None,
                     'responses_counted': _rget('responses_counted'),
                 })
 

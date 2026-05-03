@@ -1,46 +1,50 @@
 """
-patch_new_modules.py
-=====================
+patch_new_modules.py  (paralel versiyon)
+=========================================
 Mevcut 21 sıfat dökümanlarına 13 yeni modülü ekler.
-Mevcut alanları bozmaz — sadece eksik alanları ekler.
+Google Translate çevirileri ThreadPoolExecutor ile paralel çalışır:
+  - Her sıfat için TR + 16 dil aynı anda çevrilir
+  - Her dil içinde 13 modül paralel çevrilir
+  → Sequential'a göre ~10x hızlı
 
-Çalıştırma (ai_chat container içinde):
+Çalıştırma:
   pip install deep-translator
-  python /tmp/patch_new_modules.py
+  python patch_new_modules.py
 
-Yeni modüller:
-  Tip A (text): etkinlik_tavsiye, spor_aktivite, kariyer_yolu,
-                insan_kaynaklari, duygusal_ruhsal, meditasyon_egzersiz
-  Tip B (dict): kitap_tavsiye, film_tavsiye, muzik_tavsiye,
-                podcast_tavsiye, seyahat_tavsiye, gunluk_afirasyon, saglik_tavsiye
-
-RAG Notu:
-  Tip B modüllerin her öğesinde "neden" alanı bulunur.
-  Bu alan önerinin NEDEN bu sıfata uygun olduğunu açıklar — RAG için kritik.
+İlerleme: c:/tmp/patch_progress.json  (kesintide devam eder)
 """
 
-import os, json, time, re, sys
+import os, json, time, re, sys, threading
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pymongo import MongoClient
 from groq import Groq
 
 try:
     from deep_translator import GoogleTranslator
-    _GT_OK = True
 except ImportError:
-    _GT_OK = False
     print("HATA: pip install deep-translator")
     sys.exit(1)
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-MONGO_URI    = os.environ.get("MONGO_URI", "")
-PROGRESS_FILE = "/tmp/patch_progress.json"
-MODEL_SMART  = "llama-3.3-70b-versatile"
-REQUEST_DELAY = 2.5
+GROQ_API_KEY  = os.environ.get("GROQ_API_KEY", "")
+MONGO_URI     = os.environ.get("MONGO_URI", "")
+_TMP          = "c:/tmp" if os.name == "nt" else "/tmp"
+os.makedirs(_TMP, exist_ok=True)
+PROGRESS_FILE = f"{_TMP}/patch_progress.json"
+MODEL_SMART   = "llama-3.3-70b-versatile"
+MODEL_FAST    = "llama-3.1-8b-instant"
+REQUEST_DELAY = 2.0
+GT_WORKERS    = 8   # paralel GT thread sayısı (dil başına modül çevirisi)
+LANG_WORKERS  = 6   # paralel dil sayısı (aynı anda kaç dil çevrilsin)
 
 groq_client  = Groq(api_key=GROQ_API_KEY)
 mongo_client = MongoClient(MONGO_URI)
 DB           = mongo_client["facesyma-coach-backup"]
+
+# GT isteklerini throttle etmek için semaphore
+_gt_sem = threading.Semaphore(10)
+# progress dosyası için lock
+_progress_lock = threading.Lock()
 
 SIFATLAR = {
     "kararlı": "determined", "güvenilir": "reliable", "dengeli": "balanced",
@@ -64,7 +68,6 @@ _GOOGLE_LANG_MAP = {
     "ur": "ur", "vi": "vi", "hi": "hi", "ar": "ar",
 }
 
-# ── Yeni modül isimleri ────────────────────────────────────────────────────────
 NEW_TEXT_MODULES = [
     "etkinlik_tavsiye", "spor_aktivite", "kariyer_yolu",
     "insan_kaynaklari", "duygusal_ruhsal", "meditasyon_egzersiz",
@@ -73,15 +76,15 @@ NEW_DICT_MODULES = [
     "kitap_tavsiye", "film_tavsiye", "muzik_tavsiye",
     "podcast_tavsiye", "seyahat_tavsiye", "gunluk_afirasyon", "saglik_tavsiye",
 ]
-ALL_NEW_MODULES = NEW_TEXT_MODULES + NEW_DICT_MODULES
 
-# ── Yardımcı ──────────────────────────────────────────────────────────────────
-def call_groq(prompt, max_tokens=600):
-    for attempt in range(3):
+# ── Groq ──────────────────────────────────────────────────────────────────────
+def call_groq(prompt, max_tokens=600, model=None):
+    use_model = model or MODEL_SMART
+    for attempt in range(5):
         try:
             time.sleep(REQUEST_DELAY)
             r = groq_client.chat.completions.create(
-                model=MODEL_SMART,
+                model=use_model,
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=max_tokens,
                 temperature=0.7,
@@ -90,12 +93,13 @@ def call_groq(prompt, max_tokens=600):
         except Exception as e:
             err = str(e).lower()
             if "rate_limit" in err:
-                wait = 45 * (attempt + 1)
+                wait = 30 * (attempt + 1)
                 print(f"  Rate limit — {wait}s bekleniyor...")
                 time.sleep(wait)
             else:
                 print(f"  Groq hata: {e}")
                 time.sleep(5)
+    print(f"  UYARI: 5 denemede başarısız, boş döndürülüyor")
     return ""
 
 def _parse_json(raw, fallback):
@@ -105,39 +109,74 @@ def _parse_json(raw, fallback):
     except Exception:
         return fallback
 
+# ── Google Translate (thread-safe) ────────────────────────────────────────────
 def _gt(text, lang):
     if not text or not text.strip():
         return text
     mapped = _GOOGLE_LANG_MAP.get(lang, lang)
     SEP = chr(10) + chr(10)
     MAX_CHUNK = 4800
-    if len(text) <= MAX_CHUNK:
-        try:
-            return GoogleTranslator(source="en", target=mapped).translate(text) or text
-        except Exception as e:
-            print(f"    GT hata: {e}"); return text
-    paragraphs = text.split(SEP)
-    chunks, cur, cur_len = [], [], 0
-    for p in paragraphs:
-        if cur_len + len(p) + 2 > MAX_CHUNK and cur:
-            chunks.append(SEP.join(cur)); cur, cur_len = [p], len(p)
-        else:
-            cur.append(p); cur_len += len(p) + 2
-    if cur: chunks.append(SEP.join(cur))
-    parts = []
-    for c in chunks:
-        try:
-            parts.append(GoogleTranslator(source="en", target=mapped).translate(c) or c)
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"    GT chunk hata: {e}"); parts.append(c)
-    return SEP.join(parts)
+
+    with _gt_sem:
+        if len(text) <= MAX_CHUNK:
+            try:
+                return GoogleTranslator(source="en", target=mapped).translate(text) or text
+            except Exception as e:
+                print(f"    GT hata ({lang}): {e}")
+                return text
+
+        paragraphs = text.split(SEP)
+        chunks, cur, cur_len = [], [], 0
+        for p in paragraphs:
+            if cur_len + len(p) + 2 > MAX_CHUNK and cur:
+                chunks.append(SEP.join(cur)); cur, cur_len = [p], len(p)
+            else:
+                cur.append(p); cur_len += len(p) + 2
+        if cur: chunks.append(SEP.join(cur))
+
+        parts = []
+        for c in chunks:
+            try:
+                parts.append(GoogleTranslator(source="en", target=mapped).translate(c) or c)
+                time.sleep(0.2)
+            except Exception as e:
+                print(f"    GT chunk hata: {e}"); parts.append(c)
+        return SEP.join(parts)
+
 
 def _gt_dict(data, lang):
-    if isinstance(data, str):   return _gt(data, lang)
-    if isinstance(data, dict):  return {k: _gt_dict(v, lang) for k, v in data.items()}
-    if isinstance(data, list):  return [_gt_dict(i, lang) for i in data]
+    if isinstance(data, str):  return _gt(data, lang)
+    if isinstance(data, dict): return {k: _gt_dict(v, lang) for k, v in data.items()}
+    if isinstance(data, list): return [_gt_dict(i, lang) for i in data]
     return data
+
+
+def translate_all_parallel(en_new, lang_code):
+    """Bir dil için 13 modülü paralel çevirir."""
+    results = {}
+
+    def do_text(mod):
+        return mod, _gt(en_new.get(mod, ""), lang_code)
+
+    def do_dict(mod):
+        return mod, _gt_dict(en_new.get(mod, {}), lang_code)
+
+    with ThreadPoolExecutor(max_workers=GT_WORKERS) as pool:
+        futures = {}
+        for mod in NEW_TEXT_MODULES:
+            futures[pool.submit(do_text, mod)] = mod
+        for mod in NEW_DICT_MODULES:
+            futures[pool.submit(do_dict, mod)] = mod
+
+        for f in as_completed(futures):
+            try:
+                mod, val = f.result()
+                results[mod] = val
+            except Exception as e:
+                mod = futures[f]
+                print(f"    {lang_code}/{mod} hata: {e}")
+
+    return results
 
 # ── Tip A prompt'ları ─────────────────────────────────────────────────────────
 TIP_A_PROMPTS = {
@@ -193,147 +232,129 @@ TIP_A_PROMPTS = {
 
 # ── Tip B üretici fonksiyonlar ─────────────────────────────────────────────────
 def _gen_kitap(te):
-    p = (
-        f'Generate book recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why these genres suit {te}",'
-        f'"kategoriler": [{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["T by A","T by A","T by A"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["T by A","T by A","T by A"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["T by A","T by A","T by A"]}}],'
-        f'"okuma_stili": "how {te} personality engages with books"}}'
-    )
-    fb = {"neden": f"Books complement the {te} personality.", "kategoriler": [
-        {"tur": "Personal Development", "neden": f"Aligns with {te} drive for growth.", "oneriler": ["Atomic Habits by James Clear", "Mindset by Carol Dweck", "The Power of Now by Eckhart Tolle"]},
-        {"tur": "Biography", "neden": f"Inspires {te} through real stories.", "oneriler": ["Leonardo da Vinci by Walter Isaacson", "Long Walk to Freedom by Nelson Mandela", "Educated by Tara Westover"]},
+    p = (f'Generate book recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why these genres suit {te}","kategoriler":[{{"tur":"Genre","neden":"why it suits {te}","oneriler":["T by A","T by A","T by A"]}},{{"tur":"Genre","neden":"why it suits {te}","oneriler":["T by A","T by A","T by A"]}},{{"tur":"Genre","neden":"why it suits {te}","oneriler":["T by A","T by A","T by A"]}}],"okuma_stili":"how {te} reads"}}')
+    fb = {"neden": f"Books complement {te}.", "kategoriler": [
+        {"tur": "Personal Development", "neden": f"Aligns with {te} growth.", "oneriler": ["Atomic Habits by James Clear", "Mindset by Carol Dweck", "The Power of Now by Eckhart Tolle"]},
+        {"tur": "Biography", "neden": f"Inspires {te}.", "oneriler": ["Leonardo da Vinci by Walter Isaacson", "Long Walk to Freedom by Nelson Mandela", "Educated by Tara Westover"]},
         {"tur": "Philosophy", "neden": f"Feeds {te} depth.", "oneriler": ["Meditations by Marcus Aurelius", "Man's Search for Meaning by Viktor Frankl", "The Alchemist by Paulo Coelho"]},
     ], "okuma_stili": f"The {te} personality reads deeply."}
-    return _parse_json(call_groq(p, 700), fb)
+    return _parse_json(call_groq(p, 700, MODEL_FAST), fb)
 
 def _gen_film(te):
-    p = (
-        f'Generate film recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why these genres appeal to {te}",'
-        f'"kategoriler": [{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["Film (Year)","Film (Year)","Film (Year)"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["Film (Year)","Film (Year)","Film (Year)"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "oneriler": ["Film (Year)","Film (Year)","Film (Year)"]}}],'
-        f'"izleme_stili": "how {te} personality watches films"}}'
-    )
-    fb = {"neden": f"Films that reflect depth resonate with {te}.", "kategoriler": [
-        {"tur": "Drama", "neden": f"Speaks to {te} emotional depth.", "oneriler": ["The Shawshank Redemption (1994)", "Schindler's List (1993)", "Good Will Hunting (1997)"]},
-        {"tur": "Documentary", "neden": f"Feeds {te} need for insight.", "oneriler": ["Free Solo (2018)", "13th (2016)", "Jiro Dreams of Sushi (2011)"]},
-        {"tur": "Thriller", "neden": f"Engages {te} analytical mind.", "oneriler": ["Inception (2010)", "Parasite (2019)", "Gone Girl (2014)"]},
+    p = (f'Generate film recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why these genres appeal to {te}","kategoriler":[{{"tur":"Genre","neden":"why it suits {te}","oneriler":["Film (Year)","Film (Year)","Film (Year)"]}},{{"tur":"Genre","neden":"why it suits {te}","oneriler":["Film (Year)","Film (Year)","Film (Year)"]}},{{"tur":"Genre","neden":"why it suits {te}","oneriler":["Film (Year)","Film (Year)","Film (Year)"]}}],"izleme_stili":"how {te} watches films"}}')
+    fb = {"neden": f"Films reflecting depth resonate with {te}.", "kategoriler": [
+        {"tur": "Drama", "neden": f"Speaks to {te} depth.", "oneriler": ["The Shawshank Redemption (1994)", "Schindler's List (1993)", "Good Will Hunting (1997)"]},
+        {"tur": "Documentary", "neden": f"Feeds {te} insight.", "oneriler": ["Free Solo (2018)", "13th (2016)", "Jiro Dreams of Sushi (2011)"]},
+        {"tur": "Thriller", "neden": f"Engages {te} mind.", "oneriler": ["Inception (2010)", "Parasite (2019)", "Gone Girl (2014)"]},
     ], "izleme_stili": f"The {te} personality watches attentively."}
-    return _parse_json(call_groq(p, 700), fb)
+    return _parse_json(call_groq(p, 700, MODEL_FAST), fb)
 
 def _gen_muzik(te):
-    p = (
-        f'Generate music recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why this music suits {te}",'
-        f'"turler": [{{"tur": "Genre", "neden": "why it suits {te}", "sanatcilar": ["A1","A2","A3"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "sanatcilar": ["A1","A2","A3"]}},'
-        f'{{"tur": "Genre", "neden": "why it suits {te}", "sanatcilar": ["A1","A2","A3"]}}],'
-        f'"dinleme_stili": "how {te} personality engages with music"}}'
-    )
+    p = (f'Generate music recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why this music suits {te}","turler":[{{"tur":"Genre","neden":"why it suits {te}","sanatcilar":["A1","A2","A3"]}},{{"tur":"Genre","neden":"why it suits {te}","sanatcilar":["A1","A2","A3"]}},{{"tur":"Genre","neden":"why it suits {te}","sanatcilar":["A1","A2","A3"]}}],"dinleme_stili":"how {te} engages with music"}}')
     fb = {"neden": f"Music channels {te} inner world.", "turler": [
-        {"tur": "Classical", "neden": f"Mirrors {te} structured nature.", "sanatcilar": ["Beethoven", "Bach", "Chopin"]},
-        {"tur": "Jazz", "neden": f"Matches {te} improvisation.", "sanatcilar": ["Miles Davis", "John Coltrane", "Norah Jones"]},
+        {"tur": "Classical", "neden": f"Mirrors {te} structure.", "sanatcilar": ["Beethoven", "Bach", "Chopin"]},
+        {"tur": "Jazz", "neden": f"Matches {te} improvisation.", "sanatcilar": ["Miles Davis", "Coltrane", "Norah Jones"]},
         {"tur": "Indie", "neden": f"Speaks to {te} authenticity.", "sanatcilar": ["Bon Iver", "Sufjan Stevens", "Phoebe Bridgers"]},
     ], "dinleme_stili": f"The {te} personality listens deeply."}
-    return _parse_json(call_groq(p, 600), fb)
+    return _parse_json(call_groq(p, 600, MODEL_FAST), fb)
 
 def _gen_podcast(te):
-    p = (
-        f'Generate podcast recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why these podcast categories suit {te}",'
-        f'"kategoriler": [{{"tur": "Category", "neden": "why it suits {te}", "oneriler": ["P1","P2","P3"]}},'
-        f'{{"tur": "Category", "neden": "why it suits {te}", "oneriler": ["P1","P2","P3"]}},'
-        f'{{"tur": "Category", "neden": "why it suits {te}", "oneriler": ["P1","P2","P3"]}}]}}'
-    )
-    fb = {"neden": f"Podcasts offer {te} meaningful content.", "kategoriler": [
-        {"tur": "Personal Development", "neden": f"Supports {te} growth.", "oneriler": ["The Tim Ferriss Show", "Dare to Lead with Brené Brown", "The School of Greatness"]},
-        {"tur": "Science & Technology", "neden": f"Feeds {te} curiosity.", "oneriler": ["Lex Fridman Podcast", "Radiolab", "Hidden Brain"]},
-        {"tur": "Mindfulness", "neden": f"Grounds {te} inner experience.", "oneriler": ["On Being with Krista Tippett", "10% Happier", "The Daily Meditation Podcast"]},
+    p = (f'Generate podcast recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why these categories suit {te}","kategoriler":[{{"tur":"Category","neden":"why it suits {te}","oneriler":["P1","P2","P3"]}},{{"tur":"Category","neden":"why it suits {te}","oneriler":["P1","P2","P3"]}},{{"tur":"Category","neden":"why it suits {te}","oneriler":["P1","P2","P3"]}}]}}')
+    fb = {"neden": f"Podcasts offer {te} meaningful growth content.", "kategoriler": [
+        {"tur": "Personal Development", "neden": f"Supports {te} growth.", "oneriler": ["The Tim Ferriss Show", "Dare to Lead", "The School of Greatness"]},
+        {"tur": "Science", "neden": f"Feeds {te} curiosity.", "oneriler": ["Lex Fridman Podcast", "Radiolab", "Hidden Brain"]},
+        {"tur": "Mindfulness", "neden": f"Grounds {te}.", "oneriler": ["On Being with Krista Tippett", "10% Happier", "The Daily Meditation Podcast"]},
     ]}
-    return _parse_json(call_groq(p, 600), fb)
+    return _parse_json(call_groq(p, 600, MODEL_FAST), fb)
 
 def _gen_seyahat(te):
-    p = (
-        f'Generate travel recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why this travel style suits {te}",'
-        f'"destinasyon_tipi": ["Type1","Type2","Type3"],'
-        f'"aktiviteler": [{{"aktivite": "Activity", "neden": "why it suits {te}"}},{{"aktivite": "Activity", "neden": "why it suits {te}"}},{{"aktivite": "Activity", "neden": "why it suits {te}"}}],'
-        f'"seyahat_stili": "how {te} personality travels"}}'
-    )
+    p = (f'Generate travel recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why this travel style suits {te}","destinasyon_tipi":["Type1","Type2","Type3"],'
+         f'"aktiviteler":[{{"aktivite":"Activity","neden":"why it suits {te}"}},{{"aktivite":"Activity","neden":"why it suits {te}"}},{{"aktivite":"Activity","neden":"why it suits {te}"}}],"seyahat_stili":"how {te} travels"}}')
     fb = {"neden": f"Travel enriches {te} through exploration.", "destinasyon_tipi": ["Cultural cities", "Nature retreats", "Historical sites"],
-        "aktiviteler": [{"aktivite": "Museum visits", "neden": f"Satisfies {te} curiosity."}, {"aktivite": "Hiking", "neden": f"Gives {te} reflection space."}, {"aktivite": "Local cuisine tours", "neden": f"Connects {te} to authentic experiences."}],
+        "aktiviteler": [{"aktivite": "Museum visits", "neden": f"Satisfies {te} curiosity."}, {"aktivite": "Hiking", "neden": f"Gives {te} reflection space."}, {"aktivite": "Local cuisine", "neden": f"Connects {te} authentically."}],
         "seyahat_stili": f"The {te} personality travels with intention."}
-    return _parse_json(call_groq(p, 600), fb)
+    return _parse_json(call_groq(p, 600, MODEL_FAST), fb)
 
 def _gen_afirasyon(te):
-    p = (
-        f'Generate daily affirmations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences why these affirmations are designed for {te} inner dynamics",'
-        f'"sabah": "powerful morning affirmation for {te}",'
-        f'"aksam": "grounding evening affirmation for {te}",'
-        f'"haftalik": ["Mon affirmation","Tue affirmation","Wed affirmation","Thu affirmation","Fri affirmation","Sat affirmation","Sun affirmation"]}}'
-    )
-    fb = {"neden": f"These affirmations strengthen {te} personality.",
-        "sabah": f"I embrace my {te} nature and move through the day with confidence.",
-        "aksam": f"I honor the depth I brought today and release what no longer serves my growth.",
-        "haftalik": [f"My {te} spirit leads me toward my highest potential.", "I trust my natural strengths.", "Every challenge sharpens my character.", "I am worthy of all the good.", "My unique perspective creates value.", "I nurture my gifts generously.", "I rest in the knowledge of who I am."]}
-    return _parse_json(call_groq(p, 700), fb)
+    p = (f'Generate daily affirmations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences why these affirmations suit {te}","sabah":"morning affirmation for {te}","aksam":"evening affirmation for {te}",'
+         f'"haftalik":["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]}}')
+    fb = {"neden": f"These affirmations strengthen {te}.",
+        "sabah": f"I embrace my {te} nature and move with confidence.",
+        "aksam": f"I honor the depth I brought today.",
+        "haftalik": [f"My {te} spirit leads me forward.", "I trust my strengths.", "Challenges sharpen me.", "I am worthy.", "My perspective creates value.", "I nurture my gifts.", "I rest in who I am."]}
+    return _parse_json(call_groq(p, 700, MODEL_FAST), fb)
 
 def _gen_saglik(te):
-    p = (
-        f'Generate structured health recommendations for a "{te}" personality. '
-        f'Return ONLY valid JSON: {{"neden": "2 sentences: personality-health connection for {te}",'
-        f'"beslenme": {{"tavsiye": "nutrition advice for {te}", "neden": "why it suits {te}"}},'
-        f'"hareket": {{"tavsiye": "movement advice for {te}", "neden": "why it suits {te}"}},'
-        f'"uyku": {{"tavsiye": "sleep advice for {te}", "neden": "why it suits {te}"}},'
-        f'"zihin": {{"tavsiye": "mental health practice for {te}", "neden": "why it suits {te}"}}}}'
-    )
-    fb = {"neden": f"The {te} personality's health should support vitality and clarity.",
-        "beslenme": {"tavsiye": "Prioritize whole foods with regular meal timing.", "neden": f"Supports {te} consistent performance."},
-        "hareket": {"tavsiye": "Combine strength training with mindful movement.", "neden": f"Balances {te} active nature with restoration."},
-        "uyku": {"tavsiye": "Maintain 7-8 hours with a wind-down ritual.", "neden": f"Helps {te} process rich inner experience."},
-        "zihin": {"tavsiye": "Practice daily journaling and social connection.", "neden": f"Gives {te} a healthy outlet for depth."}}
-    return _parse_json(call_groq(p, 700), fb)
+    p = (f'Generate structured health recommendations for a "{te}" personality. Return ONLY valid JSON: '
+         f'{{"neden":"2 sentences personality-health connection for {te}",'
+         f'"beslenme":{{"tavsiye":"nutrition advice","neden":"why it suits {te}"}},'
+         f'"hareket":{{"tavsiye":"movement advice","neden":"why it suits {te}"}},'
+         f'"uyku":{{"tavsiye":"sleep advice","neden":"why it suits {te}"}},'
+         f'"zihin":{{"tavsiye":"mental practice","neden":"why it suits {te}"}}}}')
+    fb = {"neden": f"The {te} personality's health supports vitality.",
+        "beslenme": {"tavsiye": "Whole foods with regular timing.", "neden": f"Supports {te} performance."},
+        "hareket": {"tavsiye": "Strength + mindful movement.", "neden": f"Balances {te} energy."},
+        "uyku": {"tavsiye": "7-8 hours with wind-down ritual.", "neden": f"Helps {te} process deeply."},
+        "zihin": {"tavsiye": "Journaling + social connection.", "neden": f"Healthy outlet for {te} depth."}}
+    return _parse_json(call_groq(p, 700, MODEL_FAST), fb)
 
 DICT_GENERATORS = {
-    "kitap_tavsiye":    _gen_kitap,
-    "film_tavsiye":     _gen_film,
-    "muzik_tavsiye":    _gen_muzik,
-    "podcast_tavsiye":  _gen_podcast,
-    "seyahat_tavsiye":  _gen_seyahat,
-    "gunluk_afirasyon": _gen_afirasyon,
-    "saglik_tavsiye":   _gen_saglik,
+    "kitap_tavsiye": _gen_kitap, "film_tavsiye": _gen_film,
+    "muzik_tavsiye": _gen_muzik, "podcast_tavsiye": _gen_podcast,
+    "seyahat_tavsiye": _gen_seyahat, "gunluk_afirasyon": _gen_afirasyon,
+    "saglik_tavsiye": _gen_saglik,
 }
 
-# ── İlerleme ───────────────────────────────────────────────────────────────────
+# ── İlerleme (thread-safe) ────────────────────────────────────────────────────
 def load_progress():
     if os.path.exists(PROGRESS_FILE):
         with open(PROGRESS_FILE) as f: return json.load(f)
     return {}
 
 def save_progress(p):
-    with open(PROGRESS_FILE, "w") as f: json.dump(p, f, ensure_ascii=False, indent=2)
+    with _progress_lock:
+        with open(PROGRESS_FILE, "w") as f:
+            json.dump(p, f, ensure_ascii=False, indent=2)
 
-# ── Ana akış ───────────────────────────────────────────────────────────────────
+# ── Tek dil işleme (thread'de çağrılır) ──────────────────────────────────────
+def process_lang(trait_tr, lang_code, col_suffix, en_new, progress):
+    lp_key = f"{trait_tr}::{lang_code}_patch"
+    if lp_key in progress:
+        return lang_code, "skip"
+    try:
+        fields = translate_all_parallel(en_new, lang_code)
+        DB[f"coach_attributes_{col_suffix}"].update_one(
+            {"_id": trait_tr}, {"$set": fields}, upsert=False
+        )
+        progress[lp_key] = True
+        save_progress(progress)
+        return lang_code, "ok"
+    except Exception as e:
+        return lang_code, f"hata: {e}"
+
+# ── Ana akış ──────────────────────────────────────────────────────────────────
 def main():
     progress = load_progress()
-    total = len(SIFATLAR)
+    total    = len(SIFATLAR)
 
     for idx, (trait_tr, trait_en) in enumerate(SIFATLAR.items(), 1):
-        print(f"\n{'='*60}")
+        print(f"\n{'='*55}")
         print(f"[{idx}/{total}] {trait_tr} ({trait_en})")
-        print(f"{'='*60}")
+        print(f"{'='*55}")
 
-        # Adım 1: İngilizce yeni modülleri üret (bir kez)
-        en_patch_key = f"{trait_tr}::en_patch"
-        if en_patch_key in progress:
-            print(f"  ✓ EN patch zaten yapılmış")
-            en_new = progress[en_patch_key]
+        # Adım 1: İngilizce üretim (Groq — sequential, rate limit yüzünden)
+        en_key = f"{trait_tr}::en_patch"
+        if en_key in progress:
+            print(f"  ✓ EN zaten hazır")
+            en_new = progress[en_key]
         else:
-            print(f"  → EN yeni modüller üretiliyor...")
+            print(f"  → EN modüller üretiliyor (Groq)...")
             en_new = {}
             for mod in NEW_TEXT_MODULES:
                 print(f"    {mod}...")
@@ -341,67 +362,47 @@ def main():
             for mod, gen_fn in DICT_GENERATORS.items():
                 print(f"    {mod} (dict)...")
                 en_new[mod] = gen_fn(trait_en)
-            progress[en_patch_key] = en_new
+            progress[en_key] = en_new
             save_progress(progress)
-
-            # EN koleksiyonuna ekle
             DB["coach_attributes_en"].update_one(
-                {"_id": trait_tr},
-                {"$set": en_new},
-                upsert=False
+                {"_id": trait_tr}, {"$set": en_new}, upsert=False
             )
-            print(f"  ✓ EN patch kaydedildi")
+            print(f"  ✓ EN kaydedildi")
 
-        # Adım 2: TR — title/desc koruyarak Google Translate
-        tr_patch_key = f"{trait_tr}::tr_patch"
-        if tr_patch_key not in progress:
-            print(f"  → TR patch Google Translate...")
-            tr_new = {}
-            for mod in NEW_TEXT_MODULES:
-                tr_new[mod] = _gt(en_new.get(mod, ""), "tr")
-                time.sleep(0.3)
-            for mod in NEW_DICT_MODULES:
-                tr_new[mod] = _gt_dict(en_new.get(mod, {}), "tr")
-            DB["coach_attributes_tr"].update_one({"_id": trait_tr}, {"$set": tr_new}, upsert=False)
-            progress[tr_patch_key] = True
-            save_progress(progress)
-            print(f"  ✓ TR patch kaydedildi")
+        # Adım 2+3: TR + 16 dil — PARALEL Google Translate
+        langs_to_do = [
+            (lc, cs) for lc, cs in LANGUAGES.items()
+            if lc != "en" and f"{trait_tr}::{lc}_patch" not in progress
+        ]
 
-        # Adım 3: Diğer 16 dil
-        for lang_code, col_suffix in LANGUAGES.items():
-            if lang_code in ("en", "tr"):
-                continue
-            lp_key = f"{trait_tr}::{lang_code}_patch"
-            if lp_key in progress:
-                print(f"  ✓ {lang_code} zaten")
-                continue
-            print(f"  → {lang_code} Google Translate...")
-            new_fields = {}
-            for mod in NEW_TEXT_MODULES:
-                new_fields[mod] = _gt(en_new.get(mod, ""), lang_code)
-                time.sleep(0.3)
-            for mod in NEW_DICT_MODULES:
-                new_fields[mod] = _gt_dict(en_new.get(mod, {}), lang_code)
-            DB[f"coach_attributes_{col_suffix}"].update_one(
-                {"_id": trait_tr}, {"$set": new_fields}, upsert=False
-            )
-            progress[lp_key] = True
-            save_progress(progress)
-            print(f"  ✓ {lang_code} kaydedildi")
+        if not langs_to_do:
+            print(f"  ✓ Tüm diller zaten tamamlanmış")
+        else:
+            print(f"  → {len(langs_to_do)} dil paralel çeviriliyor...")
+            with ThreadPoolExecutor(max_workers=LANG_WORKERS) as pool:
+                futures = {
+                    pool.submit(process_lang, trait_tr, lc, cs, en_new, progress): lc
+                    for lc, cs in langs_to_do
+                }
+                for f in as_completed(futures):
+                    lang_code, result = f.result()
+                    icon = "✓" if result in ("ok", "skip") else "✗"
+                    print(f"    {icon} {lang_code}: {result}")
 
         print(f"  ✅ {trait_tr} TAMAMLANDI")
 
-    print("\n" + "="*60)
+    print("\n" + "="*55)
     print("TÜM PATCH'LER TAMAMLANDI")
-    print("="*60)
+    print("="*55)
+
     print("\n📊 Doğrulama (kitap_tavsiye varlığı):")
-    for lang_code, col_suffix in LANGUAGES.items():
-        col = DB[f"coach_attributes_{col_suffix}"]
+    for lc, cs in LANGUAGES.items():
+        col   = DB[f"coach_attributes_{cs}"]
         count = col.count_documents({"_id": {"$in": list(SIFATLAR.keys())}, "kitap_tavsiye": {"$exists": True}})
-        print(f"  {lang_code}: {count}/21")
+        print(f"  {lc}: {count}/21")
 
 if __name__ == "__main__":
     if not GROQ_API_KEY or not MONGO_URI:
-        print("HATA: GROQ_API_KEY ve MONGO_URI env değişkenleri gerekli!")
+        print("HATA: GROQ_API_KEY ve MONGO_URI gerekli!")
         sys.exit(1)
     main()

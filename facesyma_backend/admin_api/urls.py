@@ -142,7 +142,6 @@ from admin_api.views.monitoring_gamification_views import (
     GamificationDashboardView, CacheStatisticsView, LeaderboardPerformanceView,
     WebSocketMetricsView, TrendMetricsView, SystemHealthView
 )
-from admin_api.views.dashboard_html_views import GamificationDashboardHTMLView
 
 # API Endpoint'leri
 api_patterns = [
@@ -392,7 +391,6 @@ api_patterns = [
     path('leaderboards/cleanup/', CleanupSnapshotsView.as_view(), name='leaderboards-cleanup'),
 
     # Gamification Monitoring Dashboard (PHASE 6.3)
-    path('gamification-dashboard/', GamificationDashboardHTMLView.as_view(), name='gamification-dashboard-html'),
     path('monitoring/gamification/dashboard/', GamificationDashboardView.as_view(), name='gamification-dashboard'),
     path('monitoring/gamification/cache/', CacheStatisticsView.as_view(), name='gamification-cache-stats'),
     path('monitoring/gamification/performance/', LeaderboardPerformanceView.as_view(), name='gamification-performance'),

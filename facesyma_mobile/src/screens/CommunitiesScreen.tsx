@@ -2,27 +2,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  ActivityIndicator, Alert, RefreshControl,
+  ActivityIndicator, Alert, RefreshControl, ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import theme from '../utils/theme';
 const { colors, spacing, typography, radius, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
-import { AnalysisAPI, PeerChatAPI, CommunityItem } from '../services/api';
+import { AnalysisAPI, CommunityItem } from '../services/api';
 import type { ScreenProps } from '../navigation/types';
 
 const TYPE_FILTERS = [
-  { key: undefined,    label: { tr: 'Tümü',    en: 'All'      } },
-  { key: 'TRAIT',      label: { tr: 'Özellik', en: 'Trait'    } },
-  { key: 'MODULE',     label: { tr: 'Modül',   en: 'Module'   } },
-  { key: 'CATEGORY',   label: { tr: 'Kategori',en: 'Category' } },
+  { key: undefined,    labelKey: 'community.filter_all'       },
+  { key: 'TRAIT',      labelKey: 'community.filter_trait'     },
+  { key: 'MODULE',     labelKey: 'community.filter_module'    },
+  { key: 'CATEGORY',   labelKey: 'community.filter_category'  },
+  { key: 'ASTRO',      labelKey: 'community.filter_astro'     },
+  { key: 'INTEREST',   labelKey: 'community.filter_interest'  },
+  { key: 'LIFESTYLE',  labelKey: 'community.filter_lifestyle' },
+  { key: 'GOAL',       labelKey: 'community.filter_goal'      },
 ];
 
 const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) => {
   const insets    = useSafeAreaInsets();
   const { lang }  = useLanguage();
-  const lk        = lang.startsWith('tr') ? 'tr' : 'en';
 
   const initialType = route.params?.communityType ?? undefined;
 
@@ -92,7 +95,7 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
       <View style={[styles.card, isHighlight ? styles.cardHighlight : null]}>
         {isHighlight && (
           <View style={styles.matchBadge}>
-            <Text style={styles.matchBadgeText}>✨ {lk === 'tr' ? 'Önerilen' : 'Suggested'}</Text>
+            <Text style={styles.matchBadgeText}>✨ {t('community.suggested', lang)}</Text>
           </View>
         )}
         <View style={styles.cardHeader}>
@@ -121,8 +124,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
             ) : (
               <Text style={[styles.joinBtnText, isJoined && styles.joinBtnTextDone]}>
                 {isJoined
-                  ? (lk === 'tr' ? '✓ Katıldın' : '✓ Joined')
-                  : (lk === 'tr' ? 'Katıl' : 'Join')}
+                  ? `✓ ${t('community.joined', lang)}`
+                  : t('community.join', lang)}
               </Text>
             )}
           </TouchableOpacity>
@@ -133,8 +136,20 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
               activeOpacity={0.85}
             >
               <Text style={styles.meetBtnTxt}>
-                {showMembers ? '▲' : '👥'} {lk === 'tr' ? 'Tanış' : 'Meet'}
+                {showMembers ? '▲' : '👥'} {t('community.meet', lang)}
               </Text>
+            </TouchableOpacity>
+          )}
+          {isJoined && (
+            <TouchableOpacity
+              style={styles.chatBtn}
+              onPress={() => navigation.navigate('CommunityChat', {
+                communityId: item._id,
+                communityName: item.name,
+              })}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.chatBtnTxt}>💬 {t('community.chat', lang)}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -145,7 +160,7 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
             {membersLoading ? (
               <ActivityIndicator color={colors.gold} />
             ) : members.length === 0 ? (
-              <Text style={styles.noMembersTxt}>{lk === 'tr' ? 'Üye yok.' : 'No members.'}</Text>
+              <Text style={styles.noMembersTxt}>{t('community.no_members', lang)}</Text>
             ) : (
               members.map((m: any) => (
                 <View key={String(m.user_id)} style={styles.memberRow}>
@@ -156,7 +171,7 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
                   </View>
                   <View style={styles.memberInfo}>
                     <Text style={styles.memberName}>{m.username}</Text>
-                    <Text style={styles.memberHarmony}>Uyum: %{m.harmony_level ?? '—'}</Text>
+                    <Text style={styles.memberHarmony}>{t('community.compatibility', lang)}: %{m.harmony_level ?? '—'}</Text>
                   </View>
                   {m.can_request_chat && (
                     <TouchableOpacity
@@ -186,7 +201,7 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{lk === 'tr' ? 'Topluluklar' : 'Communities'}</Text>
+        <Text style={styles.title}>{t('community.title', lang)}</Text>
         <TouchableOpacity
           style={styles.chatHeaderBtn}
           onPress={() => navigation.navigate('PeerChatList')}
@@ -196,7 +211,12 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
       </View>
 
       {/* Type filter chips */}
-      <View style={styles.filterRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterRow}
+        contentContainerStyle={styles.filterRowContent}
+      >
         {TYPE_FILTERS.map(f => (
           <TouchableOpacity
             key={String(f.key)}
@@ -205,11 +225,11 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
             activeOpacity={0.8}
           >
             <Text style={[styles.filterChipText, typeFilter === f.key && styles.filterChipTextActive]}>
-              {f.label[lk]}
+              {t(f.labelKey, lang)}
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       {loading ? (
         <View style={styles.center}>
@@ -232,7 +252,7 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
           ListEmptyComponent={
             <View style={styles.center}>
               <Text style={styles.emptyText}>
-                {lk === 'tr' ? 'Henüz topluluk yok.' : 'No communities yet.'}
+                {t('community.empty', lang)}
               </Text>
             </View>
           }
@@ -252,9 +272,10 @@ const styles = StyleSheet.create({
   backBtn:     { width: 36, height: 36, justifyContent: 'center' },
   backText:    { ...typography.h2, color: colors.gold },
   title:       { ...typography.h2, color: colors.textPrimary, textAlign: 'center' as const },
-  filterRow:   {
+  filterRow:        { paddingVertical: spacing.sm },
+  filterRowContent: {
     flexDirection: 'row', gap: 8,
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg, paddingRight: spacing.lg,
   },
   filterChip:  {
     paddingHorizontal: spacing.md, paddingVertical: 6,
@@ -317,6 +338,8 @@ const styles = StyleSheet.create({
   memberHarmony:   { ...typography.caption, fontSize: 11, color: colors.gold },
   chatReqBtn:      { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.goldGlow, borderWidth: 1, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
   chatReqTxt:      { fontSize: 15 },
+  chatBtn:         { backgroundColor: colors.goldGlow, borderRadius: radius.md, paddingHorizontal: spacing.md, paddingVertical: 10, borderWidth: 1, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
+  chatBtnTxt:      { color: colors.gold, fontWeight: '700' as const, fontSize: 12 },
 });
 
 export default CommunitiesScreen;

@@ -5,7 +5,6 @@ Match a face to iconic artworks based on facial proportions and features.
 Returns closest artwork matches with similarity scores.
 """
 
-import random
 from operator import itemgetter
 from calculator import Cal
 
@@ -99,11 +98,20 @@ def _score_match(traits: dict, jaw_width: float, face_len_ratio: float, eye_dist
     return round((score / total) * 100, 1) if total > 0 else 50.0
 
 
-def match_artwork(img: str, lang: str = 'tr') -> dict:
+def match_artwork(img: str, lang: str = 'tr', user_id=None) -> dict:
     """
     Match face to iconic artworks.
-    Returns top-3 matches with similarity scores and artwork details.
+    Tries the new cluster-based art_matcher first (requires seeded MongoDB pool);
+    falls back to the legacy 6-artwork geometry-only system if unavailable.
     """
+    # ── Try new dual-scoring engine ────────────────────────────────────────
+    try:
+        from art_matcher import match_artworks
+        return match_artworks(img, lang=lang, user_id=user_id)
+    except Exception:
+        pass
+
+    # ── Legacy fallback ────────────────────────────────────────────────────
     result = Cal(img)
     lang_key = lang.split('-')[0] if '-' in lang else lang
 
@@ -118,8 +126,6 @@ def match_artwork(img: str, lang: str = 'tr') -> dict:
     scored = []
     for art in _ARTWORKS:
         s = _score_match(art['traits'], jaw_width, face_len_ratio, eye_dist)
-        # Add small random variation so results are less deterministic
-        s = min(99.9, max(40.0, s + random.uniform(-5, 5)))
         scored.append((s, art))
 
     scored.sort(key=_KEY_SCORE, reverse=True)

@@ -35,16 +35,16 @@ from .engine import (
     record_meal_feedback,
 )
 from .database import (
-    load_meals_for_country,
     get_all_countries,
     get_country_meals,
+    get_meals_by_type_and_country,
 )
 
 __all__ = [
     "get_daily_recommendation",
     "get_meal_suggestions",
     "record_meal_feedback",
-    "load_meals_for_country",
     "get_all_countries",
     "get_country_meals",
+    "get_meals_by_type_and_country",
 ]

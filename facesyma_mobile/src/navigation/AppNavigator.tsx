@@ -32,6 +32,22 @@ import CommunitiesScreen    from '../screens/CommunitiesScreen';
 import PeerChatListScreen   from '../screens/PeerChatListScreen';
 import PeerChatRequestScreen from '../screens/PeerChatRequestScreen';
 import PeerChatScreen       from '../screens/PeerChatScreen';
+import CommunityChatScreen  from '../screens/CommunityChatScreen';
+import DietScreen            from '../screens/DietScreen';
+import GamificationScreen   from '../screens/GamificationScreen';
+import LeaderboardScreen     from '../screens/LeaderboardScreen';
+import BadgesScreen          from '../screens/BadgesScreen';
+import CoinWalletScreen      from '../screens/CoinWalletScreen';
+import ChallengesScreen      from '../screens/ChallengesScreen';
+import MissionsScreen        from '../screens/MissionsScreen';
+import MealGameScreen        from '../screens/MealGameScreen';
+import DiscoveryGameScreen   from '../screens/DiscoveryGameScreen';
+import CoachHubScreen        from '../screens/CoachHubScreen';
+import CoachGoalsScreen      from '../screens/CoachGoalsScreen';
+import CoachBirthScreen      from '../screens/CoachBirthScreen';
+import GoldenRatioOverlayScreen from '../screens/GoldenRatioOverlayScreen';
+import GoldenTransformScreen    from '../screens/GoldenTransformScreen';
+import SimilarityScreen         from '../screens/SimilarityScreen';
 
 import type { RootStackParamList, TabParamList } from './types';
 
@@ -186,6 +202,22 @@ const AppNavigator = () => {
             <StackScreen name="PeerChatList"       component={PeerChatListScreen} />
             <StackScreen name="PeerChatRequest"    component={PeerChatRequestScreen} />
             <StackScreen name="PeerChat"           component={PeerChatScreen} />
+            <StackScreen name="CommunityChat"      component={CommunityChatScreen} />
+            <StackScreen name="Diet"               component={DietScreen} />
+            <StackScreen name="Gamification"       component={GamificationScreen} />
+            <StackScreen name="Leaderboard"        component={LeaderboardScreen} />
+            <StackScreen name="Badges"             component={BadgesScreen} />
+            <StackScreen name="CoinWallet"         component={CoinWalletScreen} />
+            <StackScreen name="Challenges"         component={ChallengesScreen} />
+            <StackScreen name="Missions"           component={MissionsScreen} />
+            <StackScreen name="MealGame"           component={MealGameScreen} />
+            <StackScreen name="DiscoveryGame"      component={DiscoveryGameScreen} />
+            <StackScreen name="CoachHub"           component={CoachHubScreen} />
+            <StackScreen name="CoachGoals"         component={CoachGoalsScreen} />
+            <StackScreen name="CoachBirth"         component={CoachBirthScreen} />
+            <StackScreen name="GoldenRatioOverlay" component={GoldenRatioOverlayScreen} />
+            <StackScreen name="GoldenTransform"    component={GoldenTransformScreen} />
+            <StackScreen name="Similarity"         component={SimilarityScreen} />
           </>
         )}
       </Stack.Navigator>

@@ -36,7 +36,7 @@ _KVKK_POINTS_EN = [
     '✓ Completely Optional: No impact if you choose not to use'
 ]
 
-def create_golden_transform_preview(img_path, lang='tr'):
+def create_golden_transform_preview(img_path, lang='tr', real_measurements=None):
     """
     Orijinal fotoğraf üzerinde golden ratio ayarlamalarının
     görsel gösterimini oluştur (gerçek değişiklik yapma).
@@ -44,6 +44,8 @@ def create_golden_transform_preview(img_path, lang='tr'):
     Args:
         img_path: Orijinal yüz fotoğrafının yolu
         lang: Dil kodu (tr, en)
+        real_measurements: Gerçek ölçüm listesi [{name, ratio, score, status}, ...]
+                           Verilirse transformation_guide gerçek değerlerle doldurulur.
 
     Returns:
         dict: {
@@ -74,8 +76,8 @@ def create_golden_transform_preview(img_path, lang='tr'):
         comparison_img = create_before_after_comparison(img_pil, adjusted_img, lang)
         comparison_b64 = image_to_base64(comparison_img)
 
-        # 4. Dönüşüm rehberi oluştur
-        transformation_guide = get_transformation_guide(lang)
+        # 4. Dönüşüm rehberi oluştur (gerçek ölçümler varsa kullan)
+        transformation_guide = get_transformation_guide(lang, real_measurements=real_measurements)
 
         # 5. KVKK bildirişi oluştur
         kvkk_disclaimer = get_kvkk_disclaimer(lang)
@@ -197,11 +199,63 @@ def create_before_after_comparison(original, adjusted, lang='tr'):
     return comparison
 
 
-def get_transformation_guide(lang='tr'):
+_FEATURE_PROCEDURES_TR = {
+    'Göz Mesafesi':  'Estetik cerrahiyle az bir rahatlama (10-20mm)',
+    'Dudak Genişliği': 'Minimal iğne uygulaması veya dolgu',
+    'Kaş Mesafesi':  'Kaş tasarımı ve lifting (non-invasive)',
+}
+_FEATURE_PROCEDURES_EN = {
+    'Göz Mesafesi':  'Minimal surgical adjustment (10-20mm)',
+    'Dudak Genişliği': 'Minimal injection or filler',
+    'Kaş Mesafesi':  'Brow design and lifting (non-invasive)',
+}
+_PHI = 1.618
+
+
+def get_transformation_guide(lang='tr', real_measurements=None):
     """
     Dönüşüm rehberi - neler değişebilir?
+    real_measurements: [{name, ratio, score, status}, ...] — gerçek ölçümler varsa kullan.
     """
-    if lang == 'tr':
+    is_tr = (lang == 'tr')
+    if real_measurements:
+        adjustments = []
+        procs = _FEATURE_PROCEDURES_TR if is_tr else _FEATURE_PROCEDURES_EN
+        for m in real_measurements:
+            status = m.get('status', 'adjustable')
+            score = m.get('score', 0)
+            ratio = m.get('ratio', 0)
+            name = m.get('name', '')
+            if is_tr:
+                impact = (
+                    f'{name} φ oranına çok yakın, harika bir uyum.' if status == 'golden'
+                    else f'{name} φ oranına ({_PHI}) yaklaştırılabilir.'
+                )
+            else:
+                impact = (
+                    f'{name} is very close to φ ratio, excellent harmony.' if status == 'golden'
+                    else f'{name} can be adjusted toward φ ratio ({_PHI}).'
+                )
+            adjustments.append({
+                'feature': name,
+                'current': str(round(ratio, 3)),
+                'optimal': str(_PHI),
+                'score': score,
+                'status': status,
+                'impact': impact,
+                'procedure': procs.get(name, ('Profesyonel danışmanlık önerilir' if is_tr else 'Professional consultation recommended')),
+            })
+        return {
+            'title': 'Golden Ratio Optimizasyonu - Detaylar' if is_tr else 'Golden Ratio Optimization - Details',
+            'adjustments': adjustments,
+            'note': (
+                'Bu öneriler tamamen gösterim amaçlıdır. Herhangi bir prosedür öncesinde profesyonel danışmanlık alınmalıdır.'
+                if is_tr else
+                'These suggestions are for visualization purposes only. Consult a professional before any procedure.'
+            ),
+        }
+
+    if is_tr:
         return {
             'title': 'Golden Ratio Optimizasyonu - Detaylar',
             'adjustments': [
@@ -209,6 +263,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Göz Mesafesi',
                     'current': '1.57',
                     'optimal': '1.618',
+                    'status': 'adjustable',
                     'impact': 'Gözler arasındaki mesafe φ oranına yaklaştırılabilir',
                     'procedure': 'Estetik cerrahiyle az bir rahatlama (10-20mm)'
                 },
@@ -216,6 +271,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Dudak Oranı',
                     'current': '0.99',
                     'optimal': '1.0',
+                    'status': 'adjustable',
                     'impact': 'Üst-alt dudak dengesi mükemmelleştirilir',
                     'procedure': 'Minimal iğne uygulaması veya dolgu'
                 },
@@ -223,6 +279,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Kaş Yüksekliği',
                     'current': '1.53',
                     'optimal': '1.618',
+                    'status': 'adjustable',
                     'impact': 'Kaş pozisyonu gözlere daha uygun hale gelir',
                     'procedure': 'Kaş tasarımı ve lifting (non-invasive)'
                 }
@@ -237,6 +294,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Eye Spacing',
                     'current': '1.57',
                     'optimal': '1.618',
+                    'status': 'adjustable',
                     'impact': 'Distance between eyes can be adjusted to φ ratio',
                     'procedure': 'Minimal surgical adjustment (10-20mm)'
                 },
@@ -244,6 +302,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Lip Ratio',
                     'current': '0.99',
                     'optimal': '1.0',
+                    'status': 'adjustable',
                     'impact': 'Upper-lower lip balance is optimized',
                     'procedure': 'Minimal injection or filler'
                 },
@@ -251,6 +310,7 @@ def get_transformation_guide(lang='tr'):
                     'feature': 'Eyebrow Height',
                     'current': '1.53',
                     'optimal': '1.618',
+                    'status': 'adjustable',
                     'impact': 'Brow position becomes more harmonious',
                     'procedure': 'Brow design and lifting (non-invasive)'
                 }

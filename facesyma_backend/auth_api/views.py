@@ -49,7 +49,7 @@ _JWT_ACCESS_EXP_SEC: int = settings.JWT_ACCESS_EXP_HOURS * 3600
 _JWT_REFRESH_EXP_SEC: int = settings.JWT_REFRESH_EXP_DAYS * 86400
 
 # Connection pooling — her request'te yeni bağlantı açmaz
-from admin_api.utils.mongo import get_users_col, _next_id
+from admin_api.utils.mongo import get_users_col, _next_id, get_test_results_col
 
 
 # ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
@@ -101,6 +101,7 @@ def _make_tokens(user_id: int, email: str) -> dict:
 
 _USER_PROJECTION = {'_id': 0, 'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1,
                     'birth_year': 1, 'gender': 1, 'country': 1, 'skin_tone': 1, 'hair_color': 1, 'eye_color': 1, 'goal': 1,
+                    'interests': 1, 'lifestyle': 1,
                     'onboarding_completed': 1, 'terms_accepted': 1, 'gdpr_consent': 1,
                     'last_login': 1, 'premium_expires_at': 1, 'cosmetic_surgery_regions': 1}
 _LOGIN_PROJECTION = {'id': 1, 'email': 1, 'username': 1, 'name': 1, 'avatar': 1, 'plan': 1, 'date_joined': 1,
@@ -113,6 +114,15 @@ _VALID_HAIR_COLORS       = {'black', 'brown', 'blonde', 'red', 'white_gray', 'ot
 _VALID_EYE_COLORS        = {'brown', 'black', 'blue', 'green', 'hazel', 'gray'}
 _VALID_GOALS             = {'self_discovery', 'style', 'career', 'fun'}
 _VALID_SURGERY_REGIONS   = {'nose', 'eyes', 'lips', 'cheeks', 'jawline', 'forehead', 'chin'}
+_VALID_INTERESTS  = {'music', 'film', 'sport', 'travel', 'food', 'art',
+                     'tech', 'nature', 'fashion', 'gaming', 'literature', 'health'}
+_VALID_LIFESTYLES = {'vegan', 'athlete', 'meditation', 'freelancer',
+                     'parent', 'student', 'digital_nomad', 'minimalist'}
+
+
+def _is_adult(user: dict) -> bool:
+    by = user.get('birth_year')
+    return bool(by and by <= datetime.utcnow().year - 18)
 
 
 def _user_dict(u: dict) -> dict:
@@ -151,7 +161,38 @@ def _user_dict(u: dict) -> dict:
         'premium_days_left':         _premium_days_left,
         'premium_hours_left':        _premium_hours_left,
         'cosmetic_surgery_regions':  _uget('cosmetic_surgery_regions', []),
+        'interests':                 _uget('interests', []),
+        'lifestyle':                 _uget('lifestyle', []),
     }
+
+
+def _get_test_summary(user_id: int) -> dict:
+    """En son test sonuçlarını test tipine göre gruplar; hata durumunda boş dict döner."""
+    try:
+        pipeline = [
+            {"$match": {"user_id": user_id}},
+            {"$sort": {"created_at": -1}},
+            {"$group": {
+                "_id": "$test_type",
+                "taken_at":      {"$first": "$created_at"},
+                "domain_scores": {"$first": "$domain_scores"},
+                "stress_details": {"$first": "$stress_details"},
+            }},
+        ]
+        rows = list(get_test_results_col().aggregate(pipeline))
+        latest = {}
+        for r in rows:
+            entry = {"domain_scores": r.get("domain_scores", {}), "taken_at": r.get("taken_at", "")}
+            if r.get("stress_details"):
+                entry["stress_details"] = r["stress_details"]
+            latest[r["_id"]] = entry
+        return {
+            "total_tests_taken": len(rows),
+            "completed_types":   list(latest.keys()),
+            "latest_per_type":   latest,
+        }
+    except Exception:
+        return {}
 
 
 def _decode_token(request) -> dict:
@@ -387,11 +428,14 @@ class MeView(View):
     def get(self, request):
         try:
             payload = _decode_token(request)
+            uid     = payload['user_id']
             col     = get_users_col()
-            user    = col.find_one({'id': payload['user_id']}, _USER_PROJECTION)
+            user    = col.find_one({'id': uid}, _USER_PROJECTION)
             if not user:
                 return JsonResponse({'detail': 'User not found.'}, status=404)
-            return JsonResponse(_user_dict(user))
+            data = _user_dict(user)
+            data['test_summary'] = _get_test_summary(uid)
+            return JsonResponse(data)
         except jwt.ExpiredSignatureError:
             return JsonResponse({'detail': 'Token has expired.'}, status=401)
         except Exception as e:
@@ -433,9 +477,25 @@ class MeView(View):
                 regions = data['cosmetic_surgery_regions']
                 if isinstance(regions, list):
                     update['cosmetic_surgery_regions'] = [r for r in regions if r in _VALID_SURGERY_REGIONS]
+            if 'interests' in data and isinstance(data['interests'], list):
+                val = [v for v in data['interests'] if v in _VALID_INTERESTS][:3]
+                if val:
+                    update['interests'] = val
+            if 'lifestyle' in data and isinstance(data['lifestyle'], list):
+                val = [v for v in data['lifestyle'] if v in _VALID_LIFESTYLES][:3]
+                if val:
+                    update['lifestyle'] = val
             _puid = payload['user_id']
             if update:
                 col.update_one({'id': _puid}, {'$set': update})
+                _interests_upd = update.get('interests')
+                _lifestyle_upd = update.get('lifestyle')
+                if _interests_upd or _lifestyle_upd:
+                    try:
+                        from analysis_api.community_hooks import auto_add_from_profile
+                        auto_add_from_profile(_puid, _interests_upd or [], _lifestyle_upd or [])
+                    except Exception:
+                        pass
             user = col.find_one({'id': _puid}, _USER_PROJECTION)
             if not user:
                 return JsonResponse({'detail': 'User not found.'}, status=404)
@@ -443,6 +503,48 @@ class MeView(View):
         except Exception as e:
             log.exception('Profile update error')
             return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+
+# ── Sağlık Modülü Onayı ───────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class HealthConsentView(View):
+    """
+    GET  → kullanıcının sağlık modülü onay durumunu döner
+    POST → onayı kaydeder (idempotent)
+    """
+    _CURRENT_VERSION = 'v1'
+
+    def get(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+        col  = get_users_col()
+        user = col.find_one({'id': payload['user_id']}, {'health_consent': 1})
+        if not user:
+            return JsonResponse({'detail': 'User not found.'}, status=404)
+        hc = user.get('health_consent') or {}
+        return JsonResponse({
+            'accepted':    bool(hc.get('accepted', False)),
+            'accepted_at': hc.get('accepted_at'),
+            'version':     hc.get('version'),
+        })
+
+    def post(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+        now = datetime.utcnow().isoformat()
+        get_users_col().update_one(
+            {'id': payload['user_id']},
+            {'$set': {'health_consent': {
+                'accepted':    True,
+                'accepted_at': now,
+                'version':     self._CURRENT_VERSION,
+            }}},
+        )
+        return JsonResponse({'accepted': True, 'accepted_at': now, 'version': self._CURRENT_VERSION})
 
 
 # ── Şifre Değiştir ────────────────────────────────────────────────────────────
@@ -503,6 +605,46 @@ class ChangePasswordView(View):
 
 
 # ── Şifre Sıfırlama İsteği ────────────────────────────────────────────────────
+_RESET_TOKEN_TTL = 3600  # 1 saat
+
+def _reset_cache_key(token: str) -> str:
+    return f'pw_reset_token:{token}'
+
+
+def _send_reset_email(email: str, token: str) -> None:
+    """Şifre sıfırlama e-postasını gönder."""
+    from django.core.mail import send_mail
+    from django.conf import settings
+
+    web_url  = getattr(settings, 'WEB_APP_URL', 'https://facesyma.com')
+    reset_url = f'{web_url}/reset-password?token={token}'
+
+    subject = 'Facesyma — Şifre Sıfırlama / Password Reset'
+    body = (
+        f'Merhaba,\n\n'
+        f'Şifre sıfırlama talebiniz alındı.\n\n'
+        f'Sıfırlama kodunuz: {token}\n\n'
+        f'Uygulamayı açıp bu kodu girin, ya da aşağıdaki bağlantıya tıklayın:\n'
+        f'{reset_url}\n\n'
+        f'Bu bağlantı 1 saat geçerlidir. Talep etmediyseniz dikkate almayın.\n\n'
+        f'---\n'
+        f'Hello,\n\n'
+        f'A password reset was requested for your Facesyma account.\n\n'
+        f'Your reset code: {token}\n\n'
+        f'Open the app and enter this code, or click the link below:\n'
+        f'{reset_url}\n\n'
+        f'This link is valid for 1 hour. If you did not request this, ignore this email.\n\n'
+        f'— Facesyma Team'
+    )
+    send_mail(
+        subject,
+        body,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+    )
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetRequestView(View):
     """Şifre sıfırlama e-postası gönderir.
@@ -510,6 +652,7 @@ class PasswordResetRequestView(View):
     """
 
     def post(self, request):
+        import secrets
         data  = _json(request)
         email = data.get('email', '').strip().lower()[:254]
         if not email:
@@ -530,12 +673,108 @@ class PasswordResetRequestView(View):
         col  = get_users_col()
         user = col.find_one({'email': email}, {'_id': 0, 'email': 1})
         if user:
-            # TODO: Generate and send reset token once email service is integrated.
-            # For now, just log.
-            log.info(f'Password reset requested for: {email}')
+            token = secrets.token_urlsafe(32)
+            try:
+                cache.set(_reset_cache_key(token), email, timeout=_RESET_TOKEN_TTL)
+                _send_reset_email(email, token)
+                log.info(f'Password reset email sent: {email}')
+            except Exception as e:
+                log.error(f'Password reset email failed for {email}: {e}')
 
         # Güvenlik: kullanıcı var olup olmadığından bağımsız aynı yanıt
         return JsonResponse({'detail': 'Password reset instructions have been sent to your email.'})
+
+
+# ── Şifre Sıfırlama Onayı ─────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class PasswordResetConfirmView(View):
+    """Token ile yeni şifreyi kaydeder. Token tek kullanımlık, 1 saat geçerli."""
+
+    def post(self, request):
+        data         = _json(request)
+        token        = (data.get('token') or '').strip()
+        new_password = data.get('new_password', '')
+
+        if not token or not new_password:
+            return JsonResponse({'detail': 'token and new_password are required.'}, status=400)
+        if len(new_password) < 6:
+            return JsonResponse({'detail': 'Password must be at least 6 characters.'}, status=400)
+
+        cache_key = _reset_cache_key(token)
+        try:
+            email = cache.get(cache_key)
+        except Exception:
+            email = None
+
+        if not email:
+            return JsonResponse({'detail': 'Invalid or expired reset token.'}, status=400)
+
+        col = get_users_col()
+        result = col.update_one(
+            {'email': email},
+            {'$set': {'password': _hash(new_password)}},
+        )
+        if result.matched_count == 0:
+            return JsonResponse({'detail': 'User not found.'}, status=404)
+
+        # Tek kullanımlık — token'ı hemen sil
+        try:
+            cache.delete(cache_key)
+        except Exception:
+            pass
+
+        log.info(f'Password reset confirmed: {email}')
+        return JsonResponse({'detail': 'Password reset successfully.'})
+
+
+# ── FCM Device Token ─────────────────────────────────────────────────────────
+@method_decorator(csrf_exempt, name='dispatch')
+class DeviceTokenView(View):
+    """Register or remove FCM device token for the authenticated user."""
+
+    def post(self, request):
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+        data     = _json(request)
+        token    = (data.get('device_token') or '').strip()
+        platform = data.get('platform', 'unknown')
+
+        if not token:
+            return JsonResponse({'detail': 'device_token is required.'}, status=400)
+        if len(token) > 4096:
+            return JsonResponse({'detail': 'device_token too long.'}, status=400)
+        if platform not in ('ios', 'android'):
+            platform = 'unknown'
+
+        get_users_col().update_one(
+            {'id': payload['user_id']},
+            {'$set': {
+                'device_token':            token,
+                'device_platform':         platform,
+                'device_token_updated_at': datetime.utcnow().isoformat(),
+            }},
+        )
+        return JsonResponse({'success': True})
+
+    def delete(self, request):
+        """Deregister device token on logout."""
+        try:
+            payload = _decode_token(request)
+        except Exception:
+            return JsonResponse({'detail': 'Authentication failed.'}, status=401)
+
+        get_users_col().update_one(
+            {'id': payload['user_id']},
+            {'$unset': {
+                'device_token':            '',
+                'device_platform':         '',
+                'device_token_updated_at': '',
+            }},
+        )
+        return JsonResponse({'success': True})
 
 
 # ── Hesap Silme (GDPR "right to erasure") ────────────────────────────────────

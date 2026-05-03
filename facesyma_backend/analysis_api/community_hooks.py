@@ -173,6 +173,87 @@ def auto_add_to_communities(user_id: int, analysis_result: dict):
         }
 
 
+def auto_add_from_profile(user_id: int, interests: list, lifestyle: list) -> dict:
+    """
+    Profil kurulumu sonrası INTEREST ve LIFESTYLE topluluklarına auto-invite.
+    auto_add_to_communities() ile aynı pattern — status: 'pending'.
+    """
+    try:
+        communities_col = _get_communities_col()
+        members_col = _get_community_members_col()
+        invitations_count = 0
+
+        def _process(items: list, type_label: str, name_fn, desc_fn):
+            nonlocal invitations_count
+            if not items:
+                return
+            existing_map = {
+                doc['trait_name']: doc
+                for doc in communities_col.find(
+                    {'type': type_label, 'trait_name': {'$in': list(items)}},
+                    {'_id': 1, 'trait_name': 1},
+                )
+            }
+            resolved = []
+            now_ts = time.time()
+            new_docs, new_items = [], []
+            for item in items:
+                community = existing_map.get(item)
+                if not community:
+                    doc = {
+                        'name': name_fn(item), 'type': type_label, 'trait_name': item,
+                        'description': desc_fn(item), 'founder_id': 0, 'member_count': 0,
+                        'is_active': True, 'created_at': now_ts, 'updated_at': now_ts,
+                        'rules': '', 'moderation_policy': 'automated',
+                    }
+                    new_docs.append(doc)
+                    new_items.append(item)
+                else:
+                    resolved.append((item, community))
+            if new_docs:
+                result = communities_col.insert_many(new_docs, ordered=True)
+                for doc, oid, item in zip(new_docs, result.inserted_ids, new_items):
+                    doc['_id'] = oid
+                    resolved.append((item, doc))
+                    log.info(f'New {type_label} community created: {item}')
+            community_ids = [str(c['_id']) for _, c in resolved]
+            already_member = {
+                doc['community_id']
+                for doc in members_col.find(
+                    {'community_id': {'$in': community_ids}, 'user_id': user_id},
+                    {'community_id': 1},
+                )
+            }
+            new_memberships = []
+            for item, community in resolved:
+                cid = str(community['_id'])
+                if cid not in already_member:
+                    new_memberships.append({
+                        'community_id': cid, 'user_id': user_id, 'status': 'pending',
+                        'joined_at': None, 'approved_at': None, 'harmony_level': 75,
+                        'is_mod': False, 'invited_at': now_ts,
+                    })
+            if new_memberships:
+                try:
+                    members_col.insert_many(new_memberships, ordered=False)
+                    invitations_count += len(new_memberships)
+                except Exception as e:
+                    log.warning(f'{type_label} profile invite error: {e}')
+
+        _process(interests, 'INTEREST',
+                 lambda s: f'{s.capitalize()} Topluluğu',
+                 lambda s: f'{s.capitalize()} ilgi alanına sahip kişilerin topluluğu.')
+        _process(lifestyle, 'LIFESTYLE',
+                 lambda s: f'{s.replace("_", " ").capitalize()} Topluluğu',
+                 lambda s: f'{s.replace("_", " ").capitalize()} yaşam tarzındaki kişilerin topluluğu.')
+
+        return {'success': True, 'invitations_sent': invitations_count, 'pending_approvals': invitations_count}
+
+    except Exception as e:
+        log.exception(f'auto_add_from_profile error: {e}')
+        return {'success': False, 'invitations_sent': 0, 'pending_approvals': 0}
+
+
 def find_and_notify_compatible_users(user_id: int, limit: int = 10):
     """
     Kullanıcıya uyumlu kullanıcıları bul ve (future: notify).

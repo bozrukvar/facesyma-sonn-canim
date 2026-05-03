@@ -58,6 +58,15 @@ const COUNTRY_MAP: Record<string, { flag: string; name: string }> = {
   ID:{flag:'🇮🇩',name:'Indonesia'},VN:{flag:'🇻🇳',name:'Vietnam'},IT:{flag:'🇮🇹',name:'Italy'},
   SM:{flag:'🇸🇲',name:'San Marino'},PL:{flag:'🇵🇱',name:'Poland'},OTHER:{flag:'🌍',name:'Other'},
 };
+const getLocale = (lang: string): string => {
+  const localeMap: Record<string, string> = {
+    tr:'tr-TR', en:'en-US', de:'de-DE', ru:'ru-RU', ar:'ar-SA', es:'es-ES',
+    ko:'ko-KR', ja:'ja-JP', zh:'zh-CN', hi:'hi-IN', fr:'fr-FR', pt:'pt-PT',
+    bn:'bn-IN', id:'id-ID', ur:'ur-PK', it:'it-IT', vi:'vi-VN', pl:'pl-PL',
+  };
+  return localeMap[lang] || 'en-US';
+};
+
 const getCountryDisplay = (code: string) => {
   if (code.startsWith('CUSTOM:')) return `🌍 ${code.slice(7)}`;
   const c = COUNTRY_MAP[code];
@@ -65,13 +74,13 @@ const getCountryDisplay = (code: string) => {
 };
 
 const SURGERY_REGIONS = [
-  { key: 'nose',     label: 'Burun',   emoji: '👃' },
-  { key: 'eyes',     label: 'Gözler',  emoji: '👁' },
-  { key: 'lips',     label: 'Dudaklar',emoji: '💋' },
-  { key: 'cheeks',   label: 'Yanaklar',emoji: '🫦' },
-  { key: 'jawline',  label: 'Çene',    emoji: '💎' },
-  { key: 'forehead', label: 'Alın',    emoji: '🧠' },
-  { key: 'chin',     label: 'Çene Ucu',emoji: '✨' },
+  { key: 'nose',     emoji: '👃' },
+  { key: 'eyes',     emoji: '👁' },
+  { key: 'lips',     emoji: '💋' },
+  { key: 'cheeks',   emoji: '🫦' },
+  { key: 'jawline',  emoji: '💎' },
+  { key: 'forehead', emoji: '🧠' },
+  { key: 'chin',     emoji: '✨' },
 ];
 
 const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
@@ -80,35 +89,32 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
   const { lang } = useLanguage();
   const user     = useSelector((s: RootState) => s.auth.user);
 
-  // Edit states
   const [editName,     setEditName]     = useState(user?.name || '');
   const [nameLoading,  setNameLoading]  = useState(false);
 
-  // Password
   const [oldPw,        setOldPw]        = useState('');
   const [newPw,        setNewPw]        = useState('');
   const [pwLoading,    setPwLoading]    = useState(false);
 
-  // Surgery regions
   const [surgeryRegions, setSurgeryRegions] = useState<string[]>(user?.cosmetic_surgery_regions || []);
   const [surgeryLoading,  setSurgeryLoading]  = useState(false);
 
-  // Export loading
   const [exportLoading, setExportLoading] = useState(false);
 
-  // Premium countdown
   const [premiumLabel, setPremiumLabel] = useState('');
 
   useEffect(() => {
     if (!user?.plan || user.plan !== 'premium') { setPremiumLabel(''); return; }
     const days  = user.premium_days_left  ?? 0;
     const hours = user.premium_hours_left ?? 0;
-    if (days > 0)       setPremiumLabel(`${days} gün ${hours} saat kaldı`);
-    else if (hours > 0) setPremiumLabel(`${hours} saat kaldı`);
-    else                setPremiumLabel('Süresi doldu');
-  }, [user]);
+    if (days > 0)
+      setPremiumLabel(t('account.premium_days', lang).replace('{days}', String(days)).replace('{hours}', String(hours)));
+    else if (hours > 0)
+      setPremiumLabel(t('account.premium_hours', lang).replace('{hours}', String(hours)));
+    else
+      setPremiumLabel(t('account.premium_expired', lang));
+  }, [user, lang]);
 
-  // Refresh profile from API
   useEffect(() => {
     AuthAPI.getProfile()
       .then((u) => dispatch(setUser(u)))
@@ -121,7 +127,7 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
     try {
       const result = await dispatch(updateProfile({ username: editName.trim() }));
       if (updateProfile.fulfilled.match(result)) {
-        Alert.alert('', 'Ad güncellendi.');
+        Alert.alert('', t('account.name_updated', lang));
       }
     } finally {
       setNameLoading(false);
@@ -129,15 +135,15 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
   };
 
   const handleChangePassword = async () => {
-    if (!oldPw || !newPw) { Alert.alert('', 'Tüm alanları doldurun.'); return; }
-    if (newPw.length < 6)  { Alert.alert('', 'Yeni şifre en az 6 karakter olmalı.'); return; }
+    if (!oldPw || !newPw) { Alert.alert('', t('account.fill_all', lang)); return; }
+    if (newPw.length < 6)  { Alert.alert('', t('account.pw_min', lang)); return; }
     setPwLoading(true);
     try {
       await AuthAPI.changePassword(oldPw, newPw);
       setOldPw(''); setNewPw('');
-      Alert.alert('', 'Şifre değiştirildi.');
+      Alert.alert('', t('account.pw_changed', lang));
     } catch (e: any) {
-      Alert.alert('Hata', e.response?.data?.detail || 'Şifre değiştirilemedi.');
+      Alert.alert('', e.response?.data?.detail || t('account.pw_error', lang));
     } finally {
       setPwLoading(false);
     }
@@ -154,7 +160,7 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
     try {
       const result = await dispatch(updateProfile({ cosmetic_surgery_regions: surgeryRegions }));
       if (updateProfile.fulfilled.match(result)) {
-        Alert.alert('', 'Estetik operasyon bölgeleri kaydedildi. Bu bölgeler analizden muaf tutulacak.');
+        Alert.alert('', t('account.surgery_saved', lang));
       }
     } finally {
       setSurgeryLoading(false);
@@ -163,18 +169,21 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
 
   const handleExportData = async () => {
     Alert.alert(
-      'Verileri Dışa Aktar',
-      'Tüm kişisel verileriniz (GDPR Madde 20) JSON formatında hazırlanacak.',
+      t('account.export_title', lang),
+      t('account.export_confirm', lang),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('account.export_cancel', lang), style: 'cancel' },
         {
-          text: 'Dışa Aktar', onPress: async () => {
+          text: t('account.export_action', lang), onPress: async () => {
             setExportLoading(true);
             try {
               const data = await AuthAPI.exportData();
-              Alert.alert('Hazır', `Verileriniz hazırlandı.\n\nKayıt: ${data?.data?.analysis_history?.length || 0} analiz, ${data?.data?.assessment_results?.length || 0} test sonucu.`);
+              Alert.alert(
+                t('account.export_ready_title', lang),
+                `${t('account.export_ready_title', lang)}.\n\n${data?.data?.analysis_history?.length || 0} / ${data?.data?.assessment_results?.length || 0}`
+              );
             } catch (e: any) {
-              Alert.alert('Hata', e.response?.data?.detail || 'Dışa aktarma başarısız.');
+              Alert.alert('', e.response?.data?.detail || t('account.export_error', lang));
             } finally {
               setExportLoading(false);
             }
@@ -186,27 +195,27 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Hesabı Sil',
-      'Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecek. Devam etmek istiyor musunuz?',
+      t('account.delete_title', lang),
+      t('account.delete_confirm_msg', lang),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('account.export_cancel', lang), style: 'cancel' },
         {
-          text: 'Evet, Hesabımı Sil', style: 'destructive',
+          text: t('account.delete_yes', lang), style: 'destructive',
           onPress: () => {
             Alert.alert(
-              'Son Onay',
-              'Hesabınız ve tüm verileriniz kalıcı olarak silinecek.',
+              t('account.delete_final_title', lang),
+              t('account.delete_final_msg', lang),
               [
-                { text: 'Geri Dön', style: 'cancel' },
+                { text: t('account.delete_back', lang), style: 'cancel' },
                 {
-                  text: 'Kalıcı Olarak Sil', style: 'destructive',
+                  text: t('account.delete_permanent', lang), style: 'destructive',
                   onPress: async () => {
                     try {
                       await AuthAPI.deleteAccount();
                       await dispatch(logout());
                       navigation.replace('Auth');
                     } catch (e: any) {
-                      Alert.alert('Hata', e.response?.data?.detail || 'Hesap silinemedi.');
+                      Alert.alert('', e.response?.data?.detail || t('account.delete_error', lang));
                     }
                   },
                 },
@@ -227,52 +236,50 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hesabım</Text>
+        <Text style={styles.headerTitle}>{t('account.title', lang)}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* ─── 1. Kişisel Bilgiler ─────────────────────────────────────────── */}
-        <SectionLabel>Kişisel Bilgiler</SectionLabel>
+        <SectionLabel>{t('account.personal_info', lang)}</SectionLabel>
         <View style={styles.card}>
           <InputField
-            label="Ad Soyad"
+            label={t('account.full_name', lang)}
             value={editName}
             onChangeText={setEditName}
-            placeholder="Adınızı girin"
+            placeholder={t('account.name_placeholder', lang)}
             icon="👤"
           />
           <GoldButton
-            title="Kaydet"
+            title={t('account.save', lang)}
             onPress={handleSaveName}
             loading={nameLoading}
             style={styles.smallBtn}
           />
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>E-posta</Text>
+            <Text style={styles.infoLabel}>{t('account.email', lang)}</Text>
             <Text style={styles.infoValue}>{user?.email}</Text>
           </View>
           {user?.birth_year && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Doğum Yılı</Text>
+              <Text style={styles.infoLabel}>{t('account.birth_year', lang)}</Text>
               <Text style={styles.infoValue}>{user.birth_year}</Text>
             </View>
           )}
           {user?.country && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Ülke</Text>
+              <Text style={styles.infoLabel}>{t('account.country', lang)}</Text>
               <Text style={styles.infoValue}>{getCountryDisplay(user.country)}</Text>
             </View>
           )}
         </View>
 
         {/* ─── 2. Görünüm — Estetik Operasyon ─────────────────────────────── */}
-        <SectionLabel>Görünüm & Estetik Operasyon</SectionLabel>
+        <SectionLabel>{t('account.surgery_section', lang)}</SectionLabel>
         <View style={styles.card}>
-          <Text style={styles.sectionNote}>
-            Estetik operasyon geçirdiğiniz bölgeleri işaretleyin. Bu bölgeler yüz analizinden muaf tutulur.
-          </Text>
+          <Text style={styles.sectionNote}>{t('account.surgery_note', lang)}</Text>
           <View style={styles.regionGrid}>
             {SURGERY_REGIONS.map(region => {
               const selected = surgeryRegions.includes(region.key);
@@ -285,14 +292,14 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
                 >
                   <Text style={styles.regionEmoji}>{region.emoji}</Text>
                   <Text style={[styles.regionLabel, selected && styles.regionLabelSelected]}>
-                    {region.label}
+                    {t(`account.surgery_${region.key}` as any, lang)}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
           <GoldButton
-            title="Bölgeleri Kaydet"
+            title={t('account.save_regions', lang)}
             onPress={handleSaveSurgeryRegions}
             loading={surgeryLoading}
             style={styles.smallBtn}
@@ -300,32 +307,32 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
         </View>
 
         {/* ─── 3. Hedef ────────────────────────────────────────────────────── */}
-        <SectionLabel>Hedefim</SectionLabel>
+        <SectionLabel>{t('account.my_goal', lang)}</SectionLabel>
         <View style={styles.card}>
           {user?.goal ? (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Seçili Hedef</Text>
+              <Text style={styles.infoLabel}>{t('account.goal_selected', lang)}</Text>
               <Text style={styles.infoValue}>{user.goal}</Text>
             </View>
           ) : (
-            <Text style={styles.sectionNote}>Henüz bir hedef belirlenmedi.</Text>
+            <Text style={styles.sectionNote}>{t('account.goal_none', lang)}</Text>
           )}
           <TouchableOpacity
             style={styles.linkRow}
             onPress={() => navigation.replace('ProfileSetup')}
           >
-            <Text style={styles.linkText}>Profil Bilgilerini Düzenle →</Text>
+            <Text style={styles.linkText}>{t('account.edit_profile', lang)}</Text>
           </TouchableOpacity>
         </View>
 
         {/* ─── 4. Hesap Bilgileri ───────────────────────────────────────────── */}
-        <SectionLabel>Hesap Bilgileri</SectionLabel>
+        <SectionLabel>{t('account.account_info', lang)}</SectionLabel>
         <View style={styles.card}>
           <View style={styles.planRow}>
             <View>
-              <Text style={styles.planLabel}>Plan</Text>
+              <Text style={styles.planLabel}>{t('account.plan', lang)}</Text>
               <Text style={[styles.planValue, isPremium && styles.premiumText]}>
-                {isPremium ? 'Premium' : 'Ücretsiz'}
+                {isPremium ? 'Premium' : t('account.free_plan', lang)}
               </Text>
             </View>
             {isPremium && premiumLabel ? (
@@ -334,47 +341,47 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
               </View>
             ) : !isPremium ? (
               <TouchableOpacity style={styles.upgradeBtn}>
-                <Text style={styles.upgradeBtnText}>Premium'a Geç</Text>
+                <Text style={styles.upgradeBtnText}>{t('account.upgrade_btn', lang)}</Text>
               </TouchableOpacity>
             ) : null}
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Kayıt Tarihi</Text>
+            <Text style={styles.infoLabel}>{t('account.join_date', lang)}</Text>
             <Text style={styles.infoValue}>
-              {user?.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR') : '-'}
+              {user?.created_at ? new Date(user.created_at).toLocaleDateString(getLocale(lang)) : '-'}
             </Text>
           </View>
           {user?.last_login && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Son Giriş</Text>
+              <Text style={styles.infoLabel}>{t('account.last_login', lang)}</Text>
               <Text style={styles.infoValue}>
-                {new Date(user.last_login).toLocaleString('tr-TR')}
+                {new Date(user.last_login).toLocaleString(getLocale(lang))}
               </Text>
             </View>
           )}
         </View>
 
         {/* ─── 5. Güvenlik ─────────────────────────────────────────────────── */}
-        <SectionLabel>Güvenlik</SectionLabel>
+        <SectionLabel>{t('account.security', lang)}</SectionLabel>
         <View style={styles.card}>
           <InputField
-            label="Mevcut Şifre"
+            label={t('account.current_password', lang)}
             value={oldPw}
             onChangeText={setOldPw}
             secureTextEntry
-            placeholder="Mevcut şifreniz"
+            placeholder={t('account.current_pw_placeholder', lang)}
             icon="🔒"
           />
           <InputField
-            label="Yeni Şifre"
+            label={t('account.new_password', lang)}
             value={newPw}
             onChangeText={setNewPw}
             secureTextEntry
-            placeholder="En az 6 karakter"
+            placeholder={t('account.new_pw_placeholder', lang)}
             icon="🔑"
           />
           <GoldButton
-            title="Şifreyi Değiştir"
+            title={t('account.change_password', lang)}
             onPress={handleChangePassword}
             loading={pwLoading}
             style={styles.smallBtn}
@@ -382,43 +389,39 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
         </View>
 
         {/* ─── 6. Yasal ────────────────────────────────────────────────────── */}
-        <SectionLabel>Yasal</SectionLabel>
+        <SectionLabel>{t('account.legal', lang)}</SectionLabel>
         <View style={styles.card}>
           <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(TERMS_URL)}>
             <Text style={styles.legalIcon}>📄</Text>
-            <Text style={styles.legalText}>Kullanım Koşulları</Text>
+            <Text style={styles.legalText}>{t('account.terms', lang)}</Text>
             <Text style={styles.legalArrow}>›</Text>
           </TouchableOpacity>
           <View style={styles.divider} />
           <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(PRIVACY_URL)}>
             <Text style={styles.legalIcon}>🔐</Text>
-            <Text style={styles.legalText}>Gizlilik Politikası</Text>
+            <Text style={styles.legalText}>{t('account.privacy_policy', lang)}</Text>
             <Text style={styles.legalArrow}>›</Text>
           </TouchableOpacity>
         </View>
 
         {/* ─── 7. Veri & Hesap Silme ───────────────────────────────────────── */}
-        <SectionLabel>Verilerim</SectionLabel>
+        <SectionLabel>{t('account.my_data', lang)}</SectionLabel>
         <View style={styles.card}>
-          <Text style={styles.sectionNote}>
-            GDPR Madde 20 kapsamında tüm kişisel verilerinizi dışa aktarabilirsiniz.
-          </Text>
+          <Text style={styles.sectionNote}>{t('account.gdpr_note', lang)}</Text>
           {exportLoading ? (
             <ActivityIndicator color={colors.gold} style={{ marginVertical: spacing.md }} />
           ) : (
             <TouchableOpacity style={styles.exportBtn} onPress={handleExportData}>
-              <Text style={styles.exportBtnText}>Verilerimi Dışa Aktar (JSON)</Text>
+              <Text style={styles.exportBtnText}>{t('account.export_btn', lang)}</Text>
             </TouchableOpacity>
           )}
         </View>
 
         <View style={[styles.card, styles.deleteCard]}>
-          <Text style={styles.deleteTitle}>Hesabı Sil</Text>
-          <Text style={styles.deleteNote}>
-            Hesabınızı ve tüm verilerinizi kalıcı olarak silebilirsiniz. Bu işlem geri alınamaz.
-          </Text>
+          <Text style={styles.deleteTitle}>{t('account.delete_title', lang)}</Text>
+          <Text style={styles.deleteNote}>{t('account.delete_note', lang)}</Text>
           <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
-            <Text style={styles.deleteBtnText}>Hesabımı Kalıcı Olarak Sil</Text>
+            <Text style={styles.deleteBtnText}>{t('account.delete_btn', lang)}</Text>
           </TouchableOpacity>
         </View>
 

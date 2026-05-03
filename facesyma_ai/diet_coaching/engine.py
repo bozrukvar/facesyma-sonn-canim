@@ -150,11 +150,11 @@ class RecommendationEngine:
         _exclude = self._exclude_recent_meals
         _top     = self._get_top_meals
         _reason  = self._generate_reason
-        lang_code = user_profile.language_code
-        country = self.db.get_country_meals(lang_code)
+        country_code = user_profile.country_code
+        country = self.db.get_country_meals(country_code)
 
         if not country:
-            raise ValueError(f"Country not found: {lang_code}")
+            raise ValueError(f"Country not found: {country_code}")
 
         # Son 7 gündeki yemek ID'lerini al
         recent_meal_ids = [meal.meal_id for meal in user_profile.last_7_meals]
@@ -165,28 +165,18 @@ class RecommendationEngine:
         # Sabah, öğlen, akşam için tavsiye yap
         _sifats = user_profile.sifats
         _cm = country.meals
-        breakfast_meals = _cm.breakfast
-        breakfast_meals = _filter(breakfast_meals, dietary_pref)
-        breakfast_meals = _exclude(breakfast_meals, recent_meal_ids)
-        breakfast_top = _top(breakfast_meals, _sifats, "breakfast", count=1)
 
-        lunch_meals = _cm.lunch
-        lunch_meals = _filter(lunch_meals, dietary_pref)
-        lunch_meals = _exclude(lunch_meals, recent_meal_ids)
-        lunch_top = _top(lunch_meals, _sifats, "lunch", count=1)
+        def _best_meals(raw: list, label: str):
+            filtered = _filter(_exclude(raw, recent_meal_ids), dietary_pref)
+            if not filtered:
+                # dietary filter eliminated everything — fall back to unfiltered
+                filtered = _exclude(raw, recent_meal_ids) or raw
+            top = _top(filtered, _sifats, label, count=1)
+            return top if top else [(filtered[0], 0)] if filtered else [(None, 0)]
 
-        dinner_meals = _cm.dinner
-        dinner_meals = _filter(dinner_meals, dietary_pref)
-        dinner_meals = _exclude(dinner_meals, recent_meal_ids)
-        dinner_top = _top(dinner_meals, _sifats, "dinner", count=1)
-
-        # Fallback: Eğer yemek bulunamadısa default seç
-        if not breakfast_top:
-            breakfast_top = [(breakfast_meals[0], 0) if breakfast_meals else (None, 0)]
-        if not lunch_top:
-            lunch_top = [(lunch_meals[0], 0) if lunch_meals else (None, 0)]
-        if not dinner_top:
-            dinner_top = [(dinner_meals[0], 0) if dinner_meals else (None, 0)]
+        breakfast_top = _best_meals(_cm.breakfast, "breakfast")
+        lunch_top     = _best_meals(_cm.lunch,     "lunch")
+        dinner_top    = _best_meals(_cm.dinner,    "dinner")
 
         breakfast_meal = breakfast_top[0][0]
         lunch_meal = lunch_top[0][0]
@@ -263,17 +253,15 @@ class RecommendationEngine:
         """
         Bir öğün için alternatif tavsiyeleri al.
         """
-        lang_code = user_profile.language_code
-        country = self.db.get_country_meals(lang_code)
+        country_code = user_profile.country_code
+        country = self.db.get_country_meals(country_code)
 
         if not country:
             return []
 
-        # Beslenme tercihini kontrol et
         dietary_pref = user_profile.dietary_preference
         recent_meal_ids = [meal.meal_id for meal in user_profile.last_7_meals]
 
-        # Öğün tipine göre yemekleri al
         _cm = country.meals
         if meal_type == "breakfast":
             meals = _cm.breakfast
@@ -282,13 +270,11 @@ class RecommendationEngine:
         else:
             meals = _cm.dinner
 
-        # Filtrele ve tekrarlama engelle
-        meals = _filter(meals, dietary_pref)
-        meals = _exclude(meals, recent_meal_ids)
+        meals = self._filter_meals_by_dietary(meals, dietary_pref)
+        meals = self._exclude_recent_meals(meals, recent_meal_ids)
 
-        # Top yemekleri al
         _sifats = user_profile.sifats
-        top_meals = _top(meals, _sifats, meal_type, count=count)
+        top_meals = self._get_top_meals(meals, _sifats, meal_type, count=count)
 
         # Dict olarak döndür
         alternatives = []

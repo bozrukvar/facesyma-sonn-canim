@@ -245,12 +245,12 @@ class ReviewStatsView(View):
             ],
         }}]), {})
         _rget2 = _r.get
-        total   = (_rget2('total',   [{}])[0] or {}).get('n', 0)
-        visible = (_rget2('visible', [{}])[0] or {}).get('n', 0)
-        hidden  = (_rget2('hidden',  [{}])[0] or {}).get('n', 0)
+        total   = (_rget2('total',   []) or [{}])[0].get('n', 0)
+        visible = (_rget2('visible', []) or [{}])[0].get('n', 0)
+        hidden  = (_rget2('hidden',  []) or [{}])[0].get('n', 0)
         sentiment_dict = {doc['_id']: doc['count'] for doc in _rget2('by_sentiment', [])}
         platform_dict  = {doc['_id']: doc['count'] for doc in _rget2('by_platform',  [])}
-        avg_rating = round((_rget2('avg_rating', [{}])[0] or {}).get('avg', 0) or 0, 2)
+        avg_rating = round((_rget2('avg_rating', []) or [{}])[0].get('avg', 0) or 0, 2)
 
         return JsonResponse({
             'total_reviews': total,
@@ -285,7 +285,10 @@ class ReviewUpdateView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         data = _json(request)
-        _rid = int(rid)
+        try:
+            _rid = int(rid)
+        except (ValueError, TypeError):
+            return JsonResponse({'detail': f'Invalid review id: {rid}'}, status=400)
         col = get_reviews_col()
         _cfo = col.find_one
 

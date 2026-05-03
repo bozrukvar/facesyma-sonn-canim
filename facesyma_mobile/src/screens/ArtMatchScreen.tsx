@@ -1,7 +1,10 @@
 // src/screens/ArtMatchScreen.tsx
 // Yüz → sanat eseri eşleşmesi
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image, Alert } from 'react-native';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  ActivityIndicator, Image, Alert,
+} from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Card, GoldButton } from '../components/ui';
 import { AnalysisAPI } from '../services/api';
@@ -15,6 +18,19 @@ import { AppDispatch } from '../store';
 import { markModuleUsed } from '../store/authSlice';
 import type { ScreenProps } from '../navigation/types';
 import type { ArtMatchResult } from '../types/api';
+
+const CLUSTER_COLORS: Record<string, string> = {
+  leadership:   '#E53935',
+  intelligence: '#1E88E5',
+  creativity:   '#8E24AA',
+  patience:     '#00897B',
+  strength:     '#FB8C00',
+  empathy:      '#D81B60',
+  mystery:      '#5E35B1',
+  discipline:   '#546E7A',
+  social:       '#43A047',
+  charisma:     '#F9A825',
+};
 
 const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
   const insets = useSafeAreaInsets();
@@ -54,6 +70,7 @@ const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
         <Text style={styles.title}>{t('artmatch.title', lang)}</Text>
         <View style={styles.spacer} />
       </View>
+
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {imageUri
           ? <Image source={{ uri: imageUri }} style={styles.preview} />
@@ -64,25 +81,71 @@ const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
             </Card>
           )
         }
-        <GoldButton title={t('artmatch.choose_gallery', lang)} onPress={pickImage} variant="outline" style={styles.chooseBtn} />
+
+        <GoldButton
+          title={t('artmatch.choose_gallery', lang)}
+          onPress={pickImage}
+          variant="outline"
+          style={styles.chooseBtn}
+        />
         {imageUri && (
           <GoldButton title={t('artmatch.match', lang)} onPress={analyze} loading={loading} />
         )}
+
         {result && (
           <>
             <Text style={styles.gradeRow}>
               {t('artmatch.score', lang)}: {result.overall_score}  ·  {result.grade}
             </Text>
-            {(result.matches ?? []).map(({ id: mId, rank, title, artist, year, museum, style: mStyle, similarity }) => (
-              <Card key={mId} variant={rank === 1 ? 'gold' : undefined} style={styles.matchCard}>
-                <Text style={styles.matchRank}>#{rank}</Text>
-                <Text style={styles.matchTitle}>{title}</Text>
-                <Text style={styles.matchSub}>{artist}  ·  {year}</Text>
-                <Text style={styles.matchSub}>{museum}</Text>
-                <Text style={styles.matchStyle}>{mStyle}</Text>
-                <Text style={styles.matchSimilarity}>{t('artmatch.similarity', lang)}: {similarity}%</Text>
-              </Card>
-            ))}
+
+            {(result.matches ?? []).map(match => {
+              const {
+                id: mId, rank, title, artist, year, museum,
+                style: mStyle, similarity, image_url, reason, primary_cluster, emoji,
+              } = match;
+              const clusterColor = CLUSTER_COLORS[primary_cluster ?? ''] ?? colors.gold;
+
+              return (
+                <Card key={mId} variant={rank === 1 ? 'gold' : undefined} style={styles.matchCard}>
+                  {/* Artwork image */}
+                  {image_url ? (
+                    <Image
+                      source={{ uri: image_url }}
+                      style={styles.artImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.artImagePlaceholder}>
+                      <Text style={styles.artEmoji}>{emoji ?? '🖼'}</Text>
+                    </View>
+                  )}
+
+                  {/* Cluster badge */}
+                  {primary_cluster ? (
+                    <View style={[styles.clusterBadge, { backgroundColor: clusterColor }]}>
+                      <Text style={styles.clusterBadgeText}>
+                        {t(`cluster.${primary_cluster}`, lang)}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  <Text style={styles.matchRank}>#{rank}</Text>
+                  <Text style={styles.matchTitle}>{title}</Text>
+                  <Text style={styles.matchSub}>{artist}  ·  {year}</Text>
+                  <Text style={styles.matchSub}>{museum}</Text>
+                  <Text style={styles.matchStyle}>{mStyle}</Text>
+                  <Text style={styles.matchSimilarity}>
+                    {t('artmatch.similarity', lang)}: {similarity}%
+                  </Text>
+
+                  {/* Reason */}
+                  {reason ? (
+                    <Text style={styles.reason}>{reason}</Text>
+                  ) : null}
+                </Card>
+              );
+            })}
+
             {result.message ? (
               <Card style={styles.messageCard}>
                 <Text style={styles.matchSub}>{result.message}</Text>
@@ -96,29 +159,45 @@ const ArtMatchScreen = ({ navigation, route }: ScreenProps<'ArtMatch'>) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container:    { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  back:       { ...typography.body, color: colors.gold, fontSize: 22 },
-  title:      { ...typography.h3 },
-  scroll:     { padding: spacing.lg, paddingBottom: spacing.xxxl },
-  preview:    { width: '100%', height: 280, borderRadius: radius.xl, marginBottom: 16 },
-  pickArea:       { alignItems: 'center', padding: spacing.xxxl, marginBottom: 16, borderStyle: 'dashed' },
-  pickText:       { ...typography.body, textAlign: 'center', color: colors.textWarm },
-  gradeRow:       { ...typography.label, color: colors.gold, textAlign: 'center', marginVertical: 12 },
-  matchRank:      { ...typography.caption, color: colors.textMuted, marginBottom: 2 },
-  matchTitle:     { ...typography.h3, fontSize: 16, marginBottom: 2 },
-  matchSub:       { ...typography.bodyWarm, fontSize: 12, color: colors.textWarm, marginBottom: 2 },
-  matchStyle:     { ...typography.caption, color: colors.textMuted, marginBottom: 4 },
-  matchSimilarity:{ ...typography.label, color: colors.gold, fontSize: 13 },
-  spacer:     { width: 40 },
-  pickEmoji:  { fontSize: 48, marginBottom: 12 },
-  chooseBtn:  { marginBottom: 10 },
-  matchCard:  { marginBottom: 12 },
-  messageCard:{ marginBottom: 16 },
+  back:         { ...typography.body, color: colors.gold, fontSize: 22 },
+  title:        { ...typography.h3 },
+  spacer:       { width: 40 },
+  scroll:       { padding: spacing.lg, paddingBottom: spacing.xxxl },
+  preview:      { width: '100%', height: 280, borderRadius: radius.xl, marginBottom: 16 },
+  pickArea:     { alignItems: 'center', padding: spacing.xxxl, marginBottom: 16, borderStyle: 'dashed' },
+  pickEmoji:    { fontSize: 48, marginBottom: 12 },
+  pickText:     { ...typography.body, textAlign: 'center', color: colors.textWarm },
+  chooseBtn:    { marginBottom: 10 },
+  gradeRow:     { ...typography.label, color: colors.gold, textAlign: 'center', marginVertical: 12 },
+  matchCard:    { marginBottom: 12 },
+  artImage: {
+    width: '100%', height: 200, borderRadius: radius.md,
+    marginBottom: 10, backgroundColor: colors.surface,
+  },
+  artImagePlaceholder: {
+    width: '100%', height: 140, borderRadius: radius.md,
+    backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 10,
+  },
+  artEmoji:     { fontSize: 60 },
+  clusterBadge: {
+    alignSelf: 'flex-start', borderRadius: 12,
+    paddingHorizontal: 10, paddingVertical: 3, marginBottom: 8,
+  },
+  clusterBadgeText: { color: '#fff', fontSize: 11, fontWeight: '600' },
+  matchRank:    { ...typography.caption, color: colors.textMuted, marginBottom: 2 },
+  matchTitle:   { ...typography.h3, fontSize: 16, marginBottom: 2 },
+  matchSub:     { ...typography.bodyWarm, fontSize: 12, color: colors.textWarm, marginBottom: 2 },
+  matchStyle:   { ...typography.caption, color: colors.textMuted, marginBottom: 4 },
+  matchSimilarity: { ...typography.label, color: colors.gold, fontSize: 13, marginBottom: 8 },
+  reason:       { ...typography.body, fontSize: 13, color: colors.text, fontStyle: 'italic', marginTop: 4 },
+  messageCard:  { marginBottom: 16 },
 });
 
 export default ArtMatchScreen;

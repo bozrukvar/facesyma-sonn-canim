@@ -186,9 +186,9 @@ class AuditLogStatsView(View):
                 'unique_adm': [{'$group': {'_id': '$admin_id'}}],
             }}]), {})
             _afget = _af.get
-            total_actions  = (_afget('total', [{}])[0] or {}).get('n', 0)
-            today_actions  = (_afget('today', [{}])[0] or {}).get('n', 0)
-            week_actions   = (_afget('week',  [{}])[0] or {}).get('n', 0)
+            total_actions  = (_afget('total', []) or [{}])[0].get('n', 0)
+            today_actions  = (_afget('today', []) or [{}])[0].get('n', 0)
+            week_actions   = (_afget('week',  []) or [{}])[0].get('n', 0)
             unique_admins  = len(_afget('unique_adm', []))
             action_breakdown = {doc['_id']: doc['count'] for doc in _afget('by_action', [])}
             top_admins = [

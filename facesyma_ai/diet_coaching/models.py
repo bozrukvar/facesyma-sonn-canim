@@ -63,7 +63,8 @@ class MealsByType(BaseModel):
 class CountryMeals(BaseModel):
     """Bir ülkenin tüm yemekleri"""
     country: str
-    language_code: str = Field(..., description="ISO 639-1 dil kodu (tr, en, hi, etc.)")
+    country_code: str = Field(default="", description="ISO 3166-1 alpha-2 ülke kodu (TR, MX, SA, etc.)")
+    language_code: str = Field(default="en", description="ISO 639-1 dil kodu (tr, en, hi, etc.)")
     meals: MealsByType
 
     class Config:
@@ -124,8 +125,9 @@ class UserMealHistory(BaseModel):
 class UserProfile(BaseModel):
     """Tavsiye için kullanıcı profili"""
     user_id: int
-    country: str = Field(default="Turkey", description="Ülke adı")
-    language_code: str = Field(default="tr", description="Dil kodu")
+    country_code: str = Field(default="TR", description="ISO 3166-1 alpha-2 ülke kodu (TR, US, MX, SA, …)")
+    country: str = Field(default="Turkey", description="Ülke adı (görüntüleme için)")
+    language_code: str = Field(default="tr", description="Dil kodu (mesaj dili için)")
     sifats: List[UserSifat]
     dietary_preference: DietaryPreferences = Field(default_factory=DietaryPreferences)
     last_7_meals: List[UserMealHistory] = Field(default_factory=list)
@@ -178,7 +180,8 @@ class FeedbackRequest(BaseModel):
 class CountryInfo(BaseModel):
     """Ülke bilgisi"""
     name: str
-    language_code: str
+    country_code: str = ""
+    language_code: str = ""
     meal_count: int = 0
 
     class Config:

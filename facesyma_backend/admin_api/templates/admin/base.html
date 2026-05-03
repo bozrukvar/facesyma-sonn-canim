@@ -1,6 +1,6 @@
 {% load i18n %}
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -289,26 +289,104 @@
             color: #F44336;
         }
 
+        /* --- Mobile overlay --- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* --- Hamburger button --- */
+        .hamburger-btn {
+            display: none;
+            position: fixed;
+            top: 13px;
+            left: 13px;
+            z-index: 1002;
+            background: #1a1918;
+            border: 1px solid #3a3632;
+            color: #d4af37;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .hamburger-btn:hover { background: #2a2928; }
+
+        /* --- Loading spinner --- */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(212, 175, 55, 0.25);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            vertical-align: middle;
+        }
+        .spinner-lg { width: 40px; height: 40px; border-width: 3px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 40px;
+            color: #707070;
+        }
+
+        /* --- Responsive --- */
         @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid #2a2928;
+                transform: translateX(-260px);
+                transition: transform 0.3s ease;
+                z-index: 1000;
             }
+            .sidebar.open { transform: translateX(0); }
 
             .main-content {
                 margin-left: 0;
+                padding: 20px 15px;
+                padding-top: 66px;
             }
 
             .stat-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .card {
+                overflow-x: auto;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-cards {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile hamburger -->
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
@@ -331,6 +409,7 @@
             <li><a href="/admin/reviews/" class="{% block nav-reviews %}{% endblock %}">💬 Yorumlar</a></li>
             <li><a href="/admin/coach/" class="{% block nav-coach %}{% endblock %}">🤖 Coach DB</a></li>
             <li><a href="/admin/subscriptions/" class="{% block nav-subscriptions %}{% endblock %}">💰 Abonelikler</a></li>
+            <li><a href="/admin/gamification/" class="{% block nav-gamification %}{% endblock %}">🎮 Gamification</a></li>
             <li><a href="/admin/logout/" style="color: #F44336;">🚪 Çıkış</a></li>
         </ul>
     </div>
@@ -355,40 +434,64 @@
             return div.innerHTML;
         }
 
-        // API isteği yardımcısı
+        // Use browser locale for date formatting
+        window.ADMIN_LOCALE = navigator.language || 'tr-TR';
+
+        // API call with 30-second timeout
         async function apiCall(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('admin_token');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
             const options = {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                signal: controller.signal,
             };
-
             if (body) options.body = JSON.stringify(body);
-
-            const response = await fetch(`/api/v1/admin${endpoint}`, options);
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    // Token geçersiz, login'e yönlendir
-                    localStorage.removeItem('admin_token');
-                    window.location.href = '/admin/login/';
+            try {
+                const response = await fetch(`/api/v1/admin${endpoint}`, options);
+                clearTimeout(timeoutId);
+                const data = await response.json();
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('admin_token');
+                        window.location.href = '/admin/login/';
+                    }
+                    throw new Error(data.detail || 'API hatası');
                 }
-                throw new Error(data.detail || 'API hatası');
+                return data;
+            } catch (err) {
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') throw new Error('İstek zaman aşımına uğradı (30s)');
+                throw err;
             }
-
-            return data;
         }
 
-        // Token varsa sayfada kalma, yoksa login'e yönlendir
+        // Redirect to login if no token (client-side guard)
         window.addEventListener('load', function() {
             const token = localStorage.getItem('admin_token');
             if (!token && window.location.pathname !== '/admin/login/') {
                 window.location.href = '/admin/login/';
             }
+        });
+
+        // Hamburger sidebar toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('#sidebarOverlay').classList.toggle('open');
+        }
+
+        // ESC key: close modals and mobile sidebar
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Escape') return;
+            document.querySelectorAll('.modal, [role="dialog"]').forEach(function(m) {
+                if (m.style.display && m.style.display !== 'none') m.style.display = 'none';
+            });
+            document.querySelector('.sidebar')?.classList.remove('open');
+            document.querySelector('#sidebarOverlay')?.classList.remove('open');
         });
     </script>
 

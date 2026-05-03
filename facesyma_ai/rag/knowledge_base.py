@@ -18,6 +18,7 @@ import os
 import logging
 import hashlib
 import json
+from pathlib import Path
 from typing import List, Dict, Any
 
 try:
@@ -30,7 +31,8 @@ from core.redis_client import redis_get, redis_set
 
 log = logging.getLogger(__name__)
 
-CHROMA_PATH = os.environ.get("CHROMA_PATH", "./chroma_db")
+_DEFAULT_CHROMA_PATH = str(Path(__file__).parent.parent / "chroma_db")
+CHROMA_PATH = os.environ.get("CHROMA_PATH", _DEFAULT_CHROMA_PATH)
 CHROMA_QUERY_CACHE_TTL = 86400  # 1 day
 
 # Module-level Chroma client singleton

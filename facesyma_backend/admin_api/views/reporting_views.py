@@ -34,7 +34,10 @@ class ReportGeneratorView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             _now = datetime.utcnow()
             db = _get_db()
@@ -126,7 +129,10 @@ class ReportScheduleView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             _now = datetime.utcnow()
             db = _get_db()
@@ -216,7 +222,7 @@ class ReportHistoryView(View):
                 ],
             }}]), {})
             _rfget = _rf.get
-            total_reports = (_rfget('total', [{}])[0] or {}).get('n', 0)
+            total_reports = (_rfget('total', []) or [{}])[0].get('n', 0)
             stats = {rtype: 0 for rtype in _REPORT_STAT_TYPES}
             for doc in _rfget('by_type', []):
                 _did = doc['_id']

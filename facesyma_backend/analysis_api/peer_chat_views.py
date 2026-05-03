@@ -20,7 +20,7 @@ import logging
 import time
 import os
 import uuid
-from datetime import date
+from datetime import date, datetime
 
 import jwt
 from bson import ObjectId
@@ -46,9 +46,14 @@ _PEER_DAILY_LIMITS = {'free': 5, 'premium': 200}
 _FILE_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 _REQUEST_EXPIRE_SECONDS = 48 * 3600  # 48 saat
 _MIN_MODULES_FOR_FREE = 3
+_ALLOWED_CHAT_EXTS = frozenset({
+    '.jpg', '.jpeg', '.png', '.gif', '.webp',  # images
+    '.pdf', '.txt', '.doc', '.docx',            # documents
+    '.mp4', '.mov', '.mp3',                     # media
+})
 
 # ── Projection sabitleri ───────────────────────────────────────────────────────
-_USER_PROJ  = {'_id': 0, 'id': 1, 'username': 1, 'plan': 1, 'modules': 1}
+_USER_PROJ  = {'_id': 0, 'id': 1, 'username': 1, 'plan': 1, 'modules': 1, 'birth_year': 1}
 _MSG_PROJ   = {'_id': 1, 'room_id': 1, 'sender_id': 1, 'content': 1,
                'type': 1, 'file_url': 1, 'file_name': 1, 'file_size_bytes': 1,
                'created_at': 1, 'read_by': 1}
@@ -181,6 +186,11 @@ class SendChatRequestView(View):
         user = _get_user(user_id)
         if not user:
             return JsonResponse({'detail': 'User not found.'}, status=404)
+
+        # 18+ yaş kontrolü
+        birth_year = user.get('birth_year')
+        if birth_year and birth_year > datetime.utcnow().year - 18:
+            return JsonResponse({'detail': 'age_restricted', 'min_age': 18}, status=403)
 
         # Kilit kontrolü
         unlocked, reason = _check_chat_unlock(user)
@@ -614,16 +624,23 @@ class UploadChatFileView(View):
                 'code': 'file_too_large'
             }, status=413)
 
-        room_id = request.POST.get('room_id', '')
-        if room_id:
-            room = get_peer_chat_rooms_col().find_one(
-                {'room_id': room_id, 'user_ids': user_id, 'is_active': True}
-            )
-            if not room:
-                return JsonResponse({'detail': 'Oda bulunamadı.'}, status=404)
+        room_id = request.POST.get('room_id', '').strip()
+        if not room_id:
+            return JsonResponse({'detail': 'room_id gerekli.'}, status=400)
+
+        room = get_peer_chat_rooms_col().find_one(
+            {'room_id': room_id, 'user_ids': user_id, 'is_active': True}
+        )
+        if not room:
+            return JsonResponse({'detail': 'Oda bulunamadı.'}, status=404)
 
         # Dosyayı media dizinine kaydet
         ext = os.path.splitext(uploaded.name)[1].lower()
+        if ext not in _ALLOWED_CHAT_EXTS:
+            return JsonResponse({
+                'detail': f'Desteklenmeyen dosya türü: {ext}. İzin verilenler: resim, PDF, video.',
+                'code': 'invalid_file_type'
+            }, status=400)
         filename = f"chat_{user_id}_{uuid.uuid4().hex}{ext}"
         media_root = getattr(settings, 'MEDIA_ROOT', '/tmp/chat_files')
         os.makedirs(media_root, exist_ok=True)

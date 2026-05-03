@@ -18,9 +18,25 @@ export type RootStackParamList = {
   Account:           undefined;
   Fashion:           { analysisResult?: unknown; lang?: string } | undefined;
   Communities:       { communityType?: string } | undefined;
+  CommunityChat:     { communityId: string; communityName: string };
   PeerChatList:      undefined;
   PeerChatRequest:   { requestId?: string; toUserId?: number; toUsername?: string; compatScore?: number; source?: string };
   PeerChat:          { roomId: string; otherUserId: number; otherUsername: string; compatScore?: number };
+  Diet:              undefined;
+  Gamification:      undefined;
+  Leaderboard:       { tab?: 'global' | 'trending' } | undefined;
+  Badges:            { badgeId?: string } | undefined;
+  CoinWallet:        undefined;
+  MealGame:          { countryCode?: string } | undefined;
+  DiscoveryGame:     { gameType?: string } | undefined;
+  Challenges:        undefined;
+  Missions:          undefined;
+  CoachHub:          undefined;
+  CoachGoals:        undefined;
+  CoachBirth:        undefined;
+  GoldenRatioOverlay: { imageUri: string; lang: string; goldenScore: number; goldenGrade: string };
+  GoldenTransform:    { imageUri: string; lang: string; realMeasurements?: any[] };
+  Similarity:         { sifatlar: string[]; lang: string };
 };
 
 export type TabParamList = {

@@ -88,10 +88,10 @@ class HealthMonitoringView(View):
             ])
             metrics = {
                 doc['_id']: {
-                    'cpu_usage':    (_dg := doc.get)('cpu_usage', 0),
-                    'memory_usage': _dg('memory_usage', 0),
-                    'disk_usage':   _dg('disk_usage', 0),
-                    'connections':  _dg('connections', 0),
+                    'cpu_usage':    doc.get('cpu_usage', 0),
+                    'memory_usage': doc.get('memory_usage', 0),
+                    'disk_usage':   doc.get('disk_usage', 0),
+                    'connections':  doc.get('connections', 0),
                 }
                 for doc in metrics_agg
             }
@@ -155,7 +155,10 @@ class AlertConfigView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             db = _get_db()
             alert_col = db['alert_rules']
@@ -243,9 +246,9 @@ class AlertHistoryView(View):
                 ],
             }}]), {})
             _hfget = _hf.get
-            total_alerts = (_hfget('total', [{}])[0] or {}).get('n', 0)
-            stats = {sev: (_hfget(sev, [{}])[0] or {}).get('n', 0) for sev in _VALID_ALERT_SEVERITIES}
-            _avg_ms = (_hfget('resolved', [{}])[0] or {}).get('avg', 0) or 0
+            total_alerts = (_hfget('total', []) or [{}])[0].get('n', 0)
+            stats = {sev: (_hfget(sev, []) or [{}])[0].get('n', 0) for sev in _VALID_ALERT_SEVERITIES}
+            _avg_ms = (_hfget('resolved', []) or [{}])[0].get('avg', 0) or 0
             avg_resolution_time = _avg_ms / 3600
 
             return JsonResponse({

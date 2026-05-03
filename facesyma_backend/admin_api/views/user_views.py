@@ -206,13 +206,13 @@ class UserStatsView(View):
             'by_auth':  [{'$group': {'_id': '$auth_method', 'count': {'$sum': 1}}}],
         }}]), {})
         _sget = _s.get
-        total            = (_sget('total',    [{}])[0] or {}).get('n', 0)
-        active           = (_sget('active',   [{}])[0] or {}).get('n', 0)
-        inactive         = (_sget('inactive', [{}])[0] or {}).get('n', 0)
-        registered_today = (_sget('today',    [{}])[0] or {}).get('n', 0)
-        registered_week  = (_sget('week',     [{}])[0] or {}).get('n', 0)
-        web_users        = (_sget('web',      [{}])[0] or {}).get('n', 0)
-        mobile_users     = (_sget('mobile',   [{}])[0] or {}).get('n', 0)
+        total            = (_sget('total',    []) or [{}])[0].get('n', 0)
+        active           = (_sget('active',   []) or [{}])[0].get('n', 0)
+        inactive         = (_sget('inactive', []) or [{}])[0].get('n', 0)
+        registered_today = (_sget('today',    []) or [{}])[0].get('n', 0)
+        registered_week  = (_sget('week',     []) or [{}])[0].get('n', 0)
+        web_users        = (_sget('web',      []) or [{}])[0].get('n', 0)
+        mobile_users     = (_sget('mobile',   []) or [{}])[0].get('n', 0)
         plan_dict        = {doc['_id'] or 'free': doc['count'] for doc in _sget('by_plan', [])}
         auth_dict        = {doc['_id']: doc['count']           for doc in _sget('by_auth', [])}
 
@@ -389,7 +389,7 @@ class UserDeleteView(View):
         history_col = get_history_col()
 
         # Kullanıcı var mı?
-        user = users_col.find_one({'id': _uid}, {'_id': 1})
+        user = users_col.find_one({'id': _uid}, {'_id': 1, 'email': 1})
         if not user:
             return JsonResponse(
                 {'detail': 'User not found.'},

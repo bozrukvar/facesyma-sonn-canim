@@ -1,11 +1,11 @@
 // src/screens/AssessmentScreen.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Dimensions, ActivityIndicator, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AssessmentAPI } from '../services/api';
+import { AssessmentAPI, TestAPI, TestSubmitResponse, StressDetails, NonverbalDetails, NonverbalAnswer } from '../services/api';
 import { Card, GoldButton, SectionLabel, Badge } from '../components/ui';
 import theme from '../utils/theme';
 const { colors } = theme;
@@ -41,6 +41,9 @@ const AVAILABLE_LANGUAGES = [
 ];
 
 // Test types with i18n keys
+// isNewService=true  → /test/ FastAPI servisi kullanılır
+// requiresConsent=true → başlamadan önce sağlık onayı istenir
+// newServiceType → test servisine gönderilecek gerçek tip adı (farklıysa)
 const TEST_TYPES = [
   { id: 'skills',           key: 'assessment.skills',           key_desc: 'assessment.skills_desc',           emoji: '🎯' },
   { id: 'hr',               key: 'assessment.hr',               key_desc: 'assessment.hr_desc',               emoji: '👥' },
@@ -56,7 +59,14 @@ const TEST_TYPES = [
   { id: 'body_image',       key: 'assessment.body_image',       key_desc: 'assessment.body_image_desc',       emoji: '🪞' },
   { id: 'self_efficacy',    key: 'assessment.self_efficacy',    key_desc: 'assessment.self_efficacy_desc',    emoji: '⚡' },
   { id: 'stress',           key: 'assessment.stress',           key_desc: 'assessment.stress_desc',           emoji: '🧘' },
-];
+  // ── Yeni servis testleri (/test/ FastAPI) ──────────────────────────────────
+  { id: 'eq',             key: 'assessment.eq',             key_desc: 'assessment.eq_desc',             emoji: '💡', isNewService: true },
+  { id: 'values',         key: 'assessment.values',         key_desc: 'assessment.values_desc',         emoji: '⭐', isNewService: true },
+  { id: 'stress_clinical',    key: 'assessment.stress_clinical',       key_desc: 'assessment.stress_clinical_desc',       emoji: '🏥', isNewService: true, requiresConsent: true, newServiceType: 'stress' },
+  // ── Nonverbal testler ─────────────────────────────────────────────────────────
+  { id: 'emotion_recognition', key: 'assessment.emotion_recognition',  key_desc: 'assessment.emotion_recognition_desc',  emoji: '😊', isNewService: true, nonverbal: true },
+  { id: 'stroop',              key: 'assessment.stroop',               key_desc: 'assessment.stroop_desc',               emoji: '🎨', isNewService: true, nonverbal: true },
+] as const;
 
 const getLikertLabels = (lang: string) => [
   t('assessment.likert_1', lang),
@@ -72,9 +82,26 @@ interface Question {
   q_id: string;
   order: number;
   text: string;
-  domain: string;
-  reverse_scored: boolean;
+  domain?: string;
+  reverse_scored?: boolean;
+  // Nonverbal fields
+  display_type?: 'emotion_recognition' | 'stroop';
+  emoji?: string;
+  options?: { key: string; label: string }[];
+  ink_color?: string;
+  ink_hex?: string;
+  word?: string;
+  color_options?: { key: string; label: string; hex: string }[];
 }
+
+// Yeni test servisi için severity çevirisi
+const SEVERITY_KEYS: Record<string, string> = {
+  minimal: 'assessment.severity_minimal',
+  mild: 'assessment.severity_mild',
+  moderate: 'assessment.severity_moderate',
+  moderately_severe: 'assessment.severity_moderately_severe',
+  severe: 'assessment.severity_severe',
+};
 
 interface QuestionData {
   success: boolean;
@@ -113,22 +140,50 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
   const [responses, setResponses] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
+  // Yeni test servisi state'leri
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [newServiceResult, setNewServiceResult] = useState<TestSubmitResponse | null>(null);
+  const [scaleLabels, setScaleLabels] = useState<string[]>([]);
+  // Nonverbal test state'leri (tek soru gösterimi + zamanlama)
+  const [nvIndex, setNvIndex] = useState(0);
+  const [nvAnswers, setNvAnswers] = useState<NonverbalAnswer[]>([]);
+  const questionStartRef = useRef<number>(Date.now());
   // Must be at top level — not inside conditionals (Rules of Hooks)
   const LIKERT_LABELS = useMemo(() => getLikertLabels(lang), [lang]);
 
   // Seç: Test türü seç
   const startTest = async (testId: string) => {
+    const testMeta = TEST_TYPES.find(t => t.id === testId);
+
+    // Yeni test servisi mi?
+    if (testMeta && 'isNewService' in testMeta && testMeta.isNewService) {
+      // Sağlık onayı gerektiren testler için önce dialog
+      if ('requiresConsent' in testMeta && testMeta.requiresConsent) {
+        Alert.alert(
+          t('assessment.health_consent_title', lang),
+          t('assessment.health_consent_body', lang),
+          [
+            { text: t('assessment.consent_cancel', lang), style: 'cancel' },
+            { text: t('assessment.consent_accept', lang), onPress: () => _startNewServiceTest(testId, testMeta) },
+          ]
+        );
+        return;
+      }
+      _startNewServiceTest(testId, testMeta);
+      return;
+    }
+
+    // Eski servis akışı
     setSelectedTest(testId);
     setStep('loading_questions');
     setLoading(true);
     const errTitle = t('common.error', lang);
     const errGeneric = t('assessment.error_generic', lang);
-
     try {
       const data = await AssessmentAPI.getQuestions(testId, lang);
       if (data.success) {
         setQuestions(data.data.questions);
-        setResponses({}); // Reset responses
+        setResponses({});
         setStep('answering');
       } else {
         Alert.alert(errTitle, t('assessment.error_load', lang));
@@ -142,40 +197,72 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     }
   };
 
+  const _startNewServiceTest = async (testId: string, testMeta: any) => {
+    setSelectedTest(testId);
+    setStep('loading_questions');
+    setLoading(true);
+    const apiType = testMeta.newServiceType || testId;
+    try {
+      const data = await TestAPI.startTest(apiType, lang);
+      setSessionId(data.session_id);
+      setQuestions(data.questions);
+      setScaleLabels((data.questions[0] as any)?.scale?.labels || []);
+      setResponses({});
+      setNvIndex(0);
+      setNvAnswers([]);
+      questionStartRef.current = Date.now();
+      setStep('answering');
+    } catch (error: any) {
+      Alert.alert(t('common.error', lang), error.response?.data?.detail || t('assessment.error_generic', lang));
+      setStep('select');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Cevapları gönder
   const submitResponses = async () => {
-    if (Object.keys(responses).length < questions.length) {
+    const testMeta2 = TEST_TYPES.find(tt => tt.id === selectedTest);
+    const isNonverbal2 = testMeta2 && 'nonverbal' in testMeta2 && testMeta2.nonverbal;
+    const notDone = isNonverbal2
+      ? nvAnswers.length < questions.length
+      : Object.keys(responses).length < questions.length;
+    if (notDone) {
       Alert.alert(t('common.select_required', lang), t('assessment.error_incomplete', lang));
       return;
     }
-
     if (!selectedTest) return;
 
     setStep('submitting');
     setLoading(true);
-
     const errTitle = t('common.error', lang);
     const errGeneric = t('assessment.error_generic', lang);
+    const testMeta = TEST_TYPES.find(tt => tt.id === selectedTest);
+    const isNewService = testMeta && 'isNewService' in testMeta && testMeta.isNewService;
+    const isNonverbal = testMeta && 'nonverbal' in testMeta && testMeta.nonverbal;
+    const answers: NonverbalAnswer[] = isNonverbal
+      ? nvAnswers
+      : Object.entries(responses).map(([q_id, score]) => ({ q_id, score }));
+
     try {
-      const formattedResponses = Object.entries(responses).map(([q_id, score]) => ({
-        q_id,
-        score,
-      }));
-
-      const data = await AssessmentAPI.submitAssessment(selectedTest, formattedResponses, lang);
-      if (data.success) {
-        // Try to save result to MongoDB (optional - won't block if it fails)
-        try {
-          await AssessmentAPI.saveResult(selectedTest, data);
-        } catch {
-          // Save to history is optional — unauthenticated users can still see results
-        }
-
-        setResult(data);
+      if (isNewService && sessionId) {
+        const apiType = ('newServiceType' in testMeta && testMeta.newServiceType) || selectedTest;
+        const data = await TestAPI.submitTest(sessionId, apiType as string, lang, answers);
+        setNewServiceResult(data);
+        setResult(null);
         setStep('results');
         dispatch(markModuleUsed('assessment'));
       } else {
-        Alert.alert(errTitle, errGeneric);
+        const data = await AssessmentAPI.submitAssessment(selectedTest, answers, lang);
+        if (data.success) {
+          try { await AssessmentAPI.saveResult(selectedTest, data); } catch { /* optional */ }
+          setNewServiceResult(null);
+          setResult(data);
+          setStep('results');
+          dispatch(markModuleUsed('assessment'));
+        } else {
+          Alert.alert(errTitle, errGeneric);
+        }
       }
     } catch (error: any) {
       Alert.alert(errTitle, error.response?.data?.detail || errGeneric);
@@ -191,6 +278,11 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     setQuestions([]);
     setResponses({});
     setResult(null);
+    setNewServiceResult(null);
+    setSessionId(null);
+    setScaleLabels([]);
+    setNvIndex(0);
+    setNvAnswers([]);
     setStep('select');
   };
 
@@ -229,46 +321,180 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
         </ScrollView>
 
         {/* Test Kartları */}
-        {TEST_TYPES.map(({ id: tId, emoji: tEmoji, key: tKey, key_desc: tKeyDesc }) => (
-          <TouchableOpacity
-            key={tId}
-            onPress={() => startTest(tId)}
-            activeOpacity={0.7}
-          >
-            <Card style={styles.testCard}>
-              <View style={styles.testCardContent}>
-                <Text style={styles.testEmoji}>{tEmoji}</Text>
-                <View style={styles.testInfo}>
-                  <Text style={styles.testName}>{t(tKey, lang)}</Text>
-                  <Text style={styles.testDesc}>{t(tKeyDesc, lang)}</Text>
-                  <Badge label={t('assessment.questions', lang)} />
+        {TEST_TYPES.map((tt) => {
+          const isNew = 'isNewService' in tt && tt.isNewService;
+          const isClinical = 'requiresConsent' in tt && tt.requiresConsent;
+          return (
+            <TouchableOpacity key={tt.id} onPress={() => startTest(tt.id)} activeOpacity={0.7}>
+              <Card style={styles.testCard}>
+                <View style={styles.testCardContent}>
+                  <Text style={styles.testEmoji}>{tt.emoji}</Text>
+                  <View style={styles.testInfo}>
+                    <Text style={styles.testName}>{t(tt.key, lang)}</Text>
+                    <Text style={styles.testDesc}>{t(tt.key_desc, lang)}</Text>
+                    <View style={styles.badgeRow}>
+                      <Badge label={t('assessment.questions', lang)} />
+                      {isNew && !isClinical && !('nonverbal' in tt && tt.nonverbal) && (
+                        <View style={styles.newBadge}>
+                          <Text style={styles.newBadgeText}>{t('assessment.new_badge', lang)}</Text>
+                        </View>
+                      )}
+                      {'nonverbal' in tt && tt.nonverbal && (
+                        <View style={styles.nonverbalBadge}>
+                          <Text style={styles.nonverbalBadgeText}>{t('assessment.nonverbal_badge', lang)}</Text>
+                        </View>
+                      )}
+                      {isClinical && (
+                        <View style={styles.clinicalBadge}>
+                          <Text style={styles.clinicalBadgeText}>{t('assessment.clinical_badge', lang)}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                  <Text style={styles.arrow}>→</Text>
                 </View>
-                <Text style={styles.arrow}>→</Text>
-              </View>
-            </Card>
-          </TouchableOpacity>
-        ))}
+              </Card>
+            </TouchableOpacity>
+          );
+        })}
 
         <View style={styles.spacer20} />
       </ScrollView>
     );
   }
 
-  // ─── Adım 2: Soruların Yüklenmesi ──────────────────────────────────────────────
-  if (step === 'loading_questions' && loading) {
+  // ─── Adım 2: Yükleniyor / Gönderiliyor ────────────────────────────────────────
+  if ((step === 'loading_questions' || step === 'submitting') && loading) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.gold} />
-        <Text style={styles.loadingText}>{t('assessment.loading_questions', lang)}</Text>
+        <Text style={styles.loadingText}>
+          {step === 'submitting'
+            ? t('assessment.analyzing', lang)
+            : t('assessment.loading_questions', lang)}
+        </Text>
       </View>
     );
   }
 
+  // ─── Nonverbal handler: tek soru, zamanlı ──────────────────────────────────────
+  const handleNonverbalAnswer = (selectedOption: string) => {
+    const rt = Date.now() - questionStartRef.current;
+    const q = questions[nvIndex];
+    const updated = [...nvAnswers, { q_id: q.q_id, score: 0, selected_option: selectedOption, response_time_ms: rt }];
+    setNvAnswers(updated);
+    if (nvIndex < questions.length - 1) {
+      setNvIndex(nvIndex + 1);
+      questionStartRef.current = Date.now();
+    } else {
+      setStep('submitting');
+      setLoading(true);
+      const testMeta = TEST_TYPES.find(tt => tt.id === selectedTest);
+      const apiType = (testMeta && 'newServiceType' in testMeta && testMeta.newServiceType) || selectedTest || '';
+      TestAPI.submitTest(sessionId!, apiType as string, lang, updated)
+        .then(data => {
+          setNewServiceResult(data);
+          setResult(null);
+          setStep('results');
+          dispatch(markModuleUsed('assessment'));
+        })
+        .catch(() => {
+          // Son cevabı geri al, kullanıcı tekrar deneyebilsin
+          setNvAnswers(updated.slice(0, -1));
+          setStep('answering');
+          Alert.alert(t('common.error', lang), t('assessment.error_generic', lang));
+        })
+        .finally(() => setLoading(false));
+    }
+  };
+
+  const handleNonverbalBack = () => {
+    if (nvIndex === 0) {
+      resetAssessment();
+      return;
+    }
+    Alert.alert(
+      t('assessment.back', lang).replace('← ', ''),
+      t('assessment.exit_message', lang),
+      [
+        { text: t('assessment.consent_cancel', lang), style: 'cancel' },
+        { text: t('common.exit', lang), style: 'destructive', onPress: resetAssessment },
+      ]
+    );
+  };
+
   // ─── Adım 3: Cevaplar ──────────────────────────────────────────────────────────
   const questionsLen = questions.length;
   if (step === 'answering' && questionsLen > 0) {
-    const answeredCount = Object.keys(responses).length;
     const testInfo = TEST_TYPES.find(t => t.id === selectedTest);
+    const isNonverbalTest = testInfo && 'nonverbal' in testInfo && testInfo.nonverbal;
+
+    // ── Nonverbal: tek soru renderer ────────────────────────────────────────────
+    if (isNonverbalTest) {
+      const q = questions[nvIndex];
+      return (
+        <View style={styles.container}>
+          {/* Header */}
+          <View style={[styles.testHeader, { marginTop: insets.top + 8 }]}>
+            <TouchableOpacity onPress={handleNonverbalBack}>
+              <Text style={styles.backBtn}>{t('assessment.back', lang)}</Text>
+            </TouchableOpacity>
+            <Text style={styles.testTitle}>{testInfo ? t(testInfo.key, lang) : ''}</Text>
+            <View style={styles.spacer60} />
+          </View>
+
+          {/* İlerleme */}
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${(nvIndex / questionsLen) * 100}%` }]} />
+            </View>
+            <Text style={styles.progressText}>{nvIndex + 1} {t('assessment.question_of', lang)} {questionsLen}</Text>
+          </View>
+
+          {/* Duygu tanıma */}
+          {q.display_type === 'emotion_recognition' && (
+            <View style={styles.nvContainer}>
+              <Text style={styles.nvInstruct}>{t('assessment.tap_emotion', lang)}</Text>
+              <Text style={styles.emojiStimulus}>{q.emoji}</Text>
+              <View style={styles.nvOptionGrid}>
+                {(q.options || []).map(opt => (
+                  <TouchableOpacity
+                    key={opt.key}
+                    style={styles.nvOptionBtn}
+                    onPress={() => handleNonverbalAnswer(opt.key)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={styles.nvOptionText}>{opt.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Stroop */}
+          {q.display_type === 'stroop' && (
+            <View style={styles.nvContainer}>
+              <Text style={styles.nvInstruct}>{t('assessment.tap_ink_color', lang)}</Text>
+              <Text style={[styles.stroopWord, { color: q.ink_hex ?? '#fff' }]}>{q.word}</Text>
+              <View style={styles.colorGrid}>
+                {(q.color_options || []).map(c => (
+                  <TouchableOpacity
+                    key={c.key}
+                    style={[styles.colorBtn, { backgroundColor: c.hex }]}
+                    onPress={() => handleNonverbalAnswer(c.key)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.colorBtnLabel}>{c.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
+      );
+    }
+
+    const answeredCount = Object.keys(responses).length;
 
     return (
       <ScrollView style={styles.container}>
@@ -332,7 +558,9 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
             </View>
             <Text style={styles.likertLabel}>
               {responses[qId]
-                ? (LIKERT_LABELS[responses[qId] - 1] ?? t('assessment.choose_answer', lang))
+                ? (scaleLabels.length > 0
+                    ? (scaleLabels[responses[qId] - 1] ?? t('assessment.choose_answer', lang))
+                    : (LIKERT_LABELS[responses[qId] - 1] ?? t('assessment.choose_answer', lang)))
                 : t('assessment.choose_answer', lang)}
             </Text>
           </Card>
@@ -357,7 +585,156 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     );
   }
 
-  // ─── Adım 4: Sonuçlar ──────────────────────────────────────────────────────────
+  // ─── Adım 4a: Yeni Servis Sonuçları (EQ / Values / Stress Clinical) ───────────
+  if (step === 'results' && newServiceResult) {
+    const nsr = newServiceResult;
+    const testInfo = TEST_TYPES.find(tt => tt.id === selectedTest);
+    const sd = nsr.stress_details;
+
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.resultsHeader}>
+          <Text style={styles.resultsTitle}>{testInfo?.emoji} {testInfo ? t(testInfo.key, lang) : ''}</Text>
+        </View>
+
+        {/* Crisis Banner */}
+        {sd?.crisis_flag && (
+          <View style={styles.crisisBanner}>
+            <Text style={styles.crisisText}>{t('assessment.crisis_banner', lang)}</Text>
+            <Text style={styles.crisisLine}>{t('assessment.crisis_line', lang)}</Text>
+          </View>
+        )}
+
+        {/* Stres Severity (PHQ-9 / GAD-7) */}
+        {sd && (
+          <>
+            <SectionLabel>{t('assessment.depression_severity', lang)}</SectionLabel>
+            <Card style={styles.domainCard}>
+              <View style={styles.domainHeader}>
+                <Text style={styles.domainName}>PHQ-9</Text>
+                <Text style={styles.domainScore}>{t(SEVERITY_KEYS[sd.depression_severity] || sd.depression_severity, lang)}</Text>
+              </View>
+              <View style={styles.domainBar}>
+                <View style={[styles.domainBarFill, { width: `${nsr.domain_scores.depression ?? 0}%`, backgroundColor: sd.depression_severity === 'severe' ? colors.error ?? '#e53935' : colors.gold }]} />
+              </View>
+            </Card>
+
+            <SectionLabel>{t('assessment.anxiety_severity', lang)}</SectionLabel>
+            <Card style={styles.domainCard}>
+              <View style={styles.domainHeader}>
+                <Text style={styles.domainName}>GAD-7</Text>
+                <Text style={styles.domainScore}>{t(SEVERITY_KEYS[sd.anxiety_severity] || sd.anxiety_severity, lang)}</Text>
+              </View>
+              <View style={styles.domainBar}>
+                <View style={[styles.domainBarFill, { width: `${nsr.domain_scores.anxiety ?? 0}%`, backgroundColor: sd.anxiety_severity === 'severe' ? colors.error ?? '#e53935' : colors.gold }]} />
+              </View>
+            </Card>
+          </>
+        )}
+
+        {/* Nonverbal: Stroop detayları */}
+        {nsr.nonverbal_details && nsr.test_type === 'stroop' && (
+          <>
+            <SectionLabel>{t('assessment.stroop_accuracy', lang)}</SectionLabel>
+            <Card style={styles.domainCard}>
+              <View style={styles.domainHeader}>
+                <Text style={styles.domainName}>{t('assessment.stroop_accuracy', lang)}</Text>
+                <Text style={styles.domainScore}>{Math.round(nsr.domain_scores.accuracy ?? 0)}%</Text>
+              </View>
+              <View style={styles.domainBar}>
+                <View style={[styles.domainBarFill, { width: `${nsr.domain_scores.accuracy ?? 0}%` }]} />
+              </View>
+            </Card>
+            <Card style={styles.domainCard}>
+              <View style={styles.domainHeader}>
+                <Text style={styles.domainName}>{t('assessment.stroop_cognitive_flexibility', lang)}</Text>
+                <Text style={styles.domainScore}>{Math.round(nsr.domain_scores.cognitive_flexibility ?? 0)}/100</Text>
+              </View>
+              <View style={styles.domainBar}>
+                <View style={[styles.domainBarFill, { width: `${nsr.domain_scores.cognitive_flexibility ?? 0}%` }]} />
+              </View>
+            </Card>
+            <Card style={styles.domainCard}>
+              <Text style={styles.domainName}>{t('assessment.stroop_reaction_time', lang)}</Text>
+              <Text style={styles.stroopAvgMs}>
+                {nsr.nonverbal_details.avg_reaction_ms ?? 0}
+                <Text style={styles.stroopMsUnit}> {t('assessment.stroop_ms', lang)}</Text>
+              </Text>
+              <View style={styles.stroopSplit}>
+                <View style={styles.stroopSplitItem}>
+                  <Text style={styles.stroopSplitVal}>{nsr.nonverbal_details.congruent_accuracy ?? 0}%</Text>
+                  <Text style={styles.stroopSplitLabel}>{t('assessment.congruent_label', lang)}</Text>
+                </View>
+                <View style={styles.stroopSplitDivider} />
+                <View style={styles.stroopSplitItem}>
+                  <Text style={styles.stroopSplitVal}>{nsr.nonverbal_details.incongruent_accuracy ?? 0}%</Text>
+                  <Text style={styles.stroopSplitLabel}>{t('assessment.incongruent_label', lang)}</Text>
+                </View>
+              </View>
+            </Card>
+          </>
+        )}
+
+        {/* Nonverbal: Duygu tanıma detayları */}
+        {nsr.test_type === 'emotion_recognition' && (
+          <>
+            <View style={styles.bigScoreCircle}>
+              <Text style={styles.bigScoreNumber}>{Math.round(nsr.domain_scores.overall ?? 0)}</Text>
+              <Text style={styles.bigScorePercent}>%</Text>
+              <Text style={styles.bigScoreLabel}>{t('assessment.overall_accuracy', lang)}</Text>
+            </View>
+            <SectionLabel>{t('assessment.emotion_per_category', lang)}</SectionLabel>
+            {Object.entries(nsr.domain_scores).filter(([k]) => k !== 'overall').map(([emotion, score]) => (
+              <Card key={emotion} style={styles.domainCard}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainName}>{t(`assessment.emotion_${emotion}`, lang)}</Text>
+                  <Text style={styles.domainScore}>{Math.round(score)}%</Text>
+                </View>
+                <View style={styles.domainBar}>
+                  <View style={[styles.domainBarFill, { width: `${Math.min(Math.max(score, 0), 100)}%` }]} />
+                </View>
+              </Card>
+            ))}
+          </>
+        )}
+
+        {/* Domain Skorları (EQ / Values / stress — mevcut) */}
+        {!sd && !nsr.nonverbal_details && nsr.test_type !== 'emotion_recognition' && (
+          <>
+            <SectionLabel>{t('assessment.domain_score', lang)}</SectionLabel>
+            {Object.entries(nsr.domain_scores).map(([domain, score]) => (
+              <Card key={domain} style={styles.domainCard}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainName}>{domain}</Text>
+                  <Text style={styles.domainScore}>{Math.round(score)}/100</Text>
+                </View>
+                <View style={styles.domainBar}>
+                  <View style={[styles.domainBarFill, { width: `${Math.min(Math.max(score, 0), 100)}%` }]} />
+                </View>
+              </Card>
+            ))}
+          </>
+        )}
+
+        {/* AI Yorumu */}
+        {nsr.ai_interpretation ? (
+          <>
+            <SectionLabel>{t('assessment.ai_comment', lang)}</SectionLabel>
+            <Card style={styles.recommendationCard}>
+              <Text style={styles.recommendationText}>{nsr.ai_interpretation}</Text>
+            </Card>
+          </>
+        ) : null}
+
+        <TouchableOpacity style={styles.retakeBtn} onPress={resetAssessment}>
+          <Text style={styles.retakeBtnText}>{t('assessment.another_test', lang)}</Text>
+        </TouchableOpacity>
+        <View style={styles.spacer20} />
+      </ScrollView>
+    );
+  }
+
+  // ─── Adım 4b: Eski Servis Sonuçları ───────────────────────────────────────────
   if (step === 'results' && result) {
     const data = result.data;
     const testInfo = TEST_TYPES.find(t => t.id === data.test_type);
@@ -734,6 +1111,214 @@ const styles = StyleSheet.create({
   flex1:     { flex: 1 },
   spacer20:  { height: 20 },
   spacer60:  { width: 60 },
+  // Badge row
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  newBadge: {
+    backgroundColor: `${colors.gold}25`,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: colors.gold,
+  },
+  newBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.gold,
+  },
+  clinicalBadge: {
+    backgroundColor: '#e8f5e925',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: '#43a047',
+  },
+  clinicalBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#43a047',
+  },
+  // Crisis banner
+  crisisBanner: {
+    backgroundColor: '#ffebee',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e53935',
+  },
+  crisisText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#c62828',
+    marginBottom: 4,
+  },
+  crisisLine: {
+    fontSize: 13,
+    color: '#c62828',
+  },
+  // Nonverbal badge
+  nonverbalBadge: {
+    backgroundColor: '#e3f2fd',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 4,
+    borderWidth: 1,
+    borderColor: '#90caf9',
+  },
+  nonverbalBadgeText: {
+    fontSize: 10,
+    color: '#1565c0',
+    fontWeight: '600',
+  },
+  // Nonverbal soru container
+  nvContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+  },
+  nvInstruct: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  emojiStimulus: {
+    fontSize: 110,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  nvOptionGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  nvOptionBtn: {
+    width: (width - 64) / 2,
+    paddingVertical: 16,
+    borderRadius: 12,
+    backgroundColor: colors.cardBg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  nvOptionText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  // Stroop
+  stroopWord: {
+    fontSize: 56,
+    fontWeight: '900',
+    textAlign: 'center',
+    marginBottom: 40,
+    letterSpacing: 4,
+  },
+  colorGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 14,
+  },
+  colorBtn: {
+    width: (width - 72) / 2,
+    paddingVertical: 20,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  colorBtnLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'white',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  // Big score circle (emotion recognition overall)
+  bigScoreCircle: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: `${colors.gold}18`,
+    borderWidth: 3,
+    borderColor: colors.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  bigScoreNumber: {
+    fontSize: 52,
+    fontWeight: '800',
+    color: colors.gold,
+    lineHeight: 56,
+  },
+  bigScorePercent: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.gold,
+    marginTop: -4,
+  },
+  bigScoreLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
+  // Stroop reaction time split
+  stroopAvgMs: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.gold,
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  stroopMsUnit: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.textSecondary,
+  },
+  stroopSplit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stroopSplitItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  stroopSplitVal: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  stroopSplitLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
+  stroopSplitDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: colors.border,
+    marginHorizontal: 8,
+  },
 });
 
 export default AssessmentScreen;

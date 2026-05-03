@@ -14,8 +14,18 @@ _LANG_DB_MAP = {
     "ar": "database_attribute_ar", "ar-AR": "database_attribute_ar",
     "en": "database_attribute_en", "en-US": "database_attribute_en",
     "es": "database_attribute_sp", "es-ES": "database_attribute_sp",
+    "ko": "database_attribute_kr", "ko-KR": "database_attribute_kr",
     "ja": "database_attribute_jp", "ja-JP": "database_attribute_jp",
-    "ko": "database_attribute_ko", "ko-KR": "database_attribute_ko",
+    "bn": "database_attribute_bn", "bn-BD": "database_attribute_bn",
+    "fr": "database_attribute_fr", "fr-FR": "database_attribute_fr",
+    "hi": "database_attribute_hi", "hi-IN": "database_attribute_hi",
+    "id": "database_attribute_id", "id-ID": "database_attribute_id",
+    "it": "database_attribute_it", "it-IT": "database_attribute_it",
+    "pl": "database_attribute_pl", "pl-PL": "database_attribute_pl",
+    "pt": "database_attribute_pt", "pt-BR": "database_attribute_pt", "pt-PT": "database_attribute_pt",
+    "ur": "database_attribute_ur", "ur-PK": "database_attribute_ur",
+    "vi": "database_attribute_vi", "vi-VN": "database_attribute_vi",
+    "zh": "database_attribute_zh", "zh-CN": "database_attribute_zh", "zh-TW": "database_attribute_zh",
 }
 
 _STATIC_DOCS = [

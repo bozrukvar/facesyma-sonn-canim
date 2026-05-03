@@ -132,17 +132,17 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
   };
 
   const handleDeleteOne = (id: string) => {
-    Alert.alert('Sil', 'Bu test sonucunu silmek istiyor musunuz?', [
-      { text: 'İptal', style: 'cancel' },
+    Alert.alert(t('common.delete', lang), t('assessment_history.delete_msg', lang), [
+      { text: t('common.cancel', lang), style: 'cancel' },
       {
-        text: 'Sil', style: 'destructive',
+        text: t('common.delete', lang), style: 'destructive',
         onPress: async () => {
           setDeleting(id);
           try {
             await AnalysisAPI.deleteHistory(id);
             setResults(prev => prev.filter(r => r.id !== id));
           } catch {
-            Alert.alert('Hata', 'Silinemedi.');
+            Alert.alert(t('common.error', lang), t('common.generic_error', lang));
           } finally {
             setDeleting(null);
           }
@@ -152,17 +152,17 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
   };
 
   const handleDeleteAll = () => {
-    Alert.alert('Tümünü Sil', 'Tüm test geçmişiniz kalıcı olarak silinecek. Devam edilsin mi?', [
-      { text: 'İptal', style: 'cancel' },
+    Alert.alert(t('assessment_history.delete_all_title', lang), t('assessment_history.delete_all_msg', lang), [
+      { text: t('common.cancel', lang), style: 'cancel' },
       {
-        text: 'Tümünü Sil', style: 'destructive',
+        text: t('assessment_history.delete_all_btn', lang), style: 'destructive',
         onPress: async () => {
           setDeleting('all');
           try {
             await AnalysisAPI.deleteAllHistory();
             setResults([]);
           } catch {
-            Alert.alert('Hata', 'Silinemedi.');
+            Alert.alert(t('common.error', lang), t('common.generic_error', lang));
           } finally {
             setDeleting(null);
           }
@@ -225,7 +225,7 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
         >
           {deleting === 'all'
             ? <ActivityIndicator size="small" color={colors.error} />
-            : <Text style={styles.deleteAllText}>Tümünü Sil</Text>
+            : <Text style={styles.deleteAllText}>{t('assessment_history.delete_all_btn', lang)}</Text>
           }
         </TouchableOpacity>
       </View>
@@ -235,7 +235,7 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
         <View style={styles.freeBanner}>
           <Text style={styles.freeBannerIcon}>🔒</Text>
           <Text style={styles.freeBannerText}>
-            Ücretsiz planda yalnızca son {FREE_VISIBLE_LIMIT} sonuç görüntülenir. Tüm geçmişe erişmek için Premium'a geçin.
+            {t('assessment_history.free_banner', lang).replace('{n}', String(FREE_VISIBLE_LIMIT))}
           </Text>
         </View>
       )}

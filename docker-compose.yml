@@ -17,7 +17,12 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - REDIS_URL=redis://redis:6379/1
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_CHANNELS_DB=3
       - MONGO_URI=mongodb://mongodb:27017/facesyma
+    volumes:
+      - ./facesyma_ai/diet_coaching/data:/app/meal_data:ro
     networks:
       - facesyma_network
     depends_on:
@@ -91,6 +96,12 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - CHROMA_PATH=/app/chroma_db
+      - EMBED_MODEL=mxbai-embed-large
+      - EMBEDDING_DIM=1024
+    volumes:
+      - ./facesyma_ai/chroma_db:/app/chroma_db
     networks:
       - facesyma_network
     depends_on:
@@ -117,10 +128,13 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - REDIS_URL=redis://redis:6379/2
+      - MONGO_URI=mongodb://mongodb:27017/facesyma-coach-backup
     networks:
       - facesyma_network
     depends_on:
       redis:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     restart: unless-stopped
     deploy:
@@ -142,44 +156,46 @@ services:
     env_file: ./facesyma_test/.env
     environment:
       - PYTHONUNBUFFERED=1
+      - MONGO_URI=mongodb://mongodb:27017/facesyma-test-backup
+      - OLLAMA_URL=http://host.docker.internal:11434
     networks:
       - facesyma_network
     depends_on:
       redis:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/test/health').read()"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
-  # # Face Validation Microservice (:8005) — Temporarily disabled (build issue)
-  # face_validation:
-  #   build: ./facesyma_face_validation
-  #   container_name: facesyma_face_validation
-  #   ports:
-  #     - "8005:8005"
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   networks:
-  #     - facesyma_network
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/health').read()"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 15s
+  # Face Validation Microservice — internal only, routed via nginx
+  face_validation:
+    build: ./facesyma_face_validation
+    container_name: facesyma_face_validation
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - facesyma_network
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Nginx Reverse Proxy (:80)
   nginx:
@@ -196,7 +212,7 @@ services:
       - ai_chat
       - coach
       - test
-      # - face_validation (temporarily disabled)
+      - face_validation
       - redis
     restart: unless-stopped
     deploy:

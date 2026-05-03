@@ -106,7 +106,7 @@ class GCSStorageManager:
             log.error(f"PDF upload failed: {e}")
             return None
 
-    def generate_signed_url(self, result_id: str, expiration_hours: int = 24) -> str:
+    def generate_signed_url(self, result_id: str, expiration_hours: int = 24) -> Optional[str]:
         """
         Generate signed URL for PDF download
 

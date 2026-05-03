@@ -58,6 +58,9 @@ MONGO_URI = os.environ.get(
     'MONGO_URI',
     'mongodb://localhost:27017/facesyma-backend'  # Override with MONGO_URI env var in production
 )
+# Psikolojik test servisi farklı MongoDB cluster'ına yazıyor olabilir.
+# Eğer aynı cluster ise boş bırakılır → MONGO_URI fallback kullanılır.
+TEST_MONGO_URI = os.environ.get('TEST_MONGO_URI', MONGO_URI)
 
 # ── JWT ────────────────────────────────────────────────────────────────────────
 _JWT_SECRET = os.environ.get('JWT_SECRET', '')
@@ -186,7 +189,6 @@ CACHES = {
         'OPTIONS': {
             'socket_connect_timeout': 3,
             'socket_timeout': 3,
-            'CONNECTION_POOL_KWARGS': {'max_connections': 20},
         },
         'KEY_PREFIX': 'facesyma',
     }

@@ -18,6 +18,12 @@ import os
 from typing import List, Optional
 
 from .knowledge_base import search_knowledge_base
+from .coach_kb import (
+    search_coach_content,
+    MODULE_TOPICS,
+    MODULE_LABELS,
+    COACH_MODULES,
+)
 
 log = logging.getLogger(__name__)
 
@@ -268,3 +274,96 @@ def get_relevant_context_en(
 ) -> str:
     """English version of context retrieval (uses sifat_profiles_en)"""
     return get_relevant_context(user_message, sifatlar, lang="en")
+
+
+# ── Coach KB Context ──────────────────────────────────────────────────────────
+
+def _detect_relevant_modules(message_lower: str) -> List[str]:
+    """Score modules by keyword hit count, return top matches."""
+    scored: List[tuple] = []
+    for module, keywords in MODULE_TOPICS.items():
+        hits = sum(1 for kw in keywords if kw in message_lower)
+        if hits > 0:
+            scored.append((module, hits))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return [m for m, _ in scored[:3]]
+
+
+def get_coach_context(
+    user_message: str,
+    sifatlar: List[str],
+    lang: str = "tr",
+    n_results: int = 5,
+) -> str:
+    """
+    Retrieve relevant coaching content from Coach DB (via Chroma) for the
+    user's top sıfatlar and current message topic.
+
+    Strategy:
+      1. Detect which coaching modules are relevant from message keywords
+      2. Semantic search over coach_content_{lang} filtered by user sıfatlar
+      3. If sıfat-filtered search returns < 2 results, fall back to global search
+      4. Format top results grouped by sıfat + module label
+
+    Returns:
+        Formatted string to inject into system prompt, or "" if nothing found.
+    """
+    if not user_message and not sifatlar:
+        return ""
+
+    message_lower = (user_message or "").lower()
+    top_sifatlar  = sifatlar[:5]
+
+    # Build a focused query combining user message + relevant module labels
+    relevant_modules = _detect_relevant_modules(message_lower)
+    module_hint = " ".join(MODULE_LABELS.get(m, "") for m in relevant_modules)
+    query = f"{user_message} {' '.join(top_sifatlar[:3])} {module_hint}".strip()
+
+    try:
+        # 1. Sıfat-filtered search
+        results = search_coach_content(
+            lang=lang,
+            query=query,
+            sifatlar=top_sifatlar,
+            n_results=n_results,
+        )
+
+        # 2. Fallback: global search without filter
+        if len(results) < 2:
+            results = search_coach_content(
+                lang=lang,
+                query=query,
+                sifatlar=None,
+                n_results=n_results,
+            )
+
+        if not results:
+            return ""
+
+        # 3. Format — group by (sifat, module_label), keep top 3 unique modules
+        seen_modules: set = set()
+        parts: List[str] = []
+        for item in results:
+            key = f"{item['sifat']}__{item['module']}"
+            if key in seen_modules:
+                continue
+            seen_modules.add(key)
+            label = item["module_label"] or item["module"]
+            sifat = item["sifat"]
+            text  = item["text"]
+            score = item.get("score", 0)
+            if score < 0.3:  # discard low-relevance hits
+                continue
+            parts.append(f"  [{sifat} • {label}]\n  {text}")
+            if len(parts) >= 3:
+                break
+
+        if not parts:
+            return ""
+
+        header = "## Koçluk Rehberi"
+        return f"{header}\n" + "\n\n".join(parts)
+
+    except Exception as e:
+        log.warning(f"get_coach_context failed: {e}")
+        return ""

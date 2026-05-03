@@ -114,8 +114,8 @@ class UptimeMetricsView(View):
                 'up':    [{'$match': {'timestamp': {'$gte': start_date}, 'status': 'up'}}, {'$count': 'n'}],
             }}]), {})
             _ufget = _uf.get
-            total_checks = (_ufget('total', [{}])[0] or {}).get('n', 0)
-            up_checks    = (_ufget('up',    [{}])[0] or {}).get('n', 0)
+            total_checks = (_ufget('total', []) or [{}])[0].get('n', 0)
+            up_checks    = (_ufget('up',    []) or [{}])[0].get('n', 0)
             availability = (up_checks / total_checks * 100) if total_checks else 100
 
             return JsonResponse({
@@ -171,7 +171,7 @@ class ErrorRateView(View):
                 ],
             }}]), {})
             _efget = _ef.get
-            total_errors    = (_efget('total', [{}])[0] or {}).get('n', 0)
+            total_errors    = (_efget('total', []) or [{}])[0].get('n', 0)
             endpoint_errors = _efget('endpoints', [])
             error_types     = {(e['_id'] or 'unknown'): e['count'] for e in _efget('types', [])}
 
@@ -289,7 +289,10 @@ class AlertManagementView(View):
             return JsonResponse({'detail': str(e)}, status=403)
 
         try:
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             db = _get_db()
             alert_col = db['alerts']
 

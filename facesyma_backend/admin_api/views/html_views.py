@@ -136,6 +136,14 @@ class AdminAlertsView(View):
         return render(request, 'admin/alerts.html')
 
 
+class AdminGamificationDashboardView(View):
+    def get(self, request):
+        guard = _admin_session_required(request)
+        if guard:
+            return guard
+        return render(request, 'admin/gamification_dashboard.html')
+
+
 class AdminLogoutView(View):
     def get(self, request):
         response = redirect('/admin/login/')

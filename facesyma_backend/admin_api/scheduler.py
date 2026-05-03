@@ -368,7 +368,29 @@ def _job_send_renewal_reminders():
             _ncim(batch_2, ordered=False)
         reminder_count += len(batch_2)
 
-        log.info(f"✓ Sent renewal reminders: {reminder_count} notifications created")
+        log.info(f"✓ Renewal reminder records created: {reminder_count}")
+
+        # Send FCM push to users with a registered device token
+        if reminder_count > 0:
+            try:
+                from facesyma_revize.push_service import send_multicast_chunked
+
+                all_user_ids = [r['user_id'] for r in batch_1 + batch_2 if r.get('user_id')]
+                push_users   = list(users_col.find(
+                    {'id': {'$in': all_user_ids}, 'device_token': {'$exists': True}},
+                    {'device_token': 1, '_id': 0},
+                ))
+                push_tokens = [u['device_token'] for u in push_users if u.get('device_token')]
+
+                if push_tokens:
+                    result = send_multicast_chunked(
+                        push_tokens,
+                        title='Facesyma Premium',
+                        body='Your subscription renews in a few days. Thank you for being with us!',
+                    )
+                    log.info('Renewal FCM push: %s sent, %s failed', result['success'], result['failure'])
+            except Exception as push_err:
+                log.warning('Renewal FCM push failed (non-critical): %s', push_err)
 
     except Exception as e:
         log.error(f"✗ Failed to send renewal reminders: {e}")

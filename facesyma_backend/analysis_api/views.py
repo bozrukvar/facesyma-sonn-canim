@@ -229,7 +229,7 @@ def _run_analysis(img_path: str, mode: str, lang: str = 'tr', **kwargs):
         return analyze_face_type(img_path, lang=lang)
     elif mode == 'art':
         from art_match import match_artwork
-        return match_artwork(img_path, lang=lang)
+        return match_artwork(img_path, lang=lang, user_id=kwargs.get('user_id'))
     elif mode == 'astrology':
         from astrology import analyze_astrology
         _kget = kwargs.get
@@ -245,7 +245,14 @@ def _run_analysis(img_path: str, mode: str, lang: str = 'tr', **kwargs):
         return {'result': daily(img_path, user_id, lang)}
     elif mode == 'golden_transform':
         from golden_transform import create_golden_transform_preview
-        return create_golden_transform_preview(img_path, lang)
+        import json as _json
+        real_m = kwargs.get('real_measurements')
+        if isinstance(real_m, str):
+            try:
+                real_m = _json.loads(real_m)
+            except Exception:
+                real_m = None
+        return create_golden_transform_preview(img_path, lang, real_measurements=real_m)
     else:
         from database import databases
         return databases(img_path, lang)
@@ -317,6 +324,8 @@ class AnalyzeBaseView(View):
                 extra['birth_time'] = birth_time
             if uid:
                 extra['user_id'] = uid
+            if _mode == 'golden_transform':
+                extra['real_measurements'] = _rpget('real_measurements', None)
 
             result = _run_analysis(img_path, _mode, lang, **extra)
 
@@ -360,7 +369,7 @@ class AnalyzeBaseView(View):
                 # 'character' ve 'enhanced_character' modları için benzeşme analizi
                 if _mode in _CHARACTER_MODES:
                     try:
-                        from facesyma_revize.similarity_matcher import get_similarity_matcher
+                        from similarity_matcher import get_similarity_matcher
 
                         # Sıfatları al
                         if isinstance(result, dict):
@@ -477,6 +486,7 @@ def _detect_face_center(img_path: str) -> dict:
     return {'cx': 0.50, 'cy': 0.38, 'found': False}
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class FaceDetectView(View):
     """Hızlı yüz merkezi tespiti — koordinatları döndürür, kayıt yapmaz."""
 
@@ -675,7 +685,9 @@ class TwinsView(View):
 
             # Save to history
             try:
-                app_source = request.POST.get('app_source', 'mobile')
+                app_source = request.headers.get('X-App-Source', 'mobile').lower()
+                if app_source not in ('mobile', 'web'):
+                    app_source = 'mobile'
                 history_doc = {
                     'group_score':    result.get('group_score', 0) if isinstance(result, dict) else 0,
                     'person_count':   len(images),

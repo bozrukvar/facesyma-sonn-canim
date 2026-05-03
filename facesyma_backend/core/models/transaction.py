@@ -18,3 +18,12 @@ class TransactionType(Enum):
 
     def __str__(self):
         return self.value
+
+
+USER_COIN_FIELDS = {
+    "coins": 0,
+    "total_earned": 0,
+    "total_spent": 0,
+    "streak_count": 0,
+    "last_daily_quest": None,
+}

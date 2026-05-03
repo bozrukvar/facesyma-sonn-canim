@@ -103,7 +103,10 @@ class VerifySubscriptionView(View):
             if not user_id:
                 return JsonResponse({'detail': 'Authentication required.'}, status=401)
 
-            data = json.loads(request.body)
+            try:
+                data = json.loads(request.body) if request.body else {}
+            except (json.JSONDecodeError, ValueError):
+                return JsonResponse({'detail': 'Invalid JSON.'}, status=400)
             _dget = data.get
             fetch_token = _dget('fetch_token')  # RevenueCat token
             is_ios = _dget('is_ios', True)

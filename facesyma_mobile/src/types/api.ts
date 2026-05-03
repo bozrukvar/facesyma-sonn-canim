@@ -32,6 +32,10 @@ export interface ArtMatch {
   museum: string;
   style: string;
   similarity: number;
+  image_url?: string;
+  reason?: string;
+  primary_cluster?: string;
+  emoji?: string;
 }
 
 export interface ArtMatchResult {
@@ -82,7 +86,40 @@ export interface AstrologyResult {
   face_reading?: string;
   daily_message?: string;
   astrology?: Record<string, string>;
-  numerology?: Record<string, string>;
+  numerology?: {
+    life_path_number: number;
+    life_path_meaning: string;
+    day_number: number;
+    month_number: number;
+    year_number: number;
+    personal_year_number: number;
+    personal_year_meaning: string;
+    personal_year_label: string;
+    current_year: number;
+    is_master_number: boolean;
+    master_label?: string;
+  };
+  name_numerology?: {
+    name: string;
+    expression_number: number;
+    expression_meaning: string;
+    soul_urge_number: number;
+    soul_urge_meaning: string;
+    personality_number: number;
+    personality_meaning: string;
+    ebced: { total: number; reduced: number; meaning: string; };
+    kabala: { total: number; reduced: number; meaning: string; };
+    labels: {
+      title: string;
+      expression: string;
+      soul_urge: string;
+      personality: string;
+      ebced_title: string;
+      kabala_title: string;
+      total: string;
+      reduced: string;
+    };
+  };
   sun_sign?: string;
   moon_sign?: string;
   rising_sign?: string;

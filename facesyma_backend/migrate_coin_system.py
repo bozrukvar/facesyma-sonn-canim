@@ -27,6 +27,7 @@ from admin_api.utils.mongo import get_users_col, _get_db
 from admin_api.utils.coin_indexes import create_coin_indexes
 from admin_api.utils.meal_indexes import create_meal_indexes
 from admin_api.utils.challenge_indexes import create_challenge_indexes
+from admin_api.utils.gamification_indexes import create_gamification_indexes
 from core.models.transaction import USER_COIN_FIELDS
 import logging
 
@@ -115,6 +116,11 @@ def main():
 
     print("\n[7/7] Creating social challenges indexes...")
     create_challenge_indexes()
+
+    # ── NEW GAMIFICATION COLLECTIONS ───────────────────────────────────
+    print("\n[LEADERBOARD / BADGES / DISCOVERY / MISSIONS]")
+    print("\n[8/8] Creating gamification indexes (snapshots, badges, sessions, missions)...")
+    create_gamification_indexes()
 
     print("\n" + "="*60)
     print("✅ GAMIFICATION SYSTEM MIGRATION COMPLETE")

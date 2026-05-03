@@ -173,9 +173,9 @@ class RevenueMetricsView(View):
                 'total_premium':  [{'$match': {'tier': 'premium'}}, {'$count': 'n'}],
             }}]), {})
             _revget = _rev.get
-            premium_users     = (_revget('active_premium', [{}])[0] or {}).get('n', 0)
-            canceled_users    = (_revget('canceled_30d',   [{}])[0] or {}).get('n', 0)
-            total_premium_30d = (_revget('total_premium',  [{}])[0] or {}).get('n', 0)
+            premium_users     = (_revget('active_premium', []) or [{}])[0].get('n', 0)
+            canceled_users    = (_revget('canceled_30d',   []) or [{}])[0].get('n', 0)
+            total_premium_30d = (_revget('total_premium',  []) or [{}])[0].get('n', 0)
             mrr = premium_users * 9.99
             churn_rate = (canceled_users / max(total_premium_30d, 1)) * 100
 
@@ -219,16 +219,16 @@ class CommunityMetricsView(View):
                 'active': [{'$match': {'is_active': True}}, {'$count': 'n'}],
             }}]), {})
             _ccget = _c.get
-            total_communities  = (_ccget('total',  [{}])[0] or {}).get('n', 0)
-            active_communities = (_ccget('active', [{}])[0] or {}).get('n', 0)
+            total_communities  = (_ccget('total',  []) or [{}])[0].get('n', 0)
+            active_communities = (_ccget('active', []) or [{}])[0].get('n', 0)
             _m = next(member_col.aggregate([{'$facet': {
                 'total':  [{'$count': 'n'}],
                 'active': [{'$match': {'status': 'active'}}, {'$count': 'n'}],
                 'top5':   [{'$group': {'_id': '$community_id', 'member_count': {'$sum': 1}}}, {'$sort': {'member_count': -1}}, {'$limit': 5}],
             }}]), {})
             _mget = _m.get
-            total_members    = (_mget('total',  [{}])[0] or {}).get('n', 0)
-            active_members   = (_mget('active', [{}])[0] or {}).get('n', 0)
+            total_members    = (_mget('total',  []) or [{}])[0].get('n', 0)
+            active_members   = (_mget('active', []) or [{}])[0].get('n', 0)
             top_communities  = _mget('top5', [])
             avg_size = total_members / max(total_communities, 1)
 
@@ -274,9 +274,9 @@ class CompatibilityMetricsView(View):
                 'cats':  [{'$group': {'_id': '$category', 'count': {'$sum': 1}}}],
             }}]), {})
             _cpget = _cp.get
-            total_checks = (_cpget('total', [{}])[0] or {}).get('n', 0)
-            avg_score    = (_cpget('avg',   [{}])[0] or {}).get('v', 0) or 0
-            categories   = {_id: doc['count'] for doc in _cpget('cats', []) if (_id := doc['_id']) in _cats}
+            total_checks = (_cpget('total', []) or [{}])[0].get('n', 0)
+            avg_score    = (_cpget('avg',   []) or [{}])[0].get('v', 0) or 0
+            categories   = {doc['_id']: doc['count'] for doc in _cpget('cats', []) if doc['_id'] in _cats}
             for cat in _cats:
                 categories.setdefault(cat, 0)
 
@@ -286,8 +286,8 @@ class CompatibilityMetricsView(View):
                     'total_checks': total_checks,
                     'average_score': round(avg_score, 2),
                     'categories': categories,
-                    'high_compatibility_count': (_cpget('high', [{}])[0] or {}).get('n', 0),
-                    'low_compatibility_count':  (_cpget('low',  [{}])[0] or {}).get('n', 0),
+                    'high_compatibility_count': (_cpget('high', []) or [{}])[0].get('n', 0),
+                    'low_compatibility_count':  (_cpget('low',  []) or [{}])[0].get('n', 0),
                 }
             })
 
@@ -364,7 +364,7 @@ class AnalysisActivityView(View):
             ]), {})
 
             _frget = facet_result.get
-            _totals = _frget('totals', [{}])[0] or {}
+            _totals = (_frget('totals', []) or [{}])[0]
             _tget = _totals.get
             total_analyses = _tget('total', 0)
             last_7d = _tget('last_7d', 0)
@@ -372,7 +372,7 @@ class AnalysisActivityView(View):
             web_analyses = _tget('web', 0)
             mobile_analyses = _tget('mobile', 0)
 
-            mode_breakdown = {_id: doc['count'] for doc in _frget('by_mode', []) if (_id := doc['_id'])}
+            mode_breakdown = {doc['_id']: doc['count'] for doc in _frget('by_mode', []) if doc['_id']}
 
             now_dt = datetime.utcnow()
             daily_map = {doc['_id']: doc['count'] for doc in _frget('daily', [])}

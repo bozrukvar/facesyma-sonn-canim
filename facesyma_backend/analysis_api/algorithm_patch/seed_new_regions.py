@@ -620,5 +620,19 @@ print("Seeding English databases...")
 for db_name in ["database_attribute_en"]:
     seed_language(db_name, EN_JAW, EN_CHEEKBONE, EN_CHIN)
 
+# Other 6 existing languages — use EN data
+print("Seeding other existing language databases (EN base)...")
+for db_name in ["database_attribute_de", "database_attribute_ru", "database_attribute_ar",
+                "database_attribute_sp", "database_attribute_kr", "database_attribute_jp"]:
+    seed_language(db_name, EN_JAW, EN_CHEEKBONE, EN_CHIN)
+
+# 10 new language databases — use EN data
+print("Seeding new language databases (EN base)...")
+for db_name in ["database_attribute_bn", "database_attribute_fr", "database_attribute_hi",
+                "database_attribute_id", "database_attribute_it", "database_attribute_pl",
+                "database_attribute_pt", "database_attribute_ur", "database_attribute_vi",
+                "database_attribute_zh"]:
+    seed_language(db_name, EN_JAW, EN_CHEEKBONE, EN_CHIN)
+
 print("Done.")
 client.close()

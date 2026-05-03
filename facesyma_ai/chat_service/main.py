@@ -35,12 +35,14 @@ from .modules import get_registry, init_registry, ALL_MODULES, execute_module
 from .intent import detect_intent
 from .sifat_fetcher import build_sifat_context, format_context_for_ollama
 from .routes.diet import router as diet_router
+from .context_enricher import fetch_user_context
+from .memory_manager import extract_and_save as _mem_extract, get_memory_prompt_section as _mem_section
 
 log = logging.getLogger(__name__)
 
 # Import RAG system if available
 try:
-    from ..rag.retriever import get_relevant_context
+    from ..rag.retriever import get_relevant_context, get_coach_context
     RAG_AVAILABLE = True
 except ImportError:
     RAG_AVAILABLE = False
@@ -276,9 +278,21 @@ app.add_middleware(
 # ── Module Registry Initialization ─────────────────────────────────────────────
 @app.on_event("startup")
 async def startup_event():
-    """Initialize module registry at startup."""
+    """Initialize module registry and ensure MongoDB indexes at startup."""
     registry = init_registry(ALL_MODULES)
     log.info(f"✓ Module Registry initialized with {len(registry.get_all())} modules")
+
+    # Ensure ai_user_memory index — FastAPI has its own MongoDB connection,
+    # so indexes cannot rely on the Django-side mongo.py to create them.
+    try:
+        from pymongo import ASCENDING
+        db = get_db()
+        db["ai_user_memory"].create_index(
+            [("user_id", ASCENDING)], unique=True, background=True
+        )
+        log.info("✓ ai_user_memory index ensured")
+    except Exception as _e:
+        log.warning(f"⚠️  ai_user_memory index creation failed (non-fatal): {_e}")
 
 # ── Modeller ──────────────────────────────────────────────────────────────────
 class StartChatRequest(BaseModel):
@@ -375,6 +389,16 @@ async def start_chat(
     # ── Fallback: Temel system prompt ────────────────────────────────────
     if not system_msg:
         system_msg = build_system_prompt(_analysis, _lang)
+
+    # ── Faz 3: Kullanıcı durumu enjeksiyonu ──────────────────────────────
+    if user_id:
+        try:
+            enriched = fetch_user_context(user_id, _lang, get_db())
+            if enriched:
+                system_msg += f"\n\n{enriched}"
+                _linfo(f"✓ User context injected ({len(enriched)} chars)")
+        except Exception as _e:
+            _lwarn(f"⚠️  User context injection failed: {_e}")
 
     # İlk kullanıcı mesajı — belirtilmezse default
     _bfm = body.first_message
@@ -474,16 +498,26 @@ async def send_message(
 
     # ── Adım 2: Module Execution (if module intent) ──────────────────────────
     module_context = ""
+    _exec_action   = None   # navigate/card action to append after AI response
     if _intent != "chat":
         module_name = _intent
         registry = get_registry()
         module = registry.get(module_name)
 
         if module:
+            # Enrich params based on module type
+            _conv_analysis_pre = conv.get("analysis") or {}
+            exec_params = dict(_irget("params", {}))
+            if module_name == "similarity":
+                fa_keys = list(
+                    (_conv_analysis_pre.get("face_analysis", {}).get("key_attributes") or {}).keys()
+                )[:12]
+                exec_params["sifatlar"] = fa_keys
+
             # Execute the module
             exec_result = execute_module(
                 module_name,
-                _irget("params", {}),
+                exec_params,
                 user_lang,
                 token=authorization
             )
@@ -498,6 +532,9 @@ async def send_message(
                 if module_name == "face_analysis":
                     conv.setdefault("analysis", {})["face_analysis"] = result_data
                     _info(f"✓ Face analysis stored in conversation")
+
+                # Save navigate/card action (will be appended after AI response)
+                _exec_action = _erget("action")
 
                 module_context = f"\n\n[Modül Sonucu: {module_name}]\n{_jd(result_data, ensure_ascii=False, indent=2)}"
                 _info(f"✓ Module executed successfully: {module_name}")
@@ -534,6 +571,26 @@ async def send_message(
     if not system_msg:
         system_msg = build_system_prompt(_conv_analysis, user_lang)
 
+    # ── Faz 3: Kullanıcı durumu enjeksiyonu ──────────────────────────────
+    if user_id:
+        try:
+            enriched = fetch_user_context(user_id, user_lang, get_db())
+            if enriched:
+                system_msg += f"\n\n{enriched}"
+                _info(f"✓ User context injected ({len(enriched)} chars)")
+        except Exception as _e:
+            _lwarn(f"⚠️  User context injection failed: {_e}")
+
+    # ── Faz 4: Uzun vadeli hafıza enjeksiyonu ────────────────────────────
+    if user_id:
+        try:
+            mem_section = _mem_section(user_id, user_lang, get_db())
+            if mem_section:
+                system_msg += f"\n\n{mem_section}"
+                _info(f"✓ Memory section injected ({len(mem_section)} chars)")
+        except Exception as _e:
+            _lwarn(f"⚠️  Memory injection failed: {_e}")
+
     # Eğer modül context varsa (tavsiye, motivasyon, vb.), sıfat cümlelerini ekle
     if module_context and _intent != "chat":
         module_name = _intent
@@ -567,30 +624,42 @@ async def send_message(
 
     # ── Adım 5: Inject RAG Context ───────────────────────────────────────────
     if RAG_AVAILABLE:
+        # Collect top sifatlar from analysis result
+        top_sifatlar = []
+        if "face_analysis" in _conv_analysis:
+            key_attrs = _conv_analysis["face_analysis"].get("key_attributes", {})
+            top_sifatlar = list(key_attrs.keys())[:10]
+
+        # 5a. Sifat profiles + characteristics (existing RAG)
         try:
-            # Get top sifatlar from analysis
-            top_sifatlar = []
-
-            # Try to get from face_analysis
-            if "face_analysis" in _conv_analysis:
-                key_attrs = _conv_analysis["face_analysis"].get("key_attributes", {})
-                top_sifatlar = list(key_attrs.keys())[:10]
-
-            # Get RAG context based on user message and sifatlar
             if top_sifatlar or _msg:
-                rag_context = get_relevant_context(
-                    _msg,
-                    top_sifatlar,
-                    user_lang
-                )
+                rag_context = get_relevant_context(_msg, top_sifatlar, user_lang)
                 if rag_context:
                     system_msg += f"\n\n## Bilgi Tabanı\n{rag_context}"
-                    _info(f"✓ RAG context injected ({len(rag_context)} chars)")
+                    _info(f"✓ Sifat RAG injected ({len(rag_context)} chars)")
         except Exception as e:
-            _lwarn(f"⚠️  RAG context injection failed: {e}")
+            _lwarn(f"⚠️  Sifat RAG injection failed: {e}")
+
+        # 5b. Coach DB deep coaching content (Coach RAG)
+        try:
+            if top_sifatlar or _msg:
+                coach_context = get_coach_context(_msg, top_sifatlar, user_lang)
+                if coach_context:
+                    system_msg += f"\n\n{coach_context}"
+                    _info(f"✓ Coach RAG injected ({len(coach_context)} chars)")
+        except Exception as e:
+            _lwarn(f"⚠️  Coach RAG injection failed: {e}")
 
     # ── Adım 6: Call Ollama ──────────────────────────────────────────────────
     assistant_text = call_groq(system_msg, trimmed)
+
+    # Append navigation action marker so mobile can render ActionCard
+    if _exec_action:
+        _screen = _exec_action.get("screen", "")
+        _action_json = json.dumps(_exec_action, ensure_ascii=False)
+        assistant_text = assistant_text.rstrip() + f"\n[NAVIGATE:{_screen}]{_action_json}"
+        _info(f"✓ Navigate action appended: {_screen}")
+
     _mappend({"role": "assistant", "content": assistant_text})
 
     # ── Adım 7: Save Conversation ────────────────────────────────────────────
@@ -601,6 +670,13 @@ async def send_message(
         _conv_analysis,
         user_lang,
     )
+
+    # ── Faz 4: Hafıza çıkarımı (best-effort, sessiz) ─────────────────────────
+    if user_id:
+        try:
+            _mem_extract(user_id, _msg, _cid, user_lang, get_db())
+        except Exception:
+            pass
 
     return MessageResponse(
         conversation_id   = _cid,

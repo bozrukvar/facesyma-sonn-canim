@@ -194,9 +194,7 @@ const PreviewScreen: React.FC<{
 
         {!loading && (
           <Text style={styles.gestureHint}>
-            {lang.startsWith('tr')
-              ? '👆 Sürükle · Sıkıştır · Döndür · 2x sıfırla'
-              : '👆 Drag · Pinch · Rotate · 2x to reset'}
+            {t('analysis.gesture_hint', lang)}
           </Text>
         )}
 
@@ -530,7 +528,18 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
           )}
           <View style={styles.scoreCol}>
             {result?.golden_ratio != null && (
-              <ScoreRing score={Math.round(result.golden_ratio)} label={t('analysis.golden_ratio', lang)} size={72} />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('GoldenRatioOverlay', {
+                  imageUri: imageUri!,
+                  lang,
+                  goldenScore: Math.round(result.golden_ratio ?? 0),
+                  goldenGrade: (result as any).golden_grade ?? '',
+                })}
+                activeOpacity={0.8}
+              >
+                <ScoreRing score={Math.round(result.golden_ratio)} label={t('analysis.golden_ratio', lang)} size={72} />
+                <Text style={styles.tapHint}>{t('golden.tap_to_view', lang)}</Text>
+              </TouchableOpacity>
             )}
             <TouchableOpacity
               style={styles.chatInlineBtn}
@@ -540,6 +549,23 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
               <Text style={styles.chatInlineIcon}>✨</Text>
               <Text style={styles.chatInlineText}>{t('analysis.chat_btn', lang)}</Text>
             </TouchableOpacity>
+            {(result?.sifatlar?.length ?? 0) > 0 && (
+              <TouchableOpacity
+                style={styles.similarityBtn}
+                onPress={() => {
+                  const topSifatlar = (result!.sifatlar ?? [])
+                    .filter(s => (s.score ?? 0) >= 55)
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 12)
+                    .map(s => s.sifat);
+                  navigation.navigate('Similarity', { sifatlar: topSifatlar, lang });
+                }}
+                activeOpacity={0.82}
+              >
+                <Text style={styles.chatInlineIcon}>🎭</Text>
+                <Text style={styles.chatInlineText}>{t('similarity.discover', lang)}</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -590,7 +616,7 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
 
         {result?.kisilik && typeof result.kisilik === 'string' && (
           <>
-            <SectionLabel>{lang.startsWith('tr') ? 'KİŞİLİK' : 'PERSONALITY'}</SectionLabel>
+            <SectionLabel>{t('analysis.personality', lang)}</SectionLabel>
             <Card variant="warm"><Text style={styles.moduleText}>{result.kisilik as string}</Text></Card>
           </>
         )}
@@ -611,7 +637,7 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
 
         {result?.sosyal && typeof result.sosyal === 'string' && (
           <>
-            <SectionLabel>{lang.startsWith('tr') ? 'SOSYAL' : 'SOCIAL'}</SectionLabel>
+            <SectionLabel>{t('analysis.social', lang)}</SectionLabel>
             <Card><Text style={styles.moduleText}>{result.sosyal as string}</Text></Card>
           </>
         )}
@@ -717,6 +743,18 @@ const styles = StyleSheet.create({
   },
   chatInlineIcon: { fontSize: 14 },
   chatInlineText: { ...typography.label, color: '#000', fontSize: 11, fontWeight: '700' as const },
+  similarityBtn: {
+    marginTop: spacing.xs,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: colors.gold + '55',
+  },
 
   // Chat CTA (kept for reference, no longer rendered)
   chatCTA:    { marginBottom: spacing.md },
@@ -834,6 +872,7 @@ const styles = StyleSheet.create({
   previewBtns:  { flexDirection: 'row' as const, width: '100%', gap: 10, marginTop: 16 },
   scannerWrap:  { marginTop: 24, width: '100%', alignItems: 'center' as const },
   scoreCol:     { flex: 1, gap: 12, justifyContent: 'center' as const },
+  tapHint:      { ...typography.caption, color: colors.gold, fontSize: 10, textAlign: 'center' as const, marginTop: 2 },
   badgeRow:     { flexDirection: 'row' as const, gap: 8, marginBottom: spacing.md, flexWrap: 'wrap' as const },
   ctaFlex1:     { flex: 1 },
   ctaBtn:       { marginTop: 12 },

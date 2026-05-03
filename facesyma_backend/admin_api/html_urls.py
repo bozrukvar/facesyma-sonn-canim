@@ -8,7 +8,9 @@ from django.urls import path
 from admin_api.views.html_views import (
     AdminLoginHTMLView, AdminDashboardView, AdminUsersView,
     AdminPaymentsView, AdminRenewalsView, AdminDatabaseView, AdminReviewsView, AdminCoachView,
-    SubscriptionDashboardHTMLView, AdminAnalyticsView, AdminReportsView, AdminInsightsView, AdminLiveDashboardView, AdminAuditLogView, AdminAlertsView, AdminLogoutView
+    SubscriptionDashboardHTMLView, AdminAnalyticsView, AdminReportsView, AdminInsightsView,
+    AdminLiveDashboardView, AdminAuditLogView, AdminAlertsView, AdminLogoutView,
+    AdminGamificationDashboardView,
 )
 
 urlpatterns = [
@@ -27,5 +29,6 @@ urlpatterns = [
     path('reviews/', AdminReviewsView.as_view(), name='admin-html-reviews'),
     path('coach/', AdminCoachView.as_view(), name='admin-html-coach'),
     path('subscriptions/', SubscriptionDashboardHTMLView.as_view(), name='admin-html-subscriptions'),
+    path('gamification/', AdminGamificationDashboardView.as_view(), name='admin-html-gamification'),
     path('logout/', AdminLogoutView.as_view(), name='admin-html-logout'),
 ]

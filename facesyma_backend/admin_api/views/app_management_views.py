@@ -112,17 +112,17 @@ class AppListView(View):
                     'new_30d':  [{'$match': {**source_query, 'date_joined': {'$gte': thirty_days_ago}}},    {'$count': 'n'}],
                 }}]), {})
                 _ufget = _uf.get
-                total_users   = (_ufget('total',   [{}])[0] or {}).get('n', 0)
-                active_users  = (_ufget('active',  [{}])[0] or {}).get('n', 0)
-                new_users_30d = (_ufget('new_30d', [{}])[0] or {}).get('n', 0)
+                total_users   = (_ufget('total',   []) or [{}])[0].get('n', 0)
+                active_users  = (_ufget('active',  []) or [{}])[0].get('n', 0)
+                new_users_30d = (_ufget('new_30d', []) or [{}])[0].get('n', 0)
 
                 _hf = next(history_col.aggregate([{'$facet': {
                     'total': [{'$match': source_query},                                                      {'$count': 'n'}],
                     '30d':   [{'$match': {**source_query, 'created_at': {'$gte': thirty_ago_ts}}},           {'$count': 'n'}],
                 }}]), {})
                 _hfget = _hf.get
-                analyses_total = (_hfget('total', [{}])[0] or {}).get('n', 0)
-                analyses_30d   = (_hfget('30d',   [{}])[0] or {}).get('n', 0)
+                analyses_total = (_hfget('total', []) or [{}])[0].get('n', 0)
+                analyses_30d   = (_hfget('30d',   []) or [{}])[0].get('n', 0)
 
                 result.append({
                     **app,
@@ -186,17 +186,17 @@ class AppDetailView(View):
                 'new_30d': [{'$match': {**source_query, 'date_joined': {'$gte': thirty_days_ago}}},   {'$count': 'n'}],
             }}]), {})
             _ufget = _uf.get
-            total_users   = (_ufget('total',   [{}])[0] or {}).get('n', 0)
-            active_users  = (_ufget('active',  [{}])[0] or {}).get('n', 0)
-            new_users_30d = (_ufget('new_30d', [{}])[0] or {}).get('n', 0)
+            total_users   = (_ufget('total',   []) or [{}])[0].get('n', 0)
+            active_users  = (_ufget('active',  []) or [{}])[0].get('n', 0)
+            new_users_30d = (_ufget('new_30d', []) or [{}])[0].get('n', 0)
 
             _hf = next(history_col.aggregate([{'$facet': {
                 'total': [{'$match': source_query},                                                    {'$count': 'n'}],
                 '30d':   [{'$match': {**source_query, 'created_at': {'$gte': thirty_ago_ts}}},         {'$count': 'n'}],
             }}]), {})
             _hfget2 = _hf.get
-            analyses_total = (_hfget2('total', [{}])[0] or {}).get('n', 0)
-            analyses_30d   = (_hfget2('30d',   [{}])[0] or {}).get('n', 0)
+            analyses_total = (_hfget2('total', []) or [{}])[0].get('n', 0)
+            analyses_30d   = (_hfget2('30d',   []) or [{}])[0].get('n', 0)
 
             app['stats'] = {
                 'total_users': total_users,
@@ -374,11 +374,11 @@ class AppStatsView(View):
                 'by_auth':      [{'$match': source_query}, {'$group': {'_id': '$auth_method', 'count': {'$sum': 1}}}],
             }}]), {})
             _ufget = _uf.get
-            total_users          = (_ufget('total',     [{}])[0] or {}).get('n', 0)
-            active_users         = (_ufget('active',    [{}])[0] or {}).get('n', 0)
+            total_users          = (_ufget('total',     []) or [{}])[0].get('n', 0)
+            active_users         = (_ufget('active',    []) or [{}])[0].get('n', 0)
             inactive_users       = total_users - active_users
-            registered_today     = (_ufget('today',     [{}])[0] or {}).get('n', 0)
-            registered_this_week = (_ufget('this_week', [{}])[0] or {}).get('n', 0)
+            registered_today     = (_ufget('today',     []) or [{}])[0].get('n', 0)
+            registered_this_week = (_ufget('this_week', []) or [{}])[0].get('n', 0)
             by_plan              = {doc['_id'] or 'free': doc['count'] for doc in _ufget('by_plan', [])}
             by_auth_method       = {doc['_id']: doc['count']           for doc in _ufget('by_auth', [])}
 
@@ -390,10 +390,10 @@ class AppStatsView(View):
                 'by_mode': [{'$match': source_query}, {'$group': {'_id': '$mode', 'count': {'$sum': 1}}}],
             }}]), {})
             _hfget = _hf.get
-            total_analyses  = (_hfget('total', [{}])[0] or {}).get('n', 0)
-            today_analyses  = (_hfget('today', [{}])[0] or {}).get('n', 0)
-            week_analyses   = (_hfget('week',  [{}])[0] or {}).get('n', 0)
-            month_analyses  = (_hfget('month', [{}])[0] or {}).get('n', 0)
+            total_analyses  = (_hfget('total', []) or [{}])[0].get('n', 0)
+            today_analyses  = (_hfget('today', []) or [{}])[0].get('n', 0)
+            week_analyses   = (_hfget('week',  []) or [{}])[0].get('n', 0)
+            month_analyses  = (_hfget('month', []) or [{}])[0].get('n', 0)
             by_mode         = {doc['_id']: doc['count'] for doc in _hfget('by_mode', [])}
 
             return JsonResponse({

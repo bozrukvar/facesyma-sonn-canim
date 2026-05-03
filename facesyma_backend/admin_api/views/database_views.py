@@ -253,7 +253,7 @@ class SifatCreateView(View):
 
         raw_cumleler = _dget('cumleler', [])
         validated_cumleler = [
-            {'no': int((_cg := c.get)('no', 0)), 'metin': str(_cg('metin', ''))[:1000]}
+            {'no': int(c.get('no', 0)), 'metin': str(c.get('metin', ''))[:1000]}
             for c in (raw_cumleler if isinstance(raw_cumleler, list) else [])
             if isinstance(c, dict)
         ]
@@ -327,7 +327,7 @@ class SifatUpdateView(View):
         if 'cumleler' in data:
             raw = data['cumleler']
             sifat['cumleler'] = [
-                {'no': int((_cg := c.get)('no', 0)), 'metin': str(_cg('metin', ''))[:1000]}
+                {'no': int(c.get('no', 0)), 'metin': str(c.get('metin', ''))[:1000]}
                 for c in (raw if isinstance(raw, list) else [])
                 if isinstance(c, dict)
             ]

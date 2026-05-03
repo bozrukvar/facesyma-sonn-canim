@@ -23,6 +23,7 @@ from .peer_chat_views import (
     ChatRoomsView, ChatMessagesView, MarkReadView, LeaveChatRoomView,
     UploadChatFileView,
 )
+from .community_chat_views import CommunityMessagesView, CommunityMarkReadView
 
 urlpatterns = [
     path('detect-face/',         FaceDetectView.as_view(),                name='detect-face'),
@@ -50,6 +51,8 @@ urlpatterns = [
     path('communities/<str:community_id>/join/',     JoinCommunityView.as_view(),            name='community-join'),
     path('communities/<str:community_id>/approve/',  ApproveCommunityInvitationView.as_view(), name='community-approve'),
     path('communities/<str:community_id>/members/',  ListCommunityMembersView.as_view(),     name='community-members'),
+    path('communities/<str:community_id>/chat/messages/', CommunityMessagesView.as_view(),   name='community-chat-messages'),
+    path('communities/<str:community_id>/chat/read/',     CommunityMarkReadView.as_view(),   name='community-chat-read'),
 
     # ── Subscription & Freemium (Phase 1.1+) ────────────────────────────────────
     path('subscription/status/',   SubscriptionStatusView.as_view(),   name='subscription-status'),

@@ -32,6 +32,9 @@ def setup_database():
     _sidx([("test_type", ASCENDING)])
     _sidx([("created_at", DESCENDING)])
     _sidx([("status", ASCENDING)])
+    # compound indexes for common query patterns
+    _sidx([("user_id", ASCENDING), ("test_type", ASCENDING)])
+    _sidx([("user_id", ASCENDING), ("status", ASCENDING)])
     print("      ✓ Indexes created")
 
     # ── test_results collection ───────────────────────────────────────────
@@ -42,6 +45,9 @@ def setup_database():
     _ridx([("test_type", ASCENDING)])
     _ridx([("created_at", DESCENDING)])
     _ridx([("session_id", ASCENDING)])
+    # compound indexes for common query patterns
+    _ridx([("user_id", ASCENDING), ("test_type", ASCENDING)])
+    _ridx([("user_id", ASCENDING), ("created_at", DESCENDING)])
     print("      ✓ Indexes created")
 
     # ── Verify ──────────────────────────────────────────────────────────

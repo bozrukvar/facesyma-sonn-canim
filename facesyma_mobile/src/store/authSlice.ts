@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthAPI, setCachedToken } from '../services/api';
+import { registerDeviceToken } from '../services/notifications';
 
 export interface User {
   id: number;
@@ -13,6 +14,7 @@ export interface User {
   birth_year?: number;
   gender?: string;
   country?: string;
+  country_code?: string;
   skin_tone?: string;
   hair_color?: string;
   eye_color?: string;
@@ -55,6 +57,7 @@ export const loginWithEmail = createAsyncThunk(
       await AuthAPI.saveTokens(data.access, data.refresh);
       const user = data.user as User;
       await AsyncStorage.setItem('user', JSON.stringify(user));
+      registerDeviceToken().catch(() => {}); // fire-and-forget
       return user;
     } catch (e: any) {
       return rejectWithValue(e.response?.data?.detail || 'Login failed');
@@ -70,6 +73,7 @@ export const loginWithGoogle = createAsyncThunk(
       await AuthAPI.saveTokens(data.access, data.refresh);
       const user = data.user as User;
       await AsyncStorage.setItem('user', JSON.stringify(user));
+      registerDeviceToken().catch(() => {}); // fire-and-forget
       return user;
     } catch (e: any) {
       return rejectWithValue(e.response?.data?.detail || 'Google login failed');
@@ -84,6 +88,7 @@ export const registerWithEmail = createAsyncThunk(
       const res = await AuthAPI.registerEmail(data);
       await AuthAPI.saveTokens(res.access, res.refresh);
       await AsyncStorage.setItem('user', JSON.stringify(res.user));
+      registerDeviceToken().catch(() => {}); // fire-and-forget
       return res.user as User;
     } catch (e: any) {
       return rejectWithValue(e.response?.data?.detail || e.response?.data?.email?.[0] || 'Registration failed');
@@ -111,6 +116,8 @@ export const restoreSession = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
+  // Remove device token from backend before clearing local tokens
+  AuthAPI.removeDeviceToken().catch(() => {});
   await AuthAPI.logout();
 });
 

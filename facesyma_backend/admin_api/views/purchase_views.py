@@ -73,11 +73,11 @@ class PremiumListView(View):
         return JsonResponse({
             'premium_users': [
                 {
-                    'id': (_ug := u.get)('id'),
-                    'email': _ug('email'),
-                    'username': _ug('username'),
-                    'joined_at': str(_ug('date_joined', '')),
-                    'auth_method': _ug('auth_method'),
+                    'id': u.get('id'),
+                    'email': u.get('email'),
+                    'username': u.get('username'),
+                    'joined_at': str(u.get('date_joined', '')),
+                    'auth_method': u.get('auth_method'),
                 }
                 for u in users
             ],
@@ -125,8 +125,8 @@ class PurchaseStatsView(View):
             'by_plan':          [{'$group': {'_id': '$plan', 'count': {'$sum': 1}}}],
         }}]), {})
         _pfget = _pf.get
-        total            = (_pfget('total',            [{}])[0] or {}).get('n', 0)
-        inactive_premium = (_pfget('inactive_premium', [{}])[0] or {}).get('n', 0)
+        total            = (_pfget('total',            []) or [{}])[0].get('n', 0)
+        inactive_premium = (_pfget('inactive_premium', []) or [{}])[0].get('n', 0)
         plan_dict        = {doc['_id'] or 'free': doc['count'] for doc in _pfget('by_plan', [])}
 
         _pdget = plan_dict.get

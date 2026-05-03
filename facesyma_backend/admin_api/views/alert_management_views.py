@@ -253,9 +253,7 @@ class AlertHistoryListView(View):
             items = list(history_col.find(
                 {}, {'_id': 0},
                 sort=[('triggered_at', -1)],
-                skip=skip,
-                limit=limit
-            ))
+            ).skip(skip).limit(limit))
 
             return JsonResponse({
                 'items': items,
@@ -294,8 +292,8 @@ class AlertStatsView(View):
                 'enabled': [{'$match': {'enabled': True}}, {'$count': 'n'}],
             }}]), {})
             _rfget = _rf.get
-            total_rules   = (_rfget('total',   [{}])[0] or {}).get('n', 0)
-            enabled_rules = (_rfget('enabled', [{}])[0] or {}).get('n', 0)
+            total_rules   = (_rfget('total',   []) or [{}])[0].get('n', 0)
+            enabled_rules = (_rfget('enabled', []) or [{}])[0].get('n', 0)
 
             # History: week triggers + emails sent (single $facet)
             week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
@@ -304,8 +302,8 @@ class AlertStatsView(View):
                 'emails': [{'$match': {'email_sent': True}}, {'$count': 'n'}],
             }}]), {})
             _hfget = _hf.get
-            week_triggers = (_hfget('week',   [{}])[0] or {}).get('n', 0)
-            emails_sent   = (_hfget('emails', [{}])[0] or {}).get('n', 0)
+            week_triggers = (_hfget('week',   []) or [{}])[0].get('n', 0)
+            emails_sent   = (_hfget('emails', []) or [{}])[0].get('n', 0)
 
             return JsonResponse({
                 'total_rules': total_rules,

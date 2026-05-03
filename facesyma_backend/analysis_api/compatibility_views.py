@@ -26,8 +26,10 @@ import sys
 
 log = logging.getLogger(__name__)
 
-_VALID_CATEGORIES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL'})
-_VALID_COMMUNITY_TYPES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL'})
+_VALID_CATEGORIES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL',
+                               'ASTRO', 'INTEREST', 'LIFESTYLE', 'FACE', 'COLORTYPE', 'GOAL'})
+_VALID_COMMUNITY_TYPES = frozenset({'TRAIT', 'MODULE', 'CATEGORY', 'GENERAL',
+                                    'ASTRO', 'INTEREST', 'LIFESTYLE', 'FACE', 'COLORTYPE', 'GOAL'})
 _PROJ_PENDING_INVITE = {'_id': 0, 'community_id': 1, 'invited_at': 1, 'harmony_level': 1}
 _PROJ_COMMUNITY_BRIEF = {'name': 1, 'type': 1, 'trait_name': 1}
 
@@ -469,18 +471,20 @@ class JoinCommunityView(View):
 
             # Kullanıcı profilini al (harmony score için)
             user = _get_user_profile(user_id)
-            harmony_level = 75 if not user else 75  # Default harmony
+            harmony_level = 75  # Placeholder — real score TBD from analysis data
             _joined_ts = time.time()
 
-            # Üyeliği ekle — sadece yeni kayıt ise member_count artır
+            # Üyeliği ekle / güncelle — status her zaman 'active' olarak set edilir
             upsert_result = members_col.update_one(
                 {'community_id': community_id, 'user_id': user_id},
                 {'$set': {
                     'community_id': community_id,
                     'user_id': user_id,
+                    'status': 'active',
                     'harmony_level': harmony_level,
                     'is_mod': False,
                     'joined_at': _joined_ts,
+                    'approved_at': _joined_ts,
                 }},
                 upsert=True
             )
@@ -848,8 +852,8 @@ def check_free_tier_limit(user_id: int, feature: str) -> bool:
 
     elif feature == 'direct_message':
         month_ago = time.time() - (30 * 24 * 60 * 60)
-        count = _get_db()['community_messages'].count_documents({
-            'from_user_id': user_id,
+        count = _get_db()['peer_messages'].count_documents({
+            'sender_id': user_id,
             'created_at': {'$gt': month_ago}
         })
         return count < 10

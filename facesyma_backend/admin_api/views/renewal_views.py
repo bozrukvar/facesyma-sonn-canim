@@ -70,8 +70,8 @@ class RenewalJobStatusView(View):
                 ]}}, {'$count': 'n'}],
             }}]), {})
             _rcget = _rc.get
-            expiring_today = (_rcget('today', [{}])[0] or {}).get('n', 0)
-            expiring_7d    = (_rcget('week',  [{}])[0] or {}).get('n', 0)
+            expiring_today = (_rcget('today', []) or [{}])[0].get('n', 0)
+            expiring_7d    = (_rcget('week',  []) or [{}])[0].get('n', 0)
 
             # Get users expiring soon (max 20)
             expiring_soon_users = []
@@ -154,13 +154,13 @@ class ManualRenewalTriggerView(View):
             _q = {"event_at": {"$gte": _cutoff}}
 
             expired_count = events_col.count_documents(_q)
-            recent_events = list(events_col.find(_q, _PROJ_RENEWAL_TYPE, limit=10))
+            recent_events = list(events_col.find(_q, _PROJ_RENEWAL_TYPE).limit(10))
 
             return JsonResponse({
                 'success': True,
                 'message': f'Renewal check completed. {expired_count} subscriptions downgraded.',
                 'expired_count': expired_count,
-                'events': [{'user_id': (_eg := e.get)('user_id'), 'type': _eg('type')} for e in recent_events]
+                'events': [{'user_id': e.get('user_id'), 'type': e.get('type')} for e in recent_events]
             })
 
         except Exception as e:

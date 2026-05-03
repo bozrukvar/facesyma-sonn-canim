@@ -12,5 +12,9 @@ echo "MongoDB ready."
 echo "Seeding attribute databases..."
 python /app/seed_attribute_databases.py || echo "Seed warning (non-fatal)"
 
+# Seed communities (47 predefined: ASTRO, INTEREST, LIFESTYLE, FACE, COLORTYPE, GOAL)
+echo "Seeding communities..."
+python manage.py seed_communities || echo "Community seed warning (non-fatal)"
+
 # Start the server
 exec daphne -b 0.0.0.0 -p 8000 facesyma_project.asgi:application

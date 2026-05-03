@@ -1,0 +1,288 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block nav-gamification %}active{% endblock %}
+
+{% block title %}🎮 Gamification Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPI Cards -->
+<div class="stat-cards" id="kpiCards">
+    <div class="stat-card">
+        <div class="stat-label">Toplam Aktif Kullanıcı</div>
+        <div class="stat-value" id="kpiActiveUsers">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Toplam Coin Dağıtıldı</div>
+        <div class="stat-value" id="kpiCoinsDistributed">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Aktif Meydan Okuma</div>
+        <div class="stat-value" id="kpiActiveChallenges">-</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Sistem Sağlığı</div>
+        <div class="stat-value" id="kpiHealth">-</div>
+    </div>
+</div>
+
+<!-- System Health -->
+<div class="card">
+    <div class="card-title">🏥 Sistem Sağlığı</div>
+    <div id="healthContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+
+<!-- Coin Economy -->
+<div class="card">
+    <div class="card-title">🪙 Coin Ekonomisi</div>
+    <div id="coinStatsContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+
+<!-- Leaderboard Stats -->
+<div class="card">
+    <div class="card-title">🏆 Liderlik Tablosu İstatistikleri</div>
+    <div id="leaderboardContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+
+<!-- Cache Performance -->
+<div class="card">
+    <div class="card-title">⚡ Önbellek Performansı (Redis)</div>
+    <div id="cacheContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+
+<!-- WebSocket Metrics -->
+<div class="card">
+    <div class="card-title">🔌 WebSocket Metrikleri</div>
+    <div id="wsContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+
+<!-- Trend Analysis -->
+<div class="card">
+    <div class="card-title">📈 Trend Analizi</div>
+    <div id="trendsContainer" class="loading-state">
+        <span class="spinner"></span> Yükleniyor...
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function fmtNum(n) {
+    if (n == null || n === undefined) return '-';
+    return Number(n).toLocaleString(window.ADMIN_LOCALE);
+}
+function fmtPct(n) {
+    if (n == null) return '-';
+    return Number(n).toFixed(1) + '%';
+}
+function statusBadge(ok) {
+    return ok
+        ? '<span style="color:#4CAF50;font-weight:700;">✓ OK</span>'
+        : '<span style="color:#F44336;font-weight:700;">✗ Hata</span>';
+}
+
+async function loadHealth() {
+    try {
+        const d = await apiCall('/monitoring/gamification/health/');
+        const h = d.health || d;
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">';
+        const checks = [
+            ['MongoDB', h.mongodb_ok ?? h.database_ok],
+            ['Redis', h.redis_ok ?? h.cache_ok],
+            ['WebSocket', h.websocket_ok ?? h.ws_ok],
+            ['Scheduler', h.scheduler_ok],
+        ];
+        checks.forEach(([name, ok]) => {
+            if (ok === undefined) return;
+            html += `<div class="stat-card" style="text-align:left;padding:14px;">
+                <div class="stat-label">${escapeHtml(name)}</div>
+                <div style="font-size:18px;margin-top:6px;">${statusBadge(ok)}</div>
+            </div>`;
+        });
+        html += '</div>';
+        if (h.uptime_seconds != null) {
+            const mins = Math.floor(h.uptime_seconds / 60);
+            html += `<div style="margin-top:12px;color:#707070;font-size:12px;">Uptime: ${fmtNum(mins)} dakika</div>`;
+        }
+        document.getElementById('healthContainer').innerHTML = html;
+        document.getElementById('kpiHealth').textContent = (h.mongodb_ok && h.redis_ok) ? '✓ İyi' : '⚠ Kontrol Et';
+    } catch (e) {
+        document.getElementById('healthContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+async function loadCoinStats() {
+    try {
+        const d = await apiCall('/coins/stats/');
+        const s = d.stats || d;
+        document.getElementById('kpiCoinsDistributed').textContent = fmtNum(s.total_distributed ?? s.total_coins_issued);
+        document.getElementById('coinStatsContainer').innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Dağıtılan</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.total_distributed ?? s.total_coins_issued)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Harcanan</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.total_spent ?? s.total_coins_spent)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Aktif Cüzdan</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.active_wallets ?? s.total_wallets)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ort. Bakiye</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(Math.round(s.avg_balance ?? 0))}</div>
+                </div>
+            </div>`;
+    } catch (e) {
+        document.getElementById('coinStatsContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+async function loadLeaderboard() {
+    try {
+        const d = await apiCall('/leaderboards/stats/');
+        const s = d.stats || d;
+        document.getElementById('kpiActiveUsers').textContent = fmtNum(s.total_ranked_users ?? s.total_users);
+        document.getElementById('leaderboardContainer').innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                <div class="stat-card">
+                    <div class="stat-label">Sıralamadaki Kullanıcı</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.total_ranked_users ?? s.total_users)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Aktif Meydan Okuma</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.active_challenges ?? s.challenges_count)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Rozet</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(s.total_badges ?? s.badges_awarded)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ort. Skor</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(Math.round(s.avg_score ?? s.average_score ?? 0))}</div>
+                </div>
+            </div>`;
+        document.getElementById('kpiActiveChallenges').textContent = fmtNum(s.active_challenges ?? s.challenges_count);
+    } catch (e) {
+        document.getElementById('leaderboardContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+async function loadCache() {
+    try {
+        const d = await apiCall('/monitoring/gamification/cache/');
+        const c = d.cache || d;
+        const hitRate = c.hit_rate ?? c.cache_hit_rate;
+        document.getElementById('cacheContainer').innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                <div class="stat-card">
+                    <div class="stat-label">Hit Rate</div>
+                    <div class="stat-value" style="font-size:22px;color:${hitRate > 80 ? '#4CAF50' : '#F44336'};">${fmtPct(hitRate)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Toplam İstek</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(c.total_requests ?? c.requests)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Cache Miss</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(c.misses ?? c.cache_misses)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Memory</div>
+                    <div class="stat-value" style="font-size:18px;">${escapeHtml(String(c.memory_used ?? c.used_memory ?? '-'))}</div>
+                </div>
+            </div>`;
+    } catch (e) {
+        document.getElementById('cacheContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+async function loadWebSocket() {
+    try {
+        const d = await apiCall('/monitoring/gamification/websocket/');
+        const w = d.websocket || d;
+        document.getElementById('wsContainer').innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                <div class="stat-card">
+                    <div class="stat-label">Aktif Bağlantı</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(w.active_connections ?? w.connections)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Mesaj</div>
+                    <div class="stat-value" style="font-size:22px;">${fmtNum(w.total_messages ?? w.messages_sent)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Hata Sayısı</div>
+                    <div class="stat-value" style="font-size:22px;color:${(w.errors ?? 0) > 0 ? '#F44336' : '#4CAF50'};">${fmtNum(w.errors ?? 0)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ort. Gecikme</div>
+                    <div class="stat-value" style="font-size:22px;">${w.avg_latency_ms != null ? escapeHtml(String(w.avg_latency_ms)) + 'ms' : '-'}</div>
+                </div>
+            </div>`;
+    } catch (e) {
+        document.getElementById('wsContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+async function loadTrends() {
+    try {
+        const d = await apiCall('/monitoring/gamification/trends/');
+        const trends = d.trends || d.data || [];
+        if (!trends.length) {
+            document.getElementById('trendsContainer').innerHTML = '<div style="color:#707070;padding:20px;text-align:center;">Trend verisi bulunamadı.</div>';
+            return;
+        }
+        let rows = '';
+        trends.forEach(function(row) {
+            const date = row.date || row.period || row._id || '-';
+            const users = fmtNum(row.active_users ?? row.users ?? '-');
+            const coins = fmtNum(row.coins_issued ?? row.coins ?? '-');
+            const challenges = fmtNum(row.challenges_completed ?? row.challenges ?? '-');
+            rows += `<tr>
+                <td>${escapeHtml(String(date))}</td>
+                <td>${users}</td>
+                <td>${coins}</td>
+                <td>${challenges}</td>
+            </tr>`;
+        });
+        document.getElementById('trendsContainer').innerHTML = `
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr>
+                        <th>Dönem</th>
+                        <th>Aktif Kullanıcı</th>
+                        <th>Coin Dağıtıldı</th>
+                        <th>Tamamlanan Meydan Okuma</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>`;
+    } catch (e) {
+        document.getElementById('trendsContainer').innerHTML = `<span style="color:#F44336;">Yüklenemedi: ${escapeHtml(e.message)}</span>`;
+    }
+}
+
+// Load all sections in parallel on page load
+window.addEventListener('load', function() {
+    loadHealth();
+    loadCoinStats();
+    loadLeaderboard();
+    loadCache();
+    loadWebSocket();
+    loadTrends();
+});
+</script>
+{% endblock %}

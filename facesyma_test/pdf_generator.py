@@ -323,7 +323,7 @@ class PDFReportGenerator:
         # Find top and bottom domains
         sorted_domains = sorted(domain_scores.items(), key=itemgetter(1), reverse=True)
 
-        _domains = _mget('domains', {})
+        _domains = self.metadata.get('domains', {})
         _dgget = _domains.get
         if sorted_domains:
             top_domain, top_score = sorted_domains[0]

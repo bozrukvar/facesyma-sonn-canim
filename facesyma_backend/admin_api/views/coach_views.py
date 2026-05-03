@@ -178,10 +178,10 @@ class CoachUserStatsView(View):
             'total':      [{'$count': 'n'}],
         }}]), {})
         _csget = _cs.get
-        total         = (_csget('total', [{}])[0] or {}).get('n', 0)
-        lang_dict     = {_id: doc['count'] for doc in _csget('by_lang', []) if (_id := doc['_id'])}
-        sun_sign_dict = {_id: doc['count'] for doc in _csget('by_sign', []) if (_id := doc['_id'])}
-        avg_data      = (_csget('avgs', [{}])[0] or {'avg_saglik': 0, 'avg_ozguven': 0, 'avg_iletisim': 0})
+        total         = (_csget('total', []) or [{}])[0].get('n', 0)
+        lang_dict     = {doc['_id']: doc['count'] for doc in _csget('by_lang', []) if doc['_id']}
+        sun_sign_dict = {doc['_id']: doc['count'] for doc in _csget('by_sign', []) if doc['_id']}
+        avg_data      = (_csget('avgs', []) or [{'avg_saglik': 0, 'avg_ozguven': 0, 'avg_iletisim': 0}])[0]
         _adget = avg_data.get
 
         return JsonResponse({
@@ -358,10 +358,10 @@ class CoachGoalStatsView(View):
             'by_priority': [{'$group': {'_id': '$priority', 'count': {'$sum': 1}}}],
         }}]), {})
         _gsget = _gs.get
-        total        = (_gsget('total', [{}])[0] or {}).get('n', 0)
-        status_dict  = {_id: doc['count'] for doc in _gsget('by_status',   []) if (_id := doc['_id'])}
-        module_dict  = {_id: doc['count'] for doc in _gsget('by_module',   []) if (_id := doc['_id'])}
-        priority_dict = {_id: doc['count'] for doc in _gsget('by_priority', []) if (_id := doc['_id'])}
+        total        = (_gsget('total', []) or [{}])[0].get('n', 0)
+        status_dict  = {doc['_id']: doc['count'] for doc in _gsget('by_status',   []) if doc['_id']}
+        module_dict  = {doc['_id']: doc['count'] for doc in _gsget('by_module',   []) if doc['_id']}
+        priority_dict = {doc['_id']: doc['count'] for doc in _gsget('by_priority', []) if doc['_id']}
 
         return JsonResponse({
             'total_goals': total,
