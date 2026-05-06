@@ -26,6 +26,7 @@ interface ModuleCard {
 }
 
 const MODULE_CARDS: ModuleCard[] = [
+  // ── Mevcut 14 modül ───────────────────────────────────────────────────────
   { id: 'health',        emoji: '🏃', titleKey: 'coach.mod_health',         moduleKey: 'saglik_esenwlik',     accent: '#7AE07A' },
   { id: 'honesty',       emoji: '🤝', titleKey: 'coach.mod_honesty',        moduleKey: 'dogruluk_sadakat',    accent: '#7AE0C0' },
   { id: 'security',      emoji: '🛡️', titleKey: 'coach.mod_security',       moduleKey: 'guvenlik',            accent: '#7AAEE0' },
@@ -40,6 +41,20 @@ const MODULE_CARDS: ModuleCard[] = [
   { id: 'birth',         emoji: '🌙', titleKey: 'coach.mod_birth_analysis', moduleKey: 'dogum_analizi',       accent: '#B07AE0' },
   { id: 'age',           emoji: '📊', titleKey: 'coach.mod_age_summary',    moduleKey: 'yas_koc_ozet',        accent: '#7AAEE0' },
   { id: 'body_language', emoji: '👤', titleKey: 'coach.mod_body_language',  moduleKey: 'vucut_dil',           accent: '#E0A17A' },
+  // ── 13 yeni modül ────────────────────────────────────────────────────────
+  { id: 'activity',      emoji: '🎪', titleKey: 'coach.mod_activity',       moduleKey: 'etkinlik_tavsiye',    accent: '#E07A7A' },
+  { id: 'sport',         emoji: '🏅', titleKey: 'coach.mod_sport',          moduleKey: 'spor_aktivite',       accent: '#7AE07A' },
+  { id: 'career_path',   emoji: '🚀', titleKey: 'coach.mod_career_path',    moduleKey: 'kariyer_yolu',        accent: '#7AAEE0' },
+  { id: 'hr',            emoji: '👥', titleKey: 'coach.mod_hr',             moduleKey: 'insan_kaynaklari',    accent: '#E0A17A' },
+  { id: 'emotional',     emoji: '💜', titleKey: 'coach.mod_emotional',      moduleKey: 'duygusal_ruhsal',     accent: '#C07AE0' },
+  { id: 'meditation',    emoji: '🌿', titleKey: 'coach.mod_meditation',     moduleKey: 'meditasyon_egzersiz', accent: '#7AE0B0' },
+  { id: 'book',          emoji: '📚', titleKey: 'coach.mod_book',           moduleKey: 'kitap_tavsiye',       accent: '#B07AE0' },
+  { id: 'film',          emoji: '🎬', titleKey: 'coach.mod_film',           moduleKey: 'film_tavsiye',        accent: '#E07AB0' },
+  { id: 'music',         emoji: '🎵', titleKey: 'coach.mod_music',          moduleKey: 'muzik_tavsiye',       accent: '#7AB0E0' },
+  { id: 'podcast',       emoji: '🎙️', titleKey: 'coach.mod_podcast',        moduleKey: 'podcast_tavsiye',     accent: '#F5C842' },
+  { id: 'travel',        emoji: '✈️', titleKey: 'coach.mod_travel',         moduleKey: 'seyahat_tavsiye',     accent: '#E0D07A' },
+  { id: 'affirmation',   emoji: '✨', titleKey: 'coach.mod_affirmation',    moduleKey: 'gunluk_afirasyon',    accent: '#FFD700' },
+  { id: 'health_adv',    emoji: '🌱', titleKey: 'coach.mod_health_advice',  moduleKey: 'saglik_tavsiye',      accent: '#7AE07A' },
 ];
 
 function extractModuleText(data: any): string {
