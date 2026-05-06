@@ -1,27 +1,17 @@
 """
 art_matcher.py
 ==============
-Dual-scoring art-match engine.
-  - Geometry score  (Cal() proportions vs artwork's ideal values)
-  - Personality score (sıfatlar → cluster scores vs artwork cluster weights)
-  - Blend: 40% geo + 60% personality (or 100% whichever side is available)
+Personality-based art-match engine (no TF/MediaPipe).
+  - Personality score: user's sıfatlar → cluster scores vs artwork cluster weights
+  - Fallback: total cluster weight ranking (no analysis history needed)
+  - Rotation: per-user history in MongoDB (user_art_history)
 """
 
-from collections import defaultdict
-import math
 import random
 from datetime import datetime
 
-# Geometry dimension weights (must sum to 1.0)
-_GEO_WEIGHTS = {"jaw_width": 0.35, "face_len_ratio": 0.40, "eye_distance": 0.25}
-_GEO_TOLERANCE = 0.20   # ±20% of the ideal value → score drops to 0
-
 # Minimum cluster score to include in results
-_MIN_SCORE = 0.15
-
-# Blend weight constants
-_W_GEO  = 0.40
-_W_PERS = 0.60
+_MIN_SCORE = 0.10
 
 # Grade thresholds
 _GRADE_MAP = [(90, "A+"), (80, "A"), (70, "B+"), (60, "B"), (0, "C")]
@@ -35,46 +25,10 @@ def _grade(pct: float) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Geometry scoring
-# ---------------------------------------------------------------------------
-
-def score_geometry(artwork_geo: dict, user_geo: dict) -> float:
-    """
-    Compare user's face proportions to artwork's ideal values.
-    Uses a triangle (linear) decay: full score at ideal, 0 at ±tolerance.
-    Returns 0.0–1.0.
-    """
-    if not artwork_geo or not user_geo:
-        return 0.0
-
-    weighted_sum = 0.0
-    total_weight = 0.0
-
-    for dim, w in _GEO_WEIGHTS.items():
-        ideal = artwork_geo.get(dim)
-        actual = user_geo.get(dim)
-        if ideal is None or actual is None:
-            continue
-        tol = ideal * _GEO_TOLERANCE or 0.1
-        diff = abs(actual - ideal)
-        dim_score = max(0.0, 1.0 - (diff / tol))
-        weighted_sum += dim_score * w
-        total_weight += w
-
-    if total_weight == 0.0:
-        return 0.0
-    return weighted_sum / total_weight
-
-
-# ---------------------------------------------------------------------------
-# Personality / cluster scoring (same dot-product as archetype_mapper)
+# Personality / cluster scoring
 # ---------------------------------------------------------------------------
 
 def score_personality(artwork_clusters: dict, user_clusters: dict) -> float:
-    """
-    Weighted dot-product similarity between artwork cluster profile and user's
-    cluster scores. Returns 0.0–1.0.
-    """
     if not artwork_clusters or not user_clusters:
         return 0.0
     total_w = sum(artwork_clusters.values())
@@ -84,40 +38,17 @@ def score_personality(artwork_clusters: dict, user_clusters: dict) -> float:
     return min(dot / total_w, 1.0)
 
 
-# ---------------------------------------------------------------------------
-# Score blending
-# ---------------------------------------------------------------------------
-
-def blend_scores(
-    geo_score: float,
-    pers_score: float,
-    has_portrait: bool,
-    has_sifatlar: bool,
-) -> float:
-    """
-    40 % geo + 60 % personality.
-    Falls back to available side when one is missing:
-      - non-portrait → 100 % personality
-      - no sıfatlar  → 100 % geometry (if portrait) else 0
-    """
-    if not has_portrait and not has_sifatlar:
-        return 0.0
-    if not has_portrait:
-        return pers_score
-    if not has_sifatlar:
-        return geo_score
-    return geo_score * _W_GEO + pers_score * _W_PERS
+def _default_score(artwork_clusters: dict) -> float:
+    """When no user history: score by total cluster weight (variety)."""
+    total = sum(artwork_clusters.values()) if artwork_clusters else 0
+    return min(total / 3.0, 1.0)
 
 
 # ---------------------------------------------------------------------------
-# User sıfatlar → cluster scores (from latest analysis_history)
+# User sıfatlar → cluster scores from latest analysis_history
 # ---------------------------------------------------------------------------
 
 def _get_user_cluster_scores(user_id) -> dict:
-    """
-    Fetch the user's latest face-analysis sıfatlar from MongoDB and convert
-    them to cluster scores via SIFAT_CLUSTER_MAP.  Returns {} on any failure.
-    """
     if not user_id:
         return {}
     try:
@@ -131,26 +62,21 @@ def _get_user_cluster_scores(user_id) -> dict:
         )
         if not doc:
             return {}
-        # support both field names used across collection versions
         sifatlar = doc.get("positive_sifatlar") or doc.get("sifatlar") or []
-        if not sifatlar:
-            return {}
-        return score_from_sifatlar(list(sifatlar))
+        return score_from_sifatlar(list(sifatlar)) if sifatlar else {}
     except Exception:
         return {}
 
 
 # ---------------------------------------------------------------------------
-# Rotation / history helpers  (same pattern as archetype_mapper)
+# Rotation helpers
 # ---------------------------------------------------------------------------
 
 def _get_shown_ids(user_id, db) -> set:
     hist = db["user_art_history"].find_one(
         {"user_id": user_id}, {"_id": 0, "shown": 1}
     )
-    if not hist:
-        return set()
-    return set(hist.get("shown", []))
+    return set(hist.get("shown", [])) if hist else set()
 
 
 def _mark_shown(user_id, artwork_id: str, db) -> None:
@@ -206,13 +132,6 @@ _MATCH_MSG: dict[str, str] = {
 
 
 def _localise_artwork(doc: dict, lang: str) -> dict:
-    """Return display-ready artwork dict in the requested language."""
-    _l = lang if lang in ("tr", "en") else "en"
-
-    def _pick(tr_key, en_key, fallback=""):
-        return doc.get(f"{tr_key}_{lang}") or doc.get(f"{en_key}_{lang}") \
-               or doc.get(f"{tr_key}_{_l}") or doc.get(f"{en_key}_{_l}") or fallback
-
     title  = doc.get(f"title_{lang}") or doc.get("title_en") or doc.get("title_tr", "")
     artist = doc.get(f"artist_{lang}") or doc.get("artist_en") or doc.get("artist_tr", "")
     museum = doc.get(f"museum_{lang}") or doc.get("museum_en") or doc.get("museum_tr", "")
@@ -234,7 +153,7 @@ def _localise_artwork(doc: dict, lang: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Main entry point
+# Main entry point — NO TF/MediaPipe
 # ---------------------------------------------------------------------------
 
 def match_artworks(
@@ -244,37 +163,11 @@ def match_artworks(
     n: int = 3,
 ) -> dict:
     """
-    Dual-scoring art match.
-
-    1. Run Cal(img_path) for geometric measurements.
-    2. Fetch user's sıfatlar → cluster scores from MongoDB.
-    3. Score all artworks: blend(geo, personality).
-    4. Apply rotation (skip already-seen, reset when pool exhausted).
-    5. Return top-N with localised names, image_url, reason, primary_cluster.
-
-    Falls back gracefully to geometry-only if user has no sıfatlar history,
-    or personality-only for non-portrait artworks.
+    Personality-based art match (no TF required).
+    Uses user's cluster scores from their latest face analysis history.
+    Falls back to cluster-weight ranking if no history.
     """
-    # ── 1. Geometric measurements ──────────────────────────────────────────
-    user_geo: dict = {}
-    try:
-        from calculator import Cal
-        raw = Cal(img_path)
-        user_geo = {
-            "jaw_width":      raw.get("Jaw",  {}).get("jaw_width_ratio",   1.0),
-            "face_len_ratio": raw.get("Nose", {}).get("face_length_ratio", 1.45),
-            "eye_distance":   raw.get("Eye",  {}).get("eyes_distance",     1.0),
-        }
-    except Exception:
-        pass
-
-    has_geo = bool(user_geo)
-
-    # ── 2. Personality cluster scores ──────────────────────────────────────
-    user_clusters = _get_user_cluster_scores(user_id)
-    has_clusters  = bool(user_clusters)
-
-    # ── 3. Load art pool from MongoDB ──────────────────────────────────────
+    # ── 1. Load art pool from MongoDB ──────────────────────────────────────
     db        = None
     pool_docs = []
     try:
@@ -285,29 +178,36 @@ def match_artworks(
         pass
 
     if not pool_docs:
-        # MongoDB pool not seeded — fall back to legacy art_match
-        from art_match import match_artwork as _legacy
-        return _legacy(img_path, lang=lang)
+        # MongoDB pool not seeded — return empty result with error message
+        return {
+            "matches": [],
+            "best_match": None,
+            "overall_score": 0,
+            "grade": "C",
+            "message": "Art pool not available.",
+        }
 
-    # ── 4. Score every artwork ─────────────────────────────────────────────
+    # ── 2. Personality cluster scores from analysis history ────────────────
+    user_clusters = _get_user_cluster_scores(user_id)
+    has_clusters  = bool(user_clusters)
+
+    # ── 3. Score every artwork ─────────────────────────────────────────────
     scored: list[tuple[float, dict]] = []
     for doc in pool_docs:
-        hp = doc.get("has_portrait", False)
-
-        geo_sc  = score_geometry(doc.get("geo", {}), user_geo) if (hp and has_geo) else 0.0
-        pers_sc = score_personality(doc.get("clusters", {}), user_clusters) if has_clusters else 0.0
-
-        final = blend_scores(geo_sc, pers_sc, hp, has_clusters)
-        if final >= _MIN_SCORE:
-            scored.append((final, doc))
+        if has_clusters:
+            sc = score_personality(doc.get("clusters", {}), user_clusters)
+        else:
+            sc = _default_score(doc.get("clusters", {}))
+        if sc >= _MIN_SCORE:
+            scored.append((sc, doc))
 
     if not scored:
-        from art_match import match_artwork as _legacy
-        return _legacy(img_path, lang=lang)
+        # All scores below threshold — take any top docs
+        scored = [(_default_score(d.get("clusters", {})), d) for d in pool_docs]
 
     scored.sort(key=lambda x: x[0], reverse=True)
 
-    # ── 5. Rotation (only when user is authenticated) ──────────────────────
+    # ── 4. Rotation ────────────────────────────────────────────────────────
     if user_id and db is not None:
         shown_ids = _get_shown_ids(user_id, db)
         unseen = [(sc, doc) for sc, doc in scored if doc["id"] not in shown_ids]
@@ -315,7 +215,6 @@ def match_artworks(
             _reset_shown(user_id, db)
             unseen = scored
 
-        # Pick from top-5 for variety
         pool = unseen[:max(n * 2, 5)]
         chosen = random.sample(pool, min(n, len(pool)))
         chosen.sort(key=lambda x: x[0], reverse=True)
@@ -327,7 +226,7 @@ def match_artworks(
     else:
         top_n = scored[:n]
 
-    # ── 6. Build response ──────────────────────────────────────────────────
+    # ── 5. Build response ──────────────────────────────────────────────────
     _lang = lang if lang in _MATCH_MSG else "en"
 
     matches = []

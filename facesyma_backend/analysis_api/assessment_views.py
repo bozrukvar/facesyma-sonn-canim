@@ -30,14 +30,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from bson import ObjectId
 from django.conf import settings
-from .assessment_recommendations import generate_recommendations
+from .assessment_recommendations import generate_recommendations, get_domain_description
 from admin_api.utils.mongo import get_assessment_results_col
 
 log = logging.getLogger(__name__)
 
 _JWT_SECRET: str = settings.JWT_SECRET
 _ASSESSMENT_HISTORY_PROJ = {'_id': 1, 'test_type': 1, 'overall_score': 1,
-                             'overall_level_tr': 1, 'created_at': 1, 'responses_counted': 1}
+                             'overall_level_tr': 1, 'created_at': 1, 'responses_counted': 1, 'lang': 1}
 
 # Supported test types
 VALID_TESTS = frozenset({
@@ -338,19 +338,32 @@ class AssessmentSubmitView(View):
                 lang=lang
             )
 
+            # Normalize scores to 0-100 for display (keep 0-5 internally for levels/recommendations)
+            breakdown_100 = {
+                domain: {
+                    **scores,
+                    'score': round(scores['score'] / 5 * 100),
+                    'description': get_domain_description(test_type, domain, scores['level'], lang),
+                }
+                for domain, scores in breakdown.items()
+            }
+
             _rrget = recommendations_result.get
             return JsonResponse({
                 'success': True,
                 'data': {
                     'test_type': test_type,
                     'completed_at': time.time(),
-                    'overall_score': round(overall_score, 2),
+                    'overall_score': round(overall_score / 5 * 100),
                     'overall_level': overall_level,
                     'overall_level_tr': overall_level_tr,
-                    'breakdown': breakdown,
+                    'breakdown': breakdown_100,
                     'responses_counted': len([r for r in responses if r.get('q_id')]),
+                    'narrative': _rrget('narrative', ''),
+                    'strengths': _rrget('strengths', []),
+                    'growth_areas': _rrget('growth_areas', []),
                     'recommendations': _rrget('recommendations', []),
-                    'recommendations_status': _rrget('status', 'unknown'),
+                    'recommendations_status': _rrget('recommendations_status', _rrget('status', 'unknown')),
                 }
             })
 
@@ -401,6 +414,7 @@ class SaveAssessmentResultView(View):
                 '_id': ObjectId(),
                 'user_id': user_id,
                 'test_type': test_type,
+                'lang': _bget('lang', 'tr'),
                 'overall_score': _bget('overall_score'),
                 'overall_level_tr': _bget('overall_level_tr'),
                 'breakdown': _bget('breakdown', {}),
@@ -461,6 +475,7 @@ class GetAssessmentHistoryView(View):
                 formatted.append({
                     'id': str(r['_id']),
                     'test_type': _rget('test_type'),
+                    'lang': _rget('lang', 'tr'),
                     'overall_score': _rget('overall_score'),
                     'overall_level_tr': _rget('overall_level_tr'),
                     'created_at': (_cat.isoformat() if hasattr(_cat, 'isoformat') else _cat) if _cat else None,

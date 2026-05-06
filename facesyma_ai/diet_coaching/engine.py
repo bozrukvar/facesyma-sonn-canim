@@ -20,6 +20,29 @@ from .database import get_database
 
 log = logging.getLogger(__name__)
 
+# 18 dil için tavsiye gerekçesi şablonları
+_REASON_TMPL: Dict[str, Tuple[str, str]] = {
+    # (eşleşme varsa, yoksa)
+    "tr": ("Sıfatlarınız ({}) için ideal bir seçim",      "Çeşitlilik ve beslenme açısından iyi bir seçim"),
+    "en": ("An ideal pick for your traits ({})",           "A great choice for variety and balanced nutrition"),
+    "de": ("Ideal für Ihre Eigenschaften ({})",            "Gute Wahl für Abwechslung und ausgewogene Ernährung"),
+    "ru": ("Идеально подходит для ваших качеств ({})",     "Отличный выбор для разнообразия и баланса"),
+    "ar": ("خيار مثالي لصفاتك ({})",                       "خيار جيد للتنوع والتغذية المتوازنة"),
+    "es": ("Una elección ideal para tus rasgos ({})",      "Buena opción para variedad y nutrición equilibrada"),
+    "ko": ("당신의 특성({})에 이상적인 선택",                  "다양성과 균형 잡힌 영양을 위한 선택"),
+    "ja": ("あなたの特性（{}）に最適な選択",                   "バランスの取れた栄養のための良い選択"),
+    "zh": ("最适合您特质（{}）的选择",                         "有助于饮食多样化和均衡营养的选择"),
+    "hi": ("आपके गुणों ({}) के लिए आदर्श विकल्प",          "विविधता और संतुलित पोषण के लिए अच्छा विकल्प"),
+    "fr": ("Un choix idéal pour vos traits ({})",          "Un bon choix pour la variété et la nutrition équilibrée"),
+    "pt": ("Escolha ideal para suas características ({})", "Boa escolha para variedade e nutrição equilibrada"),
+    "bn": ("আপনার বৈশিষ্ট্যের ({}) জন্য আদর্শ পছন্দ",     "বৈচিত্র্য ও সুষম পুষ্টির জন্য ভালো পছন্দ"),
+    "id": ("Pilihan ideal untuk sifat Anda ({})",          "Pilihan bagus untuk variasi dan nutrisi seimbang"),
+    "ur": ("آپ کی خصوصیات ({}) کے لیے بہترین انتخاب",     "تنوع اور متوازن غذائیت کے لیے اچھا انتخاب"),
+    "it": ("Scelta ideale per i tuoi tratti ({})",         "Buona scelta per varietà e nutrizione equilibrata"),
+    "vi": ("Lựa chọn lý tưởng cho đặc điểm của bạn ({})", "Lựa chọn tốt cho sự đa dạng và dinh dưỡng cân bằng"),
+    "pl": ("Idealny wybór dla Twoich cech ({})",           "Dobry wybór dla różnorodności i zbilansowanego odżywiania"),
+}
+
 
 class RecommendationEngine:
     """Tavsiye motoru - Sıfatlara göre yemek önerileri"""
@@ -150,6 +173,7 @@ class RecommendationEngine:
         _exclude = self._exclude_recent_meals
         _top     = self._get_top_meals
         _reason  = self._generate_reason
+        _lang    = user_profile.language_code or "en"
         country_code = user_profile.country_code
         country = self.db.get_country_meals(country_code)
 
@@ -166,83 +190,62 @@ class RecommendationEngine:
         _sifats = user_profile.sifats
         _cm = country.meals
 
-        def _best_meals(raw: list, label: str):
+        def _best_meals(raw: list, label: str, count: int = 3):
             filtered = _filter(_exclude(raw, recent_meal_ids), dietary_pref)
             if not filtered:
-                # dietary filter eliminated everything — fall back to unfiltered
                 filtered = _exclude(raw, recent_meal_ids) or raw
-            top = _top(filtered, _sifats, label, count=1)
+            top = _top(filtered, _sifats, label, count=count)
             return top if top else [(filtered[0], 0)] if filtered else [(None, 0)]
 
-        breakfast_top = _best_meals(_cm.breakfast, "breakfast")
-        lunch_top     = _best_meals(_cm.lunch,     "lunch")
-        dinner_top    = _best_meals(_cm.dinner,    "dinner")
+        def _to_recs(top) -> List[MealRecommendation]:
+            return [
+                MealRecommendation(
+                    name=meal.name_tr,
+                    description=meal.description,
+                    reason=_reason(meal, _sifats, _lang),
+                    nutrition=meal.nutrition,
+                    prep_time_min=meal.prep_time_min,
+                    vegan_substitute=meal.vegan_substitute,
+                )
+                for meal, _ in top
+                if meal is not None
+            ]
 
-        breakfast_meal = breakfast_top[0][0]
-        lunch_meal = lunch_top[0][0]
-        dinner_meal = dinner_top[0][0]
+        breakfast_recs = _to_recs(_best_meals(_cm.breakfast, "breakfast"))
+        lunch_recs     = _to_recs(_best_meals(_cm.lunch,     "lunch"))
+        dinner_recs    = _to_recs(_best_meals(_cm.dinner,    "dinner"))
 
-        if not breakfast_meal or not lunch_meal or not dinner_meal:
+        if not breakfast_recs or not lunch_recs or not dinner_recs:
             raise ValueError("No meals available for recommendation.")
 
-        # MealRecommendation oluştur
-        breakfast_rec = MealRecommendation(
-            name=breakfast_meal.name_tr,
-            description=breakfast_meal.description,
-            reason=_reason(breakfast_meal, _sifats),
-            nutrition=breakfast_meal.nutrition,
-            prep_time_min=breakfast_meal.prep_time_min,
-            vegan_substitute=breakfast_meal.vegan_substitute,
-        )
-
-        lunch_rec = MealRecommendation(
-            name=lunch_meal.name_tr,
-            description=lunch_meal.description,
-            reason=_reason(lunch_meal, _sifats),
-            nutrition=lunch_meal.nutrition,
-            prep_time_min=lunch_meal.prep_time_min,
-            vegan_substitute=lunch_meal.vegan_substitute,
-        )
-
-        dinner_rec = MealRecommendation(
-            name=dinner_meal.name_tr,
-            description=dinner_meal.description,
-            reason=_reason(dinner_meal, _sifats),
-            nutrition=dinner_meal.nutrition,
-            prep_time_min=dinner_meal.prep_time_min,
-            vegan_substitute=dinner_meal.vegan_substitute,
-        )
-
-        # Top sıfatları bul
         top_sifats = sorted(_sifats, key=attrgetter('score'), reverse=True)[:3]
-        top_sifat_names = [s.sifat for s in top_sifats]
 
         return DailyRecommendation(
             date=datetime.now().strftime("%Y-%m-%d"),
-            breakfast=breakfast_rec,
-            lunch=lunch_rec,
-            dinner=dinner_rec,
-            user_sifats=top_sifat_names,
+            breakfast=breakfast_recs,
+            lunch=lunch_recs,
+            dinner=dinner_recs,
+            user_sifats=[s.sifat for s in top_sifats],
         )
 
     def _generate_reason(
         self,
         meal: Meal,
         user_sifats: List[UserSifat],
+        language_code: str = "en",
     ) -> str:
         """
-        Yemek neden tavsiye ediliyor açıkla.
+        Yemek neden tavsiye ediliyor — kullanıcı dilinde açıkla.
         """
-        matching_sifats = []
-        for user_sifat in user_sifats:
-            _uss = user_sifat.sifat
-            if _uss in meal.sifat_appeal:
-                matching_sifats.append(_uss)
-
+        tmpl_match, tmpl_fallback = _REASON_TMPL.get(
+            language_code, _REASON_TMPL["en"]
+        )
+        matching_sifats = [
+            us.sifat for us in user_sifats if us.sifat in meal.sifat_appeal
+        ]
         if matching_sifats:
-            sifat_str = ", ".join(matching_sifats[:2])
-            return f"Sıfatlarınız ({sifat_str}) için ideal bir seçim"
-        return "Çeşitlilik ve beslenme açısından iyi bir seçim"
+            return tmpl_match.format(", ".join(matching_sifats[:2]))
+        return tmpl_fallback
 
     def get_alternatives(
         self,
@@ -274,6 +277,7 @@ class RecommendationEngine:
         meals = self._exclude_recent_meals(meals, recent_meal_ids)
 
         _sifats = user_profile.sifats
+        _lang   = user_profile.language_code or "en"
         top_meals = self._get_top_meals(meals, _sifats, meal_type, count=count)
 
         # Dict olarak döndür
@@ -282,7 +286,7 @@ class RecommendationEngine:
             alternatives.append({
                 "name": meal.name_tr,
                 "description": meal.description,
-                "reason": self._generate_reason(meal, _sifats),
+                "reason": self._generate_reason(meal, _sifats, _lang),
                 "score": round(score, 2),
             })
 

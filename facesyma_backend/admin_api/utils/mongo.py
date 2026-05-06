@@ -295,6 +295,31 @@ def _ensure_indexes(db) -> None:
         log.warning(f"Index creation warning: {e}")
 
 
+def _sync_id_counters(db) -> None:
+    """Ensure _id_counters.seq >= max existing id for each auto-increment collection.
+    Prevents DuplicateKeyError when the counter lags behind pre-existing documents
+    (e.g. after data migration, volume restore, or manual inserts).
+    """
+    try:
+        counters = db['_id_counters']
+        for coll_name in ('appfaceapi_myuser', 'admin_users'):
+            docs = list(db[coll_name].find({'id': {'$exists': True}}, {'id': 1}).sort('id', -1).limit(1))
+            if not docs:
+                continue
+            max_id = docs[0].get('id', 0)
+            if not max_id:
+                continue
+            # $max atomically sets seq = max(current_seq, max_id); upsert creates if missing
+            counters.update_one(
+                {'_id': coll_name},
+                {'$max': {'seq': max_id}},
+                upsert=True,
+            )
+        log.info("✓ ID counters synced")
+    except Exception as e:
+        log.warning(f"ID counter sync warning: {e}")
+
+
 def _get_main_client() -> MongoClient:
     """Get shared MongoDB client with connection pooling for facesyma-backend"""
     global _main_client
@@ -309,7 +334,9 @@ def _get_main_client() -> MongoClient:
             socketTimeoutMS=20000,
             retryWrites=True,
         )
-        _ensure_indexes(_main_client['facesyma-backend'])
+        _db = _main_client['facesyma-backend']
+        _ensure_indexes(_db)
+        _sync_id_counters(_db)
         log.info("✓ MongoDB main client initialized (pool: 5-50 connections)")
     return _main_client
 

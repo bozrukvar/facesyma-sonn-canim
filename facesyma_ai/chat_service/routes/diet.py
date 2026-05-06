@@ -152,11 +152,11 @@ async def get_recommendation(request: RecommendationRequest):
         # Tavsiye al
         recommendation = get_daily_recommendation(user_profile)
 
-        # Beslenme bilgilerini hesapla
+        # Beslenme bilgilerini hesapla (ilk seçenekten)
         meals_list = [
-            recommendation.breakfast.dict(),
-            recommendation.lunch.dict(),
-            recommendation.dinner.dict(),
+            recommendation.breakfast[0].dict(),
+            recommendation.lunch[0].dict(),
+            recommendation.dinner[0].dict(),
         ]
         nutrition = calculate_daily_nutrition(meals_list)
 

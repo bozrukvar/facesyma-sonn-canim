@@ -6,7 +6,6 @@ Returns closest artwork matches with similarity scores.
 """
 
 from operator import itemgetter
-from calculator import Cal
 
 _KEY_SCORE = itemgetter(0)
 
@@ -111,17 +110,9 @@ def match_artwork(img: str, lang: str = 'tr', user_id=None) -> dict:
     except Exception:
         pass
 
-    # ── Legacy fallback ────────────────────────────────────────────────────
-    result = Cal(img)
+    # ── Legacy fallback (no TF — use neutral proportions) ──────────────────
     lang_key = lang.split('-')[0] if '-' in lang else lang
-
-    try:
-        _rget = result.get
-        jaw_width      = _rget('Jaw',  {}).get('jaw_width_ratio',   1.0)
-        face_len_ratio = _rget('Nose', {}).get('face_length_ratio', 1.45)
-        eye_dist       = _rget('Eye',  {}).get('eyes_distance',     1.0)
-    except Exception:
-        jaw_width, face_len_ratio, eye_dist = 1.0, 1.45, 1.0
+    jaw_width, face_len_ratio, eye_dist = 1.0, 1.45, 1.0
 
     scored = []
     for art in _ARTWORKS:

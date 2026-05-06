@@ -82,91 +82,230 @@ def get_last_n_days_meals(
     return recent_meals
 
 
+_CHAT_I18N: Dict[str, Dict[str, str]] = {
+    "tr": {
+        "title": "Beslenme Koçluğu",
+        "traits": "Sıfatlarınız",
+        "traits_default": "profil verileriniz",
+        "breakfast": "☀️ Sabah Öğünü",
+        "lunch": "🌤️ Öğlen Öğünü",
+        "dinner": "🌙 Akşam Öğünü",
+        "fallback": "İyi bir seçim",
+        "tip": "Alternatif tavsiyeleri görmek için \"başka seçenekler\" yazabilirsiniz",
+    },
+    "en": {
+        "title": "Meal Recommendations",
+        "traits": "Your traits",
+        "traits_default": "your profile",
+        "breakfast": "☀️ Breakfast",
+        "lunch": "🌤️ Lunch",
+        "dinner": "🌙 Dinner",
+        "fallback": "A great choice",
+        "tip": "Type \"other options\" to see alternatives",
+    },
+    "de": {
+        "title": "Ernährungsempfehlungen",
+        "traits": "Ihre Eigenschaften",
+        "traits_default": "Ihr Profil",
+        "breakfast": "☀️ Frühstück",
+        "lunch": "🌤️ Mittagessen",
+        "dinner": "🌙 Abendessen",
+        "fallback": "Eine gute Wahl",
+        "tip": "Tippen Sie \"andere Optionen\" für Alternativen",
+    },
+    "ru": {
+        "title": "Рекомендации по питанию",
+        "traits": "Ваши качества",
+        "traits_default": "ваш профиль",
+        "breakfast": "☀️ Завтрак",
+        "lunch": "🌤️ Обед",
+        "dinner": "🌙 Ужин",
+        "fallback": "Хороший выбор",
+        "tip": "Напишите «другие варианты» для альтернатив",
+    },
+    "ar": {
+        "title": "توصيات غذائية",
+        "traits": "صفاتك",
+        "traits_default": "ملفك الشخصي",
+        "breakfast": "☀️ الإفطار",
+        "lunch": "🌤️ الغداء",
+        "dinner": "🌙 العشاء",
+        "fallback": "خيار جيد",
+        "tip": "اكتب \"خيارات أخرى\" للبدائل",
+    },
+    "es": {
+        "title": "Recomendaciones Nutricionales",
+        "traits": "Tus rasgos",
+        "traits_default": "tu perfil",
+        "breakfast": "☀️ Desayuno",
+        "lunch": "🌤️ Almuerzo",
+        "dinner": "🌙 Cena",
+        "fallback": "Buena opción",
+        "tip": "Escribe \"otras opciones\" para ver alternativas",
+    },
+    "ko": {
+        "title": "식단 추천",
+        "traits": "당신의 특성",
+        "traits_default": "당신의 프로필",
+        "breakfast": "☀️ 아침",
+        "lunch": "🌤️ 점심",
+        "dinner": "🌙 저녁",
+        "fallback": "좋은 선택",
+        "tip": "\"다른 옵션\"을 입력하면 대안을 볼 수 있습니다",
+    },
+    "ja": {
+        "title": "食事のおすすめ",
+        "traits": "あなたの特性",
+        "traits_default": "あなたのプロフィール",
+        "breakfast": "☀️ 朝食",
+        "lunch": "🌤️ 昼食",
+        "dinner": "🌙 夕食",
+        "fallback": "良い選択",
+        "tip": "「他の選択肢」と入力すると代替案が表示されます",
+    },
+    "zh": {
+        "title": "饮食建议",
+        "traits": "您的特质",
+        "traits_default": "您的个人资料",
+        "breakfast": "☀️ 早餐",
+        "lunch": "🌤️ 午餐",
+        "dinner": "🌙 晚餐",
+        "fallback": "不错的选择",
+        "tip": "输入「其他选项」查看替代方案",
+    },
+    "hi": {
+        "title": "आहार सिफारिशें",
+        "traits": "आपके गुण",
+        "traits_default": "आपकी प्रोफ़ाइल",
+        "breakfast": "☀️ नाश्ता",
+        "lunch": "🌤️ दोपहर का भोजन",
+        "dinner": "🌙 रात का खाना",
+        "fallback": "अच्छा विकल्प",
+        "tip": "विकल्पों के लिए \"अन्य विकल्प\" लिखें",
+    },
+    "fr": {
+        "title": "Recommandations Nutritionnelles",
+        "traits": "Vos traits",
+        "traits_default": "votre profil",
+        "breakfast": "☀️ Petit-déjeuner",
+        "lunch": "🌤️ Déjeuner",
+        "dinner": "🌙 Dîner",
+        "fallback": "Un bon choix",
+        "tip": "Tapez \"autres options\" pour voir des alternatives",
+    },
+    "pt": {
+        "title": "Recomendações Nutricionais",
+        "traits": "Suas características",
+        "traits_default": "seu perfil",
+        "breakfast": "☀️ Café da manhã",
+        "lunch": "🌤️ Almoço",
+        "dinner": "🌙 Jantar",
+        "fallback": "Uma boa escolha",
+        "tip": "Digite \"outras opções\" para ver alternativas",
+    },
+    "bn": {
+        "title": "খাদ্য সুপারিশ",
+        "traits": "আপনার বৈশিষ্ট্য",
+        "traits_default": "আপনার প্রোফাইল",
+        "breakfast": "☀️ সকালের নাস্তা",
+        "lunch": "🌤️ দুপুরের খাবার",
+        "dinner": "🌙 রাতের খাবার",
+        "fallback": "ভালো পছন্দ",
+        "tip": "বিকল্পের জন্য \"অন্য বিকল্প\" লিখুন",
+    },
+    "id": {
+        "title": "Rekomendasi Makanan",
+        "traits": "Sifat Anda",
+        "traits_default": "profil Anda",
+        "breakfast": "☀️ Sarapan",
+        "lunch": "🌤️ Makan Siang",
+        "dinner": "🌙 Makan Malam",
+        "fallback": "Pilihan yang baik",
+        "tip": "Ketik \"opsi lain\" untuk melihat alternatif",
+    },
+    "ur": {
+        "title": "غذائی سفارشات",
+        "traits": "آپ کی خصوصیات",
+        "traits_default": "آپ کا پروفائل",
+        "breakfast": "☀️ ناشتہ",
+        "lunch": "🌤️ دوپہر کا کھانا",
+        "dinner": "🌙 رات کا کھانا",
+        "fallback": "اچھا انتخاب",
+        "tip": "متبادل کے لیے \"دوسرے اختیارات\" لکھیں",
+    },
+    "it": {
+        "title": "Consigli Nutrizionali",
+        "traits": "I tuoi tratti",
+        "traits_default": "il tuo profilo",
+        "breakfast": "☀️ Colazione",
+        "lunch": "🌤️ Pranzo",
+        "dinner": "🌙 Cena",
+        "fallback": "Una buona scelta",
+        "tip": "Scrivi \"altre opzioni\" per vedere alternative",
+    },
+    "vi": {
+        "title": "Gợi Ý Dinh Dưỡng",
+        "traits": "Đặc điểm của bạn",
+        "traits_default": "hồ sơ của bạn",
+        "breakfast": "☀️ Bữa sáng",
+        "lunch": "🌤️ Bữa trưa",
+        "dinner": "🌙 Bữa tối",
+        "fallback": "Lựa chọn tốt",
+        "tip": "Nhập \"tùy chọn khác\" để xem thêm",
+    },
+    "pl": {
+        "title": "Zalecenia Żywieniowe",
+        "traits": "Twoje cechy",
+        "traits_default": "Twój profil",
+        "breakfast": "☀️ Śniadanie",
+        "lunch": "🌤️ Obiad",
+        "dinner": "🌙 Kolacja",
+        "fallback": "Dobry wybór",
+        "tip": "Wpisz \"inne opcje\", aby zobaczyć alternatywy",
+    },
+}
+
+
 def format_recommendation_for_chat(
     recommendation: Dict,
-    language: str = "tr",
+    language: str = "en",
 ) -> str:
     """
-    Tavsiyeyi chat formatında döndür.
-
-    language: "tr" (Türkçe), "en" (İngilizce)
+    Tavsiyeyi chat formatında döndür — 18 dil destekli.
     """
-    if language == "tr":
-        return _format_recommendation_tr(recommendation)
-    else:
-        return _format_recommendation_en(recommendation)
-
-
-def _format_recommendation_tr(recommendation: Dict) -> str:
-    """Türkçe format"""
+    i18n = _CHAT_I18N.get(language, _CHAT_I18N["en"])
     _rget = recommendation.get
-    date = _rget("date", "Bugün")
+
+    date        = _rget("date", "")
     user_sifats = _rget("user_sifats", [])
-    sifat_str = ", ".join(user_sifats) if user_sifats else "profil verileriniz"
+    sifat_str   = ", ".join(user_sifats) if user_sifats else i18n["traits_default"]
 
-    breakfast = _rget("breakfast", {})
-    lunch = _rget("lunch", {})
-    dinner = _rget("dinner", {})
-    _bget = breakfast.get
-    _lget = lunch.get
-    _dget = dinner.get
+    def _first(key: str) -> Dict:
+        v = _rget(key, [{}])
+        return (v[0] if isinstance(v, list) else v) or {}
 
-    text = f"""
-🍽️ **{date} Beslenme Koçluğu**
+    b = _first("breakfast"); l = _first("lunch"); d = _first("dinner")
+    fb = i18n["fallback"]
 
-Sıfatlarınız: {sifat_str}
+    header = f"🍽️ **{date} {i18n['title']}**" if date else f"🍽️ **{i18n['title']}**"
 
-**☀️ Sabah Öğünü:**
-🥣 {_bget('name', 'N/A')}
-📝 {_bget('reason', 'İyi bir seçim')}
+    return f"""{header}
 
-**🌤️ Öğlen Öğünü:**
-🥗 {_lget('name', 'N/A')}
-📝 {_lget('reason', 'İyi bir seçim')}
+{i18n['traits']}: {sifat_str}
 
-**🌙 Akşam Öğünü:**
-🍲 {_dget('name', 'N/A')}
-📝 {_dget('reason', 'İyi bir seçim')}
+**{i18n['breakfast']}:**
+🥣 {b.get('name', 'N/A')}
+📝 {b.get('reason', fb)}
 
-💡 *Alternatif tavsiyeleri görmek için "başka seçenekler" yazabilirsiniz*
-"""
-    return text.strip()
+**{i18n['lunch']}:**
+🥗 {l.get('name', 'N/A')}
+📝 {l.get('reason', fb)}
 
+**{i18n['dinner']}:**
+🍲 {d.get('name', 'N/A')}
+📝 {d.get('reason', fb)}
 
-def _format_recommendation_en(recommendation: Dict) -> str:
-    """İngilizce format"""
-    _rget = recommendation.get
-    date = _rget("date", "Today")
-    user_sifats = _rget("user_sifats", [])
-    sifat_str = ", ".join(user_sifats) if user_sifats else "your profile"
-
-    breakfast = _rget("breakfast", {})
-    lunch = _rget("lunch", {})
-    dinner = _rget("dinner", {})
-    _bget = breakfast.get
-    _lget = lunch.get
-    _dget = dinner.get
-
-    text = f"""
-🍽️ **{date} Meal Recommendations**
-
-Your traits: {sifat_str}
-
-**☀️ Breakfast:**
-🥣 {_bget('name', 'N/A')}
-📝 {_bget('reason', 'A great choice')}
-
-**🌤️ Lunch:**
-🥗 {_lget('name', 'N/A')}
-📝 {_lget('reason', 'A great choice')}
-
-**🌙 Dinner:**
-🍲 {_dget('name', 'N/A')}
-📝 {_dget('reason', 'A great choice')}
-
-💡 *Type "other options" to see alternatives*
-"""
-    return text.strip()
+💡 _{i18n['tip']}_""".strip()
 
 
 def calculate_daily_nutrition(meals: List[Dict]) -> Dict:
@@ -230,9 +369,10 @@ def format_nutrition_info(nutrition: Dict, language: str = "tr") -> str:
 def log_recommendation(user_id: int, date: str, meals: Dict) -> None:
     """Tavsiyeyi loglama"""
     _mget = meals.get
-    breakfast = _mget("breakfast", {}).get("name", "N/A")
-    lunch = _mget("lunch", {}).get("name", "N/A")
-    dinner = _mget("dinner", {}).get("name", "N/A")
+    _b = _mget("breakfast", [{}]); _l = _mget("lunch", [{}]); _d = _mget("dinner", [{}])
+    breakfast = (_b[0] if isinstance(_b, list) else _b).get("name", "N/A")
+    lunch     = (_l[0] if isinstance(_l, list) else _l).get("name", "N/A")
+    dinner    = (_d[0] if isinstance(_d, list) else _d).get("name", "N/A")
 
     log.info(
         f"Recommendation for user {user_id} ({date}): "

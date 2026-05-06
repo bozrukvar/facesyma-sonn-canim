@@ -154,9 +154,9 @@ class MealRecommendation(BaseModel):
 class DailyRecommendation(BaseModel):
     """Günlük tavsiye"""
     date: str = Field(..., description="YYYY-MM-DD formatı")
-    breakfast: MealRecommendation
-    lunch: MealRecommendation
-    dinner: MealRecommendation
+    breakfast: List[MealRecommendation]
+    lunch: List[MealRecommendation]
+    dinner: List[MealRecommendation]
     user_sifats: List[str] = Field(description="Kullanıcının en güçlü sıfatları")
 
     class Config:

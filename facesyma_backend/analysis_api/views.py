@@ -1047,36 +1047,203 @@ class HistoryDeleteAllView(View):
             return JsonResponse({'detail': 'Internal server error.'}, status=500)
 
 
-# ── Günlük motivasyon ─────────────────────────────────────────────────────────
+# ── Günlük motivasyon — AI üretimli kişisel mesaj ────────────────────────────
+
+_DAILY_AI_PROMPTS: dict = {
+    'tr': (
+        "Sen bir kişisel gelişim koçusun. Kullanıcının şu kişilik özellikleri var: {sifatlar}. "
+        "Bu özelliklere dayanarak bugün için kişiye özel, motive edici 2-3 kısa cümle yaz. "
+        "'Sen' diye hitap et, sıcak ve destekleyici ol. Sadece cümleleri yaz, başka hiçbir şey ekleme."
+    ),
+    'en': (
+        "You are a personal development coach. The user has these personality traits: {sifatlar}. "
+        "Write 2-3 short, personalized motivational sentences for today based on these traits. "
+        "Address them as 'you', keep a warm supportive tone. Write only the sentences, nothing else."
+    ),
+    'de': (
+        "Du bist ein persönlicher Entwicklungscoach. Der Nutzer hat folgende Persönlichkeitsmerkmale: {sifatlar}. "
+        "Schreibe 2-3 kurze, personalisierte Motivationssätze für heute. "
+        "Sprich sie mit 'du' an, bleib warm und unterstützend. Schreibe nur die Sätze auf Deutsch."
+    ),
+    'ru': (
+        "Ты личный коуч по развитию. У пользователя следующие черты характера: {sifatlar}. "
+        "Напиши 2-3 коротких мотивационных предложения на сегодня на русском языке. "
+        "Обращайся на 'ты', тон тёплый и поддерживающий. Пиши только предложения."
+    ),
+    'ar': (
+        "أنت مدرب تطوير شخصي. المستخدم لديه هذه الصفات الشخصية: {sifatlar}. "
+        "اكتب 2-3 جمل تحفيزية قصيرة لهذا اليوم باللغة العربية. "
+        "خاطبه بضمير المفرد، واجعل النبرة دافئة وداعمة. اكتب الجمل فقط."
+    ),
+    'es': (
+        "Eres un coach de desarrollo personal. El usuario tiene estos rasgos de personalidad: {sifatlar}. "
+        "Escribe 2-3 frases cortas y motivadoras para hoy en español. "
+        "Diríjete a él/ella de 'tú', tono cálido y de apoyo. Escribe solo las frases."
+    ),
+    'ko': (
+        "당신은 개인 발전 코치입니다. 사용자는 다음과 같은 성격 특성을 가지고 있습니다: {sifatlar}. "
+        "이러한 특성을 바탕으로 오늘을 위한 짧고 개인화된 동기 부여 문장 2-3개를 한국어로 작성하세요. "
+        "'당신'으로 호칭하고 따뜻하고 지지하는 톤으로 문장만 작성하세요."
+    ),
+    'ja': (
+        "あなたはパーソナルコーチです。ユーザーの性格特性は次のとおりです: {sifatlar}。"
+        "今日のための短い個人化されたモチベーションの文章を日本語で2-3文書いてください。"
+        "「あなた」と呼びかけ、温かいトーンで文章のみ書いてください。"
+    ),
+    'zh': (
+        "你是一位个人发展教练。用户具有以下性格特征：{sifatlar}。"
+        "根据这些特征，用中文为今天写2-3句简短的个性化励志话语。"
+        "以'你'称呼，保持温暖支持的语气，只写句子。"
+    ),
+    'hi': (
+        "आप एक व्यक्तिगत विकास कोच हैं। उपयोगकर्ता के व्यक्तित्व गुण हैं: {sifatlar}। "
+        "इन गुणों के आधार पर आज के लिए हिंदी में 2-3 छोटे प्रेरक वाक्य लिखें। "
+        "'आप' से संबोधित करें, गर्म और सहायक स्वर रखें। केवल वाक्य लिखें।"
+    ),
+    'fr': (
+        "Tu es un coach de développement personnel. L'utilisateur a ces traits de personnalité : {sifatlar}. "
+        "Écris 2-3 phrases courtes et motivantes pour aujourd'hui en français. "
+        "Tutoie-le, garde un ton chaleureux et bienveillant. Écris uniquement les phrases."
+    ),
+    'pt': (
+        "Você é um coach de desenvolvimento pessoal. O usuário tem estas características de personalidade: {sifatlar}. "
+        "Escreva 2-3 frases curtas e motivadoras para hoje em português. "
+        "Use 'você', mantenha um tom caloroso e de apoio. Escreva apenas as frases."
+    ),
+    'bn': (
+        "আপনি একজন ব্যক্তিগত উন্নয়ন কোচ। ব্যবহারকারীর ব্যক্তিত্বের বৈশিষ্ট্য: {sifatlar}। "
+        "এই বৈশিষ্ট্যের উপর ভিত্তি করে আজকের জন্য বাংলায় ২-৩টি সংক্ষিপ্ত অনুপ্রেরণামূলক বাক্য লিখুন। "
+        "'আপনি' সম্বোধন করুন, উষ্ণ ও সহায়ক স্বর রাখুন। শুধু বাক্যগুলো লিখুন।"
+    ),
+    'id': (
+        "Kamu adalah pelatih pengembangan pribadi. Pengguna memiliki sifat kepribadian ini: {sifatlar}. "
+        "Tulis 2-3 kalimat motivasi singkat dan personal untuk hari ini dalam bahasa Indonesia. "
+        "Gunakan 'kamu', jaga nada hangat dan suportif. Tulis kalimat saja."
+    ),
+    'ur': (
+        "آپ ایک ذاتی ترقی کے کوچ ہیں۔ صارف کی شخصیت کی خصوصیات ہیں: {sifatlar}۔ "
+        "ان خصوصیات کی بنیاد پر آج کے لیے اردو میں 2-3 مختصر حوصلہ افزا جملے لکھیں۔ "
+        "'آپ' سے مخاطب کریں، گرم اور معاون لہجہ رکھیں۔ صرف جملے لکھیں۔"
+    ),
+    'it': (
+        "Sei un coach di sviluppo personale. L'utente ha questi tratti della personalità: {sifatlar}. "
+        "Scrivi 2-3 frasi brevi e motivanti per oggi in italiano. "
+        "Rivolgiti con 'tu', mantieni un tono caldo e di supporto. Scrivi solo le frasi."
+    ),
+    'vi': (
+        "Bạn là một huấn luyện viên phát triển cá nhân. Người dùng có những đặc điểm tính cách: {sifatlar}. "
+        "Viết 2-3 câu động lực ngắn và cá nhân hóa cho hôm nay bằng tiếng Việt. "
+        "Dùng 'bạn', giữ giọng ấm áp và hỗ trợ. Chỉ viết các câu."
+    ),
+    'pl': (
+        "Jesteś coachem rozwoju osobistego. Użytkownik ma następujące cechy osobowości: {sifatlar}. "
+        "Napisz 2-3 krótkie, spersonalizowane zdania motywacyjne na dziś po polsku. "
+        "Zwracaj się 'ty', zachowaj ciepły i wspierający ton. Pisz tylko zdania."
+    ),
+}
+
+_DAILY_STATIC_FALLBACK: dict = {
+    'tr': [
+        "Bugün sahip olduğun güçlü yönler seni ileriye taşıyor. Kendine güven.",
+        "Her adım, seni en iyi versiyonuna yaklaştırıyor. Devam et.",
+        "Senin gibi biri için her gün yeni bir fırsat barındırıyor.",
+    ],
+    'en': [
+        "Your unique strengths carry you forward today. Trust yourself.",
+        "Every step brings you closer to your best self. Keep going.",
+        "Someone like you finds opportunity in every new day.",
+    ],
+}
+
+
+def _get_ai_daily_message(user_id: int, sifatlar: list, lang: str) -> str | None:
+    """Generate personalized daily message via Ollama HTTP API. Returns None on failure."""
+    if not sifatlar:
+        return None
+    try:
+        import requests as _req
+        from datetime import date as _date
+        today = _date.today().isoformat()
+        cache_key = f'daily_ai:{user_id}:{today}:{lang}'
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        prompt_tmpl = _DAILY_AI_PROMPTS.get(lang, _DAILY_AI_PROMPTS['en'])
+        prompt = prompt_tmpl.format(sifatlar=', '.join(sifatlar[:5]))
+        ollama_url = os.environ.get('OLLAMA_URL', 'http://host.docker.internal:11434')
+        r = _req.post(
+            f'{ollama_url}/api/generate',
+            json={'model': 'mistral', 'prompt': prompt, 'stream': False},
+            timeout=30,
+        )
+        if r.ok:
+            msg = r.json().get('response', '').strip()
+            if msg:
+                cache.set(cache_key, msg, timeout=86400)
+                return msg
+    except Exception:
+        pass
+    return None
+
+
+def _get_static_daily(base_lang: str, user_id: int | None = None) -> str:
+    """Pick today's message from seeded MongoDB — same message all day, different every day."""
+    from datetime import date as _date
+    today_str = _date.today().isoformat()
+    seed = hash(f'{today_str}:{user_id or 0}:{base_lang}') & 0x7FFFFFFF
+    try:
+        db_name = _DAILY_DB_MAP.get(base_lang, 'database_daily_en')
+        list_key = f'daily_lists:{db_name}'
+        lists = cache.get(list_key)
+        if lists is None:
+            db   = _get_main_client()[db_name]
+            pos  = db['positive'].find_one({}, {'_id': 0, 'positive_daily': 1}) or {}
+            neg  = db['negative'].find_one({}, {'_id': 0, 'negative_daily': 1}) or {}
+            lists = (pos.get('positive_daily', []), neg.get('negative_daily', []))
+            cache.set(list_key, lists, timeout=3600)
+        pos_list, _ = lists
+        if pos_list:
+            return pos_list[seed % len(pos_list)]
+    except Exception:
+        pass
+    fallback = _DAILY_STATIC_FALLBACK.get(base_lang, _DAILY_STATIC_FALLBACK['en'])
+    return fallback[seed % len(fallback)]
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class DailyView(View):
     def get(self, request):
         try:
             lang = request.GET.get('lang', 'tr')
             base_lang = lang.split('-')[0].lower() if lang else 'tr'
-            _load_engine()
-            # Daily motivation doesn't need photos — fetches directly from MongoDB
-            db_name = _DAILY_DB_MAP.get(base_lang, 'database_daily_en')
-            cache_key = f'daily_lists:{db_name}'
-            lists = cache.get(cache_key)
-            if lists is None:
-                db   = _get_main_client()[db_name]
-                pos  = db['positive'].find_one({}, {'_id': 0, 'positive_daily': 1}) or {}
-                neg  = db['negative'].find_one({}, {'_id': 0, 'negative_daily': 1}) or {}
-                lists = (pos.get('positive_daily', []), neg.get('negative_daily', []))
-                cache.set(cache_key, lists, timeout=3600)
-            pos_list, neg_list = lists
 
-            # Get fallback status if using English default
-            is_fallback = base_lang not in _DAILY_NATIVE_LANGS
-            _rc = random.choice
+            # Try AI-generated personalized message for authenticated users
+            uid = _get_user_id(request)
+            ai_msg = None
+            if uid:
+                try:
+                    db = _get_main_client()['facesyma-backend']
+                    doc = db['analysis_history'].find_one(
+                        {'user_id': uid},
+                        {'positive_sifatlar': 1, 'sifatlar': 1},
+                        sort=[('created_at', -1)],
+                    )
+                    sifatlar = []
+                    if doc:
+                        sifatlar = doc.get('positive_sifatlar') or doc.get('sifatlar') or []
+                        sifatlar = [s for s in sifatlar if s]
+                    ai_msg = _get_ai_daily_message(uid, sifatlar, base_lang)
+                except Exception:
+                    pass
+
+            positive = ai_msg or _get_static_daily(base_lang, uid)
+
             return JsonResponse({
-                'positive': _rc(pos_list) if pos_list else '',
-                'negative': _rc(neg_list) if neg_list else '',
-                'lang': base_lang,
-                'is_fallback': is_fallback,
-                'note': f'Using English fallback for {base_lang}' if is_fallback else None
+                'positive':    positive,
+                'lang':        base_lang,
+                'ai_powered':  bool(ai_msg),
+                'is_fallback': False,
             })
-        except Exception as e:
+        except Exception:
             log.exception('Daily view error')
             return JsonResponse({'detail': 'Internal server error.'}, status=500)

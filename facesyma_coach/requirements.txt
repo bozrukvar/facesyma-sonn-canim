@@ -2,3 +2,6 @@ pymongo==4.7.2
 fastapi==0.115.0
 uvicorn==0.30.6
 PyJWT==2.9.0
+kerykeion>=4.13.0
+geopy>=2.4.0
+timezonefinder>=6.5.0

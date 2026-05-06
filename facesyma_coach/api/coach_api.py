@@ -19,9 +19,24 @@ Endpoint'ler:
 
 import os
 import re
+import logging
 from datetime import datetime
 from functools import lru_cache
 from typing   import Optional, List
+
+try:
+    from kerykeion import AstrologicalSubject
+    from geopy.geocoders import Nominatim
+    from timezonefinder import TimezoneFinder
+    _KERYKEION_OK = True
+    _TF = TimezoneFinder()
+    _GEO = Nominatim(user_agent="facesyma_coach_v1")
+except ImportError:
+    _KERYKEION_OK = False
+    _TF = None
+    _GEO = None
+
+log = logging.getLogger(__name__)
 
 from fastapi              import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -247,6 +262,320 @@ def get_backup():
 
 def get_source():
     return _get_client()[SOURCE_DB]
+
+# ── Yüz × Doğum örtüşme analizi ──────────────────────────────────────────────
+
+# Her burç için beklenen kişilik arketipleri (FACE_SIFAT_ARCHETYPE değerleriyle eşleşir)
+_SIGN_ARCHETYPES: dict[str, frozenset] = {
+    'Aries':       frozenset(['lider', 'enerjik', 'güçlü', 'kararlı']),
+    'Taurus':      frozenset(['güvenilir', 'pratik', 'odaklı', 'dengeli']),
+    'Gemini':      frozenset(['sosyal', 'analitik', 'enerjik', 'çekici']),
+    'Cancer':      frozenset(['hassas', 'açık_kalpli', 'güvenilir', 'sezgisel']),
+    'Leo':         frozenset(['lider', 'enerjik', 'güçlü', 'çekici']),
+    'Virgo':       frozenset(['analitik', 'dikkatli', 'pratik', 'odaklı']),
+    'Libra':       frozenset(['dengeli', 'sosyal', 'zarif', 'açık_kalpli']),
+    'Scorpio':     frozenset(['kararlı', 'güçlü', 'analitik', 'sezgisel']),
+    'Sagittarius': frozenset(['enerjik', 'sosyal', 'güçlü', 'kararlı']),
+    'Capricorn':   frozenset(['kararlı', 'analitik', 'güvenilir', 'odaklı']),
+    'Aquarius':    frozenset(['yaratıcı', 'sosyal', 'analitik', 'açık_kalpli']),
+    'Pisces':      frozenset(['hassas', 'yaratıcı', 'açık_kalpli', 'sezgisel']),
+}
+
+_ARCHETYPE_LABELS: dict[str, dict] = {
+    'tr': {
+        'dikkatli': 'Dikkatli', 'açık_kalpli': 'Açık Kalpli', 'hassas': 'Hassas',
+        'sosyal': 'Sosyal', 'kararlı': 'Kararlı', 'lider': 'Lider',
+        'güçlü': 'Güçlü', 'enerjik': 'Enerjik', 'çekici': 'Çekici',
+        'pratik': 'Pratik', 'cazip': 'Cazip', 'odaklı': 'Odaklı',
+        'zarif': 'Zarif', 'analitik': 'Analitik', 'dengeli': 'Dengeli',
+        'yaratıcı': 'Yaratıcı', 'güvenilir': 'Güvenilir', 'sezgisel': 'Sezgisel',
+    },
+    'en': {
+        'dikkatli': 'Careful', 'açık_kalpli': 'Open-hearted', 'hassas': 'Sensitive',
+        'sosyal': 'Social', 'kararlı': 'Determined', 'lider': 'Leader',
+        'güçlü': 'Strong', 'enerjik': 'Energetic', 'çekici': 'Attractive',
+        'pratik': 'Practical', 'cazip': 'Charming', 'odaklı': 'Focused',
+        'zarif': 'Elegant', 'analitik': 'Analytical', 'dengeli': 'Balanced',
+        'yaratıcı': 'Creative', 'güvenilir': 'Reliable', 'sezgisel': 'Intuitive',
+    },
+    'de': {
+        'dikkatli': 'Sorgfältig', 'açık_kalpli': 'Aufgeschlossen', 'hassas': 'Sensibel',
+        'sosyal': 'Sozial', 'kararlı': 'Entschlossen', 'lider': 'Anführer',
+        'güçlü': 'Stark', 'enerjik': 'Energetisch', 'çekici': 'Attraktiv',
+        'pratik': 'Praktisch', 'cazip': 'Charmant', 'odaklı': 'Fokussiert',
+        'zarif': 'Elegant', 'analitik': 'Analytisch', 'dengeli': 'Ausgeglichen',
+        'yaratıcı': 'Kreativ', 'güvenilir': 'Zuverlässig', 'sezgisel': 'Intuitiv',
+    },
+    'ru': {
+        'dikkatli': 'Внимательный', 'açık_kalpli': 'Открытый', 'hassas': 'Чуткий',
+        'sosyal': 'Общительный', 'kararlı': 'Решительный', 'lider': 'Лидер',
+        'güçlü': 'Сильный', 'enerjik': 'Энергичный', 'çekici': 'Привлекательный',
+        'pratik': 'Практичный', 'cazip': 'Обаятельный', 'odaklı': 'Сосредоточенный',
+        'zarif': 'Элегантный', 'analitik': 'Аналитический', 'dengeli': 'Сбалансированный',
+        'yaratıcı': 'Творческий', 'güvenilir': 'Надёжный', 'sezgisel': 'Интуитивный',
+    },
+    'ar': {
+        'dikkatli': 'دقيق', 'açık_kalpli': 'منفتح', 'hassas': 'حساس',
+        'sosyal': 'اجتماعي', 'kararlı': 'حازم', 'lider': 'قائد',
+        'güçlü': 'قوي', 'enerjik': 'نشيط', 'çekici': 'جذاب',
+        'pratik': 'عملي', 'cazip': 'ساحر', 'odaklı': 'مركّز',
+        'zarif': 'أنيق', 'analitik': 'تحليلي', 'dengeli': 'متوازن',
+        'yaratıcı': 'مبدع', 'güvenilir': 'موثوق', 'sezgisel': 'حدسي',
+    },
+    'es': {
+        'dikkatli': 'Cuidadoso', 'açık_kalpli': 'Generoso', 'hassas': 'Sensible',
+        'sosyal': 'Social', 'kararlı': 'Determinado', 'lider': 'Líder',
+        'güçlü': 'Fuerte', 'enerjik': 'Enérgico', 'çekici': 'Atractivo',
+        'pratik': 'Práctico', 'cazip': 'Encantador', 'odaklı': 'Enfocado',
+        'zarif': 'Elegante', 'analitik': 'Analítico', 'dengeli': 'Equilibrado',
+        'yaratıcı': 'Creativo', 'güvenilir': 'Confiable', 'sezgisel': 'Intuitivo',
+    },
+    'ko': {
+        'dikkatli': '신중한', 'açık_kalpli': '열린 마음', 'hassas': '민감한',
+        'sosyal': '사교적인', 'kararlı': '결단력 있는', 'lider': '리더',
+        'güçlü': '강인한', 'enerjik': '활력 있는', 'çekici': '매력적인',
+        'pratik': '실용적인', 'cazip': '매혹적인', 'odaklı': '집중력 있는',
+        'zarif': '우아한', 'analitik': '분석적인', 'dengeli': '균형 잡힌',
+        'yaratıcı': '창의적인', 'güvenilir': '신뢰할 수 있는', 'sezgisel': '직관적인',
+    },
+    'ja': {
+        'dikkatli': '慎重', 'açık_kalpli': '開放的', 'hassas': '繊細',
+        'sosyal': '社交的', 'kararlı': '決断力がある', 'lider': 'リーダー',
+        'güçlü': '強い', 'enerjik': 'エネルギッシュ', 'çekici': '魅力的',
+        'pratik': '実用的', 'cazip': 'チャーミング', 'odaklı': '集中力がある',
+        'zarif': 'エレガント', 'analitik': '分析的', 'dengeli': 'バランスが取れている',
+        'yaratıcı': '創造的', 'güvenilir': '信頼できる', 'sezgisel': '直感的',
+    },
+    'zh': {
+        'dikkatli': '谨慎', 'açık_kalpli': '开朗', 'hassas': '敏感',
+        'sosyal': '社交', 'kararlı': '果断', 'lider': '领袖',
+        'güçlü': '强大', 'enerjik': '充满活力', 'çekici': '有魅力',
+        'pratik': '务实', 'cazip': '迷人', 'odaklı': '专注',
+        'zarif': '优雅', 'analitik': '分析型', 'dengeli': '平衡',
+        'yaratıcı': '创造力', 'güvenilir': '可靠', 'sezgisel': '直觉',
+    },
+    'hi': {
+        'dikkatli': 'सावधान', 'açık_kalpli': 'उदार', 'hassas': 'संवेदनशील',
+        'sosyal': 'सामाजिक', 'kararlı': 'दृढ़', 'lider': 'नेता',
+        'güçlü': 'शक्तिशाली', 'enerjik': 'ऊर्जावान', 'çekici': 'आकर्षक',
+        'pratik': 'व्यावहारिक', 'cazip': 'मनमोहक', 'odaklı': 'केंद्रित',
+        'zarif': 'सुरुचिपूर्ण', 'analitik': 'विश्लेषणात्मक', 'dengeli': 'संतुलित',
+        'yaratıcı': 'रचनात्मक', 'güvenilir': 'विश्वसनीय', 'sezgisel': 'सहज',
+    },
+    'fr': {
+        'dikkatli': 'Attentionné', 'açık_kalpli': "Ouvert d'esprit", 'hassas': 'Sensible',
+        'sosyal': 'Sociable', 'kararlı': 'Déterminé', 'lider': 'Leader',
+        'güçlü': 'Fort', 'enerjik': 'Énergique', 'çekici': 'Attrayant',
+        'pratik': 'Pratique', 'cazip': 'Charmant', 'odaklı': 'Concentré',
+        'zarif': 'Élégant', 'analitik': 'Analytique', 'dengeli': 'Équilibré',
+        'yaratıcı': 'Créatif', 'güvenilir': 'Fiable', 'sezgisel': 'Intuitif',
+    },
+    'pt': {
+        'dikkatli': 'Cuidadoso', 'açık_kalpli': 'Generoso', 'hassas': 'Sensível',
+        'sosyal': 'Social', 'kararlı': 'Determinado', 'lider': 'Líder',
+        'güçlü': 'Forte', 'enerjik': 'Enérgico', 'çekici': 'Atraente',
+        'pratik': 'Prático', 'cazip': 'Encantador', 'odaklı': 'Focado',
+        'zarif': 'Elegante', 'analitik': 'Analítico', 'dengeli': 'Equilibrado',
+        'yaratıcı': 'Criativo', 'güvenilir': 'Confiável', 'sezgisel': 'Intuitivo',
+    },
+    'bn': {
+        'dikkatli': 'সতর্ক', 'açık_kalpli': 'উদার', 'hassas': 'সংবেদনশীল',
+        'sosyal': 'সামাজিক', 'kararlı': 'দৃঢ়প্রতিজ্ঞ', 'lider': 'নেতা',
+        'güçlü': 'শক্তিশালী', 'enerjik': 'উদ্যমী', 'çekici': 'আকর্ষণীয়',
+        'pratik': 'বাস্তববাদী', 'cazip': 'মনোমুগ্ধকর', 'odaklı': 'মনোযোগী',
+        'zarif': 'মার্জিত', 'analitik': 'বিশ্লেষণাত্মক', 'dengeli': 'ভারসাম্যপূর্ণ',
+        'yaratıcı': 'সৃজনশীল', 'güvenilir': 'নির্ভরযোগ্য', 'sezgisel': 'স্বজ্ঞাত',
+    },
+    'id': {
+        'dikkatli': 'Teliti', 'açık_kalpli': 'Tulus', 'hassas': 'Sensitif',
+        'sosyal': 'Sosial', 'kararlı': 'Teguh', 'lider': 'Pemimpin',
+        'güçlü': 'Kuat', 'enerjik': 'Energik', 'çekici': 'Menarik',
+        'pratik': 'Praktis', 'cazip': 'Memesona', 'odaklı': 'Fokus',
+        'zarif': 'Anggun', 'analitik': 'Analitis', 'dengeli': 'Seimbang',
+        'yaratıcı': 'Kreatif', 'güvenilir': 'Dapat Diandalkan', 'sezgisel': 'Intuitif',
+    },
+    'ur': {
+        'dikkatli': 'محتاط', 'açık_kalpli': 'کھلے دل کا', 'hassas': 'حساس',
+        'sosyal': 'ملنسار', 'kararlı': 'پرعزم', 'lider': 'رہنما',
+        'güçlü': 'طاقتور', 'enerjik': 'توانا', 'çekici': 'پرکشش',
+        'pratik': 'عملی', 'cazip': 'دلکش', 'odaklı': 'متمرکز',
+        'zarif': 'خوش اطوار', 'analitik': 'تجزیاتی', 'dengeli': 'متوازن',
+        'yaratıcı': 'تخلیقی', 'güvenilir': 'قابل اعتماد', 'sezgisel': 'بدیہی',
+    },
+    'it': {
+        'dikkatli': 'Attento', 'açık_kalpli': 'Generoso', 'hassas': 'Sensibile',
+        'sosyal': 'Socievole', 'kararlı': 'Determinato', 'lider': 'Leader',
+        'güçlü': 'Forte', 'enerjik': 'Energico', 'çekici': 'Attraente',
+        'pratik': 'Pratico', 'cazip': 'Affascinante', 'odaklı': 'Concentrato',
+        'zarif': 'Elegante', 'analitik': 'Analitico', 'dengeli': 'Equilibrato',
+        'yaratıcı': 'Creativo', 'güvenilir': 'Affidabile', 'sezgisel': 'Intuitivo',
+    },
+    'vi': {
+        'dikkatli': 'Cẩn thận', 'açık_kalpli': 'Rộng lượng', 'hassas': 'Nhạy cảm',
+        'sosyal': 'Hòa đồng', 'kararlı': 'Quyết đoán', 'lider': 'Lãnh đạo',
+        'güçlü': 'Mạnh mẽ', 'enerjik': 'Năng động', 'çekici': 'Hấp dẫn',
+        'pratik': 'Thực tế', 'cazip': 'Cuốn hút', 'odaklı': 'Tập trung',
+        'zarif': 'Thanh lịch', 'analitik': 'Phân tích', 'dengeli': 'Cân bằng',
+        'yaratıcı': 'Sáng tạo', 'güvenilir': 'Đáng tin cậy', 'sezgisel': 'Trực giác',
+    },
+    'pl': {
+        'dikkatli': 'Uważny', 'açık_kalpli': 'Otwarty', 'hassas': 'Wrażliwy',
+        'sosyal': 'Towarzyski', 'kararlı': 'Zdecydowany', 'lider': 'Lider',
+        'güçlü': 'Silny', 'enerjik': 'Energiczny', 'çekici': 'Atrakcyjny',
+        'pratik': 'Praktyczny', 'cazip': 'Czarujący', 'odaklı': 'Skupiony',
+        'zarif': 'Elegancki', 'analitik': 'Analityczny', 'dengeli': 'Zrównoważony',
+        'yaratıcı': 'Kreatywny', 'güvenilir': 'Niezawodny', 'sezgisel': 'Intuicyjny',
+    },
+}
+
+_FACE_ASTRO_SUMMARY: dict[str, dict] = {
+    'high': {
+        'tr': 'Yüz analizin {sign} burç karakteriyle güçlü örtüşme gösteriyor. Her iki sistem de seni {traits} olarak tanımlıyor.',
+        'en': 'Your face analysis shows strong alignment with {sign} traits. Both systems identify you as {traits}.',
+        'de': 'Deine Gesichtsanalyse zeigt starke Übereinstimmung mit {sign}. Beide Systeme beschreiben dich als {traits}.',
+        'ru': 'Твой анализ лица показывает сильное совпадение с чертами {sign}. Обе системы описывают тебя как {traits}.',
+        'ar': 'يُظهر تحليل وجهك توافقاً قوياً مع سمات {sign}. يصفك كلا النظامين بأنك {traits}.',
+        'es': 'Tu análisis facial muestra fuerte alineación con los rasgos de {sign}. Ambos sistemas te identifican como {traits}.',
+        'ko': '당신의 얼굴 분석은 {sign} 특성과 강한 일치를 보여줍니다. 두 시스템 모두 당신을 {traits}로 식별합니다.',
+        'ja': 'あなたの顔分析は{sign}の特性と強い一致を示しています。両方のシステムがあなたを{traits}と識別しています。',
+        'zh': '您的面部分析与{sign}特质高度吻合。两个系统都将您定义为{traits}。',
+        'hi': 'आपका चेहरा विश्लेषण {sign} विशेषताओं के साथ मजबूत संरेखण दिखाता है। दोनों प्रणालियां आपको {traits} के रूप में पहचानती हैं।',
+        'fr': 'Ton analyse faciale montre une forte concordance avec les traits {sign}. Les deux systèmes te décrivent comme {traits}.',
+        'pt': 'Sua análise facial mostra forte alinhamento com os traços de {sign}. Ambos os sistemas identificam você como {traits}.',
+        'bn': 'আপনার মুখ বিশ্লেষণ {sign} বৈশিষ্ট্যগুলির সাথে শক্তিশালী সংযোগ দেখায়। উভয় সিস্টেম আপনাকে {traits} হিসাবে চিহ্নিত করে।',
+        'id': 'Analisis wajahmu menunjukkan kesesuaian kuat dengan sifat {sign}. Kedua sistem mengidentifikasimu sebagai {traits}.',
+        'ur': 'آپ کا چہرہ تجزیہ {sign} کی خصوصیات کے ساتھ مضبوط ہم آہنگی ظاہر کرتا ہے۔ دونوں نظام آپ کو {traits} کے طور پر شناخت کرتے ہیں۔',
+        'it': 'La tua analisi del viso mostra forte allineamento con i tratti {sign}. Entrambi i sistemi ti descrivono come {traits}.',
+        'vi': 'Phân tích khuôn mặt của bạn cho thấy sự phù hợp mạnh mẽ với đặc điểm {sign}. Cả hai hệ thống đều xác định bạn là {traits}.',
+        'pl': 'Twoja analiza twarzy wykazuje silną zgodność z cechami {sign}. Oba systemy określają cię jako {traits}.',
+    },
+    'mid': {
+        'tr': 'Yüz analizin {sign} burç karakteriyle kısmen örtüşüyor. {traits} özelliklerin her iki sistemde de öne çıkıyor.',
+        'en': 'Your face analysis partly aligns with {sign} traits. {traits} qualities appear in both readings.',
+        'de': 'Deine Gesichtsanalyse stimmt teilweise mit {sign} überein. {traits} erscheinen in beiden Lesungen.',
+        'ru': 'Твой анализ лица частично совпадает с {sign}. {traits} проявляются в обоих анализах.',
+        'ar': 'يتوافق تحليل وجهك جزئياً مع {sign}. تظهر صفات {traits} في كلا القراءتين.',
+        'es': 'Tu análisis facial se alinea parcialmente con {sign}. Las cualidades de {traits} aparecen en ambas lecturas.',
+        'ko': '당신의 얼굴 분석은 {sign}과 부분적으로 일치합니다. {traits} 특성이 두 분석 모두에서 나타납니다.',
+        'ja': 'あなたの顔分析は{sign}と部分的に一致しています。{traits}の特性が両方の分析に現れています。',
+        'zh': '您的面部分析与{sign}部分吻合。{traits}特质在两种分析中均有体现。',
+        'hi': 'आपका चेहरा विश्लेषण आंशिक रूप से {sign} के साथ संरेखित होता है। {traits} गुण दोनों विश्लेषणों में दिखाई देते हैं।',
+        'fr': "Ton analyse faciale s'aligne partiellement avec {sign}. Les qualités {traits} apparaissent dans les deux lectures.",
+        'pt': 'Sua análise facial se alinha parcialmente com {sign}. As qualidades de {traits} aparecem em ambas as leituras.',
+        'bn': 'আপনার মুখ বিশ্লেষণ আংশিকভাবে {sign} এর সাথে মিলে যায়। {traits} গুণাবলী উভয় পাঠেই দেখা যায়।',
+        'id': 'Analisis wajahmu sebagian selaras dengan {sign}. Kualitas {traits} muncul di kedua bacaan.',
+        'ur': 'آپ کا چہرہ تجزیہ جزوی طور پر {sign} سے ہم آہنگ ہے۔ {traits} کی خوبیاں دونوں تجزیوں میں ظاہر ہوتی ہیں۔',
+        'it': 'La tua analisi del viso si allinea parzialmente con {sign}. Le qualità {traits} appaiono in entrambe le letture.',
+        'vi': 'Phân tích khuôn mặt của bạn phù hợp một phần với {sign}. Phẩm chất {traits} xuất hiện trong cả hai bài đọc.',
+        'pl': 'Twoja analiza twarzy częściowo pokrywa się z {sign}. Cechy {traits} pojawiają się w obu odczytach.',
+    },
+    'low': {
+        'tr': 'Yüz analizin {sign} burç karakteriyle farklı özellikler öne çıkarıyor — bu ilginç bir kontrast. Yüzün {traits} vurgularken burç farklı bir enerji getiriyor.',
+        'en': 'Your face analysis highlights different qualities from {sign} — an interesting contrast. Your face emphasizes {traits} while your sign brings different energy.',
+        'de': 'Deine Gesichtsanalyse hebt andere Qualitäten als {sign} hervor — ein interessanter Kontrast. Dein Gesicht betont {traits}, während dein Zeichen andere Energie bringt.',
+        'ru': 'Твой анализ лица выделяет другие качества, чем {sign} — интересный контраст. Лицо подчёркивает {traits}, а знак несёт другую энергию.',
+        'ar': 'يبرز تحليل وجهك صفات مختلفة عن {sign} — تناقض مثير للاهتمام. يؤكد وجهك {traits} بينما يجلب برجك طاقة مختلفة.',
+        'es': 'Tu análisis facial destaca cualidades diferentes de {sign} — un interesante contraste. Tu rostro enfatiza {traits} mientras tu signo aporta energía diferente.',
+        'ko': '당신의 얼굴 분석은 {sign}과 다른 특성을 강조합니다 — 흥미로운 대조입니다. 얼굴은 {traits}를 강조하고 별자리는 다른 에너지를 가져옵니다.',
+        'ja': 'あなたの顔分析は{sign}とは異なる特性を強調しています — 興味深い対比です。顔は{traits}を強調し、星座は異なるエネルギーをもたらします。',
+        'zh': '您的面部分析突出了与{sign}不同的特质——这是一个有趣的对比。您的面部强调{traits}，而星座带来了不同的能量。',
+        'hi': 'आपका चेहरा विश्लेषण {sign} से अलग गुणों पर जोर देता है — एक दिलचस्प विरोधाभास। आपका चेहरा {traits} पर जोर देता है जबकि राशि अलग ऊर्जा लाती है।',
+        'fr': "Ton analyse faciale met en avant des qualités différentes de {sign} — un contraste intéressant. Ton visage souligne {traits} tandis que ton signe apporte une énergie différente.",
+        'pt': 'Sua análise facial destaca qualidades diferentes de {sign} — um contraste interessante. Seu rosto enfatiza {traits} enquanto seu signo traz energia diferente.',
+        'bn': 'আপনার মুখ বিশ্লেষণ {sign} থেকে আলাদা গুণাবলী তুলে ধরে — একটি আকর্ষণীয় বৈপরীত্য। আপনার মুখ {traits} জোর দেয় যখন আপনার রাশি ভিন্ন শক্তি আনে।',
+        'id': 'Analisis wajahmu menonjolkan kualitas berbeda dari {sign} — kontras yang menarik. Wajahmu menekankan {traits} sementara tandamu membawa energi berbeda.',
+        'ur': 'آپ کا چہرہ تجزیہ {sign} سے مختلف خوبیاں اجاگر کرتا ہے — ایک دلچسپ تضاد۔ آپ کا چہرہ {traits} پر زور دیتا ہے جبکہ برج مختلف توانائی لاتا ہے۔',
+        'it': 'La tua analisi del viso evidenzia qualità diverse da {sign} — un contrasto interessante. Il tuo viso enfatizza {traits} mentre il tuo segno porta energia diversa.',
+        'vi': 'Phân tích khuôn mặt của bạn nổi bật các phẩm chất khác với {sign} — một sự tương phản thú vị. Khuôn mặt bạn nhấn mạnh {traits} trong khi cung hoàng đạo mang lại năng lượng khác.',
+        'pl': 'Twoja analiza twarzy podkreśla inne cechy niż {sign} — interesujący kontrast. Twarz akcentuje {traits}, podczas gdy twój znak przynosi inną energię.',
+    },
+}
+
+_FACE_ASTRO_TITLE: dict[str, str] = {
+    'tr': 'Yüz & Doğum Örtüşmesi',
+    'en': 'Face & Birth Alignment',
+    'de': 'Gesicht & Geburts-Übereinstimmung',
+    'ru': 'Соответствие лица и рождения',
+    'ar': 'تطابق الوجه والميلاد',
+    'es': 'Alineación Cara & Nacimiento',
+    'ko': '얼굴 & 출생 일치',
+    'ja': '顔と誕生の一致',
+    'zh': '面部与出生对应',
+    'hi': 'चेहरा और जन्म संरेखण',
+    'fr': 'Alignement Visage & Naissance',
+    'pt': 'Alinhamento Rosto & Nascimento',
+    'bn': 'মুখ ও জন্ম সংযোগ',
+    'id': 'Keselarasan Wajah & Kelahiran',
+    'ur': 'چہرے اور پیدائش کی ہم آہنگی',
+    'it': 'Allineamento Viso & Nascita',
+    'vi': 'Sự Trùng Hợp Khuôn Mặt & Ngày Sinh',
+    'pl': 'Dopasowanie Twarzy i Urodzin',
+}
+
+
+def _get_user_face_sifatlar(user_id: int) -> list:
+    """Kullanıcının son enhanced_character analizinden top_sifatlar listesini döndürür."""
+    try:
+        doc = get_source()['analysis_history'].find_one(
+            {'user_id': user_id, 'mode': 'enhanced_character'},
+            sort=[('created_at', -1)],
+            projection={'result.top_sifatlar': 1, 'result.positive_sifatlar': 1, '_id': 0},
+        )
+        if not doc:
+            return []
+        result = doc.get('result', {})
+        return (result.get('top_sifatlar') or result.get('positive_sifatlar') or [])[:10]
+    except Exception:
+        return []
+
+
+def _build_face_astro_match(english_sign: str, sign_label: str, face_sifatlar: list, lang: str) -> dict:
+    """
+    Yüz sıfatlarını burç arketipleriyle karşılaştırır.
+    english_sign: 'Aries', 'Leo' gibi İngilizce burç adı (_SIGN_ARCHETYPES key'leriyle eşleşir)
+    sign_label:   Kullanıcının dilinde burç adı (gösterim için)
+    face_sifatlar: [{'sifat': str, 'score': float}, ...]
+    """
+    if not english_sign or not face_sifatlar:
+        return {'has_face_data': False}
+
+    sign_archetypes = _SIGN_ARCHETYPES.get(english_sign, frozenset())
+    lang_key = lang if lang in _ARCHETYPE_LABELS else 'en'
+    label_map = _ARCHETYPE_LABELS.get(lang_key, _ARCHETYPE_LABELS['en'])
+
+    # Yüz sıfatlarını arketipe çevir
+    face_archetypes: list[str] = []
+    for item in face_sifatlar:
+        sifat = item.get('sifat', '') if isinstance(item, dict) else str(item)
+        archetype = FACE_SIFAT_ARCHETYPE.get(sifat, sifat.lower())
+        if archetype and archetype not in face_archetypes:
+            face_archetypes.append(archetype)
+
+    # Örtüşen arketipler
+    confirming = [a for a in face_archetypes if a in sign_archetypes]
+    match_score = round(len(confirming) / len(sign_archetypes) * 100) if sign_archetypes else 0
+
+    # Özet metin
+    if confirming:
+        traits_str = ', '.join(label_map.get(a, a) for a in confirming[:3])
+    else:
+        traits_str = ', '.join(label_map.get(a, a) for a in list(face_archetypes)[:2]) if face_archetypes else '—'
+
+    level = 'high' if match_score >= 75 else ('mid' if match_score >= 40 else 'low')
+    summary_tmpl = _FACE_ASTRO_SUMMARY[level].get(lang_key, _FACE_ASTRO_SUMMARY[level]['en'])
+    summary = summary_tmpl.format(sign=sign_label, traits=traits_str)
+
+    title = _FACE_ASTRO_TITLE.get(lang, _FACE_ASTRO_TITLE['en'])
+
+    return {
+        'has_face_data': True,
+        'title': title,
+        'match_score': match_score,
+        'confirming_traits': [label_map.get(a, a) for a in confirming],
+        'face_top_archetypes': [label_map.get(a, a) for a in face_archetypes[:5]],
+        'summary': summary,
+    }
+
 
 # ── JWT ────────────────────────────────────────────────────────────────────────
 def get_user_id(authorization: Optional[str] = Header(default=None)) -> Optional[int]:
@@ -597,7 +926,8 @@ async def coach_giyim(body: GiyimRequest, authorization: Optional[str] = Header(
             dominant_raw = [k for k, _ in sorted(ss.items(), key=lambda x: -x[1])][:body.top_n]
 
     if not dominant_raw:
-        raise HTTPException(400, "Analiz sonucunda sıfat bulunamadı.")
+        # No sifatlar found — use generic fallback; giyim_base fallback below will handle it
+        dominant_raw = ["karma-adaptif"]
 
     # Dual-lookup: Track B direkt, yoksa archetype
     pascal_docs = {doc["_id"]: doc for doc in col.find({"_id": {"$in": dominant_raw}, "giyim": {"$exists": True}}, {"giyim": 1})}
@@ -613,16 +943,16 @@ async def coach_giyim(body: GiyimRequest, authorization: Optional[str] = Header(
             break
 
     if not giyim_base:
-        # Fallback: karma-adaptif (default) şablonu döndür
+        # Fallback: karma-adaptif (default) şablonu — 4 mevsim × 4 kategori
         giyim_base = {
             "stil_tipi": "karma-adaptif",
             "coaching": {
                 "felsefe": "Uyum ve pragmatizm. Giyim işlevsel, temiz ve herkes tarafından kabul edilebilir.",
-                "kombinasyon": "Klasik kombinasyonlar hiçbir zaman başarısız olmaz.",
-                "renk_psikolojisi": "Nötr renkler sakinlik ve profesyonellik verir.",
-                "yaşam_uyarlamasi": "Hızlı mix-and-match kombinasyonları tercih et."
+                "kombinasyon": "Klasik kombinasyonlar hiçbir zaman başarısız olmaz. Beyaz tişört + koyu pantolon her zaman işe yarar.",
+                "renk_psikolojisi": "Nötr renkler sakinlik ve profesyonellik verir. Siyah, beyaz, gri ve bej temel renk paketidir.",
+                "yaşam_uyarlamasi": "Hızlı mix-and-match kombinasyonları tercih et. Az ama kaliteli parçalar gardrobunu basit tutar."
             },
-            "renk_paleti": {"ana": ["#696969", "#808080"], "vurgu": ["#000000"], "kacin": []},
+            "renk_paleti": {"ana": ["#696969", "#808080", "#F5F5DC"], "vurgu": ["#000000", "#FFFFFF"], "kacin": []},
             "yuz_sekli_notu": {
                 "oval": "Her kesim uygundur; V-yaka önerilir.",
                 "kare": "Yumuşak yuvarlak yaka hatları dengeler.",
@@ -631,7 +961,128 @@ async def coach_giyim(body: GiyimRequest, authorization: Optional[str] = Header(
                 "uzun": "Yatay çizgiler ve yüksek yaka dengeler.",
                 "elmas": "Geniş yaka ve çan etek alt yapıyı dengeler.",
             },
-            "mevsim": {}
+            "mevsim": {
+                "ilkbahar": {
+                    "gunluk": {
+                        "parca": ["beyaz tişört", "slim fit chino pantolon", "hafif trençkot", "beyaz spor ayakkabı"],
+                        "kumas": ["pamuk", "keten blend"],
+                        "kesim": "slim fit / relaxed",
+                        "aksesuar": ["minimal saat", "küçük sırt çantası"],
+                        "ipucu": "Pastel renkler ve açık tonlar ilkbaharın enerjisini yansıtır."
+                    },
+                    "spor": {
+                        "parca": ["fermuarlı sweatshirt", "jogger eşofman altı", "hafif rüzgarlık", "koşu ayakkabısı"],
+                        "kumas": ["pamuk blend", "polyester", "moisture-wicking"],
+                        "kesim": "relaxed / tapered",
+                        "aksesuar": ["spor çanta", "kep", "spor bilekliği"],
+                        "ipucu": "Hafif katmanlama ilkbaharda ani hava değişikliklerine karşı korur."
+                    },
+                    "resmi": {
+                        "parca": ["açık gri blazer", "beyaz gömlek", "koyu slim pantolon", "deri loafer"],
+                        "kumas": ["hafif yün", "pamuk-elastan"],
+                        "kesim": "slim / tailored",
+                        "aksesuar": ["klasik kol saati", "deri kemer"],
+                        "ipucu": "Blazer'ı günlük kombinlerle de kullanmak versatility sağlar."
+                    },
+                    "davet": {
+                        "parca": ["lacivert blazer", "beyaz gömlek", "bej pantolon", "bağlı ayakkabı"],
+                        "kumas": ["pamuk premium", "viskon blend"],
+                        "kesim": "fitted",
+                        "aksesuar": ["cep mendili", "şık saat", "ince kravat"],
+                        "ipucu": "Blazer ve pantolonun farklı tonlarda olması modern smart-casual look yaratır."
+                    },
+                },
+                "yaz": {
+                    "gunluk": {
+                        "parca": ["polo yaka tişört", "kısa chino şort", "espadrille veya sandalet"],
+                        "kumas": ["hafif pamuk", "keten", "viskon"],
+                        "kesim": "relaxed / loose",
+                        "aksesuar": ["güneş gözlüğü", "hasır şapka", "kanvas çanta"],
+                        "ipucu": "Açık renkler ısıyı yansıtır, nefes alan kumaşlar rahatlık sağlar."
+                    },
+                    "spor": {
+                        "parca": ["kolsuz spor tişört", "spor şort", "hafif koşu ayakkabısı"],
+                        "kumas": ["moisture-wicking", "mesh", "elastan"],
+                        "kesim": "athletic / loose",
+                        "aksesuar": ["spor güneş gözlüğü", "kep", "spor bilekliği"],
+                        "ipucu": "UV koruyucu kumaşlar ve açık renkler yaz sporlarında idealdir."
+                    },
+                    "resmi": {
+                        "parca": ["keten blazer", "açık renkli gömlek", "linen pantolon", "deri loafer"],
+                        "kumas": ["keten", "hafif pamuk", "viskon"],
+                        "kesim": "loose / tailored",
+                        "aksesuar": ["hafif fular", "metal kol saati"],
+                        "ipucu": "Keten kumaş yazın hem şık hem serin kalmanızı sağlar."
+                    },
+                    "davet": {
+                        "parca": ["açık mavi gömlek", "beyaz chino pantolon", "espadrille veya loafer"],
+                        "kumas": ["premium pamuk", "keten blend"],
+                        "kesim": "slim / relaxed",
+                        "aksesuar": ["güneş gözlüğü", "hasır aksesuar", "ince bileklik"],
+                        "ipucu": "Yazlık davetlerde açık renkler ve doğal kumaşlar hem şık hem rahat hissettirir."
+                    },
+                },
+                "sonbahar": {
+                    "gunluk": {
+                        "parca": ["kazak veya triko", "koyu slim jean", "bot veya sneaker", "kaban"],
+                        "kumas": ["pamuk", "yün blend", "polar"],
+                        "kesim": "slim / regular",
+                        "aksesuar": ["bere", "deri çanta", "kashmere eşarp"],
+                        "ipucu": "Toprak tonları (haki, kestane, hardal) sonbaharın renk paleti ile uyum sağlar."
+                    },
+                    "spor": {
+                        "parca": ["uzun kollu sporcu tişörtü", "jogger pantolon", "rüzgarlık veya polar", "trail ayakkabısı"],
+                        "kumas": ["fleece", "softshell", "technical nylon"],
+                        "kesim": "tapered / athletic",
+                        "aksesuar": ["spor bere", "spor çanta", "eldiven"],
+                        "ipucu": "Katmanlı giyim sonbahar soğuklarına karşı en etkili çözümdür."
+                    },
+                    "resmi": {
+                        "parca": ["koyu renk takım elbise", "beyaz veya mavi gömlek", "kravat", "deri ayakkabı"],
+                        "kumas": ["yün", "yün-polyester blend"],
+                        "kesim": "slim / classic fit",
+                        "aksesuar": ["kol düğmesi", "deri kemer", "klasik saat"],
+                        "ipucu": "Koyu renk takımlar sonbaharda hem güçlü hem şık görünüm sağlar."
+                    },
+                    "davet": {
+                        "parca": ["koyu navy blazer", "gri pantolon", "gömlek", "deri oxford ayakkabı"],
+                        "kumas": ["yün blend", "premium pamuk"],
+                        "kesim": "tailored",
+                        "aksesuar": ["şık saat", "cep mendili", "ince eşarp"],
+                        "ipucu": "Navy ve gri kombinasyonu sonbahar davetlerinde her zaman güvenli ve şık bir seçimdir."
+                    },
+                },
+                "kis": {
+                    "gunluk": {
+                        "parca": ["kalın kazak", "koyu slim jean", "kışlık bot", "uzun palto veya kaban"],
+                        "kumas": ["yün", "kaşmir blend", "polar", "denim"],
+                        "kesim": "regular / relaxed",
+                        "aksesuar": ["bere", "kaşmir eşarp", "deri eldivenler"],
+                        "ipucu": "Katmanlı giyim ve kaliteli dış giysi kışın hem sıcak hem şık kalmanızı sağlar."
+                    },
+                    "spor": {
+                        "parca": ["termal iç çamaşır", "polar eşofman", "rüzgarlık veya mont", "yüksek bilekli spor ayakkabı"],
+                        "kumas": ["termal", "fleece", "windproof"],
+                        "kesim": "athletic / tapered",
+                        "aksesuar": ["ısıtıcı bere", "eldiven", "boyunluk"],
+                        "ipucu": "Termal iç katman soğukta vücut ısısını korurken hareket özgürlüğü sağlar."
+                    },
+                    "resmi": {
+                        "parca": ["koyu yün palto", "takım elbise", "gömlek + kravat", "deri çizme veya ayakkabı"],
+                        "kumas": ["yün", "kaşmir", "merinos"],
+                        "kesim": "classic / slim fit",
+                        "aksesuar": ["deri eldiven", "kaşmir eşarp", "klasik şapka veya bere"],
+                        "ipucu": "Uzun yün palto kışın en şık dış giysi seçeneğidir, takımın üzerine mükemmel durur."
+                    },
+                    "davet": {
+                        "parca": ["koyu kadife blazer veya takım", "beyaz gömlek", "koyu pantolon", "şık çizme veya ayakkabı"],
+                        "kumas": ["kadife", "yün blend", "premium viskon"],
+                        "kesim": "fitted / tailored",
+                        "aksesuar": ["şık saat", "cep mendili", "ince kaşmir eşarp"],
+                        "ipucu": "Kadife ve koyu renkler kış davetlerinde sofistike ve göz alıcı bir görünüm yaratır."
+                    },
+                },
+            }
         }
 
     # Mevsim/kategori filtrele
@@ -693,7 +1144,7 @@ async def birth_analysis(
     _blang   = body.lang
     lang     = _blang if _blang in ALL_LANGS else "en"
     _bbt     = body.birth_time
-    astro    = _calculate_basic_astrology(_bd, _bbt, lang)
+    astro    = _calculate_basic_astrology(_bd, _bbt, lang, body.birth_city)
     numerology = _calculate_numerology(_bd, lang)
 
     result: dict = {
@@ -705,6 +1156,18 @@ async def birth_analysis(
     }
     if body.name:
         result["name_numerology"] = _calculate_name_numerology(body.name, lang)
+
+    # Yüz × Doğum örtüşme analizi — giriş yapmış kullanıcılar için
+    if user_id:
+        try:
+            _bd_dt = datetime.strptime(_bd[:10], "%Y-%m-%d")
+            _sign_idx = _get_sign_idx(_bd_dt.month, _bd_dt.day)
+            _en_sign  = _ZODIAC_NAMES['en'][_sign_idx]   # 'Aries', 'Leo', …
+            _tr_sign  = astro.get("sun_sign", _en_sign)  # zaten dile çevrilmiş
+        except Exception:
+            _en_sign = _tr_sign = ""
+        face_sifatlar = _get_user_face_sifatlar(user_id)
+        result["face_astro_match"] = _build_face_astro_match(_en_sign, _tr_sign, face_sifatlar, lang)
 
     # Kullanıcı giriş yapmışsa backup DB'ye kaydet
     if user_id:
@@ -823,25 +1286,118 @@ _ASTRO_INVALID_DATE = {
     "pl": "Nieprawidłowy format daty — oczekiwany YYYY-MM-DD",
 }
 _ASTRO_RISING_HINT = {
-    "tr": "Yükselen için tam doğum yeri ve saati gerekli",
-    "en": "Rising sign requires full birth location and time",
-    "de": "Aszendent benötigt vollständigen Geburtsort und -zeit",
-    "ru": "Асцендент требует полного места и времени рождения",
-    "ar": "يتطلب برج الطالع موقع الولادة والوقت الكامل",
-    "es": "El signo ascendente requiere ubicación y hora completas",
-    "ko": "상승점은 완전한 출생지와 시간이 필요합니다",
-    "ja": "上昇点には完全な出生地と時刻が必要です",
-    "zh": "上升星座需要完整的出生地和时间",
-    "hi": "राइजिंग साइन को पूर्ण जन्म स्थान और समय की आवश्यकता है",
-    "fr": "Le signe ascendant nécessite le lieu et l'heure complets",
-    "pt": "O signo ascendente requer local e hora completos",
-    "bn": "উর্ধ্বগামী চিহ্নের জন্য সম্পূর্ণ জন্ম স্থান এবং সময় প্রয়োজন",
-    "id": "Tanda rising memerlukan lokasi dan waktu kelahiran lengkap",
-    "ur": "صعود ہونے والے نشان کے لیے مکمل پیدائش کی جگہ اور وقت درکار ہے",
-    "it": "Il segno ascendente richiede luogo e ora completi",
-    "vi": "Dấu hiệu tăng lên yêu cầu địa điểm và giờ sinh hoàn chỉnh",
-    "pl": "Znak wschodzący wymaga pełnej lokalizacji i czasu urodzenia",
+    "tr": "Yükselen burcu hesaplamak için doğum saati ve şehri girin",
+    "en": "Enter birth time and city to calculate rising sign",
+    "de": "Geben Sie Geburtszeit und -ort an, um den Aszendenten zu berechnen",
+    "ru": "Введите время и город рождения для расчёта асцендента",
+    "ar": "أدخل وقت الميلاد والمدينة لحساب الطالع",
+    "es": "Ingresa hora y ciudad de nacimiento para calcular el ascendente",
+    "ko": "상승 별자리를 계산하려면 출생 시간과 도시를 입력하세요",
+    "ja": "上昇点を計算するには出生時刻と都市を入力してください",
+    "zh": "输入出生时间和城市以计算上升星座",
+    "hi": "उदय राशि की गणना के लिए जन्म समय और शहर दर्ज करें",
+    "fr": "Entrez l'heure et la ville de naissance pour calculer l'ascendant",
+    "pt": "Insira hora e cidade de nascimento para calcular o ascendente",
+    "bn": "উদয় রাশি গণনার জন্য জন্মের সময় ও শহর দিন",
+    "id": "Masukkan waktu dan kota kelahiran untuk menghitung tanda rising",
+    "ur": "طلوع نشان کا حساب لگانے کے لیے پیدائش کا وقت اور شہر درج کریں",
+    "it": "Inserisci ora e città di nascita per calcolare l'ascendente",
+    "vi": "Nhập giờ sinh và thành phố để tính cung mọc",
+    "pl": "Podaj godzinę i miasto urodzenia, aby obliczyć znak wznoszący",
 }
+
+_ASTRO_CITY_NOT_FOUND = {
+    "tr": "Şehir bulunamadı — lütfen İngilizce şehir adı deneyin (ör. Istanbul, Paris)",
+    "en": "City not found — try English city name (e.g. Istanbul, Paris)",
+    "de": "Stadt nicht gefunden — englischen Namen versuchen (z.B. Istanbul, Paris)",
+    "ru": "Город не найден — попробуйте английское название (напр. Istanbul, Paris)",
+    "ar": "لم يتم العثور على المدينة — جرّب الاسم بالإنجليزية",
+    "es": "Ciudad no encontrada — intenta con el nombre en inglés (ej. Istanbul, Paris)",
+    "ko": "도시를 찾을 수 없습니다 — 영어 도시 이름으로 시도해보세요",
+    "ja": "都市が見つかりません — 英語の都市名で試してください",
+    "zh": "未找到城市 — 请尝试英文城市名（如 Istanbul, Paris）",
+    "hi": "शहर नहीं मिला — अंग्रेज़ी शहर का नाम आज़माएं",
+    "fr": "Ville introuvable — essayez le nom anglais (ex. Istanbul, Paris)",
+    "pt": "Cidade não encontrada — tente o nome em inglês (ex. Istanbul, Paris)",
+    "bn": "শহর পাওয়া যায়নি — ইংরেজিতে শহরের নাম দিন",
+    "id": "Kota tidak ditemukan — coba nama kota dalam bahasa Inggris",
+    "ur": "شہر نہیں ملا — انگریزی نام آزمائیں (مثلاً Istanbul, Paris)",
+    "it": "Città non trovata — prova il nome in inglese (es. Istanbul, Paris)",
+    "vi": "Không tìm thấy thành phố — thử tên tiếng Anh (vd. Istanbul, Paris)",
+    "pl": "Miasto nie znalezione — spróbuj angielskiej nazwy (np. Istanbul, Paris)",
+}
+
+# Kerykeion → nindex eşleştirmesi (_ZODIAC_NAMES ile aynı sıra)
+_KERYKEION_SIGN_MAP = {
+    "Aquarius": 0, "Pisces": 1, "Aries": 2, "Taurus": 3,
+    "Gemini": 4, "Cancer": 5, "Leo": 6, "Virgo": 7,
+    "Libra": 8, "Scorpio": 9, "Sagittarius": 10, "Capricorn": 11,
+}
+
+
+def _calculate_rising_sign(
+    birth_date_str: str,
+    birth_time_str: str,
+    birth_city: str,
+    lang: str = "en",
+) -> dict:
+    """
+    Kerykeion (Swiss Ephemeris) ile yükselen burcu hesapla.
+    Geocoding: Nominatim (OpenStreetMap, ücretsiz) → lat/lng
+    Timezone : timezonefinder → tz_str
+    Kerykeion: online=False, lat/lng/tz_str direkt verilir (GeoNames yok)
+    """
+    if not _KERYKEION_OK:
+        return {"error": "kerykeion not installed"}
+
+    try:
+        bd = datetime.strptime(birth_date_str, "%Y-%m-%d")
+        bt = datetime.strptime(birth_time_str, "%H:%M")
+
+        # 1 — Şehri koordinata çevir
+        location = _GEO.geocode(birth_city, timeout=8)
+        if location is None:
+            return {"error": _ASTRO_CITY_NOT_FOUND.get(lang, _ASTRO_CITY_NOT_FOUND["en"])}
+
+        lat = location.latitude
+        lng = location.longitude
+        city_resolved = location.address.split(",")[0].strip()
+
+        # 2 — Koordinattan timezone bul
+        tz_str = _TF.timezone_at(lat=lat, lng=lng) or "UTC"
+
+        # 3 — Yükselen burcu hesapla (online=False → GeoNames çağrısı yok)
+        subject = AstrologicalSubject(
+            "user",
+            bd.year, bd.month, bd.day,
+            bt.hour, bt.minute,
+            city=city_resolved,
+            lat=lat,
+            lng=lng,
+            tz_str=tz_str,
+            online=False,
+        )
+
+        sign_en  = subject.first_house.sign
+        sign_idx = _KERYKEION_SIGN_MAP.get(sign_en)
+        if sign_idx is None:
+            return {"error": f"Unknown sign: {sign_en}"}
+
+        zodiac     = _ZODIAC_NAMES.get(lang, _ZODIAC_NAMES["en"])
+        sign_local = zodiac[sign_idx]
+
+        return {
+            "rising_sign":    sign_local,
+            "rising_sign_en": sign_en,
+            "rising_degree":  round(float(subject.first_house.position), 1),
+            "city_resolved":  city_resolved,
+            "lat":            round(lat, 4),
+            "lng":            round(lng, 4),
+        }
+
+    except Exception as exc:
+        log.warning("Rising sign calc error for '%s': %s", birth_city, exc)
+        return {"error": _ASTRO_CITY_NOT_FOUND.get(lang, _ASTRO_CITY_NOT_FOUND["en"])}
 _GENDER_REPLACEMENTS = {
     "elbise": "pantolon",
     "bluz": "gömlek",
@@ -999,7 +1555,7 @@ def _get_sign_idx(month: int, day: int) -> int:
     return 11  # Default Capricorn
 
 
-def _calculate_basic_astrology(birth_date_str: str, birth_time_str: Optional[str] = None, lang: str = "tr") -> dict:
+def _calculate_basic_astrology(birth_date_str: str, birth_time_str: Optional[str] = None, lang: str = "tr", birth_city: Optional[str] = None) -> dict:
     """
     Basic astrology calculation — zodiac, element, quality from birth date.
     Supports 18 languages.
@@ -1032,9 +1588,24 @@ def _calculate_basic_astrology(birth_date_str: str, birth_time_str: Optional[str
         try:
             bt = _dsp(birth_time_str, "%H:%M")
             _bth = bt.hour
-            result["birth_hour"]     = _bth
-            result["time_energy"]    = _get_time_energy(_bth, lang)
-            result["rising_hint"]    = _ASTRO_RISING_HINT.get(lang, _ASTRO_RISING_HINT["en"])
+            result["birth_hour"]  = _bth
+            result["time_energy"] = _get_time_energy(_bth, lang)
+
+            if birth_city and birth_city.strip():
+                # Gerçek yükselen burç hesabı
+                rising = _calculate_rising_sign(birth_date_str, birth_time_str, birth_city.strip(), lang)
+                if "error" in rising:
+                    result["rising_hint"]  = rising["error"]
+                else:
+                    result["rising_sign"]   = rising["rising_sign"]
+                    result["rising_sign_en"]= rising["rising_sign_en"]
+                    result["rising_degree"] = rising["rising_degree"]
+                    result["city_resolved"] = rising["city_resolved"]
+                    result["lat"]           = rising["lat"]
+                    result["lng"]           = rising["lng"]
+            else:
+                result["rising_hint"] = _ASTRO_RISING_HINT.get(lang, _ASTRO_RISING_HINT["en"])
+
         except ValueError:
             pass
 

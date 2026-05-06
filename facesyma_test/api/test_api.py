@@ -108,18 +108,40 @@ _FALLBACK_INTERPRETATIONS = {
     "pl": "Wyniki Twojego testu zostały przeanalizowane. Kontynuuj rozwijanie swoich mocnych stron.",
 }
 
+def compute_spotlight(scores: Dict) -> Dict:
+    """Return top 2 strengths and bottom 2 growth areas from domain_scores (0-100 scale)."""
+    skip = {'overall', 'depression', 'anxiety', 'accuracy', 'cognitive_flexibility'}
+    filtered = [(k, v) for k, v in scores.items() if k not in skip]
+    filtered.sort(key=lambda x: x[1], reverse=True)
+    strengths    = [{'name': d, 'score': round(s)} for d, s in filtered[:2]]
+    growth_areas = [{'name': d, 'score': round(s)} for d, s in filtered[-2:] if s < 70]
+    return {'strengths': strengths, 'growth_areas': growth_areas}
+
+
 def get_ai_interpretation(test_type: str, scores: Dict, lang: str) -> str:
-    """Get AI interpretation of test results in the user's language."""
+    """Get 3-paragraph AI narrative for test results in the user's language."""
     lang_name = _LANG_NAMES.get(lang, "English")
     fallback = _FALLBACK_INTERPRETATIONS.get(lang, _FALLBACK_INTERPRETATIONS["en"])
     try:
-        score_text = "\n".join([f"  {domain}: {int(score)}/100" for domain, score in scores.items()])
+        skip = {'overall', 'depression', 'anxiety', 'accuracy', 'cognitive_flexibility'}
+        filtered = {k: v for k, v in scores.items() if k not in skip}
+        score_text = "\n".join([f"  {domain}: {int(score)}/100" for domain, score in filtered.items()])
+        sorted_domains = sorted(filtered.items(), key=lambda x: x[1], reverse=True)
+        top    = ', '.join(d for d, _ in sorted_domains[:2]) or 'top areas'
+        bottom = ', '.join(d for d, _ in sorted_domains[-2:]) or 'growth areas'
         prompt = (
-            f"You are a psychologist. Analyze the following {test_type} test results and "
-            f"provide a brief, helpful interpretation in 2-3 sentences. "
-            f"IMPORTANT: Respond ONLY in {lang_name}. Do not use any other language.\n\n"
-            f"Test scores:\n{score_text}\n\n"
-            f"Write your interpretation in {lang_name}:"
+            f"You are a professional psychologist giving personalized assessment feedback.\n\n"
+            f"Test: {test_type}\n"
+            f"Domain scores (0-100):\n{score_text}\n\n"
+            f"Top strengths: {top}\n"
+            f"Growth opportunity: {bottom}\n\n"
+            f"Write a personal 3-paragraph psychological profile in {lang_name}. "
+            f"Address the person directly as 'you'.\n\n"
+            f"Paragraph 1 (2-3 sentences): Overall character — what kind of person do these scores suggest? Be specific and warm.\n"
+            f"Paragraph 2 (2-3 sentences): Strengths ({top}) — what does excelling here mean for how they think or relate?\n"
+            f"Paragraph 3 (2-3 sentences): Growth opportunity ({bottom}) — frame it positively, give one concrete action.\n\n"
+            f"Rules: RESPOND ONLY IN {lang_name}. No bullet points. No headers. "
+            f"Separate paragraphs with a blank line. 6-9 sentences total."
         )
         response = requests.post(
             f"{OLLAMA_URL}/api/generate",
@@ -128,7 +150,7 @@ def get_ai_interpretation(test_type: str, scores: Dict, lang: str) -> str:
         )
         response.raise_for_status()
         result = response.json().get("response", "").strip()
-        return result if result else fallback
+        return result if len(result) > 40 else fallback
     except Exception as e:
         log.error(f"Ollama error: {e}")
         return fallback
@@ -173,6 +195,8 @@ class SubmitTestResponse(BaseModel):
     test_type: str
     domain_scores: Dict[str, float]
     ai_interpretation: str
+    strengths: Optional[List[Dict]] = None
+    growth_areas: Optional[List[Dict]] = None
     pdf_url: Optional[str] = None
     stress_details: Optional[Dict] = None
     nonverbal_details: Optional[Dict] = None
@@ -226,7 +250,7 @@ def calculate_domain_scores(test_type: str, answers: List[AnswerItem]) -> Dict[s
         # Handle reverse-scored items
         score = answer.score
         if _qget("reverse_scored"):
-            score = 6 - score
+            score = (3 - score) if test_type == "stress" else (6 - score)
 
         domains[domain] += score
         domain_counts[domain] += 1
@@ -236,8 +260,11 @@ def calculate_domain_scores(test_type: str, answers: List[AnswerItem]) -> Dict[s
     for domain in domains:
         _dcd = domain_counts[domain]
         if _dcd > 0:
-            avg = domains[domain] / _dcd  # 1-5 scale
-            percentage = ((avg - 1) / 4) * 100  # Convert to 0-100
+            avg = domains[domain] / _dcd
+            if test_type == "stress":
+                percentage = (avg / 3) * 100   # PHQ-9/GAD-7: 0-3 scale
+            else:
+                percentage = ((avg - 1) / 4) * 100  # Standard Likert: 1-5 scale
             domain_scores[domain] = max(0, min(100, percentage))
 
     return domain_scores
@@ -285,8 +312,8 @@ async def get_test_types():
         },
         "values": {
             "name": "Schwartz Values Assessment",
-            "description": "Discover your core personal values based on Schwartz Values Theory",
-            "domains": ["universalism", "self_direction", "achievement", "security", "hedonism"],
+            "description": "Discover your core personal values based on Schwartz full ten-domain model",
+            "domains": ["universalism", "self_direction", "achievement", "security", "hedonism", "benevolence", "stimulation", "power", "conformity", "tradition"],
         },
         "stress": {
             "name": "Stress & Wellbeing Assessment (PHQ-9 + GAD-7)",
@@ -333,8 +360,6 @@ async def start_test(
         raise HTTPException(400, f"Unknown test type: {_ttype}")
 
     user_id = get_user_id(authorization)
-    if not user_id:
-        raise HTTPException(401, "Authentication required.")
     session_id = str(uuid.uuid4())
     _lang = body.lang
 
@@ -360,7 +385,13 @@ async def start_test(
     # Likert-based question loading
     qbank = QUESTION_BANKS[_ttype]
     questions = qbank["questions"]
-    scale_labels = qbank["scale_labels"].get(_lang, qbank["scale_labels"]["en"])
+    scale_labels_dict = qbank["scale_labels"].get(_lang, qbank["scale_labels"]["en"])
+
+    # Compute min/max from dict keys and convert to sorted array
+    scale_keys = sorted(int(k) for k in scale_labels_dict.keys())
+    scale_min = scale_keys[0]
+    scale_max = scale_keys[-1]
+    scale_labels_array = [scale_labels_dict[str(k)] for k in scale_keys]
 
     response_questions = []
     for q in questions:
@@ -369,7 +400,7 @@ async def start_test(
             "q_id": q["q_id"],
             "order": q["order"],
             "text": _qt.get(_lang, _qt["en"]),
-            "scale": {"min": 1, "max": 5, "labels": scale_labels}
+            "scale": {"min": scale_min, "max": scale_max, "labels": scale_labels_array}
         })
 
     db = get_db()
@@ -396,27 +427,31 @@ def _stress_severity(domain_scores: Dict[str, float], answers: List[AnswerItem])
     dep = domain_scores.get("depression", 0)
     anx = domain_scores.get("anxiety", 0)
 
-    if dep < 20:
+    # PHQ-9 raw bands: 0-4 minimal, 5-9 mild, 10-14 moderate, 15-19 mod-severe, 20-27 severe
+    # Normalized to 0-100 via (raw/27)*100: <15, <34, <52, <71, >=71
+    if dep < 15:
         dep_sev = "minimal"
-    elif dep < 40:
+    elif dep < 34:
         dep_sev = "mild"
-    elif dep < 60:
+    elif dep < 52:
         dep_sev = "moderate"
-    elif dep < 80:
+    elif dep < 71:
         dep_sev = "moderately_severe"
     else:
         dep_sev = "severe"
 
-    if anx < 20:
+    # GAD-7 raw bands: 0-4 minimal, 5-9 mild, 10-14 moderate, 15-21 severe
+    # Normalized to 0-100 via (raw/21)*100: <19, <43, <67, >=67
+    if anx < 19:
         anx_sev = "minimal"
-    elif anx < 40:
+    elif anx < 43:
         anx_sev = "mild"
-    elif anx < 60:
+    elif anx < 67:
         anx_sev = "moderate"
     else:
         anx_sev = "severe"
 
-    crisis = any(a.q_id == "S009" and a.score >= 4 for a in answers)
+    crisis = any(a.q_id == "S009" and a.score >= 1 for a in answers)
 
     result: Dict = {
         "depression_severity": dep_sev,
@@ -643,8 +678,6 @@ async def submit_test(
     _ttype = body.test_type
     _lang = body.lang
     user_id = get_user_id(authorization)
-    if not user_id:
-        raise HTTPException(401, "Authentication required.")
 
     # Calculate domain scores
     nonverbal_details = None
@@ -658,12 +691,9 @@ async def submit_test(
     # Stress-specific severity interpretation
     stress_details = _stress_severity(domain_scores, body.answers) if _ttype == "stress" else None
 
-    # Get AI interpretation
-    ai_interpretation = get_ai_interpretation(
-        _ttype,
-        domain_scores,
-        _lang
-    )
+    # Get AI interpretation + spotlight
+    ai_interpretation = get_ai_interpretation(_ttype, domain_scores, _lang)
+    spotlight = compute_spotlight(domain_scores)
 
     # Create result ID
     result_id = str(uuid.uuid4())
@@ -721,6 +751,8 @@ async def submit_test(
         test_type=_ttype,
         domain_scores=domain_scores,
         ai_interpretation=ai_interpretation,
+        strengths=spotlight['strengths'],
+        growth_areas=spotlight['growth_areas'],
         pdf_url=pdf_url,
         stress_details=stress_details,
         nonverbal_details=nonverbal_details,
