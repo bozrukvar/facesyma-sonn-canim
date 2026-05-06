@@ -416,6 +416,12 @@ export const AssessmentAPI = {
     const res = await analysisClient.get(`/assessment/history/?limit=${limit}`);
     return res.data;
   },
+
+  // Get latest score per test type (with domain breakdown, 0-100 scale)
+  getLatestScores: async (): Promise<Record<string, Record<string, number>>> => {
+    const res = await analysisClient.get('/assessment/latest-scores/');
+    return (res.data as { scores: Record<string, Record<string, number>> }).scores ?? {};
+  },
 };
 
 // ── AI Chat API (FastAPI :8002, routed through nginx /chat/) ─────────────────
@@ -640,8 +646,18 @@ export const CoachAPI = {
     birth_city?: string; dominant_sifatlar?: string[];
   }) => (await coachAxios.post('/coach/profile', data)).data,
   getProfile: async (userId: number) => (await coachAxios.get(`/coach/profile/${encodeURIComponent(userId)}`)).data,
-  analyzeWithCoach: async (analysisResult: object, lang = 'tr', modules?: string[]) =>
-    (await coachAxios.post('/coach/analyze', { analysis_result: analysisResult, lang, include_modules: modules })).data,
+  analyzeWithCoach: async (
+    analysisResult: object,
+    lang = 'tr',
+    modules?: string[],
+    testScores?: Record<string, Record<string, number>>,
+  ) =>
+    (await coachAxios.post('/coach/analyze', {
+      analysis_result: analysisResult,
+      lang,
+      include_modules: modules,
+      ...(testScores && Object.keys(testScores).length > 0 ? { test_scores: testScores } : {}),
+    })).data,
   birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr', name?: string, birthCity?: string) =>
     (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang, name: name || undefined, birth_city: birthCity || undefined })).data,
   getGoals: async (userId: number, status?: string) =>

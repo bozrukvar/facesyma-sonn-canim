@@ -493,3 +493,69 @@ class GetAssessmentHistoryView(View):
         except Exception as e:
             log.exception(f'Error fetching assessment history: {e}')
             return JsonResponse({'detail': 'Internal server error.'}, status=500)
+
+
+class GetLatestScoresView(View):
+    """
+    GET /api/v1/assessment/latest-scores/
+
+    Returns the most recent score per test type (with breakdown) for the
+    authenticated user. Used by the coach to personalise module selection.
+
+    Response:
+      {
+        "success": true,
+        "scores": {
+          "personality": {"openness": 80, "conscientiousness": 60, ...},
+          "skills":      {"problem_solving": 70, ...},
+          ...
+        }
+      }
+    """
+
+    def get(self, request):
+        try:
+            user_id = _get_user_id(request)
+            if not user_id:
+                return JsonResponse({'detail': 'Authentication required.'}, status=401)
+
+            col = get_assessment_results_col()
+
+            # Aggregate: for each test_type get the single most-recent document
+            pipeline = [
+                {'$match': {'user_id': user_id}},
+                {'$sort': {'created_at': -1}},
+                {'$group': {
+                    '_id': '$test_type',
+                    'breakdown': {'$first': '$breakdown'},
+                    'overall_score': {'$first': '$overall_score'},
+                }},
+            ]
+            docs = list(col.aggregate(pipeline))
+
+            scores: dict = {}
+            for doc in docs:
+                test_type = doc['_id']
+                raw_breakdown = doc.get('breakdown') or {}
+                overall = doc.get('overall_score', 0)
+
+                # Convert breakdown {domain: {score, level, ...}} → {domain: score_0_100}
+                domain_scores: dict = {}
+                for domain, val in raw_breakdown.items():
+                    if isinstance(val, dict):
+                        raw = val.get('score', 0)
+                    else:
+                        raw = float(val)
+                    # Scores stored 0-5; multiply by 20 to get 0-100
+                    domain_scores[domain] = round(float(raw) * 20, 1)
+
+                if not domain_scores and overall is not None:
+                    domain_scores['overall'] = round(float(overall) * 20, 1)
+
+                scores[test_type] = domain_scores
+
+            return JsonResponse({'success': True, 'scores': scores})
+
+        except Exception as e:
+            log.exception(f'Error fetching latest scores: {e}')
+            return JsonResponse({'detail': 'Internal server error.'}, status=500)

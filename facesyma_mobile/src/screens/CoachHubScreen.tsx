@@ -7,7 +7,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { CoachAPI } from '../services/api';
+import { CoachAPI, AssessmentAPI } from '../services/api';
 import theme from '../utils/theme';
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
@@ -217,7 +217,11 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
     setAnalyzing(true);
     setSelectedModule(null);
     try {
-      const res = await CoachAPI.analyzeWithCoach(lastAnalysis, lang);
+      // Fetch latest psych test scores (silent fail — coach still works without them)
+      let testScores: Record<string, Record<string, number>> = {};
+      try { testScores = await AssessmentAPI.getLatestScores(); } catch { /* no scores yet */ }
+
+      const res = await CoachAPI.analyzeWithCoach(lastAnalysis, lang, undefined, testScores);
       setCoachData(res);
       // İlk veri olan modülü otomatik seç
       const first = MODULE_CARDS.find(c => res.coach_modules?.[c.moduleKey]?.length);

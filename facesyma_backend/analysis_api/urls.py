@@ -9,7 +9,7 @@ from .views import (
 )
 from .assessment_views import (
     AssessmentQuestionsView, AssessmentSubmitView,
-    SaveAssessmentResultView, GetAssessmentHistoryView
+    SaveAssessmentResultView, GetAssessmentHistoryView, GetLatestScoresView,
 )
 from .similarity_views import SimilarityAnalyzeView
 from .compatibility_views import (
@@ -74,4 +74,5 @@ urlpatterns = [
     path('assessment/submit/<str:test_type>/',    AssessmentSubmitView.as_view(),    name='assessment-submit'),
     path('assessment/results/<str:test_type>/',   SaveAssessmentResultView.as_view(), name='assessment-save-result'),
     path('assessment/history/',                   GetAssessmentHistoryView.as_view(), name='assessment-history'),
+    path('assessment/latest-scores/',             GetLatestScoresView.as_view(),      name='assessment-latest-scores'),
 ]

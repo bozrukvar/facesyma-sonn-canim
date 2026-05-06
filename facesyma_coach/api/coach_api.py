@@ -648,28 +648,122 @@ class GiyimRequest(BaseModel):
     top_n:           int = 3
 
 _TEST_MODULE_HINTS: list[tuple[str, str, float, str]] = [
-    # (test_type, domain, threshold, suggested_module)   — threshold: score triggers hint
-    ("personality", "neuroticism",        65.0, "stres_yonetimi"),
-    ("personality", "conscientiousness",  65.0, "zaman_yonetimi"),
-    ("personality", "extraversion",       40.0, "iletisim_becerileri"),  # < threshold
-    ("eq",          "empathy",            40.0, "iliski_yonetimi"),       # < threshold
-    ("eq",          "self_awareness",     40.0, "ozguven"),               # < threshold
-    ("eq",          "self_regulation",    40.0, "stres_yonetimi"),        # < threshold
-    ("stress",      "depression",         40.0, "duygusal_ruhsal"),
-    ("stress",      "anxiety",            40.0, "stres_yonetimi"),
-    ("stress",              "depression",             60.0, "meditasyon_egzersiz"),
-    # Nonverbal tests
-    ("emotion_recognition", "overall",                60.0, "iletisim_becerileri"),
-    ("emotion_recognition", "overall",                60.0, "iliski_yonetimi"),
-    ("stroop",              "cognitive_flexibility",  50.0, "stres_yonetimi"),
-    ("stroop",              "cognitive_flexibility",  50.0, "zaman_yonetimi"),
+    # ── Personality (Big Five) ─────────────────────────────────────────────────
+    ("personality", "neuroticism",       65.0, "stres_yonetimi"),
+    ("personality", "neuroticism",       65.0, "meditasyon_egzersiz"),
+    ("personality", "conscientiousness", 65.0, "zaman_yonetimi"),
+    ("personality", "extraversion",      40.0, "iletisim_becerileri"),   # low
+    ("personality", "extraversion",      40.0, "etkinlik_tavsiye"),      # low
+    ("personality", "openness",          65.0, "kitap_tavsiye"),
+    ("personality", "openness",          65.0, "film_tavsiye"),
+    ("personality", "openness",          65.0, "muzik_tavsiye"),
+    ("personality", "agreeableness",     40.0, "iliski_yonetimi"),       # low
+
+    # ── Skills ────────────────────────────────────────────────────────────────
+    ("skills", "problem_solving",  40.0, "kariyer_yolu"),               # low
+    ("skills", "empathy",          40.0, "iliski_yonetimi"),            # low
+    ("skills", "organization",     40.0, "zaman_yonetimi"),             # low
+    ("skills", "learning_speed",   65.0, "kitap_tavsiye"),
+    ("skills", "learning_speed",   65.0, "podcast_tavsiye"),
+    ("skills", "decision_making",  40.0, "insan_kaynaklari"),           # low
+
+    # ── HR ────────────────────────────────────────────────────────────────────
+    ("hr", "leadership",       65.0, "kariyer_yolu"),
+    ("hr", "leadership",       65.0, "insan_kaynaklari"),
+    ("hr", "team_fit",         40.0, "iletisim_becerileri"),            # low
+    ("hr", "stress_tolerance", 40.0, "stres_yonetimi"),                 # low
+    ("hr", "stress_tolerance", 40.0, "meditasyon_egzersiz"),            # low
+    ("hr", "motivation",       40.0, "gunluk_afirasyon"),               # low
+    ("hr", "motivation",       40.0, "kariyer_yolu"),                   # low
+
+    # ── Career ────────────────────────────────────────────────────────────────
+    ("career", "creative",       65.0, "film_tavsiye"),
+    ("career", "creative",       65.0, "muzik_tavsiye"),
+    ("career", "creative",       65.0, "kitap_tavsiye"),
+    ("career", "social",         65.0, "etkinlik_tavsiye"),
+    ("career", "entrepreneurial",65.0, "kariyer_yolu"),
+    ("career", "managerial",     65.0, "insan_kaynaklari"),
+    ("career", "analytical",     65.0, "podcast_tavsiye"),
+    ("career", "technical",      65.0, "kariyer_yolu"),
+
+    # ── Vocation (Holland RIASEC) ─────────────────────────────────────────────
+    ("vocation", "artistic",      65.0, "film_tavsiye"),
+    ("vocation", "artistic",      65.0, "muzik_tavsiye"),
+    ("vocation", "artistic",      65.0, "kitap_tavsiye"),
+    ("vocation", "social",        65.0, "etkinlik_tavsiye"),
+    ("vocation", "realistic",     65.0, "spor_aktivite"),
+    ("vocation", "investigative", 65.0, "podcast_tavsiye"),
+    ("vocation", "enterprising",  65.0, "kariyer_yolu"),
+
+    # ── Relationship ──────────────────────────────────────────────────────────
+    ("relationship", "emotional_intelligence", 40.0, "duygusal_ruhsal"), # low
+    ("relationship", "emotional_intelligence", 40.0, "iliski_yonetimi"), # low
+    ("relationship", "relationship_values",    40.0, "iliski_yonetimi"), # low
+
+    # ── Attachment ────────────────────────────────────────────────────────────
+    ("attachment", "anxiety",   65.0, "duygusal_ruhsal"),
+    ("attachment", "anxiety",   65.0, "meditasyon_egzersiz"),
+    ("attachment", "avoidance", 65.0, "iliski_yonetimi"),
+
+    # ── Grit ──────────────────────────────────────────────────────────────────
+    ("grit", "perseverance", 40.0, "gunluk_afirasyon"),                  # low
+    ("grit", "perseverance", 40.0, "kariyer_yolu"),                      # low
+    ("grit", "passion",      65.0, "kariyer_yolu"),
+
+    # ── Growth mindset ────────────────────────────────────────────────────────
+    ("growth_mindset", "growth_mindset", 65.0, "kitap_tavsiye"),
+    ("growth_mindset", "growth_mindset", 65.0, "podcast_tavsiye"),
+
+    # ── Self-compassion ───────────────────────────────────────────────────────
+    ("self_compassion", "mindfulness",       40.0, "meditasyon_egzersiz"), # low
+    ("self_compassion", "self_kindness",     40.0, "gunluk_afirasyon"),    # low
+    ("self_compassion", "isolation",         65.0, "etkinlik_tavsiye"),
+    ("self_compassion", "isolation",         65.0, "seyahat_tavsiye"),
+    ("self_compassion", "self_judgment",     65.0, "duygusal_ruhsal"),
+    ("self_compassion", "overidentification",65.0, "stres_yonetimi"),
+
+    # ── Body image ────────────────────────────────────────────────────────────
+    ("body_image", "body_satisfaction",    40.0, "saglik_tavsiye"),       # low
+    ("body_image", "body_satisfaction",    40.0, "spor_aktivite"),        # low
+    ("body_image", "appearance_evaluation",40.0, "ozguven"),              # low
+
+    # ── Self-efficacy & Stress ────────────────────────────────────────────────
+    ("self_efficacy", "self_efficacy", 40.0, "ozguven"),                  # low
+    ("self_efficacy", "self_efficacy", 40.0, "kariyer_yolu"),             # low
+    ("stress",        "depression",    40.0, "duygusal_ruhsal"),          # low
+    ("stress",        "anxiety",       40.0, "stres_yonetimi"),           # low
+    ("stress",        "depression",    60.0, "meditasyon_egzersiz"),
+
+    # ── Life satisfaction ─────────────────────────────────────────────────────
+    ("life_satisfaction", "life_satisfaction", 40.0, "gunluk_afirasyon"), # low
+    ("life_satisfaction", "life_satisfaction", 40.0, "seyahat_tavsiye"),  # low
+
+    # ── EQ & nonverbal ───────────────────────────────────────────────────────
+    ("eq",                "empathy",             40.0, "iliski_yonetimi"),
+    ("eq",                "self_awareness",       40.0, "ozguven"),
+    ("eq",                "self_regulation",      40.0, "stres_yonetimi"),
+    ("emotion_recognition","overall",             60.0, "iletisim_becerileri"),
+    ("emotion_recognition","overall",             60.0, "iliski_yonetimi"),
+    ("stroop",             "cognitive_flexibility",50.0, "stres_yonetimi"),
+    ("stroop",             "cognitive_flexibility",50.0, "zaman_yonetimi"),
 ]
 
 # Domains where LOW score triggers the hint (below threshold)
 _LOW_SCORE_DOMAINS = {
-    "extraversion", "empathy", "self_awareness", "self_regulation",
-    "overall",               # emotion_recognition
-    "cognitive_flexibility", # stroop
+    # personality
+    "extraversion", "agreeableness",
+    # skills / hr
+    "empathy", "organization", "problem_solving", "decision_making", "team_fit", "stress_tolerance", "motivation",
+    # relationship / attachment
+    "emotional_intelligence", "relationship_values", "anxiety", "avoidance",
+    # self-compassion
+    "mindfulness", "self_kindness",
+    # body image / self-efficacy / life-sat / grit
+    "body_satisfaction", "appearance_evaluation", "self_efficacy", "life_satisfaction", "perseverance",
+    # EQ / stress
+    "self_awareness", "self_regulation", "depression",
+    # nonverbal
+    "overall", "cognitive_flexibility",
 }
 
 
