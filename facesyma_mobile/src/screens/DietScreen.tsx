@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert,
+  ActivityIndicator, Alert, FlatList, Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,8 @@ import theme from '../utils/theme';
 import type { ScreenProps } from '../navigation/types';
 
 const { colors, spacing, typography, radius, shadow } = theme;
+const SCREEN_W = Dimensions.get('window').width;
+const OPTION_CARD_W = SCREEN_W - spacing.lg * 2 - spacing.md * 2 - 32;
 
 type Meal = {
   name: string;
@@ -24,13 +26,14 @@ type Meal = {
 
 type Recommendation = {
   date: string;
-  breakfast: Meal;
-  lunch: Meal;
-  dinner: Meal;
+  breakfast: Meal[];
+  lunch: Meal[];
+  dinner: Meal[];
   user_sifats: string[];
 };
 
 type FeedbackMap = Record<string, 'liked' | 'disliked' | 'neutral'>;
+type SelectedMap  = Record<string, number>;
 
 const MEAL_TYPES: Array<{ key: keyof Recommendation; icon: string; labelKey: string }> = [
   { key: 'breakfast', icon: '🌅', labelKey: 'diet.breakfast' },
@@ -43,16 +46,21 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
   const { lang } = useLanguage();
   const user = useSelector((s: RootState) => s.auth.user);
 
-  const [loading,        setLoading]        = useState(false);
-  const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
-  const [feedback,       setFeedback]       = useState<FeedbackMap>({});
+  const [loading,         setLoading]         = useState(false);
+  const [recommendation,  setRecommendation]  = useState<Recommendation | null>(null);
+  const [feedback,        setFeedback]        = useState<FeedbackMap>({});
   const [feedbackLoading, setFeedbackLoading] = useState<string | null>(null);
+  const [selectedMeals,   setSelectedMeals]   = useState<SelectedMap>({
+    breakfast: 0, lunch: 0, dinner: 0,
+  });
 
   const countryCode = user?.country_code ?? 'TR';
 
   const fetchRecommendation = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
+    setFeedback({});
+    setSelectedMeals({ breakfast: 0, lunch: 0, dinner: 0 });
     try {
       const res = await DietAPI.getRecommendation({
         user_id: user.id,
@@ -68,58 +76,114 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
     }
   }, [user, countryCode, lang]);
 
-  const submitFeedback = async (mealType: string, mealName: string, fb: 'liked' | 'disliked' | 'neutral') => {
+  const submitFeedback = async (
+    mealType: string,
+    mealName: string,
+    fb: 'liked' | 'disliked' | 'neutral',
+  ) => {
     if (!user?.id || !recommendation) return;
-    const key = mealType;
-    setFeedbackLoading(key);
+    setFeedbackLoading(mealType);
     try {
       await DietAPI.submitFeedback(user.id, mealName, recommendation.date, mealType, fb);
-      setFeedback(prev => ({ ...prev, [key]: fb }));
+      setFeedback(prev => ({ ...prev, [mealType]: fb }));
     } catch {
-      // silent — feedback is non-critical
+      // silent
     } finally {
       setFeedbackLoading(null);
     }
   };
 
-  const renderMealCard = (mealType: keyof Recommendation, icon: string, labelKey: string) => {
-    const meal = recommendation?.[mealType] as Meal | undefined;
-    if (!meal) return null;
+  const renderOptionCard = (
+    meal: Meal,
+    mealType: string,
+    idx: number,
+    isActive: boolean,
+  ) => (
+    <TouchableOpacity
+      key={idx}
+      style={[styles.optionCard, isActive && styles.optionCardActive]}
+      onPress={() => setSelectedMeals(prev => ({ ...prev, [mealType]: idx }))}
+      activeOpacity={0.8}
+    >
+      {isActive && <View style={styles.activeIndicator} />}
+      <Text style={[styles.optionName, isActive && styles.optionNameActive]}>
+        {meal.name}
+      </Text>
+      {meal.description ? (
+        <Text style={styles.optionDesc} numberOfLines={2}>{meal.description}</Text>
+      ) : null}
+      {meal.reason ? (
+        <Text style={styles.optionReason} numberOfLines={2}>{meal.reason}</Text>
+      ) : null}
+      {meal.prep_time_min ? (
+        <Text style={styles.prepTime}>⏱ {meal.prep_time_min} min</Text>
+      ) : null}
+      {isActive && (
+        <View style={styles.activeChip}>
+          <Text style={styles.activeChipTxt}>✓</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+
+  const renderMealSection = (
+    mealType: keyof Recommendation,
+    icon: string,
+    labelKey: string,
+  ) => {
+    const meals = recommendation?.[mealType] as Meal[] | undefined;
+    if (!meals?.length) return null;
+    const selectedIdx = selectedMeals[mealType as string] ?? 0;
+    const selectedMeal = meals[selectedIdx];
     const fb = feedback[mealType as string];
     const isLoadingFb = feedbackLoading === mealType;
 
     return (
-      <View style={styles.mealCard} key={mealType}>
+      <View style={styles.mealSection} key={mealType as string}>
+        {/* Section header */}
         <View style={styles.mealHeader}>
           <Text style={styles.mealIcon}>{icon}</Text>
           <Text style={styles.mealTypeLabel}>{t(labelKey, lang)}</Text>
+          {meals.length > 1 && (
+            <Text style={styles.optionCount}>{selectedIdx + 1}/{meals.length}</Text>
+          )}
         </View>
-        <Text style={styles.mealName}>{meal.name}</Text>
-        {meal.description ? (
-          <Text style={styles.mealDesc}>{meal.description}</Text>
-        ) : null}
-        {meal.reason ? (
-          <Text style={styles.mealReason}>{meal.reason}</Text>
-        ) : null}
-        {meal.prep_time_min ? (
-          <Text style={styles.prepTime}>⏱ {meal.prep_time_min} min</Text>
-        ) : null}
 
-        {/* Feedback row */}
+        {/* Horizontal option cards */}
+        <FlatList
+          data={meals}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(_, i) => String(i)}
+          contentContainerStyle={styles.optionList}
+          renderItem={({ item, index }) =>
+            renderOptionCard(item, mealType as string, index, index === selectedIdx)
+          }
+          snapToInterval={OPTION_CARD_W + spacing.sm}
+          decelerationRate="fast"
+        />
+
+        {/* Feedback row for selected meal */}
         <View style={styles.feedbackRow}>
           {(['liked', 'neutral', 'disliked'] as const).map(fbType => {
-            const icons = { liked: '👍', neutral: '😐', disliked: '👎' };
-            const fbKeys = { liked: 'diet.feedback_like', neutral: 'diet.feedback_neutral', disliked: 'diet.feedback_dislike' };
+            const icons  = { liked: '👍', neutral: '😐', disliked: '👎' };
+            const fbKeys = {
+              liked:    'diet.feedback_like',
+              neutral:  'diet.feedback_neutral',
+              disliked: 'diet.feedback_dislike',
+            };
             const isActive = fb === fbType;
             return (
               <TouchableOpacity
                 key={fbType}
                 style={[styles.fbBtn, isActive && styles.fbBtnActive]}
-                onPress={() => submitFeedback(mealType as string, meal.name, fbType)}
+                onPress={() =>
+                  submitFeedback(mealType as string, selectedMeal.name, fbType)
+                }
                 disabled={isLoadingFb || !!fb}
                 activeOpacity={0.8}
               >
-                {isLoadingFb && fb === undefined ? (
+                {isLoadingFb ? (
                   <ActivityIndicator size="small" color={colors.gold} />
                 ) : (
                   <Text style={[styles.fbBtnTxt, isActive && styles.fbBtnTxtActive]}>
@@ -147,7 +211,10 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
         <View style={styles.spacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.subtitle}>{t('diet.subtitle', lang)}</Text>
 
         <View style={styles.countryRow}>
@@ -173,7 +240,7 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
         {recommendation ? (
           <View style={styles.mealsContainer}>
             {MEAL_TYPES.map(({ key, icon, labelKey }) =>
-              renderMealCard(key, icon, labelKey)
+              renderMealSection(key, icon, labelKey),
             )}
           </View>
         ) : !loading ? (
@@ -215,20 +282,50 @@ const styles = StyleSheet.create({
   },
   getBtnLoading: { opacity: 0.7 },
   getBtnTxt:    { ...typography.label, color: '#000', fontSize: 15 },
-  mealsContainer: { gap: spacing.lg },
-  mealCard:     {
+  mealsContainer: { gap: spacing.xl },
+
+  mealSection:  {
     backgroundColor: colors.surface, borderRadius: radius.lg,
     borderWidth: 1, borderColor: colors.border,
-    padding: spacing.lg, gap: spacing.sm,
+    paddingVertical: spacing.md, gap: spacing.sm,
+    overflow: 'hidden' as const,
   },
-  mealHeader:   { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  mealHeader:   {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
   mealIcon:     { fontSize: 22 },
-  mealTypeLabel: { ...typography.label, color: colors.gold, fontSize: 13, fontWeight: '700' as const },
-  mealName:     { ...typography.h2, fontSize: 16, color: colors.textPrimary },
-  mealDesc:     { ...typography.body, color: colors.textSecondary, fontSize: 13, lineHeight: 18 },
-  mealReason:   { ...typography.caption, color: colors.textMuted, fontSize: 12, fontStyle: 'italic' as const },
+  mealTypeLabel: { ...typography.label, color: colors.gold, fontSize: 13, fontWeight: '700' as const, flex: 1 },
+  optionCount:  { ...typography.caption, color: colors.textMuted, fontSize: 11 },
+
+  optionList:   { paddingHorizontal: spacing.md, gap: spacing.sm },
+  optionCard:   {
+    width: OPTION_CARD_W,
+    backgroundColor: colors.background, borderRadius: radius.md,
+    borderWidth: 1.5, borderColor: colors.border,
+    padding: spacing.md, gap: 6,
+    position: 'relative' as const,
+  },
+  optionCardActive: {
+    borderColor: colors.gold, backgroundColor: colors.goldGlow,
+  },
+  activeIndicator: {
+    position: 'absolute' as const, top: 0, left: 0, right: 0,
+    height: 2, backgroundColor: colors.gold, borderRadius: 1,
+  },
+  activeChip:   {
+    position: 'absolute' as const, top: spacing.sm, right: spacing.sm,
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: colors.gold, alignItems: 'center' as const, justifyContent: 'center' as const,
+  },
+  activeChipTxt: { color: '#000', fontSize: 10, fontWeight: '700' as const },
+  optionName:   { ...typography.h2, fontSize: 15, color: colors.textPrimary },
+  optionNameActive: { color: colors.gold },
+  optionDesc:   { ...typography.body, color: colors.textSecondary, fontSize: 12, lineHeight: 17 },
+  optionReason: { ...typography.caption, color: colors.textMuted, fontSize: 11, fontStyle: 'italic' as const },
   prepTime:     { ...typography.caption, color: colors.textMuted, fontSize: 11 },
-  feedbackRow:  { flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs },
+
+  feedbackRow:  { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.md, marginTop: spacing.xs },
   fbBtn:        {
     flex: 1, paddingVertical: 8, borderRadius: radius.sm,
     borderWidth: 1, borderColor: colors.border,
@@ -237,7 +334,8 @@ const styles = StyleSheet.create({
   fbBtnActive:   { borderColor: colors.gold, backgroundColor: colors.goldGlow },
   fbBtnTxt:     { ...typography.caption, color: colors.textMuted, fontSize: 11 },
   fbBtnTxtActive: { color: colors.gold, fontWeight: '700' as const },
-  feedbackSent: { ...typography.caption, color: colors.gold, fontSize: 11, textAlign: 'center' as const },
+  feedbackSent: { ...typography.caption, color: colors.gold, fontSize: 11, textAlign: 'center' as const, paddingHorizontal: spacing.md },
+
   emptyContainer: { alignItems: 'center' as const, paddingVertical: spacing.xl * 2, gap: spacing.md },
   emptyIcon:    { fontSize: 56 },
   emptyText:    { ...typography.body, color: colors.textMuted, textAlign: 'center' as const },

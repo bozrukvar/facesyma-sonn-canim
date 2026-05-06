@@ -132,6 +132,7 @@ export interface AssessmentDomainScore {
   score: number;
   level?: string;
   level_tr?: string;
+  description?: string;
 }
 
 export interface AssessmentResult {

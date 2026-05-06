@@ -28,17 +28,30 @@ interface NameNumerology {
   labels: { title: string; expression: string; soul_urge: string; personality: string; ebced_title: string; kabala_title: string; total: string; reduced: string; };
 }
 
+interface FaceAstroMatch {
+  has_face_data: boolean;
+  title?: string;
+  match_score?: number;
+  confirming_traits?: string[];
+  face_top_archetypes?: string[];
+  summary?: string;
+}
+
 interface BirthResult {
   birth_date: string;
   name_numerology?: NameNumerology;
+  face_astro_match?: FaceAstroMatch;
   astrology: {
-    sun_sign:    string;
-    element:     string;
-    quality:     string;
-    season:      string;
-    birth_year:  number;
-    time_energy?: string;
-    rising_hint?: string;
+    sun_sign:      string;
+    element:       string;
+    quality:       string;
+    season:        string;
+    birth_year:    number;
+    time_energy?:  string;
+    rising_sign?:  string;
+    rising_degree?: number;
+    city_resolved?: string;
+    rising_hint?:  string;
     error?: string;
   };
   numerology: {
@@ -69,6 +82,7 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
 
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
+  const [birthCity, setBirthCity] = useState('');
   const [name,      setName]      = useState('');
   const [loading,   setLoading]   = useState(false);
   const [result,    setResult]    = useState<BirthResult | null>(null);
@@ -88,6 +102,7 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
         birthTime.trim() || undefined,
         lang,
         name.trim() || undefined,
+        birthCity.trim() || undefined,
       );
       setResult(res);
     } catch {
@@ -146,6 +161,19 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <Text style={[styles.fieldLabel, { marginTop: spacing.md }]}>
+            {t('coach.birth_city_label', lang)}
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={birthCity}
+            onChangeText={setBirthCity}
+            placeholder="Istanbul, Paris, Tokyo..."
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="words"
+            autoCorrect={false}
+          />
+
+          <Text style={[styles.fieldLabel, { marginTop: spacing.md }]}>
             {t('coach.name_label', lang)}
           </Text>
           <TextInput
@@ -185,9 +213,24 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
               {astro.time_energy && (
                 <InfoRow label="⏰" value={astro.time_energy} />
               )}
-              {astro.rising_hint && (
+              {astro.rising_sign ? (
+                <InfoRow
+                  label={`↑ ${t('coach.rising_sign', lang)}`}
+                  value={
+                    astro.rising_degree != null
+                      ? `${astro.rising_sign}  ${astro.rising_degree}°`
+                      : astro.rising_sign
+                  }
+                  accent="#C07AE0"
+                />
+              ) : astro.rising_hint ? (
                 <Text style={styles.hintText}>ℹ️ {astro.rising_hint}</Text>
-              )}
+              ) : null}
+              {astro.city_resolved ? (
+                <Text style={[styles.hintText, { marginTop: 2 }]}>
+                  📍 {astro.city_resolved}
+                </Text>
+              ) : null}
             </View>
 
             {/* Numerology card */}
@@ -233,6 +276,51 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
             )}
           </>
         )}
+
+        {/* Face × Birth alignment card */}
+        {result?.face_astro_match?.has_face_data && (() => {
+          const fam = result.face_astro_match!;
+          const score = fam.match_score ?? 0;
+          const barColor = score >= 75 ? '#4CAF50' : score >= 40 ? colors.gold : '#C07AE0';
+          return (
+            <View style={[styles.resultCard, { borderLeftColor: '#26C6DA' }]}>
+              <Text style={styles.resultCardTitle}>🔗 {fam.title}</Text>
+
+              {/* Match score bar */}
+              <View style={styles.matchBarContainer}>
+                <View style={[styles.matchBarFill, { width: `${score}%` as any, backgroundColor: barColor }]} />
+              </View>
+              <Text style={[styles.matchScoreText, { color: barColor }]}>{score}%</Text>
+
+              {/* Confirming traits chips */}
+              {fam.confirming_traits && fam.confirming_traits.length > 0 && (
+                <View style={styles.traitChips}>
+                  {fam.confirming_traits.map((trait, i) => (
+                    <View key={i} style={[styles.traitChip, { borderColor: barColor }]}>
+                      <Text style={[styles.traitChipText, { color: barColor }]}>✓ {trait}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Face top archetypes (when no confirming match) */}
+              {(!fam.confirming_traits || fam.confirming_traits.length === 0) &&
+                fam.face_top_archetypes && fam.face_top_archetypes.length > 0 && (
+                <View style={styles.traitChips}>
+                  {fam.face_top_archetypes.slice(0, 4).map((trait, i) => (
+                    <View key={i} style={[styles.traitChip, { borderColor: colors.textMuted }]}>
+                      <Text style={[styles.traitChipText, { color: colors.textMuted }]}>{trait}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {!!fam.summary && (
+                <Text style={styles.meaningText}>{fam.summary}</Text>
+              )}
+            </View>
+          );
+        })()}
 
         {/* Name Numerology card */}
         {result?.name_numerology && (
@@ -402,6 +490,21 @@ const styles = StyleSheet.create({
   },
   numChipNum:   { ...typography.h2, color: colors.gold, fontSize: 22 },
   numChipLabel: { ...typography.caption, color: colors.textMuted, fontSize: 10 },
+
+  // Face × Birth alignment
+  matchBarContainer: {
+    height: 8, backgroundColor: colors.border,
+    borderRadius: radius.full, overflow: 'hidden',
+    marginTop: spacing.sm, marginBottom: spacing.xs,
+  },
+  matchBarFill: { height: '100%', borderRadius: radius.full },
+  matchScoreText: { ...typography.h2, fontSize: 20, fontWeight: '700' as const, marginBottom: spacing.sm },
+  traitChips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.sm },
+  traitChip: {
+    borderRadius: radius.full, borderWidth: 1,
+    paddingVertical: 3, paddingHorizontal: spacing.sm,
+  },
+  traitChipText: { ...typography.caption, fontSize: 11, fontWeight: '600' as const },
 
   // Error
   errorCard: {

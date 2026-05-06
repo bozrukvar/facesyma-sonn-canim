@@ -214,7 +214,10 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <View>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Text style={styles.backBtnText}>←</Text>
+        </TouchableOpacity>
+        <View style={styles.flex1}>
           <Text style={styles.title}>{t('assessment_history.title', lang)}</Text>
           <Text style={styles.subtitle}>{results.length} {t('assessment_history.tests_count', lang)}</Text>
         </View>
@@ -371,9 +374,12 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 16, fontSize: 16, color: colors.text },
 
   header: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+    flexDirection: 'row', alignItems: 'center', gap: 8,
     marginTop: 16, marginBottom: 16,
   },
+  backBtn: { paddingRight: 4, paddingVertical: 4 },
+  backBtnText: { fontSize: 22, color: colors.text },
+  flex1: { flex: 1 },
   title:        { fontSize: 28, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
   subtitle:     { fontSize: 14, color: colors.textSecondary },
   deleteAllBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.error + '88' },

@@ -260,6 +260,13 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => stepIdx > 0 ? setStepIdx(i => i - 1) : navigation.goBack()}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.backBtnText}>←</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>{t('profile_setup.title', lang)}</Text>
         <Text style={styles.subtitle}>
           {stepIdx + 1} / {STEPS.length}
@@ -613,6 +620,8 @@ const StepLifestyle = ({
 const styles = StyleSheet.create({
   container:   { flex: 1, backgroundColor: colors.background },
   header:      { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  backBtn:     { marginBottom: spacing.sm },
+  backBtnText: { fontSize: 22, color: colors.textPrimary, lineHeight: 28 },
   title:       { ...typography.display, fontSize: 22, color: colors.textPrimary, marginBottom: 4 },
   subtitle:    { ...typography.caption, color: colors.textMuted, marginBottom: spacing.md },
   progressBar: { height: 3, backgroundColor: colors.border, borderRadius: 2, overflow: 'hidden' },

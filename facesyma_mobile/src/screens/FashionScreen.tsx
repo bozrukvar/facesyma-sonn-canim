@@ -5,7 +5,7 @@
  * Mevsim ve kategori seçimli.
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Alert,
@@ -22,6 +22,47 @@ import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
 import type { AnalysisResult } from '../types/api';
+
+// Hex → Türkçe renk adı (yaklaşık eşleşme)
+const HEX_COLOR_NAMES: Record<string, string> = {
+  '#000000': 'Siyah',     '#FFFFFF': 'Beyaz',     '#808080': 'Gri',
+  '#C0C0C0': 'Gümüş',     '#BDC3C7': 'Açık Gri',  '#2C3E50': 'Lacivert',
+  '#1A1A2E': 'Gece Mavisi','#34495E': 'Gri-Mavi',  '#2980B9': 'Mavi',
+  '#3498DB': 'Açık Mavi', '#1E90FF': 'Kobalt',     '#4682B4': 'Çelik Mavisi',
+  '#000080': 'Koyu Lacivert','#191970': 'Gece Mavisi',
+  '#F5F5F5': 'Kırık Beyaz','#F5F0E8': 'Krem',      '#FAEBD7': 'Açık Krem',
+  '#F5F5DC': 'Bej',       '#D2B48C': 'Ten',        '#C8A97E': 'Kumral',
+  '#A0522D': 'Kahve',     '#8B4513': 'Koyu Kahve', '#5C3317': 'Çikolata',
+  '#8B6914': 'Bronz',     '#C9A84C': 'Altın',      '#FFD700': 'Sarı Altın',
+  '#DAA520': 'Kadife Altın','#B8860B': 'Koyu Altın',
+  '#556B2F': 'Haki',      '#6B8E23': 'Zeytin',     '#8FBC8F': 'Açık Yeşil',
+  '#2E8B57': 'Orman Yeşili','#006400': 'Koyu Yeşil','#228B22': 'Yeşil',
+  '#8B0000': 'Koyu Kırmızı','#B22222': 'Tuğla',    '#DC143C': 'Kırmızı',
+  '#800020': 'Bordo',     '#722F37': 'Şarap',
+  '#9B5DE5': 'Mor',       '#800080': 'Koyu Mor',   '#4B0082': 'İndigo',
+  '#696969': 'Antrasit',  '#708090': 'Kurşun Gri', '#A9A9A9': 'Orta Gri',
+  '#8E9B90': 'Çam Yeşili','#607D8B': 'Slate',
+  '#FF6B6B': 'Mercan',    '#FF8C00': 'Koyu Turuncu','#FFA500': 'Turuncu',
+  '#F4A460': 'Kum',       '#DEB887': 'Bisküvi',
+};
+
+function hexToColorName(hex: string): string {
+  const upper = hex.toUpperCase();
+  if (HEX_COLOR_NAMES[upper]) return HEX_COLOR_NAMES[upper];
+  // Yaklaşık eşleşme: en yakın rengi bul
+  const r = parseInt(upper.slice(1, 3), 16) || 0;
+  const g = parseInt(upper.slice(3, 5), 16) || 0;
+  const b = parseInt(upper.slice(5, 7), 16) || 0;
+  let best = '', minDist = Infinity;
+  for (const [h, name] of Object.entries(HEX_COLOR_NAMES)) {
+    const dr = (parseInt(h.slice(1, 3), 16) || 0) - r;
+    const dg = (parseInt(h.slice(3, 5), 16) || 0) - g;
+    const db2 = (parseInt(h.slice(5, 7), 16) || 0) - b;
+    const dist = dr * dr + dg * dg + db2 * db2;
+    if (dist < minDist) { minDist = dist; best = name; }
+  }
+  return best || hex;
+}
 
 const getSeasons = (lang: string) => [
   { id: 'ilkbahar', emoji: '🌸', label: t('fashion.spring', lang) },
@@ -84,12 +125,11 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FashionData | null>(null);
 
-  useEffect(() => {
-    if (!analysisResult) {
-      Alert.alert(t('common.error', lang), t('fashion.error_no_analysis', lang));
-      navigation.goBack();
-    }
-  }, [analysisResult, lang, navigation]);
+  const hasValidAnalysis = !!(
+    (analysisResult as any)?.top_sifatlar?.length ||
+    Object.keys((analysisResult as any)?.sifat_scores ?? {}).length ||
+    (analysisResult as any)?.attributes?.length
+  );
 
   const fetchFashionAdvice = async () => {
     setLoading(true);
@@ -140,6 +180,16 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Analiz yoksa soft info banner */}
+        {!hasValidAnalysis && (
+          <View style={styles.infoBanner}>
+            <Text style={styles.infoBannerText}>ℹ️ {t('fashion.no_analysis_hint', lang)}</Text>
+            <TouchableOpacity style={styles.infoBannerBtn} onPress={() => navigation.goBack()}>
+              <Text style={styles.infoBannerBtnText}>📷 {t('fashion.go_to_analysis', lang)}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Mevsim Seçici */}
         <View style={styles.section}>
           <SectionLabel>{t('fashion.section_select_season', lang)}</SectionLabel>
@@ -236,25 +286,39 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
             <Card style={styles.card}>
               <Text style={styles.cardTitle}>{t('fashion.color_palette', lang)}</Text>
               <View style={styles.colorRow}>
-                {dataRenkPaleti?.ana?.map((color, idx) => (
+                {dataRenkPaleti?.ana?.filter(c => c.startsWith('#')).map((color, idx) => (
                   <View key={`ana-${idx}`} style={styles.colorContainer}>
-                    <View
-                      style={[styles.colorSwatch, { backgroundColor: color }]}
-                    />
-                    <Text style={styles.colorLabel}>{color}</Text>
+                    <View style={[styles.colorSwatch, { backgroundColor: color }]}>
+                      <View style={[styles.colorSwatchInner, { backgroundColor: color }]} />
+                    </View>
+                    <Text style={styles.colorLabel}>{hexToColorName(color)}</Text>
                   </View>
                 ))}
               </View>
-              {(dataRenkPaleti?.vurgu?.length ?? 0) > 0 && (
+              {(dataRenkPaleti?.vurgu?.filter(c => c.startsWith('#')).length ?? 0) > 0 && (
                 <>
                   <Text style={styles.colorSubtitle}>{t('fashion.accent_colors', lang)}</Text>
                   <View style={styles.colorRow}>
-                    {dataRenkPaleti!.vurgu!.map((color, idx) => (
+                    {dataRenkPaleti!.vurgu!.filter(c => c.startsWith('#')).map((color, idx) => (
                       <View key={`vurgu-${idx}`} style={styles.colorContainer}>
-                        <View
-                          style={[styles.colorSwatch, { backgroundColor: color }]}
-                        />
-                        <Text style={styles.colorLabel}>{color}</Text>
+                        <View style={[styles.colorSwatch, { backgroundColor: color }]}>
+                          <View style={[styles.colorSwatchInner, { backgroundColor: color }]} />
+                        </View>
+                        <Text style={styles.colorLabel}>{hexToColorName(color)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+              {(dataRenkPaleti?.kacin?.length ?? 0) > 0 && (
+                <>
+                  <Text style={styles.colorSubtitleAvoid}>{t('fashion.avoid_colors', lang)}</Text>
+                  <View style={styles.chipRow}>
+                    {dataRenkPaleti!.kacin!.map((item, idx) => (
+                      <View key={`kacin-${idx}`} style={styles.chipAvoid}>
+                        <Text style={styles.chipAvoidText}>
+                          {item.startsWith('#') ? hexToColorName(item) : item}
+                        </Text>
                       </View>
                     ))}
                   </View>
@@ -400,6 +464,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  infoBanner: {
+    backgroundColor: '#2a2a1a',
+    borderLeftWidth: 3,
+    borderLeftColor: colors.gold,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  infoBannerText: {
+    color: colors.textWarm,
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 10,
+  },
+  infoBannerBtn: {
+    backgroundColor: colors.gold,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    alignSelf: 'flex-start',
+  },
+  infoBannerBtnText: {
+    color: '#000',
+    fontSize: 13,
+    fontWeight: '600',
+  },
   section: {
     marginBottom: 24,
   },
@@ -529,25 +619,53 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   colorSwatch: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     marginBottom: 6,
-    borderWidth: 2,
-    borderColor: colors.border,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.15)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  colorSwatchInner: {
+    flex: 1,
   },
   colorLabel: {
     fontSize: 11,
     color: colors.textMuted,
     textAlign: 'center',
-    maxWidth: 60,
+    maxWidth: 64,
   },
   colorSubtitle: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.text,
-    marginTop: 12,
+    marginTop: 16,
     marginBottom: 8,
+  },
+  colorSubtitleAvoid: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FF6B6B',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  chipAvoid: {
+    backgroundColor: 'rgba(255,107,107,0.12)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.4)',
+  },
+  chipAvoidText: {
+    fontSize: 12,
+    color: '#FF6B6B',
   },
   faceNote: {
     fontSize: 14,

@@ -33,6 +33,10 @@ type Messaging = {
 
 function getMessaging(): Messaging | null {
   try {
+    // Guard: if native module is absent (dev build without google-services.json), no-op.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { NativeModules } = require('react-native');
+    if (!NativeModules.RNFBAppModule) return null;
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require('@react-native-firebase/messaging').default();
   } catch {

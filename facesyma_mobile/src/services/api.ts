@@ -635,8 +635,8 @@ export const CoachAPI = {
   getProfile: async (userId: number) => (await coachAxios.get(`/coach/profile/${encodeURIComponent(userId)}`)).data,
   analyzeWithCoach: async (analysisResult: object, lang = 'tr', modules?: string[]) =>
     (await coachAxios.post('/coach/analyze', { analysis_result: analysisResult, lang, include_modules: modules })).data,
-  birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr', name?: string) =>
-    (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang, name: name || undefined })).data,
+  birthAnalysis: async (birthDate: string, birthTime?: string, lang = 'tr', name?: string, birthCity?: string) =>
+    (await coachAxios.post('/coach/birth', { birth_date: birthDate, birth_time: birthTime, lang, name: name || undefined, birth_city: birthCity || undefined })).data,
   getGoals: async (userId: number, status?: string) =>
     (await coachAxios.get(`/coach/goals/${encodeURIComponent(userId)}`, { params: status ? { status } : {} })).data,
   addGoal: async (data: { title: string; module?: string; target_date?: string; priority?: string }) =>
@@ -803,11 +803,15 @@ export interface NonverbalAnswer {
   response_time_ms?: number;
 }
 
+export interface SpotlightItem { name: string; score: number; }
+
 export interface TestSubmitResponse {
   result_id: string;
   test_type: string;
   domain_scores: Record<string, number>;
   ai_interpretation: string;
+  strengths?: SpotlightItem[];
+  growth_areas?: SpotlightItem[];
   pdf_url?: string;
   stress_details?: StressDetails;
   nonverbal_details?: NonverbalDetails | null;
