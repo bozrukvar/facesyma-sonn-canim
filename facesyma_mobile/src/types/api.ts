@@ -142,3 +142,12 @@ export interface AssessmentResult {
   recommendations: string[];
   responses_counted: number;
 }
+
+export interface UserMemory {
+  id: string;
+  content: string;
+  category: 'goal' | 'preference' | 'emotion' | 'concern' | 'insight';
+  source?: 'rule' | 'ai_summary';
+  created_at: string;
+  conversation_id?: string;
+}

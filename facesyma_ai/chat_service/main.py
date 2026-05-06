@@ -36,7 +36,13 @@ from .intent import detect_intent
 from .sifat_fetcher import build_sifat_context, format_context_for_ollama
 from .routes.diet import router as diet_router
 from .context_enricher import fetch_user_context
-from .memory_manager import extract_and_save as _mem_extract, get_memory_prompt_section as _mem_section
+from .memory_manager import (
+    extract_and_save as _mem_extract,
+    extract_and_save_summary as _mem_summary,
+    get_memory_prompt_section as _mem_section,
+    get_memories as _mem_get,
+    delete_memory as _mem_delete,
+)
 
 log = logging.getLogger(__name__)
 
@@ -673,10 +679,18 @@ async def send_message(
 
     # ── Faz 4: Hafıza çıkarımı (best-effort, sessiz) ─────────────────────────
     if user_id:
+        _db = get_db()
         try:
-            _mem_extract(user_id, _msg, _cid, user_lang, get_db())
+            _mem_extract(user_id, _msg, _cid, user_lang, _db)
         except Exception:
             pass
+        # AI summary — her 4 user mesajda bir tetiklenir (multiples of 4)
+        _user_msg_count = sum(1 for m in messages if m.get("role") == "user")
+        if _user_msg_count > 0 and _user_msg_count % 4 == 0:
+            try:
+                _mem_summary(user_id, messages, _cid, user_lang, _db)
+            except Exception:
+                pass
 
     return MessageResponse(
         conversation_id   = _cid,
@@ -689,6 +703,30 @@ async def send_message(
             "plan":          _plan,
         },
     )
+
+# ── Endpoint: Hafıza (Uzun Vadeli) ───────────────────────────────────────────
+@app.get("/chat/memories")
+async def get_memories_endpoint(authorization: Optional[str] = Header(default=None)):
+    user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Kimlik doğrulama gerekli.")
+    memories = _mem_get(user_id, get_db())
+    return {"user_id": user_id, "memories": memories, "total": len(memories)}
+
+
+@app.delete("/chat/memories/{memory_id}")
+async def delete_memory_endpoint(
+    memory_id: str,
+    authorization: Optional[str] = Header(default=None),
+):
+    user_id = get_user_id(authorization)
+    if not user_id:
+        raise HTTPException(401, "Kimlik doğrulama gerekli.")
+    deleted = _mem_delete(user_id, memory_id, get_db())
+    if not deleted:
+        raise HTTPException(404, "Hafıza kaydı bulunamadı.")
+    return {"detail": "Silindi."}
+
 
 # ── Endpoint: Konuşma Geçmişi ─────────────────────────────────────────────────
 @app.get("/chat/history")

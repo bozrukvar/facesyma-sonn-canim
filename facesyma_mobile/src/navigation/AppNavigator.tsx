@@ -45,6 +45,7 @@ import DiscoveryGameScreen   from '../screens/DiscoveryGameScreen';
 import CoachHubScreen        from '../screens/CoachHubScreen';
 import CoachGoalsScreen      from '../screens/CoachGoalsScreen';
 import CoachBirthScreen      from '../screens/CoachBirthScreen';
+import MemoriesScreen        from '../screens/MemoriesScreen';
 import GoldenRatioOverlayScreen from '../screens/GoldenRatioOverlayScreen';
 import GoldenTransformScreen    from '../screens/GoldenTransformScreen';
 import SimilarityScreen         from '../screens/SimilarityScreen';
@@ -215,6 +216,7 @@ const AppNavigator = () => {
             <StackScreen name="CoachHub"           component={CoachHubScreen} />
             <StackScreen name="CoachGoals"         component={CoachGoalsScreen} />
             <StackScreen name="CoachBirth"         component={CoachBirthScreen} />
+            <StackScreen name="Memories"           component={MemoriesScreen} />
             <StackScreen name="GoldenRatioOverlay" component={GoldenRatioOverlayScreen} />
             <StackScreen name="GoldenTransform"    component={GoldenTransformScreen} />
             <StackScreen name="Similarity"         component={SimilarityScreen} />

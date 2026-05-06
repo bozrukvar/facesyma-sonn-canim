@@ -263,6 +263,23 @@ def get_backup():
 def get_source():
     return _get_client()[SOURCE_DB]
 
+def get_main_db():
+    return _get_client()["facesyma-backend"]
+
+
+def _fetch_user_memories(user_id: int) -> list:
+    """Pull long-term memories from ai_user_memory (best-effort, returns [] on error)."""
+    if not user_id:
+        return []
+    try:
+        doc = get_main_db()["ai_user_memory"].find_one(
+            {"user_id": user_id}, {"_id": 0, "memories": 1}
+        )
+        return (doc or {}).get("memories", [])[-12:]  # max 12 recent
+    except Exception as e:
+        log.warning(f"_fetch_user_memories failed for {user_id}: {e}")
+        return []
+
 # ── Yüz × Doğum örtüşme analizi ──────────────────────────────────────────────
 
 # Her burç için beklenen kişilik arketipleri (FACE_SIFAT_ARCHETYPE değerleriyle eşleşir)
@@ -621,6 +638,7 @@ class AnalyzeRequest(BaseModel):
     lang:            str = "tr"
     include_modules: List[str] = Field(default_factory=lambda: COACH_MODULES)
     test_scores:     Optional[dict] = None   # {test_type: {domain: score 0-100}}
+    user_memories:   Optional[List[dict]] = None  # from GET /chat/memories
 
 class GiyimRequest(BaseModel):
     analysis_result: dict           # /analyze/enhanced/ çıktısı
@@ -847,6 +865,25 @@ async def coach_analyze(body: AnalyzeRequest, authorization: Optional[str] = Hea
     golden = _arget("golden_ratio", 0)
     face_type = _arget("face_type", "")
 
+    # Uzun vadeli hafıza — body'den geldiyse kullan, yoksa DB'den çek
+    user_id = get_user_id(authorization)
+    memories: list = body.user_memories if body.user_memories is not None else []
+    if not memories and user_id:
+        memories = _fetch_user_memories(user_id)
+
+    # Hafıza özetini modül önerilerine dahil et
+    memory_insights: dict = {}
+    if memories:
+        goals    = [m["content"] for m in memories if m.get("category") == "goal"][:3]
+        concerns = [m["content"] for m in memories if m.get("category") == "concern"][:2]
+        prefs    = [m["content"] for m in memories if m.get("category") == "preference"][:3]
+        if goals or concerns or prefs:
+            memory_insights = {
+                "goals":    goals,
+                "concerns": concerns,
+                "preferences": prefs,
+            }
+
     has_health = bool(HEALTH_MODULES.intersection(coach_output.keys()))
     result = {
         "dominant_sifatlar":  dominant_raw,
@@ -859,6 +896,8 @@ async def coach_analyze(body: AnalyzeRequest, authorization: Optional[str] = Hea
     }
     if test_based_insights:
         result["test_based_insights"] = test_based_insights
+    if memory_insights:
+        result["memory_insights"] = memory_insights
     if has_health:
         result["health_disclaimer"] = _get_disclaimer(lang)
     return result

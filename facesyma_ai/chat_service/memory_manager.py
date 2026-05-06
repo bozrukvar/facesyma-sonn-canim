@@ -3,24 +3,43 @@ facesyma_ai/chat_service/memory_manager.py
 ==========================================
 Faz 4 — Uzun Vadeli Hafıza
 
-Kullanıcı mesajlarından rule-based insight çıkarır ve MongoDB
+Kullanıcı mesajlarından rule-based + AI insight çıkarır ve MongoDB
 `ai_user_memory` koleksiyonuna kaydeder.  Sonraki konuşmalarda
 bu hafıza sistem promptuna enjekte edilir.
 
 Public API:
   extract_and_save(user_id, user_message, conversation_id, lang, db)
+  extract_and_save_summary(user_id, messages, conversation_id, lang, db)
   get_memory_prompt_section(user_id, lang, db) → str
+  get_memories(user_id, db) → list
+  delete_memory(user_id, memory_id, db) → bool
 """
 
+import json
 import logging
+import os
 import re
 import uuid
 from datetime import datetime, timezone
 
 log = logging.getLogger(__name__)
 
-MAX_MEMORIES = 30   # per user
-MAX_MEM_LEN  = 120  # chars per memory item
+MAX_MEMORIES    = 40   # per user (expanded for summaries)
+MAX_MEM_LEN     = 160  # chars per memory item
+MIN_MSGS_SUMMARY = 4   # min user messages to trigger AI summary
+
+# ── Groq lazy client (avoids circular import from main.py) ───────────────────
+_groq_client = None
+
+def _get_groq():
+    global _groq_client
+    if _groq_client is None:
+        try:
+            from groq import Groq
+            _groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
+        except Exception as e:
+            log.warning(f"Groq init failed in memory_manager: {e}")
+    return _groq_client
 
 # ── Dil etiketleri ────────────────────────────────────────────────────────────
 _SECTION_LABELS = {
@@ -343,3 +362,145 @@ def get_memory_prompt_section(user_id: int, lang: str, db, limit: int = 8) -> st
     except Exception as e:
         log.debug(f"Memory fetch failed for user {user_id}: {e}")
         return ""
+
+
+def get_memories(user_id: int, db) -> list:
+    """Return full memory list for a user (for API endpoint)."""
+    if not user_id:
+        return []
+    try:
+        doc = db["ai_user_memory"].find_one({"user_id": user_id}, {"_id": 0})
+        return (doc or {}).get("memories", [])
+    except Exception as e:
+        log.debug(f"get_memories failed: {e}")
+        return []
+
+
+def delete_memory(user_id: int, memory_id: str, db) -> bool:
+    """Remove a single memory by id. Returns True if something was deleted."""
+    if not user_id or not memory_id:
+        return False
+    try:
+        col = db["ai_user_memory"]
+        doc = col.find_one({"user_id": user_id}, {"_id": 0, "memories": 1})
+        if not doc:
+            return False
+        original = doc.get("memories", [])
+        filtered = [m for m in original if m.get("id") != memory_id]
+        if len(filtered) == len(original):
+            return False
+        col.update_one(
+            {"user_id": user_id},
+            {"$set": {"memories": filtered, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        )
+        return True
+    except Exception as e:
+        log.debug(f"delete_memory failed: {e}")
+        return False
+
+
+# ── AI-powered conversation summary ──────────────────────────────────────────
+
+_SUMMARY_PROMPTS = {
+    "tr": (
+        "Aşağıda bir kullanıcı ile yapay zeka koç arasındaki konuşma var.\n"
+        "Bu konuşmadan kullanıcı hakkında 3-5 önemli bilgiyi JSON listesi olarak çıkar.\n"
+        "Her madde: {{\"category\": \"goal|preference|emotion|concern|insight\", \"content\": \"kısa cümle (max 140 karakter)\"}}\n"
+        "Sadece JSON listesini döndür, başka bir şey ekleme.\n\n"
+        "Konuşma:\n{conversation}"
+    ),
+    "en": (
+        "Below is a conversation between a user and an AI coach.\n"
+        "Extract 3-5 key facts about the user as a JSON list.\n"
+        "Each item: {{\"category\": \"goal|preference|emotion|concern|insight\", \"content\": \"short sentence (max 140 chars)\"}}\n"
+        "Return ONLY the JSON list, nothing else.\n\n"
+        "Conversation:\n{conversation}"
+    ),
+}
+
+def _format_msgs_for_summary(messages: list) -> str:
+    lines = []
+    for m in messages:
+        role = "Kullanıcı" if m.get("role") == "user" else "Koç"
+        content = (m.get("content") or "")[:300]
+        if content:
+            lines.append(f"{role}: {content}")
+    return "\n".join(lines)
+
+
+def extract_and_save_summary(
+    user_id: int,
+    messages: list,
+    conversation_id: str,
+    lang: str,
+    db,
+) -> None:
+    """
+    Use Groq to extract structured insights from a completed conversation.
+    Called once when the conversation has >= MIN_MSGS_SUMMARY user messages.
+    Silently fails — never raises.
+    """
+    if not user_id or not messages:
+        return
+
+    user_msgs = [m for m in messages if m.get("role") == "user"]
+    if len(user_msgs) < MIN_MSGS_SUMMARY:
+        return
+
+    client = _get_groq()
+    if not client:
+        return
+
+    try:
+        _lang = lang if lang in _SUMMARY_PROMPTS else "en"
+        conv_text = _format_msgs_for_summary(messages[-20:])  # last 20 msgs
+        prompt = _SUMMARY_PROMPTS[_lang].format(conversation=conv_text)
+
+        resp = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=512,
+        )
+        raw = (resp.choices[0].message.content or "").strip()
+
+        # Parse JSON — handle markdown code fences
+        if raw.startswith("```"):
+            raw = re.sub(r"```[a-z]*\n?", "", raw).replace("```", "").strip()
+        items = json.loads(raw)
+        if not isinstance(items, list):
+            return
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        new_mems = []
+        for item in items[:5]:
+            content = (item.get("content") or "")[:MAX_MEM_LEN].strip()
+            cat     = item.get("category", "insight")
+            if content:
+                new_mems.append({
+                    "id":              str(uuid.uuid4()),
+                    "content":         content,
+                    "category":        cat,
+                    "source":          "ai_summary",
+                    "created_at":      now_iso,
+                    "conversation_id": conversation_id,
+                })
+
+        if not new_mems:
+            return
+
+        col = db["ai_user_memory"]
+        doc = col.find_one({"user_id": user_id}, {"_id": 0, "memories": 1})
+        existing: list = (doc or {}).get("memories", [])
+        combined = existing + new_mems
+        if len(combined) > MAX_MEMORIES:
+            combined = combined[-MAX_MEMORIES:]
+
+        col.update_one(
+            {"user_id": user_id},
+            {"$set": {"memories": combined, "updated_at": now_iso}},
+            upsert=True,
+        )
+        log.info(f"✓ AI summary saved {len(new_mems)} memories for user {user_id}")
+    except Exception as e:
+        log.debug(f"AI summary extraction failed for user {user_id}: {e}")

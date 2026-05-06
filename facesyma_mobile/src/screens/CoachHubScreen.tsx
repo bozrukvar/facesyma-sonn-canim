@@ -378,6 +378,14 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.actionEmoji}>🌌</Text>
             <Text style={styles.actionTitle}>{t('coach.birth_btn', lang)}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionCard, { borderColor: '#9B7AE040' }]}
+            onPress={() => (navigation.navigate as any)('Memories')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.actionEmoji}>🧠</Text>
+            <Text style={styles.actionTitle}>{t('coach.memories_btn', lang)}</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

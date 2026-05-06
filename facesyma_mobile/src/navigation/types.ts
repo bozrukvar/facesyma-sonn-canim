@@ -34,6 +34,7 @@ export type RootStackParamList = {
   CoachHub:          undefined;
   CoachGoals:        undefined;
   CoachBirth:        undefined;
+  Memories:          undefined;
   GoldenRatioOverlay: { imageUri: string; lang: string; goldenScore: number; goldenGrade: string };
   GoldenTransform:    { imageUri: string; lang: string; realMeasurements?: any[] };
   Similarity:         { sifatlar: string[]; lang: string };

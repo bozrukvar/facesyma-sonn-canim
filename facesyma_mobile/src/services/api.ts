@@ -482,6 +482,13 @@ export const ChatAPI = {
     const res = await aiChatAxios.get('/languages');
     return res.data as { languages: Record<string, object> };
   },
+  getMemories: async () => {
+    const res = await aiChatAxios.get('/chat/memories');
+    return res.data as { memories: UserMemory[]; total: number };
+  },
+  deleteMemory: async (memoryId: string) => {
+    await aiChatAxios.delete(`/chat/memories/${encodeURIComponent(memoryId)}`);
+  },
 };
 
 // ── Peer Chat API (Django backend /api/v1/analysis/peer-chat/) ───────────────
