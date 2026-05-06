@@ -82,26 +82,55 @@ export async function registerDeviceToken(): Promise<void> {
   }
 }
 
+// ── Navigation ref (set from App.tsx / AppNavigator) ─────────────────────────
+
+let _navigationRef: any = null;
+
+export function setNotificationNavigationRef(ref: any): void {
+  _navigationRef = ref;
+}
+
+function _navigateFromNotification(msg: RemoteMessage): void {
+  const nav = _navigationRef?.current ?? _navigationRef;
+  if (!nav || !msg?.data) return;
+  const { type, screen } = msg.data;
+  try {
+    if (type === 'coach' || screen === 'CoachHub') {
+      nav.navigate('CoachHub');
+    } else if (type === 'subscription') {
+      nav.navigate('Account');
+    } else if (screen) {
+      nav.navigate(screen as any);
+    }
+  } catch {
+    // Navigation not ready yet — silently ignore
+  }
+}
+
 // ── Notification handlers (call once on app start) ────────────────────────────
 
 export function setupNotificationHandlers(): void {
   const m = getMessaging();
   if (!m) return;
 
-  // Foreground messages — show in-app banner or handle silently
-  m.onMessage(async _msg => {
-    // TODO: show an in-app toast/banner if needed
+  // Foreground messages — log for now; banner shown by OS on Android ≥ API26
+  m.onMessage(async msg => {
+    if (__DEV__) {
+      console.log('[FCM] foreground:', msg?.notification?.title, msg?.data);
+    }
+    // Coach messages are informational in foreground — no extra UI needed.
   });
 
-  // Tapped while app is in background
-  m.onNotificationOpenedApp(_msg => {
-    // TODO: navigate to relevant screen based on msg.data
+  // Tapped while app is in background — navigate to relevant screen
+  m.onNotificationOpenedApp(msg => {
+    _navigateFromNotification(msg);
   });
 
-  // Tapped while app was fully quit
-  m.getInitialNotification().then(_msg => {
-    if (_msg) {
-      // TODO: handle cold-start navigation
+  // Tapped while app was fully quit — navigate after app finishes loading
+  m.getInitialNotification().then(msg => {
+    if (msg) {
+      // Delay to ensure navigator is ready
+      setTimeout(() => _navigateFromNotification(msg), 1000);
     }
   });
 

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
 import { restoreSession, logout } from '../store/authSlice';
 import { registerLogoutHandler } from '../services/api';
+import { setNotificationNavigationRef } from '../services/notifications';
 import theme from '../utils/theme';
 const { colors, spacing, typography, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
@@ -157,6 +158,7 @@ const AppNavigator = () => {
   useEffect(() => {
     dispatch(restoreSession()).finally(() => setReady(true));
     registerLogoutHandler(() => dispatch(logout()));
+    setNotificationNavigationRef(navRef);
   }, []);
 
   useEffect(() => {

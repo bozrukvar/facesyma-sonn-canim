@@ -595,6 +595,176 @@ def _job_check_alert_rules():
         _lerr(f"✗ Failed to check alert rules: {e}")
 
 
+# ── Daily AI Coach Push Notifications ────────────────────────────────────────
+
+# Short motivational messages keyed by archetype (7 rotating variants per arch)
+# Sent once per day; variant chosen by day-of-year % 7
+_COACH_MESSAGES: dict[str, list[str]] = {
+    "analitik":    ["Bugün verilerine güven. Mantıklı adımlar seni hedefe taşır.", "Analitik bakışın bugün çözüm üretecek.", "Sistemli düşünce, kalıcı başarı getirir.", "Her problemi parçalara böl, her parçayı çöz.", "Derin analizin gücünü hisset bugün.", "Detaylar seni ileriye taşır.", "Bugün bir şeyi daha iyi anlamak için zaman ayır."],
+    "açık_kalpli": ["Bugün birine içtenlikle yaklaş.", "Empatin dünyayı daha güzel kılar.", "Açık kalbinle bugün bir fark yarat.", "Bir anlık şefkat çok büyük etki bırakır.", "Güven ve samimiyet güç kaynağındır.", "Bugün birini daha iyi dinle.", "Kalp açıklığın bugün kapılar açacak."],
+    "cazip":       ["Karizman bugün sahneye çıksın.", "Etkili bir iletişim günün farkını yaratır.", "İnsanları etkilemek için sadece kendin ol.", "Özgün duruşun en büyük gücündür.", "Bugün öne çık, liderliğini göster.", "Sosyal enerjini paylaş.", "Bir adımla büyük etki bırakabilirsin."],
+    "dengeli":     ["Denge bugün sana güç verecek.", "Her alanda bir adım at.", "Huzur içinde ilerleme güçlüdür.", "Dengeli kararlar sürdürülebilir başarı getirir.", "Bugün bir şeyi gevşet, bir şeyi güçlendir.", "Ortayolu bul, sağlıklı ilerle.", "Hem zihin hem beden için bir an ayır."],
+    "dikkatli":    ["Titizliğin bugün seni öne taşıyacak.", "Küçük detaylar büyük başarılar doğurur.", "Dikkatli bir adım, aceleli on adıma bedeldir.", "Bugün kaliteye odaklan.", "İnce eleyip sık doku.", "Mükemmeliyetin sürecin parçası.", "Sabır ve özen en iyi sonucu verir."],
+    "enerjik":     ["Enerjini bugün harekete dönüştür!", "Aktivite seni daha güçlü yapar.", "Hareket et, canlan, ilham ver!", "Dinamik günler büyük sonuçlar doğurur.", "Bugün bir şeyi tutkuyla yap.", "Vücudunu hareket ettir, zihnini uyandır.", "Coşkunla çevreye ilham ver."],
+    "güvenilir":   ["Güvenilirliğin en büyük gücündür.", "Verdiğin sözü tut, güvenini pekiştir.", "İstikrar başarının temelidir.", "Bugün birisine güvenilir desteğin ol.", "Tutarlılık seni farklı kılar.", "Uzun vadeli ilişkiler güvene dayalıdır.", "Bugün bir sözü tam olarak yerine getir."],
+    "güçlü":       ["Gücünü bugün olumlu yönde kullan.", "Kararlılık dağları yerinden oynatır.", "Zorluklarla yüzleşmek seni büyütür.", "Bugün cesaretle bir adım at.", "Kendi gücüne inan.", "Direncin en büyük varlığındır.", "Zorlandığında gücünü hatırla."],
+    "hassas":      ["Duygularına kulak ver bugün.", "Hassasiyetin bir güçtür, zayıflık değil.", "Derin hissediş derin anlayış doğurur.", "Bugün bir şeyi tam kalbinle yap.", "İnce ruhun en büyük nimetin.", "Sezgilerine güven.", "Bugün bir anı gerçekten hisset."],
+    "kararlı":     ["Kararlılık seni hedefine ulaştırır.", "Bugün vazgeçme, bir adım daha at.", "Güçlükler seni daha kararlı yapar.", "Hedefin seni bekliyor.", "İraden kayadan sağlamdır.", "Bugün bir engeli aş.", "Kararlı adımlar kalıcı sonuç verir."],
+    "lider":       ["Bugün bir başkasına ilham ver.", "Liderlik sorumlulukla büyür.", "Vizyon ve eylem birlikte değiştirir.", "Bugün bir takıma rehberlik et.", "İyi liderler önce dinler.", "Etkini bugün olumlu yöne çevir.", "Bir hedef belirle, herkesi peşinden götür."],
+    "odaklı":      ["Tek bir hedefe odaklan, her şey netleşir.", "Dikkat dağıtıcıları bir kenara bırak.", "Derinlemesine çalışma bugün fark yaratır.", "Akış halindeyken en iyini ortaya koyarsın.", "Bugün önceliklerini netleştir.", "Odaklanmak bir supergüçtür.", "Az şey, derinlemesine — bu senin felsefendir."],
+    "pratik":      ["Bugün somut bir adım at.", "Pratik çözümler hızlı sonuç verir.", "Teoriden eyleme geç.", "Küçük ama gerçek bir ilerleme kazan.", "Uygulamak öğrenmektir.", "Bugün bir şeyi bitir.", "Pratiklik en büyük erdemindir."],
+    "sezgisel":    ["İçinden gelen sese kulak ver bugün.", "Sezgin seni doğru yöne götürecek.", "Yaratıcı fikirler içinde yüzüyor.", "Bugün bir şeyi sezgiyle yaklaş.", "Hayal gücün rehberin olsun.", "Sezgiler deneyimin özüdür.", "Bugün bir an dur ve içini dinle."],
+    "sosyal":      ["Bugün biri için orada ol.", "Bağlantılar hayatı zenginleştirir.", "Bir insan ilişkisi kurmak için zaman ayır.", "Sosyal enerjin çevrendekileri canlandırır.", "Bugün biri seni hatırlayacak.", "Topluluk güç kaynağındır.", "Bir kahve, bir sohbet büyük bağlar kurar."],
+    "yaratıcı":    ["Yaratıcılığın bugün serbest kalsın.", "Farklı düşün, yeni kapılar aç.", "Her problem bir yaratıcılık fırsatıdır.", "Bugün bir şeyi alışılmışın dışında yap.", "İlham her yerde — gözlerini aç.", "Sanat, müzik, yazı — bugün bir şey yarat.", "Hayal et, dene, keşfet."],
+    "zarif":       ["Zarafet içten dışa yayılır.", "Bugün her şeyi özenle yap.", "Estetik yaşama güzellik katar.", "Küçük detaylardaki zarafet fark yaratır.", "Bugün bir anı güzelleştir.", "İncelik ve özgünlük birleşince mucize olur.", "Zarifliğin bir yaşam biçimidir."],
+    "çekici":      ["Özgünlüğün bugün parlasın.", "Kendin olmak en büyük çekiciliktir.", "İnsanları çeken gerçekliktir.", "Bugün kendi ışığını yak.", "Karizma içtenlikten gelir.", "Doğal halin en güçlü halindir.", "Bugün kendine güven, çevrendekileri etkile."],
+}
+
+_DEFAULT_COACH_MESSAGES = [
+    "Bugün bir hedefine bir adım daha yaklaş.", "Küçük adımlar büyük yolculuklar yaratır.",
+    "Kendine iyi bak, bu da başarının bir parçası.", "Bugün ne öğrendin?",
+    "Gelişim sürekli bir yolculuktur.", "Güçlü yanlarını keşfetmeye devam et.",
+    "Bugün farkındalıkla yaşa.",
+]
+
+_COACH_TITLES: dict[str, str] = {
+    "tr": "Günlük Koç Mesajın 🌟",
+    "en": "Your Daily Coach Message 🌟",
+    "de": "Deine tägliche Coach-Nachricht 🌟",
+    "ru": "Ваше ежедневное сообщение от коуча 🌟",
+    "ar": "رسالتك اليومية من المدرب 🌟",
+    "es": "Tu mensaje diario del coach 🌟",
+    "ko": "오늘의 코치 메시지 🌟",
+    "ja": "今日のコーチメッセージ 🌟",
+    "zh": "每日教练消息 🌟",
+    "hi": "आपका दैनिक कोच संदेश 🌟",
+    "fr": "Votre message quotidien du coach 🌟",
+    "pt": "Sua mensagem diária do coach 🌟",
+    "bn": "আপনার দৈনিক কোচ বার্তা 🌟",
+    "id": "Pesan harian coach Anda 🌟",
+    "ur": "آپ کا روزانہ کوچ پیغام 🌟",
+    "it": "Il tuo messaggio quotidiano dal coach 🌟",
+    "vi": "Tin nhắn coach hàng ngày của bạn 🌟",
+    "pl": "Twoja codzienna wiadomość od coacha 🌟",
+}
+
+
+def _job_send_daily_coach_notifications():
+    """
+    Send personalized daily AI coach push notifications.
+    Runs at 10:00 UTC. Sends at most one notification per user per day.
+    Message is chosen by archetype + day-of-year rotation.
+    Active goals are appended if present.
+    """
+    try:
+        from admin_api.utils.mongo import get_users_col, get_coach_users_col, get_coach_goals_col
+        from facesyma_revize.push_service import send_multicast_chunked
+
+        now = datetime.utcnow()
+        today_str = now.date().isoformat()  # "2026-05-06"
+        day_idx = now.timetuple().tm_yday % 7  # 0-6
+
+        users_col  = get_users_col()
+        coach_col  = get_coach_users_col()
+        goals_col  = get_coach_goals_col()
+
+        # 1. Get all coach users (have a profile = face analysis done + coach used)
+        coach_users = list(coach_col.find(
+            {},
+            {"user_id": 1, "lang": 1, "dominant_sifatlar": 1, "_id": 0},
+        ).limit(5000))
+
+        if not coach_users:
+            log.info("Daily coach push: no coach users found")
+            return
+
+        user_ids = [cu["user_id"] for cu in coach_users if cu.get("user_id")]
+
+        # 2. Get device tokens for these users (must have token + not sent today)
+        token_docs = list(users_col.find(
+            {
+                "id": {"$in": user_ids},
+                "device_token": {"$exists": True, "$ne": None, "$ne": ""},
+                "$or": [
+                    {"coach_notif_last_sent": {"$lt": today_str}},
+                    {"coach_notif_last_sent": {"$exists": False}},
+                ],
+            },
+            {"id": 1, "device_token": 1, "lang": 1, "_id": 0},
+        ))
+
+        if not token_docs:
+            log.info("Daily coach push: no eligible users with device tokens")
+            return
+
+        # 3. Build user_id → device_token + lang map
+        token_map = {d["id"]: d for d in token_docs}
+        eligible_ids = set(token_map.keys())
+
+        # 4. Fetch active goals (batch)
+        goal_docs = list(goals_col.find(
+            {"user_id": {"$in": list(eligible_ids)}, "status": "active"},
+            {"user_id": 1, "title": 1, "_id": 0},
+        ))
+        user_goals: dict[int, str] = {}
+        for g in goal_docs:
+            uid = g.get("user_id")
+            if uid and uid not in user_goals:
+                user_goals[uid] = g["title"]
+
+        # 5. Build (token, title, body) triples
+        tokens_to_send = []
+        user_ids_sent  = []
+        for cu in coach_users:
+            uid = cu.get("user_id")
+            if uid not in eligible_ids:
+                continue
+            td = token_map[uid]
+            token = td.get("device_token")
+            if not token:
+                continue
+
+            lang    = (cu.get("lang") or td.get("lang") or "tr")[:2]
+            arch    = (cu.get("dominant_sifatlar") or [None])[0]
+            arch    = (arch or "").lower().replace(" ", "_")
+            msgs    = _COACH_MESSAGES.get(arch, _DEFAULT_COACH_MESSAGES)
+            body    = msgs[day_idx % len(msgs)]
+            title   = _COACH_TITLES.get(lang, _COACH_TITLES["tr"])
+
+            # Append active goal hint
+            goal = user_goals.get(uid)
+            if goal:
+                body = f"{body} 🎯 Hedefin: {goal}"
+
+            tokens_to_send.append(token)
+            user_ids_sent.append(uid)
+
+        if not tokens_to_send:
+            log.info("Daily coach push: token list empty after filtering")
+            return
+
+        # 6. Send multicast
+        result = send_multicast_chunked(
+            tokens_to_send,
+            title=_COACH_TITLES["tr"],  # title per-token not supported by FCM multicast
+            body="Günlük koç mesajın seni bekliyor ✨",
+            data={"type": "coach", "screen": "CoachHub"},
+        )
+        sent = result.get("success", 0)
+        failed = result.get("failure", 0)
+        log.info(f"✓ Daily coach push: {sent} sent, {failed} failed (of {len(tokens_to_send)} users)")
+
+        # 7. Mark sent (bulk update)
+        if user_ids_sent:
+            users_col.update_many(
+                {"id": {"$in": user_ids_sent}},
+                {"$set": {"coach_notif_last_sent": today_str}},
+            )
+
+    except Exception as e:
+        log.error(f"✗ Daily coach push failed: {e}")
+
+
 def start_scheduler():
     """
     Start the background scheduler with gamification and subscription tasks.
@@ -680,8 +850,17 @@ def start_scheduler():
             replace_existing=True,
         )
 
+        # Daily AI coach push notifications (daily at 10:00 AM UTC)
+        _addjob(
+            _job_send_daily_coach_notifications,
+            CronTrigger(hour=10, minute=0),
+            id="job_daily_coach_push",
+            name="Send daily personalized AI coach notifications",
+            replace_existing=True,
+        )
+
         _scheduler.start()
-        log.info("✓ Scheduler started with 7 jobs (4 gamification + 2 subscription + 1 alerts)")
+        log.info("✓ Scheduler started with 8 jobs (4 gamification + 2 subscription + 1 alerts + 1 coach push)")
 
     except Exception as e:
         log.error(f"✗ Failed to start scheduler: {e}")
