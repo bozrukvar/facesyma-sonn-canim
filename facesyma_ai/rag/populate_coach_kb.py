@@ -78,10 +78,16 @@ DEFAULT_LANGS = ["tr", "en"]  # embed these two by default
 
 # The 14 deep coaching modules to embed
 COACH_MODULES = [
+    # Original 14 modules
     "saglik_esenwlik", "dogruluk_sadakat", "guvenlik", "suc_egilim",
     "iliski_yonetimi", "iletisim_becerileri", "stres_yonetimi", "ozguven",
     "zaman_yonetimi", "kisisel_hedefler", "astroloji_harita", "dogum_analizi",
     "yas_koc_ozet", "vucut_dil",
+    # 13 new media/lifestyle modules (patch_media_modules_v1)
+    "etkinlik_tavsiye", "spor_aktivite", "kariyer_yolu", "insan_kaynaklari",
+    "duygusal_ruhsal", "meditasyon_egzersiz", "kitap_tavsiye", "film_tavsiye",
+    "muzik_tavsiye", "podcast_tavsiye", "seyahat_tavsiye", "gunluk_afirasyon",
+    "saglik_tavsiye",
 ]
 
 # Also embed these legacy modules if present

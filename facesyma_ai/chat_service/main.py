@@ -636,11 +636,14 @@ async def send_message(
             key_attrs = _conv_analysis["face_analysis"].get("key_attributes", {})
             top_sifatlar = list(key_attrs.keys())[:10]
 
+        _RAG_MAX = 2000  # cap per-context to stay within token budget
+
         # 5a. Sifat profiles + characteristics (existing RAG)
         try:
             if top_sifatlar or _msg:
                 rag_context = get_relevant_context(_msg, top_sifatlar, user_lang)
                 if rag_context:
+                    rag_context = rag_context[:_RAG_MAX]
                     system_msg += f"\n\n## Bilgi Tabanı\n{rag_context}"
                     _info(f"✓ Sifat RAG injected ({len(rag_context)} chars)")
         except Exception as e:
@@ -651,6 +654,7 @@ async def send_message(
             if top_sifatlar or _msg:
                 coach_context = get_coach_context(_msg, top_sifatlar, user_lang)
                 if coach_context:
+                    coach_context = coach_context[:_RAG_MAX]
                     system_msg += f"\n\n{coach_context}"
                     _info(f"✓ Coach RAG injected ({len(coach_context)} chars)")
         except Exception as e:
