@@ -63,11 +63,25 @@ const DEV_SERVICES = {
 const IS_DEV = __DEV__;
 const BASE = IS_DEV ? DEV_SERVICES : SERVICES;
 
+// ── Network error detection ────────────────────────────────────────────────────
+// These are transient failures (no internet, timeout, DNS) — safe to retry.
+// 4xx / 5xx are NOT retried (server gave a real answer).
+const RETRYABLE_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT', 'ERR_NETWORK', 'ENOTFOUND', 'ECONNRESET']);
+const isNetworkError = (err: unknown): boolean => {
+  if (!err || typeof err !== 'object') return false;
+  const e = err as Record<string, unknown>;
+  if (typeof e.code === 'string' && RETRYABLE_CODES.has(e.code)) return true;
+  if (!e.response && e.request) return true; // request was made but no response
+  return false;
+};
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
 // ── Axios instance fabrikası ────────────────────────────────────────────────────
 function createClient(baseURL: string): AxiosInstance {
   const client = axios.create({
     baseURL,
-    timeout: 30000,
+    timeout: 15000,  // was 30s — fail faster, retry smarter
     headers: { 'Content-Type': 'application/json' },
   });
 
@@ -80,19 +94,33 @@ function createClient(baseURL: string): AxiosInstance {
     return config;
   });
 
-  // Token yenileme interceptor
+  // Response interceptor: token refresh + network retry
   client.interceptors.response.use(
     (res) => res,
     async (error) => {
       const cfg = error.config;
+
+      // ── Network retry (2 attempts, exponential backoff) ───────────────────
+      if (isNetworkError(error) && !cfg._networkRetry) {
+        cfg._networkRetry = 1;
+        await sleep(800);
+        try { return await client(cfg); } catch { /* fall through */ }
+        cfg._networkRetry = 2;
+        await sleep(1600);
+        try { return await client(cfg); } catch (retryErr) {
+          // Attach a flag so callers can show the right message
+          (retryErr as Record<string, unknown>).isOfflineError = true;
+          return Promise.reject(retryErr);
+        }
+      }
+
+      // ── JWT token refresh ─────────────────────────────────────────────────
       if (error.response?.status === 401 && !cfg._retried) {
         cfg._retried = true;
         try {
           const refresh = await AsyncStorage.getItem('refresh_token');
           if (refresh) {
-            const res = await axios.post(`${BASE.auth}/token/refresh/`, {
-              refresh,
-            });
+            const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
             const newToken = res.data.access;
             await AsyncStorage.setItem('access_token', newToken);
             setCachedToken(newToken);
@@ -105,6 +133,7 @@ function createClient(baseURL: string): AxiosInstance {
           _logoutHandler?.();
         }
       }
+
       return Promise.reject(error);
     }
   );

@@ -9,6 +9,8 @@ import { AppDispatch, RootState } from '../store';
 import { restoreSession, logout } from '../store/authSlice';
 import { registerLogoutHandler } from '../services/api';
 import { setNotificationNavigationRef } from '../services/notifications';
+import { NetworkProvider } from '../utils/NetworkContext';
+import OfflineBanner from '../components/OfflineBanner';
 import theme from '../utils/theme';
 const { colors, spacing, typography, shadow } = theme;
 import { useLanguage } from '../utils/LanguageContext';
@@ -172,6 +174,8 @@ const AppNavigator = () => {
   if (!ready || isLoading) return <SplashScreen />;
 
   return (
+    <NetworkProvider>
+      <OfflineBanner />
     <NavigationContainer ref={navRef} theme={{
       dark: true,
       colors: {
@@ -230,6 +234,7 @@ const AppNavigator = () => {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </NetworkProvider>
   );
 };
 
