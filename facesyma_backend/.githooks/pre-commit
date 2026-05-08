@@ -1,0 +1,24 @@
+#!/bin/sh
+# Pre-commit guard: DB access patterns + .env file protection
+
+# ── 1. .env dosyası kontrolü ──────────────────────────────────────────────────
+STAGED_ENV=$(git diff --cached --name-only | grep -E '(^|/)\.env($|\.)')
+if [ -n "$STAGED_ENV" ]; then
+    echo ""
+    echo "COMMIT ENGELLENDI: .env dosyası commit'e eklenemez!"
+    echo "  Etkilenen dosyalar:"
+    echo "$STAGED_ENV" | sed 's/^/    /'
+    echo ""
+    echo "  git reset HEAD <dosya> ile unstage edin."
+    exit 1
+fi
+
+# ── 2. DB erişim kalitesi kontrolü ───────────────────────────────────────────
+cd facesyma_backend
+python check_db_access.py
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "COMMIT ENGELLENDI: DB erişim ihlali var."
+    echo "  'from admin_api.utils.mongo import get_db' kullan."
+    exit 1
+fi

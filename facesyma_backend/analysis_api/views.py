@@ -1222,7 +1222,8 @@ class DailyView(View):
             ai_msg = None
             if uid:
                 try:
-                    db = _get_main_client()['facesyma-backend']
+                    from admin_api.utils.mongo import get_db as _canonical_get_db
+                    db = _canonical_get_db()
                     doc = db['analysis_history'].find_one(
                         {'user_id': uid},
                         {'positive_sifatlar': 1, 'sifatlar': 1},

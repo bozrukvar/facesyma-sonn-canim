@@ -1,0 +1,400 @@
+{
+  "test_type": "finance_anxiety",
+  "version": "1.0",
+  "description": "Finansal Kaygı Profili — para konusundaki kaygı, kaçınma ve utanç alt ölçekleri",
+  "domains": [
+    "anxiety_worry",
+    "anxiety_avoidance",
+    "anxiety_shame"
+  ],
+  "scale_labels": {
+    "tr": {
+      "1": "Kesinlikle Katılmıyorum",
+      "2": "Katılmıyorum",
+      "3": "Kararsızım",
+      "4": "Katılıyorum",
+      "5": "Kesinlikle Katılıyorum"
+    },
+    "en": {
+      "1": "Strongly Disagree",
+      "2": "Disagree",
+      "3": "Neutral",
+      "4": "Agree",
+      "5": "Strongly Agree"
+    },
+    "de": {
+      "1": "Stimme überhaupt nicht zu",
+      "2": "Stimme nicht zu",
+      "3": "Neutral",
+      "4": "Stimme zu",
+      "5": "Stimme voll zu"
+    },
+    "ru": {
+      "1": "Совершенно не согласен",
+      "2": "Не согласен",
+      "3": "Нейтрально",
+      "4": "Согласен",
+      "5": "Полностью согласен"
+    },
+    "ar": {
+      "1": "لا أوافق إطلاقاً",
+      "2": "لا أوافق",
+      "3": "محايد",
+      "4": "أوافق",
+      "5": "أوافق تماماً"
+    },
+    "es": {
+      "1": "Totalmente en desacuerdo",
+      "2": "En desacuerdo",
+      "3": "Neutral",
+      "4": "De acuerdo",
+      "5": "Totalmente de acuerdo"
+    },
+    "ko": {
+      "1": "전혀 동의하지 않음",
+      "2": "동의하지 않음",
+      "3": "보통",
+      "4": "동의함",
+      "5": "매우 동의함"
+    },
+    "ja": {
+      "1": "全く同意しない",
+      "2": "同意しない",
+      "3": "どちらでもない",
+      "4": "同意する",
+      "5": "非常に同意する"
+    },
+    "zh": {
+      "1": "完全不同意",
+      "2": "不同意",
+      "3": "中立",
+      "4": "同意",
+      "5": "完全同意"
+    },
+    "hi": {
+      "1": "बिल्कुल असहमत",
+      "2": "असहमत",
+      "3": "तटस्थ",
+      "4": "सहमत",
+      "5": "पूरी तरह सहमत"
+    },
+    "fr": {
+      "1": "Pas du tout d'accord",
+      "2": "Pas d'accord",
+      "3": "Neutre",
+      "4": "D'accord",
+      "5": "Tout à fait d'accord"
+    },
+    "pt": {
+      "1": "Discordo totalmente",
+      "2": "Discordo",
+      "3": "Neutro",
+      "4": "Concordo",
+      "5": "Concordo totalmente"
+    },
+    "bn": {
+      "1": "সম্পূর্ণ দ্বিমত",
+      "2": "দ্বিমত",
+      "3": "নিরপেক্ষ",
+      "4": "একমত",
+      "5": "সম্পূর্ণ একমত"
+    },
+    "id": {
+      "1": "Sangat tidak setuju",
+      "2": "Tidak setuju",
+      "3": "Netral",
+      "4": "Setuju",
+      "5": "Sangat setuju"
+    },
+    "ur": {
+      "1": "بالکل متفق نہیں",
+      "2": "متفق نہیں",
+      "3": "غیر جانبدار",
+      "4": "متفق ہوں",
+      "5": "مکمل متفق ہوں"
+    },
+    "it": {
+      "1": "Non sono affatto d'accordo",
+      "2": "Non sono d'accordo",
+      "3": "Neutrale",
+      "4": "D'accordo",
+      "5": "Completamente d'accordo"
+    },
+    "vi": {
+      "1": "Hoàn toàn không đồng ý",
+      "2": "Không đồng ý",
+      "3": "Trung lập",
+      "4": "Đồng ý",
+      "5": "Hoàn toàn đồng ý"
+    },
+    "pl": {
+      "1": "Zdecydowanie się nie zgadzam",
+      "2": "Nie zgadzam się",
+      "3": "Neutralnie",
+      "4": "Zgadzam się",
+      "5": "Zdecydowanie się zgadzam"
+    }
+  },
+  "questions": [
+    {
+      "q_id": "FAX001",
+      "domain": "anxiety_worry",
+      "reverse_scored": true,
+      "order": 1,
+      "translations": {
+        "tr": "Para konularını düşündüğümde stres veya endişe hissederim.",
+        "en": "I feel stressed or anxious when thinking about money matters.",
+        "de": "Wenn ich über Geldangelegenheiten nachdenke, fühle ich mich gestresst oder ängstlich.",
+        "ru": "Когда я думаю о денежных вопросах, я чувствую стресс или тревогу.",
+        "ar": "أشعر بالتوتر أو القلق عند التفكير في الأمور المالية.",
+        "es": "Me siento estresado/a o ansioso/a cuando pienso en asuntos de dinero.",
+        "ko": "돈 문제를 생각하면 스트레스나 불안을 느낀다.",
+        "ja": "お金のことを考えるとストレスや不安を感じます。",
+        "zh": "想到金钱问题时，我感到压力或焦虑。",
+        "hi": "पैसे के मामलों के बारे में सोचने पर मुझे तनाव या चिंता होती है।",
+        "fr": "Je me sens stressé(e) ou anxieux(se) quand je pense aux questions d'argent.",
+        "pt": "Sinto-me estressado(a) ou ansioso(a) quando penso em questões financeiras.",
+        "bn": "অর্থ-সম্পর্কিত বিষয় নিয়ে ভাবলে আমি চাপ বা উদ্বেগ অনুভব করি।",
+        "id": "Saya merasa stres atau cemas saat memikirkan masalah keuangan.",
+        "ur": "مالی معاملات کے بارے میں سوچنے پر مجھے تناؤ یا پریشانی ہوتی ہے۔",
+        "it": "Mi sento stressato/a o ansioso/a quando penso alle questioni di denaro.",
+        "vi": "Tôi cảm thấy căng thẳng hoặc lo lắng khi nghĩ đến vấn đề tiền bạc.",
+        "pl": "Czuję się zestresowany/a lub niespokojny/a, gdy myślę o sprawach finansowych."
+      }
+    },
+    {
+      "q_id": "FAX002",
+      "domain": "anxiety_worry",
+      "reverse_scored": true,
+      "order": 2,
+      "translations": {
+        "tr": "Beklenmedik bir masraf veya fatura beni günlerce endişelendirir.",
+        "en": "An unexpected expense or bill worries me for days.",
+        "de": "Eine unerwartete Ausgabe oder Rechnung beunruhigt mich tagelang.",
+        "ru": "Неожиданный расход или счёт беспокоит меня несколько дней.",
+        "ar": "يُقلقني الإنفاق غير المتوقع أو فاتورة مفاجئة لأيام.",
+        "es": "Un gasto inesperado o una factura me preocupa durante días.",
+        "ko": "예상치 못한 지출이나 청구서가 며칠 동안 걱정된다.",
+        "ja": "予想外の出費や請求書が何日も気になります。",
+        "zh": "意外支出或账单会让我担心好几天。",
+        "hi": "एक अप्रत्याशित खर्च या बिल मुझे कई दिनों तक चिंतित रखता है।",
+        "fr": "Une dépense inattendue ou une facture me préoccupe pendant des jours.",
+        "pt": "Uma despesa inesperada ou conta me preocupa por dias.",
+        "bn": "একটি অপ্রত্যাশিত খরচ বা বিল আমাকে কয়েকদিন ধরে চিন্তিত রাখে।",
+        "id": "Pengeluaran atau tagihan tak terduga membuat saya khawatir selama berhari-hari.",
+        "ur": "کوئی غیر متوقع خرچ یا بل مجھے کئی دنوں تک فکرمند رکھتا ہے۔",
+        "it": "Una spesa imprevista o una bolletta mi preoccupa per giorni.",
+        "vi": "Một khoản chi phí hoặc hóa đơn bất ngờ khiến tôi lo lắng trong nhiều ngày.",
+        "pl": "Nieoczekiwany wydatek lub rachunek martwi mnie przez kilka dni."
+      }
+    },
+    {
+      "q_id": "FAX003",
+      "domain": "anxiety_worry",
+      "reverse_scored": true,
+      "order": 3,
+      "translations": {
+        "tr": "Geleceğimdeki olası finansal krizleri zihnimde tekrar tekrar canlandırırım.",
+        "en": "I repeatedly imagine potential financial crises in my future.",
+        "de": "Ich stelle mir wiederholt mögliche finanzielle Krisen in meiner Zukunft vor.",
+        "ru": "Я снова и снова представляю возможные финансовые кризисы в своём будущем.",
+        "ar": "أتخيل مراراً وتكراراً أزمات مالية محتملة في مستقبلي.",
+        "es": "Imagino repetidamente posibles crisis financieras en mi futuro.",
+        "ko": "미래에 닥칠 수 있는 재정적 위기를 반복해서 상상한다.",
+        "ja": "将来起こりうる財政的な危機を何度も想像してしまいます。",
+        "zh": "我反复想象自己未来可能面临的财务危机。",
+        "hi": "मैं अपने भविष्य में संभावित वित्तीय संकटों की बार-बार कल्पना करता हूँ।",
+        "fr": "J'imagine à répétition des crises financières possibles dans mon avenir.",
+        "pt": "Imagino repetidamente potenciais crises financeiras no meu futuro.",
+        "bn": "আমি বারবার ভবিষ্যতে সম্ভাব্য আর্থিক সংকট কল্পনা করি।",
+        "id": "Saya berulang kali membayangkan krisis keuangan yang mungkin terjadi di masa depan.",
+        "ur": "میں اپنے مستقبل کے ممکنہ مالی بحرانوں کو بار بار سوچتا رہتا ہوں۔",
+        "it": "Immagino ripetutamente possibili crisi finanziarie nel mio futuro.",
+        "vi": "Tôi liên tục tưởng tượng những cuộc khủng hoảng tài chính có thể xảy ra trong tương lai.",
+        "pl": "Wielokrotnie wyobrażam sobie możliwe kryzysy finansowe w mojej przyszłości."
+      }
+    },
+    {
+      "q_id": "FAX004",
+      "domain": "anxiety_worry",
+      "reverse_scored": true,
+      "order": 4,
+      "translations": {
+        "tr": "Küçük bir harcama bile bütçemi mahvedecekmiş gibi hissettiriyor.",
+        "en": "Even a small expense feels like it will ruin my budget.",
+        "de": "Selbst eine kleine Ausgabe fühlt sich an, als würde sie mein Budget ruinieren.",
+        "ru": "Даже небольшая трата ощущается как угроза всему бюджету.",
+        "ar": "حتى إنفاق بسيط يبدو وكأنه سيدمر ميزانيتي.",
+        "es": "Incluso un gasto pequeño me parece que va a arruinar mi presupuesto.",
+        "ko": "작은 지출도 내 예산을 망칠 것처럼 느껴진다.",
+        "ja": "ちょっとした出費でも、予算を台無しにしてしまうように感じます。",
+        "zh": "即使是一笔小支出，也让我感觉会毁掉整个预算。",
+        "hi": "एक छोटा खर्च भी लगता है जैसे मेरा बजट बर्बाद कर देगा।",
+        "fr": "Même une petite dépense me semble susceptible de ruiner mon budget.",
+        "pt": "Mesmo uma pequena despesa parece que vai arruinar meu orçamento.",
+        "bn": "ছোট একটি খরচও মনে হয় আমার বাজেট নষ্ট করে দেবে।",
+        "id": "Bahkan pengeluaran kecil pun terasa seperti akan merusak anggaran saya.",
+        "ur": "چھوٹا سا خرچ بھی لگتا ہے جیسے میرا بجٹ تباہ کر دے گا۔",
+        "it": "Anche una piccola spesa sembra che distruggerà il mio budget.",
+        "vi": "Dù chỉ một khoản chi tiêu nhỏ cũng khiến tôi cảm thấy ngân sách sẽ bị sụp đổ.",
+        "pl": "Nawet mały wydatek sprawia, że mam wrażenie, że zniszczy mój budżet."
+      }
+    },
+    {
+      "q_id": "FAX005",
+      "domain": "anxiety_avoidance",
+      "reverse_scored": true,
+      "order": 5,
+      "translations": {
+        "tr": "Banka hesabımı veya faturalarımı kontrol etmekten kaçınırım.",
+        "en": "I avoid checking my bank account or bills.",
+        "de": "Ich vermeide es, mein Bankkonto oder meine Rechnungen zu überprüfen.",
+        "ru": "Я избегаю проверки своего банковского счёта или счетов.",
+        "ar": "أتجنب الاطلاع على حسابي البنكي أو فواتيري.",
+        "es": "Evito revisar mi cuenta bancaria o mis facturas.",
+        "ko": "은행 계좌나 청구서를 확인하는 것을 피한다.",
+        "ja": "銀行口座や請求書を確認することを避けています。",
+        "zh": "我会避免查看银行账户或账单。",
+        "hi": "मैं अपना बैंक खाता या बिल देखने से बचता हूँ।",
+        "fr": "J'évite de consulter mon compte bancaire ou mes factures.",
+        "pt": "Evito verificar minha conta bancária ou contas a pagar.",
+        "bn": "আমি আমার ব্যাংক অ্যাকাউন্ট বা বিল চেক করা এড়িয়ে চলি।",
+        "id": "Saya menghindari memeriksa rekening bank atau tagihan saya.",
+        "ur": "میں اپنا بینک اکاؤنٹ یا بل چیک کرنے سے گریز کرتا ہوں۔",
+        "it": "Evito di controllare il mio conto bancario o le mie bollette.",
+        "vi": "Tôi tránh kiểm tra tài khoản ngân hàng hoặc hóa đơn của mình.",
+        "pl": "Unikam sprawdzania konta bankowego lub rachunków."
+      }
+    },
+    {
+      "q_id": "FAX006",
+      "domain": "anxiety_avoidance",
+      "reverse_scored": true,
+      "order": 6,
+      "translations": {
+        "tr": "Ödemem gereken faturaları ya da vergi beyannamelerini olabildiğince erteliyorum.",
+        "en": "I postpone paying bills or filing tax returns as long as possible.",
+        "de": "Ich verzögere das Bezahlen von Rechnungen oder Steuererklärungen so lange wie möglich.",
+        "ru": "Я откладываю оплату счетов или подачу налоговых деклараций как можно дольше.",
+        "ar": "أؤجل دفع الفواتير أو تقديم الإقرارات الضريبية قدر الإمكان.",
+        "es": "Pospongo el pago de facturas o la declaración de impuestos todo lo posible.",
+        "ko": "청구서 납부나 세금 신고를 가능한 한 미룬다.",
+        "ja": "請求書の支払いや確定申告をできるだけ先送りにします。",
+        "zh": "我尽可能推迟支付账单或申报纳税。",
+        "hi": "मैं बिल भुगतान या कर रिटर्न दाखिल करने को जितना हो सके टालता हूँ।",
+        "fr": "Je reporte le paiement des factures ou la déclaration fiscale aussi longtemps que possible.",
+        "pt": "Adio o pagamento de contas ou a declaração de impostos o máximo possível.",
+        "bn": "আমি যতটা সম্ভব বিল পরিশোধ বা কর রিটার্ন দাখিল করা পিছিয়ে দিই।",
+        "id": "Saya menunda pembayaran tagihan atau pengajuan laporan pajak selama mungkin.",
+        "ur": "میں بل ادائیگی یا ٹیکس ریٹرن جمع کرنے کو جتنا ہو سکے ٹالتا رہتا ہوں۔",
+        "it": "Rimando il pagamento delle bollette o la dichiarazione dei redditi il più a lungo possibile.",
+        "vi": "Tôi trì hoãn thanh toán hóa đơn hoặc nộp thuế càng lâu càng tốt.",
+        "pl": "Odkładam płacenie rachunków lub składanie zeznań podatkowych jak najdłużej."
+      }
+    },
+    {
+      "q_id": "FAX007",
+      "domain": "anxiety_avoidance",
+      "reverse_scored": true,
+      "order": 7,
+      "translations": {
+        "tr": "Finansal konularda karar vermeyi ya da harekete geçmeyi sürekli erteliyorum.",
+        "en": "I constantly procrastinate on making or acting on financial decisions.",
+        "de": "Ich zögere ständig, finanzielle Entscheidungen zu treffen oder umzusetzen.",
+        "ru": "Я постоянно откладываю принятие или выполнение финансовых решений.",
+        "ar": "أماطل باستمرار في اتخاذ القرارات المالية أو التصرف بناءً عليها.",
+        "es": "Constantemente pospongo tomar o actuar sobre decisiones financieras.",
+        "ko": "재정적인 결정을 내리거나 행동하는 것을 계속 미룬다.",
+        "ja": "財務上の意思決定や行動を常に先延ばしにしています。",
+        "zh": "我经常拖延做出或执行财务决定。",
+        "hi": "मैं वित्तीय निर्णय लेने या उन पर काम करने में लगातार टालमटोल करता हूँ।",
+        "fr": "Je reporte constamment les décisions financières ou les actions à prendre.",
+        "pt": "Procrastino constantemente para tomar ou agir em decisões financeiras.",
+        "bn": "আমি আর্থিক সিদ্ধান্ত নেওয়া বা তাতে পদক্ষেপ নেওয়া ক্রমাগত পিছিয়ে দিই।",
+        "id": "Saya terus-menerus menunda membuat atau bertindak berdasarkan keputusan keuangan.",
+        "ur": "میں مالی فیصلے کرنے یا ان پر عمل کرنے میں مسلسل تاخیر کرتا ہوں۔",
+        "it": "Procrastino costantemente nel prendere o agire su decisioni finanziarie.",
+        "vi": "Tôi liên tục trì hoãn việc đưa ra hoặc thực hiện các quyết định tài chính.",
+        "pl": "Ciągle odkładam podejmowanie lub realizowanie decyzji finansowych."
+      }
+    },
+    {
+      "q_id": "FAX008",
+      "domain": "anxiety_shame",
+      "reverse_scored": true,
+      "order": 8,
+      "translations": {
+        "tr": "Finansal durumumu başkalarıyla konuşmak beni rahatsız eder veya utandırır.",
+        "en": "Talking about my financial situation with others makes me uncomfortable or embarrassed.",
+        "de": "Über meine finanzielle Lage mit anderen zu sprechen macht mich unwohl oder verlegen.",
+        "ru": "Говорить о своём финансовом положении с другими мне неловко или стыдно.",
+        "ar": "الحديث عن وضعي المالي مع الآخرين يجعلني غير مرتاح أو محرجاً.",
+        "es": "Hablar de mi situación financiera con otros me hace sentir incómodo/a o avergonzado/a.",
+        "ko": "다른 사람들과 재정 상황에 대해 이야기하면 불편하거나 부끄럽다.",
+        "ja": "自分の財務状況について他人と話すと、不快感や恥ずかしさを感じます。",
+        "zh": "与他人谈论我的财务状况让我感到不舒适或尴尬。",
+        "hi": "दूसरों के साथ अपनी वित्तीय स्थिति के बारे में बात करना मुझे असहज या शर्मिंदा महसूस कराता है।",
+        "fr": "Parler de ma situation financière avec d'autres me met mal à l'aise ou me gêne.",
+        "pt": "Falar sobre minha situação financeira com outras pessoas me deixa desconfortável ou envergonhado(a).",
+        "bn": "অন্যদের সাথে আমার আর্থিক অবস্থা নিয়ে কথা বলা আমাকে অস্বস্তিকর বা বিব্রত করে।",
+        "id": "Berbicara tentang situasi keuangan saya dengan orang lain membuat saya tidak nyaman atau malu.",
+        "ur": "دوسروں کے ساتھ اپنی مالی حالت کے بارے میں بات کرنا مجھے بے آرام یا شرمندہ کرتا ہے۔",
+        "it": "Parlare della mia situazione finanziaria con gli altri mi mette a disagio o in imbarazzo.",
+        "vi": "Nói về tình hình tài chính của tôi với người khác khiến tôi khó chịu hoặc xấu hổ.",
+        "pl": "Mówienie o mojej sytuacji finansowej z innymi sprawia, że czuję się niekomfortowo lub zawstydzony/a."
+      }
+    },
+    {
+      "q_id": "FAX009",
+      "domain": "anxiety_shame",
+      "reverse_scored": true,
+      "order": 9,
+      "translations": {
+        "tr": "Geçmişte yaptığım finansal hatalar için kendimi çok uzun süre suçlarım.",
+        "en": "I blame myself for past financial mistakes for a very long time.",
+        "de": "Ich mache mir wegen vergangener finanzieller Fehler sehr lange Selbstvorwürfe.",
+        "ru": "Я очень долго корю себя за прошлые финансовые ошибки.",
+        "ar": "أتهم نفسي على أخطائي المالية الماضية لفترة طويلة جداً.",
+        "es": "Me culpo a mí mismo/a por errores financieros pasados durante mucho tiempo.",
+        "ko": "과거의 재정적 실수에 대해 오랫동안 자책한다.",
+        "ja": "過去の財務上のミスをとても長い間自分を責め続けています。",
+        "zh": "我为过去的财务错误长期自责。",
+        "hi": "मैं अपनी पिछली वित्तीय गलतियों के लिए खुद को बहुत लंबे समय तक दोषी मानता हूँ।",
+        "fr": "Je me reproche très longtemps mes erreurs financières passées.",
+        "pt": "Culpo-me pelos erros financeiros passados por muito tempo.",
+        "bn": "অতীতের আর্থিক ভুলের জন্য আমি নিজেকে দীর্ঘ সময় ধরে দোষ দিই।",
+        "id": "Saya menyalahkan diri sendiri atas kesalahan keuangan masa lalu dalam waktu yang sangat lama.",
+        "ur": "میں ماضی کی مالی غلطیوں کے لیے خود کو بہت دیر تک الزام دیتا رہتا ہوں۔",
+        "it": "Mi biasimo per gli errori finanziari passati per un tempo molto lungo.",
+        "vi": "Tôi tự trách bản thân về những sai lầm tài chính trong quá khứ rất lâu.",
+        "pl": "Winię się za przeszłe błędy finansowe przez bardzo długi czas."
+      }
+    },
+    {
+      "q_id": "FAX010",
+      "domain": "anxiety_shame",
+      "reverse_scored": true,
+      "order": 10,
+      "translations": {
+        "tr": "Maddi durumum hakkında başkalarının ne düşündüğünü çok önemserim.",
+        "en": "I care a great deal about what others think of my financial situation.",
+        "de": "Ich kümmere mich sehr darum, was andere über meine finanzielle Situation denken.",
+        "ru": "Мне очень важно, что другие думают о моём финансовом положении.",
+        "ar": "أهتم كثيراً بما يعتقده الآخرون عن وضعي المالي.",
+        "es": "Me importa mucho lo que otros piensan de mi situación financiera.",
+        "ko": "다른 사람들이 내 재정 상황에 대해 어떻게 생각하는지 매우 신경 쓴다.",
+        "ja": "他人が私の財務状況についてどう思うかをとても気にします。",
+        "zh": "我非常在意别人对我财务状况的看法。",
+        "hi": "दूसरे मेरी वित्तीय स्थिति के बारे में क्या सोचते हैं, इसकी मुझे बहुत परवाह है।",
+        "fr": "Je me soucie beaucoup de ce que les autres pensent de ma situation financière.",
+        "pt": "Me importo muito com o que os outros pensam da minha situação financeira.",
+        "bn": "অন্যরা আমার আর্থিক অবস্থা সম্পর্কে কী ভাবে তা আমার কাছে অনেক গুরুত্বপূর্ণ।",
+        "id": "Saya sangat peduli dengan apa yang dipikirkan orang lain tentang situasi keuangan saya.",
+        "ur": "دوسرے میری مالی حالت کے بارے میں کیا سوچتے ہیں، مجھے اس کی بہت فکر رہتی ہے۔",
+        "it": "Mi preoccupo molto di ciò che gli altri pensano della mia situazione finanziaria.",
+        "vi": "Tôi rất quan tâm đến việc người khác nghĩ gì về tình hình tài chính của tôi.",
+        "pl": "Bardzo zależy mi na tym, co inni myślą o mojej sytuacji finansowej."
+      }
+    }
+  ]
+}

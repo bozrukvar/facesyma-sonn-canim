@@ -1,0 +1,281 @@
+"""
+add_golden_transform_i18n.py
+GoldenTransformScreen için 10 yeni i18n key'i
+golden.kvkk_title'dan sonra 18 dile ekler.
+"""
+import re
+
+I18N_PATH = 'src/utils/i18n.ts'
+
+TRANSLATIONS = {
+    'tr': {'golden.kvkk_title': 'KVKK Bildirimi',
+        'golden.trait_section_title': 'Karakter Değişimi',
+        'golden.trait_col_name':      'Özellik',
+        'golden.trait_col_before':    'Önce',
+        'golden.trait_col_after':     'Sonra',
+        'golden.meas_section_title':  'Matematiksel Değişim Oranları',
+        'golden.meas_col_name':       'Ölçüm',
+        'golden.meas_col_ratio':      'Oran',
+        'golden.meas_col_target':     'Hedef',
+        'golden.meas_col_score':      'Skor',
+        'golden.phi_note':            'Hedef değer φ=1.618 altın oran sabiti baz alınarak hesaplanmıştır.',
+    },
+    'en': {'golden.kvkk_title': 'Privacy Notice',
+        'golden.trait_section_title': 'Character Shift',
+        'golden.trait_col_name':      'Trait',
+        'golden.trait_col_before':    'Before',
+        'golden.trait_col_after':     'After',
+        'golden.meas_section_title':  'Mathematical Measurements',
+        'golden.meas_col_name':       'Measurement',
+        'golden.meas_col_ratio':      'Ratio',
+        'golden.meas_col_target':     'Target',
+        'golden.meas_col_score':      'Score',
+        'golden.phi_note':            'Target values are calculated based on the φ=1.618 golden ratio constant.',
+    },
+    'de': {'golden.kvkk_title': 'Datenschutzhinweis',
+        'golden.trait_section_title': 'Charakterwandel',
+        'golden.trait_col_name':      'Merkmal',
+        'golden.trait_col_before':    'Vorher',
+        'golden.trait_col_after':     'Nachher',
+        'golden.meas_section_title':  'Mathematische Messungen',
+        'golden.meas_col_name':       'Messung',
+        'golden.meas_col_ratio':      'Verhältnis',
+        'golden.meas_col_target':     'Ziel',
+        'golden.meas_col_score':      'Punktzahl',
+        'golden.phi_note':            'Zielwerte basieren auf der goldenen Verhältniskonstante φ=1.618.',
+    },
+    'ru': {'golden.kvkk_title': 'Уведомление о конфиденциальности',
+        'golden.trait_section_title': 'Изменение характера',
+        'golden.trait_col_name':      'Черта',
+        'golden.trait_col_before':    'До',
+        'golden.trait_col_after':     'После',
+        'golden.meas_section_title':  'Математические измерения',
+        'golden.meas_col_name':       'Измерение',
+        'golden.meas_col_ratio':      'Соотношение',
+        'golden.meas_col_target':     'Цель',
+        'golden.meas_col_score':      'Балл',
+        'golden.phi_note':            'Целевые значения рассчитаны на основе константы φ=1.618.',
+    },
+    'ar': {'golden.kvkk_title': 'إشعار الخصوصية',
+        'golden.trait_section_title': 'تغيير الشخصية',
+        'golden.trait_col_name':      'سمة',
+        'golden.trait_col_before':    'قبل',
+        'golden.trait_col_after':     'بعد',
+        'golden.meas_section_title':  'القياسات الرياضية',
+        'golden.meas_col_name':       'قياس',
+        'golden.meas_col_ratio':      'نسبة',
+        'golden.meas_col_target':     'هدف',
+        'golden.meas_col_score':      'درجة',
+        'golden.phi_note':            'تستند القيم المستهدفة إلى ثابت النسبة الذهبية φ=1.618.',
+    },
+    'es': {'golden.kvkk_title': 'Aviso de Privacidad',
+        'golden.trait_section_title': 'Cambio de carácter',
+        'golden.trait_col_name':      'Rasgo',
+        'golden.trait_col_before':    'Antes',
+        'golden.trait_col_after':     'Después',
+        'golden.meas_section_title':  'Medidas matemáticas',
+        'golden.meas_col_name':       'Medida',
+        'golden.meas_col_ratio':      'Proporción',
+        'golden.meas_col_target':     'Objetivo',
+        'golden.meas_col_score':      'Puntuación',
+        'golden.phi_note':            'Los valores objetivo se calculan según la constante φ=1.618.',
+    },
+    'ko': {'golden.kvkk_title': '개인정보 고지',
+        'golden.trait_section_title': '성격 변화',
+        'golden.trait_col_name':      '특성',
+        'golden.trait_col_before':    '이전',
+        'golden.trait_col_after':     '이후',
+        'golden.meas_section_title':  '수학적 측정',
+        'golden.meas_col_name':       '측정',
+        'golden.meas_col_ratio':      '비율',
+        'golden.meas_col_target':     '목표',
+        'golden.meas_col_score':      '점수',
+        'golden.phi_note':            '목표값은 황금비율 상수 φ=1.618을 기반으로 계산됩니다.',
+    },
+    'ja': {'golden.kvkk_title': 'プライバシー通知',
+        'golden.trait_section_title': '性格の変化',
+        'golden.trait_col_name':      '特性',
+        'golden.trait_col_before':    '前',
+        'golden.trait_col_after':     '後',
+        'golden.meas_section_title':  '数学的測定',
+        'golden.meas_col_name':       '測定',
+        'golden.meas_col_ratio':      '比率',
+        'golden.meas_col_target':     '目標',
+        'golden.meas_col_score':      'スコア',
+        'golden.phi_note':            '目標値は黄金比定数φ=1.618に基づいて計算されます。',
+    },
+    'zh': {'golden.kvkk_title': '隐私声明',
+        'golden.trait_section_title': '性格变化',
+        'golden.trait_col_name':      '特征',
+        'golden.trait_col_before':    '之前',
+        'golden.trait_col_after':     '之后',
+        'golden.meas_section_title':  '数学测量',
+        'golden.meas_col_name':       '测量',
+        'golden.meas_col_ratio':      '比例',
+        'golden.meas_col_target':     '目标',
+        'golden.meas_col_score':      '得分',
+        'golden.phi_note':            '目标值根据黄金比例常数φ=1.618计算。',
+    },
+    'hi': {'golden.kvkk_title': 'गोपनीयता सूचना',
+        'golden.trait_section_title': 'चरित्र परिवर्तन',
+        'golden.trait_col_name':      'विशेषता',
+        'golden.trait_col_before':    'पहले',
+        'golden.trait_col_after':     'बाद',
+        'golden.meas_section_title':  'गणितीय माप',
+        'golden.meas_col_name':       'माप',
+        'golden.meas_col_ratio':      'अनुपात',
+        'golden.meas_col_target':     'लक्ष्य',
+        'golden.meas_col_score':      'स्कोर',
+        'golden.phi_note':            'लक्ष्य मान स्वर्णिम अनुपात स्थिरांक φ=1.618 के आधार पर हैं।',
+    },
+    'fr': {'golden.kvkk_title': 'Avis de Confidentialité',
+        'golden.trait_section_title': 'Changement de caractère',
+        'golden.trait_col_name':      'Trait',
+        'golden.trait_col_before':    'Avant',
+        'golden.trait_col_after':     'Après',
+        'golden.meas_section_title':  'Mesures mathématiques',
+        'golden.meas_col_name':       'Mesure',
+        'golden.meas_col_ratio':      'Ratio',
+        'golden.meas_col_target':     'Cible',
+        'golden.meas_col_score':      'Score',
+        'golden.phi_note':            'Les valeurs cibles sont calculées sur la base de φ=1.618.',
+    },
+    'pt': {'golden.kvkk_title': 'Aviso de Privacidade',
+        'golden.trait_section_title': 'Mudança de caráter',
+        'golden.trait_col_name':      'Traço',
+        'golden.trait_col_before':    'Antes',
+        'golden.trait_col_after':     'Depois',
+        'golden.meas_section_title':  'Medidas matemáticas',
+        'golden.meas_col_name':       'Medida',
+        'golden.meas_col_ratio':      'Proporção',
+        'golden.meas_col_target':     'Alvo',
+        'golden.meas_col_score':      'Pontuação',
+        'golden.phi_note':            'Os valores alvo são calculados com base na constante φ=1.618.',
+    },
+    'bn': {'golden.kvkk_title': 'গোপনীয়তা বিজ্ঞপ্তি',
+        'golden.trait_section_title': 'চরিত্র পরিবর্তন',
+        'golden.trait_col_name':      'বৈশিষ্ট্য',
+        'golden.trait_col_before':    'আগে',
+        'golden.trait_col_after':     'পরে',
+        'golden.meas_section_title':  'গাণিতিক পরিমাপ',
+        'golden.meas_col_name':       'পরিমাপ',
+        'golden.meas_col_ratio':      'অনুপাত',
+        'golden.meas_col_target':     'লক্ষ্য',
+        'golden.meas_col_score':      'স্কোর',
+        'golden.phi_note':            'লক্ষ্য মানগুলি φ=1.618 স্বর্ণিম অনুপাতের উপর ভিত্তি করে।',
+    },
+    'id': {'golden.kvkk_title': 'Pemberitahuan Privasi',
+        'golden.trait_section_title': 'Perubahan Karakter',
+        'golden.trait_col_name':      'Sifat',
+        'golden.trait_col_before':    'Sebelum',
+        'golden.trait_col_after':     'Sesudah',
+        'golden.meas_section_title':  'Pengukuran Matematis',
+        'golden.meas_col_name':       'Pengukuran',
+        'golden.meas_col_ratio':      'Rasio',
+        'golden.meas_col_target':     'Target',
+        'golden.meas_col_score':      'Skor',
+        'golden.phi_note':            'Nilai target dihitung berdasarkan konstanta φ=1.618.',
+    },
+    'ur': {'golden.kvkk_title': 'رازداری کا نوٹس',
+        'golden.trait_section_title': 'کردار کی تبدیلی',
+        'golden.trait_col_name':      'خصوصیت',
+        'golden.trait_col_before':    'پہلے',
+        'golden.trait_col_after':     'بعد',
+        'golden.meas_section_title':  'ریاضیاتی پیمائش',
+        'golden.meas_col_name':       'پیمائش',
+        'golden.meas_col_ratio':      'تناسب',
+        'golden.meas_col_target':     'ہدف',
+        'golden.meas_col_score':      'اسکور',
+        'golden.phi_note':            'ہدف اقدار سنہری تناسب ثابت φ=1.618 کی بنیاد پر ہیں۔',
+    },
+    'it': {'golden.kvkk_title': 'Avviso sulla Privacy',
+        'golden.trait_section_title': 'Cambiamento di carattere',
+        'golden.trait_col_name':      'Tratto',
+        'golden.trait_col_before':    'Prima',
+        'golden.trait_col_after':     'Dopo',
+        'golden.meas_section_title':  'Misure matematiche',
+        'golden.meas_col_name':       'Misura',
+        'golden.meas_col_ratio':      'Rapporto',
+        'golden.meas_col_target':     'Obiettivo',
+        'golden.meas_col_score':      'Punteggio',
+        'golden.phi_note':            'I valori target sono calcolati sulla base della costante φ=1.618.',
+    },
+    'vi': {'golden.kvkk_title': 'Thông Báo Quyền Riêng Tư',
+        'golden.trait_section_title': 'Thay đổi tính cách',
+        'golden.trait_col_name':      'Đặc điểm',
+        'golden.trait_col_before':    'Trước',
+        'golden.trait_col_after':     'Sau',
+        'golden.meas_section_title':  'Đo lường toán học',
+        'golden.meas_col_name':       'Đo lường',
+        'golden.meas_col_ratio':      'Tỷ lệ',
+        'golden.meas_col_target':     'Mục tiêu',
+        'golden.meas_col_score':      'Điểm',
+        'golden.phi_note':            'Giá trị mục tiêu được tính dựa trên hằng số φ=1.618.',
+    },
+    'pl': {'golden.kvkk_title': 'Powiadomienie o Prywatności',
+        'golden.trait_section_title': 'Zmiana charakteru',
+        'golden.trait_col_name':      'Cecha',
+        'golden.trait_col_before':    'Przed',
+        'golden.trait_col_after':     'Po',
+        'golden.meas_section_title':  'Pomiary matematyczne',
+        'golden.meas_col_name':       'Pomiar',
+        'golden.meas_col_ratio':      'Stosunek',
+        'golden.meas_col_target':     'Cel',
+        'golden.meas_col_score':      'Wynik',
+        'golden.phi_note':            'Wartości docelowe są obliczane na podstawie stałej φ=1.618.',
+    },
+}
+
+KEYS_ORDER = [
+    'golden.trait_section_title',
+    'golden.trait_col_name',
+    'golden.trait_col_before',
+    'golden.trait_col_after',
+    'golden.meas_section_title',
+    'golden.meas_col_name',
+    'golden.meas_col_ratio',
+    'golden.meas_col_target',
+    'golden.meas_col_score',
+    'golden.phi_note',
+]
+
+with open(I18N_PATH, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+inserted = 0
+for lang, vals in TRANSLATIONS.items():
+    # golden.kvkk_title satırını bul
+    anchor = f"'golden.kvkk_title': '{vals.get('golden.kvkk_title', '')}'"
+    # anchor yoksa dil bloğu içinde genel golden.kvkk_title ara
+    pattern = re.compile(r"('golden\.kvkk_title'\s*:\s*'[^']*')")
+
+    # golden.trait_section_title zaten varsa atla
+    if f"'golden.trait_section_title': '{vals['golden.trait_section_title']}'" in content:
+        print(f'[{lang}] zaten mevcut, atlandı')
+        continue
+
+    # Her dil bloğunu eşleştirmek için kvkk_title değerine göre ara
+    kvkk_val = vals.get('golden.kvkk_title')
+    if not kvkk_val:
+        # kvkk_title değeri bilinmiyor — lang koduna göre bul
+        print(f'[{lang}] kvkk_title bilinmiyor, atlandı')
+        continue
+
+    anchor_str = f"'golden.kvkk_title': '{kvkk_val}'"
+    if anchor_str not in content:
+        print(f'[{lang}] anchor bulunamadı: {anchor_str}')
+        continue
+
+    # Eklenecek satırlar
+    new_lines = '\n' + ''.join(
+        f"    '{k}': '{vals[k]}',\n"
+        for k in KEYS_ORDER
+    )
+    content = content.replace(anchor_str, anchor_str + ',' + new_lines.rstrip(',\n'), 1)
+    inserted += 1
+    print(f'[{lang}] eklendi')
+
+with open(I18N_PATH, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f'\nToplam {inserted} dil bloğuna eklendi.')

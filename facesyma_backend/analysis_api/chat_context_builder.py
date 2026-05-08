@@ -31,9 +31,8 @@ _indexes_created = False
 
 
 def _get_db():
-    """Get facesyma-backend database with pooled connection"""
-    from admin_api.utils.mongo import _get_main_client
-    return _get_main_client()['facesyma-backend']
+    from admin_api.utils.mongo import get_db
+    return get_db()
 
 
 def _ensure_indexes():

@@ -35,9 +35,11 @@ export type RootStackParamList = {
   CoachGoals:        undefined;
   CoachBirth:        undefined;
   Memories:          undefined;
-  GoldenRatioOverlay: { imageUri: string; lang: string; goldenScore: number; goldenGrade: string };
-  GoldenTransform:    { imageUri: string; lang: string; realMeasurements?: any[] };
-  Similarity:         { sifatlar: string[]; lang: string };
+  GoldenRatioOverlay:    { imageUri: string; lang: string; goldenScore: number; goldenGrade: string };
+  GoldenTransform:       { imageUri: string; lang: string; realMeasurements?: any[] };
+  Similarity:            { sifatlar: string[]; lang: string };
+  Partner:               undefined;
+  CompatibilityReport:   undefined;
 };
 
 export type TabParamList = {

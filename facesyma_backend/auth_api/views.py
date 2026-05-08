@@ -793,9 +793,8 @@ class DeleteAccountView(View):
             return JsonResponse({'detail': 'Invalid token.'}, status=401)
 
         try:
-            from admin_api.utils.mongo import _get_main_client
-            client = _get_main_client()
-            db     = client['facesyma_db']
+            from admin_api.utils.mongo import get_db
+            db = get_db()
 
             # 1. Kullanıcı belgesi
             db['users'].delete_one({'id': uid})
@@ -843,9 +842,8 @@ class ExportDataView(View):
             pass
 
         try:
-            from admin_api.utils.mongo import _get_main_client
-            client = _get_main_client()
-            db     = client['facesyma_db']
+            from admin_api.utils.mongo import get_db
+            db = get_db()
 
             user = db['users'].find_one({'id': uid}, {'_id': 0, 'password': 0})
             if not user:

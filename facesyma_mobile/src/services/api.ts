@@ -46,6 +46,7 @@ const SERVICES = {
   twins:         'https://api.facesyma.com/api/v1/analysis',
   art:           'https://api.facesyma.com/api/v1/analysis',
   gamification:  'https://api.facesyma.com/api/v1/gamification',
+  partner:       'https://api.facesyma.com/api/v1/partner',
 };
 
 // Geliştirme ortamı (local)
@@ -56,6 +57,7 @@ const DEV_SERVICES = {
   twins:         'http://10.0.2.2/api/v1/analysis',
   art:           'http://10.0.2.2/api/v1/analysis',
   gamification:  'http://10.0.2.2/api/v1/gamification',
+  partner:       'http://10.0.2.2/api/v1/partner',
 };
 
 const IS_DEV = __DEV__;
@@ -116,6 +118,7 @@ export const authClient     = createClient(BASE.auth);
 export const chatClient     = createClient(BASE.chat);
 export const twinsClient    = createClient(BASE.twins);
 export const artClient      = createClient(BASE.art);
+export const partnerClient  = createClient(BASE.partner);
 
 // ── Auth API ──────────────────────────────────────────────────────────────────
 export const AuthAPI = {
@@ -1146,6 +1149,59 @@ export const GamificationAPI = {
 
   abandonGame: async (sessionId: string) => {
     const res = await gamAxios.post('/discovery/abandon/', { session_id: sessionId });
+    return res.data as { success: boolean };
+  },
+};
+
+// ── Partner API ───────────────────────────────────────────────────────────────
+export interface CompatibilityReport {
+  overall_score: number;
+  personality_score: number;
+  attachment_score: number;
+  relationship_score: number;
+  attachment_you: string;
+  attachment_partner: string;
+  personality_delta: Record<string, number>;
+  relationship_breakdown: Record<string, number>;
+  strengths: string[];
+  watchouts: string[];
+  narrative: string;
+  lang: string;
+}
+
+export interface PartnerStatus {
+  status: 'no_partner' | 'pending' | 'active';
+  invite_code?: string;
+  partner_name?: string;
+  partner_id?: number;
+  connected_at?: string;
+}
+
+const partnerAxios = partnerClient;
+
+export const PartnerAPI = {
+  getStatus: async () => {
+    const res = await partnerAxios.get('/status/');
+    return res.data as PartnerStatus;
+  },
+
+  invite: async () => {
+    const res = await partnerAxios.post('/invite/');
+    return res.data as { invite_code: string };
+  },
+
+  join: async (invite_code: string, lang = 'tr') => {
+    const res = await partnerAxios.post('/join/', { invite_code, lang });
+    return res.data as { success: boolean; partner_name: string };
+  },
+
+  getCompatibility: async (lang = 'tr') => {
+    const res = await partnerAxios.get('/compatibility/', { params: { lang } });
+    return res.data as CompatibilityReport;
+  },
+
+  disconnect: async () => {
+    const res = await partnerAxios.post('/disconnect/');
     return res.data as { success: boolean };
   },
 };

@@ -30,6 +30,7 @@ const getFeatures = (lang: string) => {
     { id:'chat',     emoji:'💬', title: t('features.chat', lang), desc: t('features.chat_desc', lang), screen:'Chat', accent: colors.warmAmber, badge: reqBadge },
     { id:'diet',     emoji:'🥗', title: t('features.diet', lang), desc: t('features.diet_desc', lang), screen:'Diet', accent:'#7AE07A' },
     { id:'coach',    emoji:'🧠', title: t('coach.hub_title', lang), desc: t('coach.hub_desc', lang), screen:'CoachHub', accent:'#C07AE0' },
+    { id:'partner',  emoji:'💑', title: t('features.partner', lang), desc: t('features.partner_desc', lang), screen:'Partner', accent:'#E0607A' },
   ];
 };
 

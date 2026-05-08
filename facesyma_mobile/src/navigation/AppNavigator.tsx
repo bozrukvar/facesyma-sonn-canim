@@ -50,6 +50,8 @@ import MemoriesScreen        from '../screens/MemoriesScreen';
 import GoldenRatioOverlayScreen from '../screens/GoldenRatioOverlayScreen';
 import GoldenTransformScreen    from '../screens/GoldenTransformScreen';
 import SimilarityScreen         from '../screens/SimilarityScreen';
+import PartnerScreen            from '../screens/PartnerScreen';
+import CompatibilityReportScreen from '../screens/CompatibilityReportScreen';
 
 import type { RootStackParamList, TabParamList } from './types';
 
@@ -219,9 +221,11 @@ const AppNavigator = () => {
             <StackScreen name="CoachGoals"         component={CoachGoalsScreen} />
             <StackScreen name="CoachBirth"         component={CoachBirthScreen} />
             <StackScreen name="Memories"           component={MemoriesScreen} />
-            <StackScreen name="GoldenRatioOverlay" component={GoldenRatioOverlayScreen} />
-            <StackScreen name="GoldenTransform"    component={GoldenTransformScreen} />
-            <StackScreen name="Similarity"         component={SimilarityScreen} />
+            <StackScreen name="GoldenRatioOverlay"  component={GoldenRatioOverlayScreen} />
+            <StackScreen name="GoldenTransform"     component={GoldenTransformScreen} />
+            <StackScreen name="Similarity"          component={SimilarityScreen} />
+            <StackScreen name="Partner"             component={PartnerScreen} />
+            <StackScreen name="CompatibilityReport" component={CompatibilityReportScreen} />
           </>
         )}
       </Stack.Navigator>
