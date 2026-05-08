@@ -19,7 +19,7 @@ urlpatterns = [
     # Admin HTML Panel
     path('admin/',           include('admin_api.html_urls')),
 
-    # AI chat servisi — FastAPI'ye proxy (aynı domainle erişim için)
-    # Nginx veya doğrudan FastAPI portu kullanılabilir
-    # path('api/v1/chat/', include('chat_proxy.urls')),  # opsiyonel
+    # AI chat servisi (FastAPI, ai_chat:8002) — Django'ya BAĞLI DEĞİL.
+    # Nginx doğrudan yönlendirir: /chat/* → ai_chat:8002, /languages → ai_chat:8002
+    # Django'ya /api/v1/chat/ route'u EKLEME — gereksiz ve yanlış olur.
 ]

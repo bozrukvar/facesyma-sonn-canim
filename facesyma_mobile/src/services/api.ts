@@ -42,7 +42,7 @@ const getToken = async (): Promise<string | null> => {
 const SERVICES = {
   analysis:      'https://api.facesyma.com/api/v1/analysis',
   auth:          'https://api.facesyma.com/api/v1/auth',
-  chat:          'https://api.facesyma.com/api/v1/chat',
+  chat:          'https://api.facesyma.com',  // nginx routes /chat/* + /languages directly to ai_chat:8002
   twins:         'https://api.facesyma.com/api/v1/analysis',
   art:           'https://api.facesyma.com/api/v1/analysis',
   gamification:  'https://api.facesyma.com/api/v1/gamification',
@@ -53,7 +53,7 @@ const SERVICES = {
 const DEV_SERVICES = {
   analysis:      'http://10.0.2.2/api/v1/analysis',  // Android emülatör → nginx port 80
   auth:          'http://10.0.2.2/api/v1/auth',
-  chat:          'http://10.0.2.2/api/v1/chat',
+  chat:          'http://10.0.2.2',  // nginx routes /chat/* + /languages directly to ai_chat:8002
   twins:         'http://10.0.2.2/api/v1/analysis',
   art:           'http://10.0.2.2/api/v1/analysis',
   gamification:  'http://10.0.2.2/api/v1/gamification',
@@ -427,76 +427,44 @@ export const AssessmentAPI = {
   },
 };
 
-// ── AI Chat API (FastAPI :8002, routed through nginx /chat/) ─────────────────
-// DEV: direct to port 8002. PROD: via nginx location /chat/ → ai_chat:8002
-const AI_CHAT_BASE = __DEV__
-  ? 'http://10.0.2.2'  // Android emülatör → nginx port 80 → /chat/ → ai_chat:8002
-  : 'https://api.facesyma.com';
-
-const aiChatAxios = axios.create({ baseURL: AI_CHAT_BASE, timeout: 60000 });
-aiChatAxios.interceptors.request.use(async (cfg) => {
-  const token = await AsyncStorage.getItem('access_token');
-  if (token) cfg.headers.Authorization = `Bearer ${token}`;
-  return cfg;
-});
-aiChatAxios.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const cfg = error.config;
-    if (error.response?.status === 401 && !cfg._retried) {
-      cfg._retried = true;
-      try {
-        const refresh = await AsyncStorage.getItem('refresh_token');
-        if (refresh) {
-          const res = await axios.post(`${BASE.auth}/token/refresh/`, { refresh });
-          const newToken = res.data.access;
-          await AsyncStorage.setItem('access_token', newToken);
-          cfg.headers.Authorization = `Bearer ${newToken}`;
-          return aiChatAxios(cfg);
-        }
-      } catch {
-        await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
-        _logoutHandler?.();
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
+// ── AI Chat API (FastAPI :8002, routed by nginx) ──────────────────────────────
+// chatClient base URL = 'https://api.facesyma.com' (or 'http://10.0.2.2' in dev)
+// nginx routes: /chat/* → ai_chat:8002, /languages → ai_chat:8002
+// Django is NOT involved — no /api/v1/chat/ route exists or is needed.
 export const ChatAPI = {
   startChat: async (analysisResult: object, lang = 'tr', firstMessage?: string) => {
-    const res = await aiChatAxios.post('/chat/start', {
+    const res = await chatClient.post('/chat/start', {
       analysis_result: analysisResult, lang, first_message: firstMessage,
     });
     return res.data as { conversation_id: string; assistant_message: string; lang: string; usage: { daily_used: number; daily_limit: number; plan: string } };
   },
   sendMessage: async (conversationId: string, message: string, lang = 'tr') => {
-    const res = await aiChatAxios.post('/chat/message', {
+    const res = await chatClient.post('/chat/message', {
       conversation_id: conversationId, message, lang,
     });
     return res.data as { conversation_id: string; assistant_message: string; usage: { daily_used: number; daily_limit: number; plan: string } };
   },
   getHistory: async () => {
-    const res = await aiChatAxios.get('/chat/history');
+    const res = await chatClient.get('/chat/history');
     return res.data as { conversations: object[] };
   },
   getConversation: async (id: string) => {
-    const res = await aiChatAxios.get(`/chat/${id}`);
+    const res = await chatClient.get(`/chat/${id}`);
     return res.data;
   },
   deleteConversation: async (id: string) => {
-    await aiChatAxios.delete(`/chat/${id}`);
+    await chatClient.delete(`/chat/${id}`);
   },
   getLanguages: async () => {
-    const res = await aiChatAxios.get('/languages');
+    const res = await chatClient.get('/languages');
     return res.data as { languages: Record<string, object> };
   },
   getMemories: async () => {
-    const res = await aiChatAxios.get('/chat/memories');
+    const res = await chatClient.get('/chat/memories');
     return res.data as { memories: UserMemory[]; total: number };
   },
   deleteMemory: async (memoryId: string) => {
-    await aiChatAxios.delete(`/chat/memories/${encodeURIComponent(memoryId)}`);
+    await chatClient.delete(`/chat/memories/${encodeURIComponent(memoryId)}`);
   },
 };
 
