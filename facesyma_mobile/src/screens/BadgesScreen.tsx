@@ -87,7 +87,10 @@ const BadgesScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('badge.title', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('badge.title', lang)}</Text>
@@ -115,6 +118,8 @@ const BadgesScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.tabBar}>
         {(['earned', 'all'] as const).map(tabId => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='t(`badge.$tabId`, lang)'
             key={tabId}
             style={[styles.tab, tab === tabId && styles.tabActive]}
             onPress={() => setTab(tabId)}

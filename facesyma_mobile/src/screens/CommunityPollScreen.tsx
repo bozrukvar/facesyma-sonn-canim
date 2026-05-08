@@ -223,7 +223,10 @@ const CommunityPollScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.topBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('poll.title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{t('poll.title', lang)}</Text>
@@ -289,6 +292,8 @@ const CommunityPollScreen: React.FC<Props> = ({ navigation }) => {
 
             return (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel='Option'
                 key={index}
                 style={[styles.optionBtn, { borderColor }]}
                 onPress={() => handleVote(index)}

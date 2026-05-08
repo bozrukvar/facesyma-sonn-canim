@@ -35,6 +35,8 @@ export const GoldButton: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={icon}
       style={[{
         height:          54,
         borderRadius:    radius.lg,
@@ -161,7 +163,10 @@ export const Card: React.FC<CardProps> = ({ children, style, variant = 'default'
 
   if (onPress) {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel='label'
+      >
         {content}
       </TouchableOpacity>
     );

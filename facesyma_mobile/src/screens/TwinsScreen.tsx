@@ -139,7 +139,10 @@ const CommunityCard = ({ communityType, lang, onExplore }: CommunityCardProps) =
   <Card variant="gold" style={dStyles.communityCard}>
     <Text style={dStyles.communityType}>{communityType}</Text>
     <Text style={dStyles.communityDesc}>{t('twins.community_desc', lang)}</Text>
-    <TouchableOpacity style={dStyles.communityBadge} onPress={onExplore} activeOpacity={0.85}>
+    <TouchableOpacity style={dStyles.communityBadge} onPress={onExplore} activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={t('twins.community_join', lang)}
+    >
       <Text style={dStyles.communityBadgeText}>{t('twins.community_join', lang)} →</Text>
     </TouchableOpacity>
   </Card>
@@ -183,7 +186,10 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('twins.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('twins.title', lang)}</Text>
@@ -200,6 +206,8 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
             <View key={i} style={styles.photoWrap}>
               <Image source={{ uri }} style={styles.photo} />
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('twins.person', lang)}
                 style={styles.removeBtn}
                 onPress={() => { setPhotos(p => p.filter((_,idx) => idx !== i)); setResult(null); }}
               >
@@ -209,7 +217,10 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
             </View>
           ))}
           {photosLen < 5 && (
-            <TouchableOpacity style={styles.addBtn} onPress={addPhoto}>
+            <TouchableOpacity style={styles.addBtn} onPress={addPhoto}
+              accessibilityRole="button"
+              accessibilityLabel='＋'
+            >
               <Text style={[styles.addBtnIcon, { color: colors.gold }]}>＋</Text>
               <Text style={[styles.addBtnText, { color: colors.gold }]}>{t('twins.add', lang)}</Text>
             </TouchableOpacity>

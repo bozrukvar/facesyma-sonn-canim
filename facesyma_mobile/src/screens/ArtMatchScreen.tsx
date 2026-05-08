@@ -110,7 +110,10 @@ const ArtMatchScreen = ({ navigation }: ScreenProps<'ArtMatch'>) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityRole="button"
+          accessibilityLabel={t('artmatch.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('artmatch.title', lang)}</Text>

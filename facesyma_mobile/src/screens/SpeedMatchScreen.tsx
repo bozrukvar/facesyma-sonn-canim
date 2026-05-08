@@ -264,7 +264,10 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
         <StatusBar barStyle="light-content" />
         <View style={[styles.readyWrapper, { paddingTop: insets.top + spacing.md }]}>
           {/* Back */}
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtnAbs}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtnAbs}
+            accessibilityRole="button"
+            accessibilityLabel={t('speed_match.title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
 
@@ -289,7 +292,10 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.startBtn} onPress={startGame} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.startBtn} onPress={startGame} activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('speed_match.start', lang)}
+            >
               <Text style={styles.startBtnText}>{t('speed_match.start', lang)}</Text>
             </TouchableOpacity>
           </View>
@@ -344,6 +350,8 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
         {/* Timer + question counter row */}
         <View style={styles.playingHeader}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='currentIndex + 1/total'
             onPress={() => { stopTimer(); setPhase('ready'); }}
             style={styles.playingBackBtn}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -393,6 +401,8 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
                 ]}
               >
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={option}
                   style={[
                     styles.optionCell,
                     isCorrectFlash && styles.optionCellCorrect,
@@ -450,7 +460,10 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
         >
           {/* Back */}
           <View style={styles.resultHeader}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t('speed_match.title', lang)}
+            >
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
             <Text style={styles.resultScreenTitle}>{t('speed_match.title', lang)}</Text>
@@ -496,10 +509,15 @@ const SpeedMatchScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Action buttons */}
           <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.playAgainBtn} onPress={startGame} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.playAgainBtn} onPress={startGame} activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('speed_match.play_again', lang)}
+            >
               <Text style={styles.playAgainText}>{t('speed_match.play_again', lang)}</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('speed_match.leaderboard', lang)}
               style={styles.lbBtn}
               onPress={() => {
                 if (!showLeaderboard) loadLeaderboard();

@@ -261,6 +261,8 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('profile_setup.title', lang)}
           style={styles.backBtn}
           onPress={() => stepIdx > 0 ? setStepIdx(i => i - 1) : navigation.goBack()}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -313,11 +315,16 @@ const ProfileSetupScreen = ({ navigation }: ScreenProps<'ProfileSetup'>) => {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
         {isOptionalStep && (
-          <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
+          <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}
+            accessibilityRole="button"
+            accessibilityLabel={t('profile_setup.skip', lang)}
+          >
             <Text style={styles.skipText}>{t('profile_setup.skip', lang)}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('profile_setup.birth_year_title', lang)}
           style={[styles.nextBtn, !canProceed() && styles.nextBtnDisabled]}
           onPress={handleNext}
           disabled={!canProceed() || isLoading}
@@ -347,6 +354,8 @@ const StepBirthYear = ({
     <ScrollView style={styles.yearScroll} showsVerticalScrollIndicator={false}>
       {BIRTH_YEARS.map(y => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={y}
           key={y}
           style={[styles.yearItem, value === y && styles.yearItemSelected]}
           onPress={() => onChange(y)}
@@ -367,6 +376,8 @@ const StepGender = ({
     <View style={styles.genderGrid}>
       {GENDERS.map(g => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={g.icon}
           key={g.key}
           style={[styles.genderCard, value === g.key && styles.cardSelected]}
           onPress={() => onChange(g.key)}
@@ -413,6 +424,8 @@ const StepCountry = ({
       <View style={styles.countryGrid}>
         {filtered.map(c => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={c.flag}
             key={c.code}
             style={[styles.countryChip, value === c.code && styles.chipSelected]}
             onPress={() => onChange(c.code)}
@@ -424,6 +437,8 @@ const StepCountry = ({
         ))}
         {showCustom && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='query.trim()'
             style={[styles.countryChip, value === customCode && styles.chipSelected]}
             onPress={() => onChange(customCode)}
             activeOpacity={0.8}
@@ -448,6 +463,8 @@ const StepSkinTone = ({
     <View style={styles.skinGrid}>
       {SKIN_TONES.map(s => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={s.label}
           key={s.key}
           style={[styles.skinCircle, { backgroundColor: s.color }, value === s.key && styles.skinCircleSelected]}
           onPress={() => onChange(s.key)}
@@ -473,6 +490,8 @@ const StepHairColor = ({
     <View style={styles.skinGrid}>
       {HAIR_COLORS.map(h => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='t(`profile_setup.hair_$h.key` as any, lang)'
           key={h.key}
           style={[styles.skinCircle, { backgroundColor: h.color }, value === h.key && styles.skinCircleSelected]}
           onPress={() => onChange(h.key)}
@@ -501,6 +520,8 @@ const StepEyeColor = ({
     <View style={styles.skinGrid}>
       {EYE_COLORS.map(e => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='t(`profile_setup.eye_$e.key` as any, lang)'
           key={e.key}
           style={[styles.skinCircle, { backgroundColor: e.color }, value === e.key && styles.skinCircleSelected]}
           onPress={() => onChange(e.key)}
@@ -528,6 +549,8 @@ const StepGoal = ({
     <View style={styles.goalGrid}>
       {GOALS.map(g => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={g.icon}
           key={g.key}
           style={[styles.goalCard, value === g.key && styles.cardSelected]}
           onPress={() => onChange(g.key)}
@@ -562,6 +585,8 @@ const StepInterests = ({
           const selected = value.includes(item.key);
           return (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={item.icon}
               key={item.key}
               style={[styles.chipItem, selected && styles.chipItemSelected]}
               onPress={() => toggle(item.key)}
@@ -598,6 +623,8 @@ const StepLifestyle = ({
           const selected = value.includes(item.key);
           return (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={item.icon}
               key={item.key}
               style={[styles.chipItem, selected && styles.chipItemSelected]}
               onPress={() => toggle(item.key)}

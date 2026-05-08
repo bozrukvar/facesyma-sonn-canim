@@ -104,11 +104,16 @@ const ChallengesScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.meta}>{t('challenge.ends', lang)}: {end}</Text>
         <View style={styles.cardActions}>
           {isMine ? (
-            <TouchableOpacity style={styles.abandonBtn} onPress={() => abandon(item.challenge_id)}>
+            <TouchableOpacity style={styles.abandonBtn} onPress={() => abandon(item.challenge_id)}
+              accessibilityRole="button"
+              accessibilityLabel={t('challenge.abandon', lang)}
+            >
               <Text style={styles.abandonText}>{t('challenge.abandon', lang)}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('challenge.join', lang)}
               style={styles.joinBtn}
               onPress={() => join(item.challenge_id)}
               disabled={joining === item.challenge_id}
@@ -129,11 +134,17 @@ const ChallengesScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('challenge.title', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('challenge.title', lang)}</Text>
-        <TouchableOpacity style={styles.createFab} onPress={() => setCreateVisible(true)}>
+        <TouchableOpacity style={styles.createFab} onPress={() => setCreateVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel='+'
+        >
           <Text style={styles.createFabText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -165,10 +176,16 @@ const ChallengesScreen: React.FC<Props> = ({ navigation }) => {
               onChangeText={setNewTitle}
             />
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setCreateVisible(false)}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setCreateVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.cancel', lang)}
+              >
                 <Text style={styles.cancelText}>{t('common.cancel', lang)}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmBtn} onPress={createChallenge} disabled={creating}>
+              <TouchableOpacity style={styles.confirmBtn} onPress={createChallenge} disabled={creating}
+                accessibilityRole="button"
+                accessibilityLabel={t('challenge.create', lang)}
+              >
                 {creating ? <ActivityIndicator size="small" color={colors.background} /> : (
                   <Text style={styles.confirmText}>{t('challenge.create', lang)}</Text>
                 )}

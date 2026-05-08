@@ -158,7 +158,10 @@ const PreviewScreen: React.FC<{
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
-        <TouchableOpacity onPress={onReset}><Text style={styles.back}>←</Text></TouchableOpacity>
+        <TouchableOpacity onPress={onReset}><Text style={styles.back}>←</Text></TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('analysis.preview', lang)}
+        >
         <Text style={styles.headerTitle}>{t('analysis.preview', lang)}</Text>
         <View style={styles.spacer} />
       </View>
@@ -199,7 +202,10 @@ const PreviewScreen: React.FC<{
         )}
 
         <View style={styles.previewBtns}>
-          <TouchableOpacity style={styles.changeBtn} onPress={onReset} disabled={loading}>
+          <TouchableOpacity style={styles.changeBtn} onPress={onReset} disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel={t('analysis.change', lang)}
+          >
             <Text style={styles.changeBtnText}>{t('analysis.change', lang)}</Text>
           </TouchableOpacity>
           <GoldButton
@@ -328,7 +334,10 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
     return (
       <View style={styles.container}>
         <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
-          <TouchableOpacity onPress={reset}><Text style={styles.back}>←</Text></TouchableOpacity>
+          <TouchableOpacity onPress={reset}><Text style={styles.back}>←</Text></TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('analysis.quality_check', lang)}
+          >
           <Text style={styles.headerTitle}>{t('analysis.quality_check', lang)}</Text>
           <View style={styles.spacer} />
         </View>
@@ -421,7 +430,10 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
 
           {/* Butonlar */}
           <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.retakeBtn} onPress={reset}>
+            <TouchableOpacity style={styles.retakeBtn} onPress={reset}
+              accessibilityRole="button"
+              accessibilityLabel={t('analysis.retake', lang)}
+            >
               <Text style={styles.retakeBtnText}>{t('analysis.retake', lang)}</Text>
             </TouchableOpacity>
             <GoldButton
@@ -440,7 +452,10 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
   if (step === 'pick') return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('analysis.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('analysis.title', lang)}</Text>
@@ -453,6 +468,8 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.langScroll}>
           {availableLangs.map(({ code, flag }) => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={flag}
               key={code}
               style={[styles.langChip, lang === code && styles.langChipActive]}
               onPress={() => setLang(code)}
@@ -515,7 +532,10 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insetsTop + spacing.sm }]}>
-        <TouchableOpacity onPress={reset}><Text style={styles.back}>{t('analysis.new_label', lang)}</Text></TouchableOpacity>
+        <TouchableOpacity onPress={reset}><Text style={styles.back}>{t('analysis.new_label', lang)}</Text></TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('analysis.results', lang)}
+        >
         <Text style={styles.headerTitle}>{t('analysis.results', lang)}</Text>
         <View style={styles.spacer} />
       </View>
@@ -529,6 +549,8 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
           <View style={styles.scoreCol}>
             {result?.golden_ratio != null && (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('golden.tap_to_view', lang)}
                 onPress={() => navigation.navigate('GoldenRatioOverlay', {
                   imageUri: imageUri!,
                   lang,
@@ -542,6 +564,8 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
               </TouchableOpacity>
             )}
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('analysis.chat_btn', lang)}
               style={styles.chatInlineBtn}
               onPress={() => navigation.navigate('Chat', { analysisResult: result, lang })}
               activeOpacity={0.82}
@@ -551,6 +575,8 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
             </TouchableOpacity>
             {(result?.sifatlar?.length ?? 0) > 0 && (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('similarity.discover', lang)}
                 style={styles.similarityBtn}
                 onPress={() => {
                   const topSifatlar = (result!.sifatlar ?? [])

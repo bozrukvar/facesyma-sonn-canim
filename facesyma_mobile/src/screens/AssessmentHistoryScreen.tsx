@@ -199,7 +199,10 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
           <Text style={styles.emptyEmoji}>📋</Text>
           <Text style={styles.emptyTitle}>{t('assessment_history.empty', lang)}</Text>
           <Text style={styles.emptyDesc}>{t('assessment_history.empty_desc', lang)}</Text>
-          <TouchableOpacity style={styles.startBtn} onPress={() => navigation.navigate('Assessment')}>
+          <TouchableOpacity style={styles.startBtn} onPress={() => navigation.navigate('Assessment')}
+            accessibilityRole="button"
+            accessibilityLabel={t('assessment_history.start_btn', lang)}
+          >
             <Text style={styles.startBtnText}>{t('assessment_history.start_btn', lang)}</Text>
           </TouchableOpacity>
         </View>
@@ -214,7 +217,10 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('assessment_history.title', lang)}
+        >
           <Text style={styles.backBtnText}>←</Text>
         </TouchableOpacity>
         <View style={styles.flex1}>
@@ -222,6 +228,8 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
           <Text style={styles.subtitle}>{results.length} {t('assessment_history.tests_count', lang)}</Text>
         </View>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('assessment_history.delete_all_btn', lang)}
           style={styles.deleteAllBtn}
           onPress={handleDeleteAll}
           disabled={deleting === 'all'}
@@ -257,7 +265,10 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
                   <Text style={styles.lockedTitle}>{testInfo?.emoji || '📋'} {testInfo ? t(testInfo.key, lang) : result.test_type}</Text>
                   <Text style={styles.lockedDate}>{formatDate(result.created_at)}</Text>
                 </View>
-                <TouchableOpacity style={styles.premiumChip}>
+                <TouchableOpacity style={styles.premiumChip}
+                  accessibilityRole="button"
+                  accessibilityLabel='Premium'
+                >
                   <Text style={styles.premiumChipText}>Premium</Text>
                 </TouchableOpacity>
               </View>
@@ -286,6 +297,8 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
                 <View style={styles.resultMeta}>
                   <Badge label={`${result.responses_counted} ${t('assessment_history.questions', lang)}`} />
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={t('assessment_history.twins_section', lang)}
                     style={styles.deleteBtn}
                     onPress={() => handleDeleteOne(result.id)}
                     disabled={deleting === result.id}
@@ -327,7 +340,10 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
                       <Text style={styles.lockedTitle}>👥 {t('assessment.twins', lang)}</Text>
                       <Text style={styles.lockedDate}>{dateStr}</Text>
                     </View>
-                    <TouchableOpacity style={styles.premiumChip}>
+                    <TouchableOpacity style={styles.premiumChip}
+                      accessibilityRole="button"
+                      accessibilityLabel='Premium'
+                    >
                       <Text style={styles.premiumChipText}>Premium</Text>
                     </TouchableOpacity>
                   </View>

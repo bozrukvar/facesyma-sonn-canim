@@ -126,6 +126,8 @@ const OnboardingScreen = ({ navigation }: ScreenProps<'Onboarding'>) => {
 
       {/* Devam butonu */}
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={t('onboarding.skip', lang)}
         style={[styles.nextBtn, { backgroundColor: slideAccent }]}
         onPress={goNext}
         activeOpacity={0.85}
@@ -138,6 +140,8 @@ const OnboardingScreen = ({ navigation }: ScreenProps<'Onboarding'>) => {
       {/* Atla */}
       {index < slidesLen - 1 && (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('onboarding.skip', lang)}
           style={[styles.skipBtn, { marginBottom: insets.bottom + spacing.sm }]}
           onPress={() => navigation.replace('Auth')}
         >

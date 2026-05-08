@@ -114,6 +114,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
         ) : null}
         <View style={styles.cardBtnRow}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='isJoined'
             style={[styles.joinBtn, isJoined && styles.joinBtnDone, { flex: 1 }]}
             onPress={() => handleJoin(item)}
             disabled={isJoined || isJoining}
@@ -131,6 +133,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
           </TouchableOpacity>
           {isJoined && (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('community.meet', lang)}
               style={styles.meetBtn}
               onPress={() => handleOpenMembers(item._id)}
               activeOpacity={0.85}
@@ -142,6 +146,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
           )}
           {isJoined && (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('community.chat', lang)}
               style={styles.chatBtn}
               onPress={() => navigation.navigate('CommunityChat', {
                 communityId: item._id,
@@ -175,6 +181,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
                   </View>
                   {m.can_request_chat && (
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel='Chat Req'
                       style={styles.chatReqBtn}
                       onPress={() => navigation.navigate('PeerChatRequest', {
                         toUserId: m.user_id,
@@ -198,11 +206,16 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('community.title', lang)}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('community.title', lang)}</Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='Chat Header'
           style={styles.chatHeaderBtn}
           onPress={() => navigation.navigate('PeerChatList')}
         >
@@ -219,6 +232,8 @@ const CommunitiesScreen = ({ navigation, route }: ScreenProps<'Communities'>) =>
       >
         {TYPE_FILTERS.map(f => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='t(f.labelKey, lang)'
             key={String(f.key)}
             style={[styles.filterChip, typeFilter === f.key && styles.filterChipActive]}
             onPress={() => setTypeFilter(f.key)}

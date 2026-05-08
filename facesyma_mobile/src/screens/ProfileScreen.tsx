@@ -57,7 +57,10 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('profile.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('profile.title', lang)}</Text>
@@ -94,6 +97,8 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
               <Text style={styles.aiPromptDesc}>{t('profile.talk_desc', lang)}</Text>
             </View>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('profile.start', lang)}
               style={styles.aiPromptBtn}
               onPress={() => navigation.navigate('Chat', {})}
             >
@@ -104,7 +109,10 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
 
         {/* Premium */}
         {userPlan !== 'premium' && (
-          <TouchableOpacity style={styles.premiumBanner} activeOpacity={0.9}>
+          <TouchableOpacity style={styles.premiumBanner} activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.upgrade', lang)}
+          >
             <View>
               <Text style={styles.premiumTitle}>{t('profile.upgrade', lang)}</Text>
               <Text style={styles.premiumDesc}>{t('profile.upgrade_desc', lang)}</Text>
@@ -119,6 +127,8 @@ const ProfileScreen: React.FC<{ navigation: ProfileNavProp }> = ({ navigation })
           {MENU.map((item, i) => (
             <React.Fragment key={item.label}>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={item.icon}
                 style={styles.menuItem}
                 onPress={() => handleMenuPress(item.screen)}
                 activeOpacity={0.7}

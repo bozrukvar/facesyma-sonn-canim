@@ -233,7 +233,10 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('account.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('account.title', lang)}</Text>
@@ -285,6 +288,8 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
               const selected = surgeryRegions.includes(region.key);
               return (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={region.emoji}
                   key={region.key}
                   style={[styles.regionChip, selected && styles.regionChipSelected]}
                   onPress={() => toggleSurgeryRegion(region.key)}
@@ -318,6 +323,8 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
             <Text style={styles.sectionNote}>{t('account.goal_none', lang)}</Text>
           )}
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('account.edit_profile', lang)}
             style={styles.linkRow}
             onPress={() => navigation.replace('ProfileSetup')}
           >
@@ -340,7 +347,10 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
                 <Text style={styles.premiumBadgeText}>{premiumLabel}</Text>
               </View>
             ) : !isPremium ? (
-              <TouchableOpacity style={styles.upgradeBtn}>
+              <TouchableOpacity style={styles.upgradeBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('account.upgrade_btn', lang)}
+              >
                 <Text style={styles.upgradeBtnText}>{t('account.upgrade_btn', lang)}</Text>
               </TouchableOpacity>
             ) : null}
@@ -391,13 +401,19 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
         {/* ─── 6. Yasal ────────────────────────────────────────────────────── */}
         <SectionLabel>{t('account.legal', lang)}</SectionLabel>
         <View style={styles.card}>
-          <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(TERMS_URL)}>
+          <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(TERMS_URL)}
+            accessibilityRole="button"
+            accessibilityLabel={t('account.terms', lang)}
+          >
             <Text style={styles.legalIcon}>📄</Text>
             <Text style={styles.legalText}>{t('account.terms', lang)}</Text>
             <Text style={styles.legalArrow}>›</Text>
           </TouchableOpacity>
           <View style={styles.divider} />
-          <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(PRIVACY_URL)}>
+          <TouchableOpacity style={styles.legalRow} onPress={() => Linking.openURL(PRIVACY_URL)}
+            accessibilityRole="button"
+            accessibilityLabel={t('account.privacy_policy', lang)}
+          >
             <Text style={styles.legalIcon}>🔐</Text>
             <Text style={styles.legalText}>{t('account.privacy_policy', lang)}</Text>
             <Text style={styles.legalArrow}>›</Text>
@@ -411,7 +427,10 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
           {exportLoading ? (
             <ActivityIndicator color={colors.gold} style={{ marginVertical: spacing.md }} />
           ) : (
-            <TouchableOpacity style={styles.exportBtn} onPress={handleExportData}>
+            <TouchableOpacity style={styles.exportBtn} onPress={handleExportData}
+              accessibilityRole="button"
+              accessibilityLabel={t('account.export_btn', lang)}
+            >
               <Text style={styles.exportBtnText}>{t('account.export_btn', lang)}</Text>
             </TouchableOpacity>
           )}
@@ -420,7 +439,10 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
         <View style={[styles.card, styles.deleteCard]}>
           <Text style={styles.deleteTitle}>{t('account.delete_title', lang)}</Text>
           <Text style={styles.deleteNote}>{t('account.delete_note', lang)}</Text>
-          <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
+          <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}
+            accessibilityRole="button"
+            accessibilityLabel={t('account.delete_btn', lang)}
+          >
             <Text style={styles.deleteBtnText}>{t('account.delete_btn', lang)}</Text>
           </TouchableOpacity>
         </View>

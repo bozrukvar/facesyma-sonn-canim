@@ -48,6 +48,8 @@ const PeerChatListScreen: React.FC<ScreenProps<'PeerChatList'>> = ({ navigation 
       : '';
     return (
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel="(other.username?.[0] ?? '?').toUpperCase()"
         style={styles.roomCard}
         activeOpacity={0.85}
         onPress={() => navigation.navigate('PeerChat', {
@@ -82,11 +84,16 @@ const PeerChatListScreen: React.FC<ScreenProps<'PeerChatList'>> = ({ navigation 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('peer_chat.title', lang)}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('peer_chat.title', lang)}</Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={pendingCnt}
           style={styles.requestBtn}
           onPress={() => navigation.navigate('PeerChatRequest', {})}
         >

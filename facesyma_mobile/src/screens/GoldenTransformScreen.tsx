@@ -57,7 +57,10 @@ const GoldenTransformScreen: React.FC<ScreenProps<'GoldenTransform'>> = ({ navig
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('golden.transform_title', lang)}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('golden.transform_title', activeLang)}</Text>

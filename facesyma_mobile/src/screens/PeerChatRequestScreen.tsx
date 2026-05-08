@@ -127,6 +127,8 @@ const PeerChatRequestScreen: React.FC<ScreenProps<'PeerChatRequest'>> = ({ navig
         </View>
         <View style={styles.btnRow}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('peer_chat.accept', lang)}
             style={[styles.acceptBtn, isResponding && styles.btnDisabled]}
             onPress={() => respond(rid, 'accept')}
             disabled={isResponding}
@@ -135,6 +137,8 @@ const PeerChatRequestScreen: React.FC<ScreenProps<'PeerChatRequest'>> = ({ navig
             {isResponding ? <ActivityIndicator color="#000" size="small" /> : <Text style={styles.acceptTxt}>{t('peer_chat.accept', lang)}</Text>}
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('peer_chat.reject', lang)}
             style={[styles.rejectBtn, isResponding && styles.btnDisabled]}
             onPress={() => respond(rid, 'reject')}
             disabled={isResponding}
@@ -152,7 +156,10 @@ const PeerChatRequestScreen: React.FC<ScreenProps<'PeerChatRequest'>> = ({ navig
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('peer_chat.send_request', lang)}
+          >
             <Text style={styles.backTxt}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{t('peer_chat.send_request', lang)}</Text>
@@ -174,7 +181,10 @@ const PeerChatRequestScreen: React.FC<ScreenProps<'PeerChatRequest'>> = ({ navig
             <>
               <Text style={styles.lockIcon}>🤝</Text>
               <Text style={styles.toUsername}>{toUsername}</Text>
-              <TouchableOpacity style={styles.sendBtn} onPress={sendRequest} activeOpacity={0.85}>
+              <TouchableOpacity style={styles.sendBtn} onPress={sendRequest} activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel={t('peer_chat.send_request', lang)}
+              >
                 <Text style={styles.sendBtnTxt}>{t('peer_chat.send_request', lang)}</Text>
               </TouchableOpacity>
             </>
@@ -187,7 +197,10 @@ const PeerChatRequestScreen: React.FC<ScreenProps<'PeerChatRequest'>> = ({ navig
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('peer_chat.pending_requests', lang)}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('peer_chat.pending_requests', lang)}</Text>

@@ -100,6 +100,8 @@ const MissionsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.cardActions}>
           {!joined ? (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('challenge.join', lang)}
               style={styles.joinBtn}
               onPress={() => join(item.mission_id)}
               disabled={joining === item.mission_id}
@@ -112,6 +114,8 @@ const MissionsScreen: React.FC<Props> = ({ navigation }) => {
             </TouchableOpacity>
           ) : item.status === 'active' ? (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('gamification.contribute', lang)}
               style={styles.contributeBtn}
               onPress={() => contribute(item.mission_id)}
               disabled={contributing === item.mission_id}
@@ -134,7 +138,10 @@ const MissionsScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('gamification.missions', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('gamification.missions', lang)}</Text>

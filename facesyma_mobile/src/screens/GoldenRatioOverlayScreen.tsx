@@ -50,7 +50,10 @@ const GoldenRatioOverlayScreen: React.FC<ScreenProps<'GoldenRatioOverlay'>> = ({
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('golden.overlay_title', lang)}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('golden.overlay_title', activeLang)}</Text>
@@ -117,6 +120,8 @@ const GoldenRatioOverlayScreen: React.FC<ScreenProps<'GoldenRatioOverlay'>> = ({
 
           {/* Before/After CTA */}
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('golden.view_transform', lang)}
             style={styles.transformBtn}
             onPress={() => navigation.navigate('GoldenTransform', {
               imageUri,

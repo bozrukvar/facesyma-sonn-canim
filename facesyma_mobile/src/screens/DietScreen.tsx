@@ -100,6 +100,8 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
     isActive: boolean,
   ) => (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel='meal.name'
       key={idx}
       style={[styles.optionCard, isActive && styles.optionCardActive]}
       onPress={() => setSelectedMeals(prev => ({ ...prev, [mealType]: idx }))}
@@ -175,6 +177,8 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
             const isActive = fb === fbType;
             return (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel='icons[fbType] t(fbKeys[fbType], lang)'
                 key={fbType}
                 style={[styles.fbBtn, isActive && styles.fbBtnActive]}
                 onPress={() =>
@@ -204,7 +208,10 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('diet.title', lang)}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('diet.title', lang)}</Text>
@@ -225,6 +232,8 @@ const DietScreen = ({ navigation }: ScreenProps<'Diet'>) => {
         </View>
 
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('diet.get_recommendation', lang)}
           style={[styles.getBtn, loading && styles.getBtnLoading]}
           onPress={fetchRecommendation}
           disabled={loading}

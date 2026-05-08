@@ -139,6 +139,8 @@ const CommunityChatScreen: React.FC<ScreenProps<'CommunityChat'>> = ({ navigatio
     const isMine = item.sender_id === user?.id;
     return (
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel="(item.sender_username[0] ?? '?').toUpperCase()"
         activeOpacity={0.8}
         onLongPress={() => {
           if (!isMine) {
@@ -178,7 +180,10 @@ const CommunityChatScreen: React.FC<ScreenProps<'CommunityChat'>> = ({ navigatio
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={communityName}
+          >
             <Text style={styles.backTxt}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title} numberOfLines={1}>{communityName}</Text>
@@ -201,7 +206,10 @@ const CommunityChatScreen: React.FC<ScreenProps<'CommunityChat'>> = ({ navigatio
     >
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={communityName}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -250,6 +258,8 @@ const CommunityChatScreen: React.FC<ScreenProps<'CommunityChat'>> = ({ navigatio
         />
         <Text style={styles.charCount}>{text.length}/{MAX_LEN}</Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('community.chat_send', lang)}
           style={[styles.sendBtn, (!text.trim() || sending) && styles.sendBtnOff]}
           onPress={sendMessage}
           disabled={!text.trim() || sending}

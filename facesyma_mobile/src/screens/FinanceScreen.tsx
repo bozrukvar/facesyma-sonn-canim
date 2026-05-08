@@ -146,7 +146,10 @@ const FinanceScreen: React.FC<Props> = ({ navigation }) => {
       <StatusBar barStyle="light-content" />
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('finance.title', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerText}>
@@ -167,7 +170,10 @@ const FinanceScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.emptyEmoji}>📊</Text>
             <Text style={styles.emptyTitle}>{t('finance.no_result', lang)}</Text>
             <Text style={styles.emptyDesc}>{t('finance.take_test_desc', lang)}</Text>
-            <TouchableOpacity style={styles.ctaBtn} onPress={goToAssessment}>
+            <TouchableOpacity style={styles.ctaBtn} onPress={goToAssessment}
+              accessibilityRole="button"
+              accessibilityLabel={t('finance.take_test', lang)}
+            >
               <Text style={styles.ctaBtnText}>{t('finance.take_test', lang)}</Text>
             </TouchableOpacity>
           </View>
@@ -210,7 +216,10 @@ const FinanceScreen: React.FC<Props> = ({ navigation }) => {
           <AdviceCard emoji="📈" title={t('finance.advice_invest_title', lang)} text={profile.advice.investment} color={profile.color} />
 
           {/* Retake */}
-          <TouchableOpacity style={styles.retakeBtn} onPress={goToAssessment}>
+          <TouchableOpacity style={styles.retakeBtn} onPress={goToAssessment}
+            accessibilityRole="button"
+            accessibilityLabel={t('finance.retake_test', lang)}
+          >
             <Text style={styles.retakeBtnText}>{t('finance.retake_test', lang)}</Text>
           </TouchableOpacity>
 

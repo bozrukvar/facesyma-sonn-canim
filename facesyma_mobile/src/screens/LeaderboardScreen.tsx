@@ -86,7 +86,10 @@ const LeaderboardScreen: React.FC<Props> = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('leaderboard.title', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('leaderboard.title', lang)}</Text>
@@ -103,6 +106,8 @@ const LeaderboardScreen: React.FC<Props> = ({ navigation, route }) => {
       <View style={styles.tabBar}>
         {(['global', 'trending'] as Tab[]).map(tabId => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='t(`leaderboard.$tabId`, lang)'
             key={tabId}
             style={[styles.tab, tab === tabId && styles.tabActive]}
             onPress={() => setTab(tabId)}

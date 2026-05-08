@@ -65,6 +65,9 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
             <Text style={styles.name}>{firstName} 👋</Text>
           </View>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('nav.profile', lang)}
+            accessibilityHint="Profil ekranını aç"
             onPress={() => navigation.navigate('Profile')}
             activeOpacity={0.85}
           >
@@ -93,6 +96,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
 
         {/* Analiz başlat */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('home.analyze_title', lang)}
           style={styles.analyzeBtn}
           onPress={() => navigation.navigate('Analysis')}
           activeOpacity={0.88}
@@ -111,6 +116,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
         <View style={styles.grid}>
           {FEATURES.map(({ id: fId, accent: fAccent, badge: fBadge, screen: fScreen, emoji: fEmoji, title: fTitle, desc: fDesc }) => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={fTitle}
               key={fId}
               style={[styles.featureCard, { borderColor: `${fAccent}28` }]}
               onPress={() => (navigation.navigate as unknown as (screen: string, params?: object) => void)(fScreen, lastAnalysis ? { analysisResult: lastAnalysis, lang } : { lang })}
@@ -134,6 +141,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
         <Text style={styles.sectionLabel}>{t('home.social', lang)}</Text>
         <View style={styles.socialRow}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('community.title', lang)}
             style={styles.socialCard}
             onPress={() => navigation.navigate('Communities' as any)}
             activeOpacity={0.85}
@@ -143,6 +152,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
             <Text style={styles.socialDesc}>{t('home.communities_desc', lang)}</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('home.chats', lang)}
             style={styles.socialCard}
             onPress={() => navigation.navigate('PeerChatList' as any)}
             activeOpacity={0.85}
@@ -156,6 +167,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
         {/* Gamification */}
         <Text style={styles.sectionLabel}>{t('gamification.title', lang)}</Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('gamification.hub_title', lang)}
           style={styles.gamificationBanner}
           onPress={() => (navigation.navigate as any)('Gamification')}
           activeOpacity={0.85}
@@ -178,6 +191,8 @@ const HomeScreen: React.FC<{ navigation: HomeNavProp }> = ({ navigation }) => {
         {/* Son analizler */}
         <Text style={styles.sectionLabel}>{t('home.recent_results', lang)}</Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('home.history_empty_cta', lang)}
           style={styles.historyEmpty}
           onPress={() => navigation.navigate('Analysis')}
         >

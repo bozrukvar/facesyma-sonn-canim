@@ -103,7 +103,10 @@ const CoinWalletScreen: React.FC<Props> = ({ navigation }) => {
           <>
             {/* Back + title */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('coin.balance', lang)}
+              >
                 <Text style={styles.backArrow}>←</Text>
               </TouchableOpacity>
               <Text style={styles.title}>{t('coin.balance', lang)}</Text>
@@ -117,7 +120,10 @@ const CoinWalletScreen: React.FC<Props> = ({ navigation }) => {
             </View>
 
             {/* Daily quest */}
-            <TouchableOpacity style={styles.dailyBtn} onPress={claimDaily} disabled={claiming} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.dailyBtn} onPress={claimDaily} disabled={claiming} activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('coin.daily_quest', lang)}
+            >
               {claiming ? (
                 <ActivityIndicator size="small" color={colors.background} />
               ) : (

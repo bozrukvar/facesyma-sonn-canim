@@ -168,7 +168,10 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('fashion.back', lang)}
+        >
           <Text style={styles.backBtn}>{t('fashion.back', lang)}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>👗 {t('fashion.title', lang)}</Text>
@@ -184,7 +187,10 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
         {!hasValidAnalysis && (
           <View style={styles.infoBanner}>
             <Text style={styles.infoBannerText}>ℹ️ {t('fashion.no_analysis_hint', lang)}</Text>
-            <TouchableOpacity style={styles.infoBannerBtn} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.infoBannerBtn} onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+              accessibilityLabel={t('fashion.go_to_analysis', lang)}
+            >
               <Text style={styles.infoBannerBtnText}>📷 {t('fashion.go_to_analysis', lang)}</Text>
             </TouchableOpacity>
           </View>
@@ -196,6 +202,8 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
           <View style={styles.buttonRow}>
             {MEVSIMLER.map(({ id: mId, emoji: mEmoji, label: mLabel }) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={mEmoji}
                 key={mId}
                 style={[
                   styles.seasonBtn,
@@ -223,6 +231,8 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
           <View style={styles.categoryTabs}>
             {KATEGORILER.map(({ id: kId, emoji: kEmoji, label: kLabel }) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={kEmoji}
                 key={kId}
                 style={[
                   styles.categoryTab,
@@ -246,6 +256,8 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
 
         {/* Load Button — mevsim/kategori değişince tekrar çekilebilsin */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('fashion.loading', lang)}
           style={[styles.loadBtn, data ? styles.loadBtnRefresh : null]}
           onPress={handleLoadAdvice}
           disabled={loading}

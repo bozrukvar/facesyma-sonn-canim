@@ -137,7 +137,10 @@ const PeerChatScreen: React.FC<ScreenProps<'PeerChat'>> = ({ navigation, route }
       keyboardVerticalOffset={insets.top}
     >
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={otherUsername}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -182,6 +185,8 @@ const PeerChatScreen: React.FC<ScreenProps<'PeerChat'>> = ({ navigation, route }
           maxLength={MAX_LEN}
         />
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('peer_chat.send', lang)}
           style={[styles.sendBtn, (!text.trim() || sending) && styles.sendBtnOff]}
           onPress={sendMessage}
           disabled={!text.trim() || sending}

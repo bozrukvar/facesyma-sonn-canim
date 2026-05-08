@@ -71,6 +71,8 @@ const TaskRow: React.FC<{
   toggling: boolean;
 }> = ({ task, lang, onToggle, toggling }) => (
   <TouchableOpacity
+    accessibilityRole="button"
+    accessibilityLabel="tl('week', lang) task.week"
     style={[styles.taskRow, task.done && styles.taskRowDone]}
     onPress={() => !toggling && onToggle(task.id, !task.done)}
     activeOpacity={0.75}
@@ -172,7 +174,10 @@ export default function GoalDetailScreen({ navigation, route }: Props) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={goal.title}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={2}>{goal.title}</Text>
@@ -233,12 +238,16 @@ export default function GoalDetailScreen({ navigation, route }: Props) {
         {isActive && (
           <View style={styles.actionBtns}>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="🎉 tl('complete_goal', lang)"
               style={styles.completeBtn}
               onPress={() => confirmStatusChange('completed')}
             >
               <Text style={styles.completeBtnText}>🎉 {tl('complete_goal', lang)}</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="tl('abandon', lang)"
               style={styles.abandonBtn}
               onPress={() => confirmStatusChange('abandoned')}
             >

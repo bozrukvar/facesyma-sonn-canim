@@ -83,6 +83,8 @@ const MealGameScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const renderMeal = ({ item }: { item: MealItem }) => (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={item.name}
       style={styles.mealCard}
       onPress={() => selectMeal(item)}
       activeOpacity={0.85}
@@ -113,7 +115,10 @@ const MealGameScreen: React.FC<Props> = ({ navigation, route }) => {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-          <TouchableOpacity onPress={() => { setPhase('browse'); setSelectedMeal(null); }} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => { setPhase('browse'); setSelectedMeal(null); }} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('meal_game.guess_sifat', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{t('meal_game.guess_sifat', lang)}</Text>
@@ -128,6 +133,8 @@ const MealGameScreen: React.FC<Props> = ({ navigation, route }) => {
         <View style={styles.optionGrid}>
           {SIFAT_OPTIONS.map(opt => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={opt}
               key={opt}
               style={styles.optionBtn}
               onPress={() => guessOption(opt)}
@@ -153,7 +160,10 @@ const MealGameScreen: React.FC<Props> = ({ navigation, route }) => {
         ListHeaderComponent={() => (
           <>
             <View style={styles.topBar}>
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('meal_game.title', lang)}
+              >
                 <Text style={styles.backArrow}>←</Text>
               </TouchableOpacity>
               <Text style={styles.title}>{t('meal_game.title', lang)}</Text>

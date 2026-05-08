@@ -88,6 +88,8 @@ const TestQuestionsCard = ({
               const selected = answers[q.q_id] === n;
               return (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={n}
                   key={n}
                   style={[tStyles.optBtn, selected && tStyles.optBtnSel]}
                   onPress={() => setAnswers(prev => ({ ...prev, [q.q_id]: n }))}
@@ -102,7 +104,10 @@ const TestQuestionsCard = ({
       ))}
 
       {allAnswered && (
-        <TouchableOpacity style={tStyles.submitBtn} onPress={handleSubmit}>
+        <TouchableOpacity style={tStyles.submitBtn} onPress={handleSubmit}
+          accessibilityRole="button"
+          accessibilityLabel={t('chat.see_results', lang)}
+        >
           <Text style={tStyles.submitText}>
             {t('chat.see_results', lang)}
           </Text>
@@ -117,6 +122,8 @@ const ActionCard = ({ screen, params, label }: NavAction) => {
   const nav = useNavigation<AppNavProp>();
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={label}
       style={acStyles.card}
       onPress={() => (nav as any).navigate(screen, params)}
       activeOpacity={0.8}
@@ -181,6 +188,8 @@ const ModuleMenuBar = ({
         const trigger = item.triggers[lang] ?? item.triggers.en;
         return (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={item.emoji}
             key={item.labelKey}
             style={mmStyles.chip}
             onPress={() => onSelect(trigger)}
@@ -437,7 +446,10 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
     ];
     return (
       <View style={[gateStyles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <TouchableOpacity style={gateStyles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={gateStyles.backBtn} onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('chat.gate_title', lang)}
+        >
           <Text style={gateStyles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={gateStyles.lockIcon}>🔒</Text>
@@ -492,7 +504,10 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
     >
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('chat.assistant', lang)}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
 
@@ -516,12 +531,16 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
 
         <View style={styles.headerActions}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="showModuleMenu ? '✕' : '⊞'"
             onPress={() => setShowModuleMenu(v => !v)}
             style={[styles.newBtn, showModuleMenu && styles.newBtnActive]}
           >
             <Text style={styles.newBtnText}>{showModuleMenu ? '✕' : '⊞'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('chat.new', lang)}
             onPress={startConversation}
             style={styles.newBtn}
           >
@@ -560,6 +579,8 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
           <View style={styles.quickRow}>
             {QUICK_QUESTIONS.map((q, i) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={q}
                 key={i}
                 style={styles.quickChip}
                 onPress={() => sendMessage(q)}
@@ -590,6 +611,9 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
           maxLength={500}
         />
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('chat.send', lang)}
+          accessibilityHint="Mesaj gönder"
           style={[
             styles.sendBtn,
             (!input.trim() || loading) && styles.sendBtnDisabled,

@@ -51,7 +51,10 @@ export default function ActiveGoalsWidget({ lang, onGoalPress, onViewAll }: Prop
     <View style={styles.wrap}>
       <View style={styles.rowHeader}>
         <Text style={styles.sectionLabel}>🎯 {lb.title}</Text>
-        <TouchableOpacity onPress={onViewAll}>
+        <TouchableOpacity onPress={onViewAll}
+          accessibilityRole="button"
+          accessibilityLabel={lb.see_all}
+        >
           <Text style={styles.seeAll}>{lb.see_all}</Text>
         </TouchableOpacity>
       </View>
@@ -69,6 +72,8 @@ export default function ActiveGoalsWidget({ lang, onGoalPress, onViewAll }: Prop
           const tasksTotal = g.weekly_tasks.length;
           return (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={g.title}
               key={g.goal_id}
               style={styles.card}
               onPress={() => onGoalPress(g.goal_id, g.title)}

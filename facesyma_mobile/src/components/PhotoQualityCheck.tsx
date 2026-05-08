@@ -215,12 +215,16 @@ export const PhotoQualityCheck: React.FC<Props> = ({
       {/* Action buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='📸 YENİDEN ÇEK'
           style={[styles.button, styles.retakeButton]}
           onPress={onRetake}
         >
           <Text style={styles.retakeButtonText}>📸 YENİDEN ÇEK</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='isValid ? ✅ DEVAM ET : ⚠️ DEVAM ET'
           style={[
             styles.button,
             styles.proceedButton,

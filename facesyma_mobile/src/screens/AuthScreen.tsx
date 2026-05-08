@@ -179,7 +179,10 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
             style={styles.submitBtn}
           />
 
-          <TouchableOpacity style={styles.backToLogin} onPress={() => switchMode('login')}>
+          <TouchableOpacity style={styles.backToLogin} onPress={() => switchMode('login')}
+            accessibilityRole="button"
+            accessibilityLabel={t('auth.sign_in', lang)}
+          >
             <Text style={styles.forgotText}>← {t('auth.sign_in', lang)}</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -220,6 +223,8 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
         <View style={styles.tabs}>
           {(['login', 'register'] as Mode[]).map(m => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel='m === login ? t(auth.sign_in, lang) : t(auth.sign_up, lang)'
               key={m}
               style={[styles.tab, mode === m && styles.tabActive]}
               onPress={() => switchMode(m)}
@@ -272,13 +277,18 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
         )}
 
         {mode === 'login' && (
-          <TouchableOpacity style={styles.forgotBtn} onPress={handleForgotPassword}>
+          <TouchableOpacity style={styles.forgotBtn} onPress={handleForgotPassword}
+            accessibilityRole="button"
+            accessibilityLabel={t('auth.forgot_password', lang)}
+          >
             <Text style={styles.forgotText}>{t('auth.forgot_password', lang)}</Text>
           </TouchableOpacity>
         )}
 
         {mode === 'register' && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('auth.terms_of_use', lang)}
             style={styles.termsRow}
             onPress={() => setTermsAccepted(p => !p)}
             activeOpacity={0.8}
@@ -310,6 +320,8 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
 
         {/* Google */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel='G'
           style={styles.googleBtn}
           onPress={handleGoogle}
           disabled={isLoading}

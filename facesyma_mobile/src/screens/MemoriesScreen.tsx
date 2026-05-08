@@ -91,6 +91,8 @@ const MemoriesScreen: React.FC<ScreenProps<'Memories'>> = ({ navigation }) => {
           )}
           <View style={{ flex: 1 }} />
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="s('delete', lang)"
             onPress={() => handleDelete(item)}
             disabled={isDel}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -113,7 +115,10 @@ const MemoriesScreen: React.FC<ScreenProps<'Memories'>> = ({ navigation }) => {
 
       {/* Header */}
       <View style={st.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={st.back}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={st.back}
+          accessibilityRole="button"
+          accessibilityLabel="s('title', lang)"
+        >
           <Text style={st.backArrow}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

@@ -168,18 +168,26 @@ export default function MonthlyReportScreen({ navigation, route }: Props) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="tl('title', lang)"
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>{tl('title', lang)}</Text>
           {/* Month navigator */}
           <View style={styles.monthNav}>
-            <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.monthArrow}>
+            <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.monthArrow}
+              accessibilityRole="button"
+              accessibilityLabel={month}
+            >
               <Text style={styles.monthArrowText}>‹</Text>
             </TouchableOpacity>
             <Text style={styles.monthLabel}>{month}</Text>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel='= todayStr &&  opacity: 0.3 ]>›'
               onPress={() => changeMonth(1)}
               style={[styles.monthArrow, month >= todayStr && styles.monthArrowDisabled]}
               disabled={month >= todayStr}
@@ -188,7 +196,10 @@ export default function MonthlyReportScreen({ navigation, route }: Props) {
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity onPress={handleShare} style={styles.shareBtn} disabled={sharing || !hasData}>
+        <TouchableOpacity onPress={handleShare} style={styles.shareBtn} disabled={sharing || !hasData}
+          accessibilityRole="button"
+          accessibilityLabel="tl('no_data', lang)"
+        >
           {sharing
             ? <ActivityIndicator size="small" color={colors.gold} />
             : <Text style={styles.shareBtnText}>↑</Text>
@@ -352,7 +363,10 @@ export default function MonthlyReportScreen({ navigation, route }: Props) {
           )}
 
           {/* Share CTA */}
-          <TouchableOpacity style={styles.shareCta} onPress={handleShare} disabled={sharing}>
+          <TouchableOpacity style={styles.shareCta} onPress={handleShare} disabled={sharing}
+            accessibilityRole="button"
+            accessibilityLabel="↑ tl('share', lang)"
+          >
             {sharing
               ? <ActivityIndicator color="#1A1A2E" size="small" />
               : <Text style={styles.shareCtaText}>↑ {tl('share', lang)}</Text>

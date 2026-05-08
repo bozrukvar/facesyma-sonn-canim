@@ -110,7 +110,10 @@ const SimilarityScreen: React.FC<ScreenProps<'Similarity'>> = ({ navigation, rou
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('similarity.title', lang)}
+        >
           <Text style={styles.backTxt}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('similarity.title', activeLang)}</Text>
@@ -138,7 +141,10 @@ const SimilarityScreen: React.FC<ScreenProps<'Similarity'>> = ({ navigation, rou
           ) : null}
 
           {/* Refresh */}
-          <TouchableOpacity style={styles.refreshBtn} onPress={load}>
+          <TouchableOpacity style={styles.refreshBtn} onPress={load}
+            accessibilityRole="button"
+            accessibilityLabel={t('similarity.refresh', lang)}
+          >
             <Text style={styles.refreshTxt}>🔄 {t('similarity.refresh', activeLang)}</Text>
           </TouchableOpacity>
 

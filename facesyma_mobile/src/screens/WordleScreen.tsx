@@ -222,7 +222,10 @@ const WordleScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.center}>
         <Text style={styles.errorEmoji}>⚠️</Text>
         <Text style={styles.errorText}>{t('common.error', lang)}</Text>
-        <TouchableOpacity style={styles.retryBtn} onPress={loadDaily}>
+        <TouchableOpacity style={styles.retryBtn} onPress={loadDaily}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.retry', lang)}
+        >
           <Text style={styles.retryText}>{t('common.retry', lang)}</Text>
         </TouchableOpacity>
       </View>
@@ -248,7 +251,10 @@ const WordleScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={emoji}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <View style={styles.headerCenter}>
@@ -364,6 +370,8 @@ const WordleScreen: React.FC<Props> = ({ navigation }) => {
                     ]}
                   >
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={t('wordle.wrong', lang)}
                       style={[
                         styles.optionBtn,
                         isWrong && styles.optionBtnWrong,

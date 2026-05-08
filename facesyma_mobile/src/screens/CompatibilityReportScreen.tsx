@@ -195,7 +195,10 @@ const CompatibilityReportScreen: React.FC<{ navigation: any }> = ({ navigation }
     return (
       <View style={[styles.container, styles.center, { paddingTop: insets.top }]}>
         <Text style={styles.errorText}>{L(lang, 'error')}</Text>
-        <TouchableOpacity onPress={load} style={styles.retryBtn}>
+        <TouchableOpacity onPress={load} style={styles.retryBtn}
+          accessibilityRole="button"
+          accessibilityLabel="L(lang, 'retry')"
+        >
           <Text style={styles.retryText}>{L(lang, 'retry')}</Text>
         </TouchableOpacity>
       </View>
@@ -212,11 +215,17 @@ const CompatibilityReportScreen: React.FC<{ navigation: any }> = ({ navigation }
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="L(lang, 'back')"
+        >
           <Text style={styles.backText}>{L(lang, 'back')}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{L(lang, 'title')}</Text>
-        <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
+        <TouchableOpacity onPress={handleShare} style={styles.shareBtn}
+          accessibilityRole="button"
+          accessibilityLabel="L(lang, 'share_btn')"
+        >
           <Text style={styles.shareBtnText}>{L(lang, 'share_btn')}</Text>
         </TouchableOpacity>
       </View>
@@ -309,7 +318,10 @@ const CompatibilityReportScreen: React.FC<{ navigation: any }> = ({ navigation }
         ) : null}
 
         {/* Share CTA */}
-        <TouchableOpacity style={styles.shareCTA} onPress={handleShare} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.shareCTA} onPress={handleShare} activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel="L(lang, 'share_btn')"
+        >
           <Text style={styles.shareCTAText}>{L(lang, 'share_btn')}</Text>
         </TouchableOpacity>
       </ScrollView>

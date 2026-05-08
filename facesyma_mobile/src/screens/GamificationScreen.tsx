@@ -77,7 +77,10 @@ const GamificationScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('gamification.title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{t('gamification.title', lang)}</Text>
@@ -85,6 +88,8 @@ const GamificationScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Coin balance banner */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('coin.balance', lang)}
           style={styles.coinBanner}
           onPress={() => navigation.navigate('CoinWallet')}
           activeOpacity={0.85}
@@ -111,6 +116,8 @@ const GamificationScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.grid}>
           {CARDS.map(card => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={card.emoji}
               key={card.id}
               style={[styles.card, { borderColor: `${card.accent}30` }]}
               onPress={() => (navigation.navigate as any)(card.screen)}

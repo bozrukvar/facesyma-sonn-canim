@@ -181,7 +181,10 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="L(lang, 'back')"
+        >
           <Text style={styles.backText}>{L(lang, 'back')}</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -213,11 +216,17 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <Text style={styles.noPartnerTitle}>{L(lang, 'no_partner')}</Text>
               <Text style={styles.noPartnerSub}>{L(lang, 'no_partner_sub')}</Text>
 
-              <TouchableOpacity style={styles.primaryBtn} onPress={handleInvite} activeOpacity={0.85}>
+              <TouchableOpacity style={styles.primaryBtn} onPress={handleInvite} activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'invite_btn')"
+              >
                 <Text style={styles.primaryBtnText}>{L(lang, 'invite_btn')}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.secondaryBtn} onPress={() => setShowJoin(v => !v)} activeOpacity={0.85}>
+              <TouchableOpacity style={styles.secondaryBtn} onPress={() => setShowJoin(v => !v)} activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'join_btn')"
+              >
                 <Text style={styles.secondaryBtnText}>{L(lang, 'join_btn')}</Text>
               </TouchableOpacity>
 
@@ -233,6 +242,8 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     maxLength={6}
                   />
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel="L(lang, 'join_action')"
                     style={[styles.joinActionBtn, joinCode.length === 6 && styles.joinActionActive]}
                     onPress={handleJoin}
                     disabled={joinCode.length !== 6 || joining}
@@ -262,13 +273,19 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={styles.codeDisplay}>{status.invite_code}</Text>
               </View>
 
-              <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'invite_copy')"
+              >
                 <Text style={styles.copyBtnText}>{L(lang, 'invite_copy')}</Text>
               </TouchableOpacity>
 
               <Text style={styles.waitText}>{L(lang, 'invite_wait')}</Text>
 
-              <TouchableOpacity style={styles.disconnectBtn} onPress={handleDisconnect} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.disconnectBtn} onPress={handleDisconnect} activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'disconnect')"
+              >
                 <Text style={styles.disconnectBtnText}>{L(lang, 'disconnect')}</Text>
               </TouchableOpacity>
             </View>
@@ -294,6 +311,8 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               )}
 
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'view_report')"
                 style={styles.primaryBtn}
                 onPress={() => (navigation.navigate as any)('CompatibilityReport')}
                 activeOpacity={0.85}
@@ -301,7 +320,10 @@ const PartnerScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={styles.primaryBtnText}>{L(lang, 'view_report')}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.disconnectBtn} onPress={handleDisconnect} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.disconnectBtn} onPress={handleDisconnect} activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="L(lang, 'disconnect')"
+              >
                 <Text style={styles.disconnectBtnText}>{L(lang, 'disconnect')}</Text>
               </TouchableOpacity>
             </View>

@@ -122,6 +122,8 @@ export default function MoodCheckin({ lang = 'tr', onCheckinDone, compact = fals
           <View style={styles.moodRow}>
             {MOODS.map((m) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={m.emoji}
                 key={m.score}
                 onPress={() => setSelected(m.score)}
                 style={[styles.moodBtn, selected === m.score && styles.moodBtnSel]}
@@ -134,6 +136,8 @@ export default function MoodCheckin({ lang = 'tr', onCheckinDone, compact = fals
             ))}
           </View>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="isTr ? 'Devam' : 'Next' →"
             style={[styles.nextBtn, selected === null && styles.nextBtnDisabled]}
             onPress={() => selected !== null && setStep('tags')}
             disabled={selected === null}
@@ -151,6 +155,8 @@ export default function MoodCheckin({ lang = 'tr', onCheckinDone, compact = fals
           <View style={styles.tagsRow}>
             {tags.map((tag) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel='TAG_LABELS[tag]'
                 key={tag}
                 onPress={() => toggleTag(tag)}
                 style={[styles.tagChip, selectedTags.includes(tag) && styles.tagChipSel]}
@@ -162,10 +168,15 @@ export default function MoodCheckin({ lang = 'tr', onCheckinDone, compact = fals
             ))}
           </View>
           <View style={styles.tagsBtns}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => setStep('mood')}>
+            <TouchableOpacity style={styles.backBtn} onPress={() => setStep('mood')}
+              accessibilityRole="button"
+              accessibilityLabel="← isTr ? 'Geri' : 'Back'"
+            >
               <Text style={styles.backBtnText}>← {isTr ? 'Geri' : 'Back'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="isTr ? 'Kaydet' : 'Save' ✓"
               style={[styles.nextBtn, { flex: 1 }]}
               onPress={submitCheckin}
               disabled={saving}

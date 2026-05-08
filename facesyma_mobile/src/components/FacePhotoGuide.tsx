@@ -109,7 +109,10 @@ export const FacePhotoGuide: React.FC<Props> = ({ onAcknowledge, lang = 'tr' }) 
       </ScrollView>
 
       {/* Action Button */}
-      <TouchableOpacity style={styles.button} onPress={onAcknowledge}>
+      <TouchableOpacity style={styles.button} onPress={onAcknowledge}
+        accessibilityRole="button"
+        accessibilityLabel={t('photo_guide.confirm', lang)}
+      >
         <Text style={styles.buttonText}>{t('photo_guide.confirm', lang)}</Text>
       </TouchableOpacity>
     </View>

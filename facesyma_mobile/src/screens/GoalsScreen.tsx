@@ -68,7 +68,10 @@ const GoalCard: React.FC<{ goal: Goal; lang: string; onPress: () => void }> = ({
   const barColor   = scoreColor(pct);
 
   return (
-    <TouchableOpacity style={styles.goalCard} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity style={styles.goalCard} onPress={onPress} activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={goal.title}
+    >
       <View style={styles.goalCardHeader}>
         <Text style={styles.goalTitle} numberOfLines={2}>{goal.title}</Text>
         {goal.status !== 'active' && (
@@ -173,14 +176,20 @@ export default function GoalsScreen({ navigation }: Props) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="tl('title', lang)"
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerBody}>
           <Text style={styles.headerTitle}>{tl('title', lang)}</Text>
           <Text style={styles.headerSub}>{tl('subtitle', lang)}</Text>
         </View>
-        <TouchableOpacity style={styles.newBtn} onPress={() => setShowModal(true)}>
+        <TouchableOpacity style={styles.newBtn} onPress={() => setShowModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel='+'
+        >
           <Text style={styles.newBtnText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -189,6 +198,8 @@ export default function GoalsScreen({ navigation }: Props) {
       <View style={styles.filterRow}>
         {(['active', 'all'] as const).map(s => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='Filter Tab'
             key={s}
             style={[styles.filterTab, filterStatus === s && styles.filterTabActive]}
             onPress={() => setFilterStatus(s)}
@@ -214,7 +225,10 @@ export default function GoalsScreen({ navigation }: Props) {
             <View style={styles.empty}>
               <Text style={styles.emptyEmoji}>🎯</Text>
               <Text style={styles.emptyText}>{tl('empty', lang)}</Text>
-              <TouchableOpacity style={styles.emptyBtn} onPress={() => setShowModal(true)}>
+              <TouchableOpacity style={styles.emptyBtn} onPress={() => setShowModal(true)}
+                accessibilityRole="button"
+                accessibilityLabel="+ tl('new_goal', lang)"
+              >
                 <Text style={styles.emptyBtnText}>+ {tl('new_goal', lang)}</Text>
               </TouchableOpacity>
             </View>
@@ -251,6 +265,8 @@ export default function GoalsScreen({ navigation }: Props) {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.typeScroll}>
               {TEST_TYPES.map(tt => (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel='TEST_TYPE_LABELS[tt]'
                   key={tt}
                   style={[styles.typeChip, fTestType === tt && styles.typeChipSelected]}
                   onPress={() => setFTestType(tt)}
@@ -288,12 +304,17 @@ export default function GoalsScreen({ navigation }: Props) {
 
             <View style={styles.modalBtns}>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="tl('cancel', lang)"
                 style={styles.cancelBtn}
                 onPress={() => { setShowModal(false); resetForm(); }}
               >
                 <Text style={styles.cancelBtnText}>{tl('cancel', lang)}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate} disabled={saving}>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate} disabled={saving}
+                accessibilityRole="button"
+                accessibilityLabel="tl('save', lang)"
+              >
                 {saving
                   ? <ActivityIndicator color="#1A1A2E" size="small" />
                   : <Text style={styles.saveBtnText}>{tl('save', lang)}</Text>

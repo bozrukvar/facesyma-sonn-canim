@@ -301,6 +301,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
 
     return (
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel='?'
         key={card.id}
         onPress={() => handleCardPress(index)}
         disabled={!canFlip || card.isFlipped || card.isMatched}
@@ -367,6 +369,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
           ]}
         >
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('memory.title', lang)}
             onPress={() => navigation.goBack()}
             style={styles.backBtn}
           >
@@ -379,6 +383,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
         {/* Tab row */}
         <View style={styles.tabRow}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Oyun sekmesi"
             style={[
               styles.tab,
               activeTab === 'game' && styles.tabActive,
@@ -395,6 +401,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('memory.title', lang)}
             style={[
               styles.tab,
               activeTab === 'leaderboard' && styles.tabActive,
@@ -426,6 +434,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
 
             <View style={styles.sizeRow}>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="4×4 kart boyutu"
                 style={[
                   styles.sizeBtn,
                   selectedSize === 4 && styles.sizeBtnActive,
@@ -452,6 +462,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="6×6 kart boyutu"
                 style={[
                   styles.sizeBtn,
                   selectedSize === 6 && styles.sizeBtnActive,
@@ -479,6 +491,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
             </View>
 
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('memory.start', lang)}
               style={styles.startBtn}
               onPress={() => startGame(selectedSize)}
               disabled={loading}
@@ -554,6 +568,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
         ]}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('memory.title', lang)}
           onPress={() => {
             stopTimer();
             setPhase('select');
@@ -646,6 +662,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
             )}
 
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('memory.play_again', lang)}
               style={styles.playAgainBtn}
               onPress={handlePlayAgain}
               activeOpacity={0.85}
@@ -656,6 +674,8 @@ const MemoryCardsScreen: React.FC<Props> = ({ navigation, route }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('memory.leaderboard', lang)}
               onPress={() => {
                 setShowModal(false);
                 navigation.goBack();

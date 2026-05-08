@@ -408,7 +408,10 @@ const SpinWheelScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('spin.title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.pageTitle}>{t('spin.title', lang)}</Text>
@@ -430,6 +433,8 @@ const SpinWheelScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Spin button */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('spin.spinning', lang)}
           style={[styles.spinBtn, (!canSpin || spinning) && styles.spinBtnOff]}
           onPress={handleSpin}
           disabled={!canSpin || spinning}

@@ -85,6 +85,8 @@ const EmptyState: React.FC<{ onAnalyze: () => void; analyzing: boolean; lang: st
     <Text style={es.sub}>{t('coach.subtitle', lang)}</Text>
 
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={t('coach.analyze_btn', lang)}
       style={[es.btn, analyzing && es.btnDisabled]}
       onPress={onAnalyze}
       activeOpacity={0.85}
@@ -159,7 +161,10 @@ const ProfileCard: React.FC<{
           </View>
         ) : null}
       </View>
-      <TouchableOpacity onPress={onReanalyze} disabled={analyzing} style={pc.reBtn} activeOpacity={0.8}>
+      <TouchableOpacity onPress={onReanalyze} disabled={analyzing} style={pc.reBtn} activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel='↺'
+      >
         {analyzing
           ? <ActivityIndicator size="small" color={colors.gold} />
           : <Text style={pc.reBtnTxt}>↺</Text>
@@ -281,7 +286,10 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('coach.title', lang)}</Text>
@@ -328,6 +336,8 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
                 const isActive = selectedModule === card.moduleKey;
                 return (
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={card.emoji}
                     style={[
                       styles.stripItem,
                       isActive && { borderColor: card.accent, backgroundColor: `${card.accent}18` },
@@ -382,6 +392,8 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.sectionLabel}>{t('coach.goals_btn', lang)}</Text>
         <View style={styles.actionRow}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.goals_btn', lang)}
             style={[styles.actionCard, { borderColor: `${colors.gold}40` }]}
             onPress={() => (navigation.navigate as any)('CoachGoals')}
             activeOpacity={0.85}
@@ -390,6 +402,8 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.actionTitle}>{t('coach.goals_btn', lang)}</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.birth_btn', lang)}
             style={[styles.actionCard, { borderColor: `${'#C07AE0'}40` }]}
             onPress={() => (navigation.navigate as any)('CoachBirth')}
             activeOpacity={0.85}
@@ -398,6 +412,8 @@ const CoachHubScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.actionTitle}>{t('coach.birth_btn', lang)}</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.memories_btn', lang)}
             style={[styles.actionCard, { borderColor: '#9B7AE040' }]}
             onPress={() => (navigation.navigate as any)('Memories')}
             activeOpacity={0.85}

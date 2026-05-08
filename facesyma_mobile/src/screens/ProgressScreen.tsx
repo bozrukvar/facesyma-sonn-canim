@@ -314,7 +314,10 @@ const ProgressScreen = ({ navigation }: ScreenProps<'Progress'>) => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="tr_('title', lang)"
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerBody}>
@@ -347,6 +350,8 @@ const ProgressScreen = ({ navigation }: ScreenProps<'Progress'>) => {
               const selected = tt.id === selectedType;
               return (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={tt.emoji}
                   key={tt.id}
                   style={[
                     styles.chip,
@@ -373,6 +378,8 @@ const ProgressScreen = ({ navigation }: ScreenProps<'Progress'>) => {
               <Text style={styles.emptyTitle}>{t(selectedTestInfo?.key ?? 'assessment.personality', lang)}</Text>
               <Text style={styles.emptyText}>{tr_('no_data', lang)}</Text>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="tr_('take_test', lang)"
                 style={styles.emptyBtn}
                 onPress={() => navigation.navigate('Assessment')}
                 activeOpacity={0.85}

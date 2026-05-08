@@ -125,7 +125,10 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.birth_title', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <View style={styles.headerBody}>
@@ -188,6 +191,8 @@ const CoachBirthScreen: React.FC<Props> = ({ navigation }) => {
           {!!error && <Text style={styles.errorText}>{error}</Text>}
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.calculate', lang)}
             style={[styles.calcBtn, loading && styles.calcBtnDisabled]}
             onPress={handleCalculate}
             disabled={loading}

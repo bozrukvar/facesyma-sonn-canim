@@ -42,7 +42,10 @@ const DailyScreen = ({ navigation, route }: ScreenProps<'Daily'>) => {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={t('daily.title', lang)}
+        >
           <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('daily.title', lang)}</Text>
@@ -51,6 +54,8 @@ const DailyScreen = ({ navigation, route }: ScreenProps<'Daily'>) => {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {!hasAnalysis && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.no_analysis', lang)}
             style={styles.noAnalysisBanner}
             onPress={() => navigation.navigate('Analysis' as any)}
             activeOpacity={0.8}

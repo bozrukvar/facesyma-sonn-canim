@@ -384,7 +384,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     return (
       <ScrollView style={styles.container}>
         <View style={[styles.header, { marginTop: insets.top + 8 }]}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingRight: 8 }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingRight: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel={t('assessment.title', lang)}
+          >
             <Text style={styles.backBtn}>←</Text>
           </TouchableOpacity>
           <View style={styles.flex1}>
@@ -392,6 +395,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
             <Text style={styles.subtitle}>{t('assessment.subtitle', lang)}</Text>
           </View>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('assessment.history', lang)}
             style={styles.historyBtn}
             onPress={() => navigation.navigate('AssessmentHistory')}
           >
@@ -407,6 +412,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
         >
           {AVAILABLE_LANGUAGES.map(({ code: lCode, flag: lFlag, name: lName }) => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel='lFlag lName'
               key={lCode}
               style={[styles.langBtn, lang === lCode && styles.langBtnActive]}
               onPress={() => setLang(lCode)}
@@ -421,7 +428,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
           const isNew = 'isNewService' in tt && tt.isNewService;
           const isClinical = 'requiresConsent' in tt && tt.requiresConsent;
           return (
-            <TouchableOpacity key={tt.id} onPress={() => startTest(tt.id)} activeOpacity={0.7}>
+            <TouchableOpacity key={tt.id} onPress={() => startTest(tt.id)} activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={tt.emoji}
+            >
               <Card style={styles.testCard}>
                 <View style={styles.testCardContent}>
                   <Text style={styles.testEmoji}>{tt.emoji}</Text>
@@ -534,7 +544,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
         <View style={styles.container}>
           {/* Header */}
           <View style={[styles.testHeader, { marginTop: insets.top + 8 }]}>
-            <TouchableOpacity onPress={handleNonverbalBack}>
+            <TouchableOpacity onPress={handleNonverbalBack}
+              accessibilityRole="button"
+              accessibilityLabel={t('assessment.back', lang)}
+            >
               <Text style={styles.backBtn}>{t('assessment.back', lang)}</Text>
             </TouchableOpacity>
             <Text style={styles.testTitle}>{testInfo ? t(testInfo.key, lang) : ''}</Text>
@@ -557,6 +570,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
               <View style={styles.nvOptionGrid}>
                 {(q.options || []).map(opt => (
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={opt.label}
                     key={opt.key}
                     style={styles.nvOptionBtn}
                     onPress={() => handleNonverbalAnswer(opt.key)}
@@ -577,6 +592,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
               <View style={styles.colorGrid}>
                 {(q.color_options || []).map(c => (
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={c.label}
                     key={c.key}
                     style={[styles.colorBtn, { backgroundColor: c.hex }]}
                     onPress={() => handleNonverbalAnswer(c.key)}
@@ -598,7 +615,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
       <ScrollView style={styles.container}>
         {/* Başlık */}
         <View style={styles.testHeader}>
-          <TouchableOpacity onPress={resetAssessment}>
+          <TouchableOpacity onPress={resetAssessment}
+            accessibilityRole="button"
+            accessibilityLabel={t('assessment.back', lang)}
+          >
             <Text style={styles.backBtn}>{t('assessment.back', lang)}</Text>
           </TouchableOpacity>
           <Text style={styles.testTitle}>{testInfo ? t(testInfo.key, lang) : ''}</Text>
@@ -631,6 +651,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
             <View style={styles.likertContainer}>
               {Array.from({ length: scaleMax - scaleMin + 1 }, (_, i) => scaleMin + i).map((score) => (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel='responses[qId] !== undefined'
                   key={score}
                   style={[
                     styles.likertBtn,
@@ -677,6 +699,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
                 </Text>
               )}
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('assessment.submit', lang)}
                 style={[styles.submitBtn, (!answeredAll || loading) && styles.submitBtnDisabled]}
                 onPress={submitResponses}
                 disabled={loading || !answeredAll}
@@ -705,7 +729,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     return (
       <ScrollView style={styles.container}>
         <View style={styles.testHeader}>
-          <TouchableOpacity onPress={() => setStep('select')}>
+          <TouchableOpacity onPress={() => setStep('select')}
+            accessibilityRole="button"
+            accessibilityLabel="testInfo?.emoji testInfo ? t(testInfo.key, lang) : ''"
+          >
             <Text style={styles.backBtn}>←</Text>
           </TouchableOpacity>
           <Text style={styles.resultsTitle}>{testInfo?.emoji} {testInfo ? t(testInfo.key, lang) : ''}</Text>
@@ -863,7 +890,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
           </>
         ) : null}
 
-        <TouchableOpacity style={styles.retakeBtn} onPress={resetAssessment}>
+        <TouchableOpacity style={styles.retakeBtn} onPress={resetAssessment}
+          accessibilityRole="button"
+          accessibilityLabel={t('assessment.another_test', lang)}
+        >
           <Text style={styles.retakeBtnText}>{t('assessment.another_test', lang)}</Text>
         </TouchableOpacity>
         <View style={styles.spacer20} />
@@ -879,7 +909,10 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
     return (
       <ScrollView style={styles.container}>
         <View style={styles.testHeader}>
-          <TouchableOpacity onPress={() => setStep('select')}>
+          <TouchableOpacity onPress={() => setStep('select')}
+            accessibilityRole="button"
+            accessibilityLabel="testInfo?.emoji testInfo ? t(testInfo.key, lang) : ''"
+          >
             <Text style={styles.backBtn}>←</Text>
           </TouchableOpacity>
           <Text style={styles.resultsTitle}>{testInfo?.emoji} {testInfo ? t(testInfo.key, lang) : ''}</Text>
@@ -960,6 +993,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
 
         {/* Düğmeler */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('assessment.another_test', lang)}
           style={styles.retakeBtn}
           onPress={resetAssessment}
         >

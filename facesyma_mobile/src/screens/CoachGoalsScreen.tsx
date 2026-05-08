@@ -120,7 +120,10 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.goalDate}>📅 {item.target_date}</Text>
       )}
       {(item.status === 'aktif' || item.status === 'active') && (
-        <TouchableOpacity style={styles.completeBtn} onPress={() => handleComplete(item)} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.completeBtn} onPress={() => handleComplete(item)} activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t('coach.status_completed', lang)}
+        >
           <Text style={styles.completeBtnText}>✓ {t('coach.status_completed', lang)}</Text>
         </TouchableOpacity>
       )}
@@ -131,11 +134,17 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t('coach.goals_title', lang)}
+        >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.topTitle}>{t('coach.goals_title', lang)}</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setModal(true)} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.addBtn} onPress={() => setModal(true)} activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel='+'
+        >
           <Text style={styles.addBtnText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -144,6 +153,8 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.tabs}>
         {TABS.map((tb) => (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel='tb.label'
             key={tb.key}
             style={[styles.tab, tab === tb.key && styles.tabActive]}
             onPress={() => setTab(tb.key)}
@@ -164,7 +175,10 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.center}>
           <Text style={styles.emptyEmoji}>🎯</Text>
           <Text style={styles.emptyText}>{t('coach.no_goals', lang)}</Text>
-          <TouchableOpacity style={styles.emptyAddBtn} onPress={() => setModal(true)} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.emptyAddBtn} onPress={() => setModal(true)} activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={t('coach.add_goal', lang)}
+          >
             <Text style={styles.emptyAddBtnText}>+ {t('coach.add_goal', lang)}</Text>
           </TouchableOpacity>
         </View>
@@ -198,6 +212,8 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
             <View style={styles.priorityRow}>
               {(['düşük', 'orta', 'yüksek'] as const).map((p) => (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel='p === düşük ? t(coach.goal_priority_low, lang) :'
                   key={p}
                   style={[styles.priorityChip, newPriority === p && styles.priorityChipActive]}
                   onPress={() => setNewPriority(p)}
@@ -213,10 +229,15 @@ const CoachGoalsScreen: React.FC<Props> = ({ navigation }) => {
             </View>
 
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModal(false)} activeOpacity={0.85}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModal(false)} activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.cancel', lang)}
+              >
                 <Text style={styles.cancelBtnText}>{t('common.cancel', lang)}</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('coach.goal_save', lang)}
                 style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
                 onPress={handleAddGoal}
                 disabled={saving || !newTitle.trim()}

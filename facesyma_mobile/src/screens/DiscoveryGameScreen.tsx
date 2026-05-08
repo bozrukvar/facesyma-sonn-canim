@@ -127,7 +127,10 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const renderType = ({ item }: { item: GameType }) => (
-    <TouchableOpacity style={styles.typeCard} onPress={() => startGame(item.game_type_id)} activeOpacity={0.85}>
+    <TouchableOpacity style={styles.typeCard} onPress={() => startGame(item.game_type_id)} activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={item.name}
+    >
       <Text style={styles.typeEmoji}>🔍</Text>
       <View style={styles.typeBody}>
         <Text style={styles.typeName}>{item.name}</Text>
@@ -150,7 +153,10 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-          <TouchableOpacity onPress={() => setPhase('select')} style={styles.backBtn}>
+          <TouchableOpacity onPress={() => setPhase('select')} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('discovery.result', lang)}
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{t('discovery.result', lang)}</Text>
@@ -161,7 +167,10 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
           <Text style={styles.resultAccLabel}>{t('discovery.accuracy', lang)}</Text>
           <Text style={styles.resultCoins}>+{result.coins_earned} 🪙</Text>
           {result.insights ? <Text style={styles.resultInsights}>{result.insights}</Text> : null}
-          <TouchableOpacity style={styles.playAgainBtn} onPress={() => setPhase('select')}>
+          <TouchableOpacity style={styles.playAgainBtn} onPress={() => setPhase('select')}
+            accessibilityRole="button"
+            accessibilityLabel={t('discovery.play_again', lang)}
+          >
             <Text style={styles.playAgainText}>{t('discovery.play_again', lang)}</Text>
           </TouchableOpacity>
         </View>
@@ -175,7 +184,10 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={[styles.topBar, { paddingTop: insets.top + spacing.md }]}>
-          <TouchableOpacity onPress={abandon} style={styles.backBtn}>
+          <TouchableOpacity onPress={abandon} style={styles.backBtn}
+            accessibilityRole="button"
+            accessibilityLabel='qIndex + 1/totalQs'
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>{qIndex + 1}/{totalQs}</Text>
@@ -198,6 +210,8 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
         <View style={styles.choiceList}>
           {choices.map((choice, idx) => (
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel='String.fromCharCode(65 + idx)'
               key={idx}
               style={styles.choiceBtn}
               onPress={() => answer(idx)}
@@ -225,7 +239,10 @@ const DiscoveryGameScreen: React.FC<Props> = ({ navigation, route }) => {
         contentContainerStyle={[styles.list, { paddingTop: insets.top + spacing.md }]}
         ListHeaderComponent={() => (
           <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t('discovery.title', lang)}
+            >
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
             <Text style={styles.title}>{t('discovery.title', lang)}</Text>
