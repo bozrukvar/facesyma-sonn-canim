@@ -16,6 +16,7 @@ import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const TERMS_URL   = 'https://facesyma.com/wp-content/uploads/2024/07/maula-en.pdf';
 const PRIVACY_URL = 'https://facesyma.com/wp-content/uploads/2024/07/ppa-en.pdf';
@@ -33,6 +34,8 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading, error } = useSelector((s: RootState) => s.auth);
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
 
   const [mode,          setMode]          = useState<Mode>('login');
   const [email,         setEmail]         = useState('');
@@ -87,7 +90,7 @@ const AuthScreen = ({ navigation }: ScreenProps<'Auth'>) => {
         [{ text: 'OK', onPress: () => switchMode('login') }],
       );
     } catch (e: any) {
-      const msg = e?.response?.data?.detail || t('common.generic_error', lang);
+      const msg = getErrorMessage(e);
       setLocalErr(msg);
     } finally {
       setResetLoading(false);

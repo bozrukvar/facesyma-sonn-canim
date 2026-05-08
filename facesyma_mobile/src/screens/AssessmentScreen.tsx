@@ -15,6 +15,7 @@ import { markModuleUsed } from '../store/authSlice';
 import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import type { ScreenProps } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const { width } = Dimensions.get('window');
 
@@ -222,6 +223,8 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
   const [step, setStep] = useState<AssessmentStep>('select');
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const { lang, setLang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [responses, setResponses] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -304,7 +307,7 @@ const AssessmentScreen = ({ navigation }: ScreenProps<'Assessment'>) => {
       questionStartRef.current = Date.now();
       setStep('answering');
     } catch (error: any) {
-      Alert.alert(t('common.error', lang), error.response?.data?.detail || t('assessment.error_generic', lang));
+      Alert.alert(t('common.error', lang), getErrorMessage(error));
       setStep('select');
     } finally {
       setLoading(false);

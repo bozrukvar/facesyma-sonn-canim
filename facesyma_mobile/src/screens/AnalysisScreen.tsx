@@ -20,6 +20,7 @@ import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { AnalysisResult } from '../types/api';
 import type { AnalysisNavProp } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const { width } = Dimensions.get('window');
 const MIN_SCAN_MS = 6500;
@@ -225,6 +226,8 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
   const insetsTop  = insets.top;
   const dispatch = useDispatch<AppDispatch>();
   const { lang, setLang, availableLangs } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [faceCenter, setFaceCenter] = useState<{ cx: number; cy: number; fw?: number; fh?: number } | null>(null);
@@ -286,7 +289,7 @@ const AnalysisScreen: React.FC<{ navigation: AnalysisNavProp }> = ({ navigation 
       dispatch(markModuleUsed('face_analysis'));
       setStep('result');
     } catch (e: any) {
-      Alert.alert(t('common.error', lang), e.response?.data?.detail || t('common.generic_error', lang));
+      Alert.alert(t('common.error', lang), getErrorMessage(e));
     } finally {
       setLoading(false);
     }

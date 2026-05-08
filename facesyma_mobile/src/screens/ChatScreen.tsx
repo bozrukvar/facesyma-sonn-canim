@@ -17,6 +17,7 @@ import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps, AppNavProp } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const { width } = Dimensions.get('window');
 
@@ -273,6 +274,8 @@ const TypingIndicator = () => {
 const MessageBubble = ({ item, onTestSubmit }: { item: Message; onTestSubmit?: (text: string) => void }) => {
   const isUser = item.role === 'user';
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(12)).current;
 
@@ -388,7 +391,7 @@ const ChatScreen = ({ navigation, route }: ScreenProps<'Chat'>) => {
       }
       setShowQuick(true);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || t('chat.error_init', lang));
+      setError(getErrorMessage(e));
     } finally {
       setInitializing(false);
     }

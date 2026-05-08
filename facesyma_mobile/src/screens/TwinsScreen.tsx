@@ -17,6 +17,7 @@ import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
 import type { TwinsResult, TwinsDimensions } from '../types/api';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const { width } = Dimensions.get('window');
 const PHOTO_SIZE = (width - spacing.lg * 2 - spacing.sm * 2) / 3;
@@ -152,6 +153,8 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const [photos,  setPhotos]  = useState<string[]>([]);
   const [result,  setResult]  = useState<TwinsResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -176,7 +179,7 @@ const TwinsScreen = ({ navigation }: ScreenProps<'Twins'>) => {
       setResult(data);
       dispatch(markModuleUsed('twins'));
     } catch (e: any) {
-      Alert.alert(t('common.error', lang), e.response?.data?.detail || t('twins.error_generic', lang));
+      Alert.alert(t('common.error', lang), getErrorMessage(e));
     } finally { setLoading(false); }
   };
 

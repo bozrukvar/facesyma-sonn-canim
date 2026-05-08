@@ -14,6 +14,7 @@ import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const FREE_VISIBLE_LIMIT = 3;
 
@@ -80,6 +81,7 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
   const isPremium = user?.plan === 'premium';
 
   const [results,      setResults]      = useState<AssessmentResult[]>([]);
+  const getErrorMessage = useOfflineError();
   const [twinsHistory, setTwinsHistory] = useState<TwinsHistoryItem[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [refreshing,   setRefreshing]   = useState(false);
@@ -106,7 +108,7 @@ const AssessmentHistoryScreen = ({ navigation }: ScreenProps<'AssessmentHistory'
         Alert.alert(t('common.authentication_required', lang), t('common.please_login', lang));
         navigation.navigate('Auth');
       } else {
-        Alert.alert(t('common.error', lang), error.response?.data?.detail || t('common.generic_error', lang));
+        Alert.alert(t('common.error', lang), getErrorMessage(error));
       }
     } finally {
       setLoading(false);

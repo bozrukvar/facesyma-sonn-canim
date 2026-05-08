@@ -15,6 +15,7 @@ import { useLanguage } from '../utils/LanguageContext';
 import { t } from '../utils/i18n';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const TERMS_URL   = 'https://facesyma.com/wp-content/uploads/2024/07/maula-en.pdf';
 const PRIVACY_URL = 'https://facesyma.com/wp-content/uploads/2024/07/ppa-en.pdf';
@@ -87,6 +88,8 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
   const insets   = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const user     = useSelector((s: RootState) => s.auth.user);
 
   const [editName,     setEditName]     = useState(user?.name || '');
@@ -143,7 +146,7 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
       setOldPw(''); setNewPw('');
       Alert.alert('', t('account.pw_changed', lang));
     } catch (e: any) {
-      Alert.alert('', e.response?.data?.detail || t('account.pw_error', lang));
+      Alert.alert('', getErrorMessage(e));
     } finally {
       setPwLoading(false);
     }
@@ -183,7 +186,7 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
                 `${t('account.export_ready_title', lang)}.\n\n${data?.data?.analysis_history?.length || 0} / ${data?.data?.assessment_results?.length || 0}`
               );
             } catch (e: any) {
-              Alert.alert('', e.response?.data?.detail || t('account.export_error', lang));
+              Alert.alert('', getErrorMessage(e));
             } finally {
               setExportLoading(false);
             }
@@ -215,7 +218,7 @@ const AccountScreen = ({ navigation }: ScreenProps<'Account'>) => {
                       await dispatch(logout());
                       navigation.replace('Auth');
                     } catch (e: any) {
-                      Alert.alert('', e.response?.data?.detail || t('account.delete_error', lang));
+                      Alert.alert('', getErrorMessage(e));
                     }
                   },
                 },

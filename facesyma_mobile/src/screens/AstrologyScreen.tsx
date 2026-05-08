@@ -14,6 +14,7 @@ import { AppDispatch } from '../store';
 import { markModuleUsed } from '../store/authSlice';
 import type { ScreenProps } from '../navigation/types';
 import type { AstrologyResult } from '../types/api';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const AstrologyScreen = ({ navigation, route }: ScreenProps<'Astrology'>) => {
   const insets = useSafeAreaInsets();
@@ -24,6 +25,8 @@ const AstrologyScreen = ({ navigation, route }: ScreenProps<'Astrology'>) => {
   const [result,    setResult]    = useState<AstrologyResult | null>(null);
   const [loading,   setLoading]   = useState(false);
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
 
   const calculate = async () => {
     if (!birthDate) return;
@@ -44,7 +47,7 @@ const AstrologyScreen = ({ navigation, route }: ScreenProps<'Astrology'>) => {
     } catch (e: any) {
       Alert.alert(
         errTitle,
-        e?.response?.data?.detail || t('common.generic_error', lang),
+        getErrorMessage(e),
       );
     } finally {
       setLoading(false);

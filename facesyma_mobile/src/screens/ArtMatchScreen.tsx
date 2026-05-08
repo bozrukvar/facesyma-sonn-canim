@@ -17,6 +17,7 @@ import { AppDispatch } from '../store';
 import { markModuleUsed } from '../store/authSlice';
 import type { ScreenProps } from '../navigation/types';
 import type { ArtMatchResult } from '../types/api';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 const CLUSTER_COLORS: Record<string, string> = {
   leadership:   '#E53935',
@@ -81,6 +82,8 @@ const ArtMatchScreen = ({ navigation }: ScreenProps<'ArtMatch'>) => {
   const [result,   setResult]   = useState<ArtMatchResult | null>(null);
   const [loading,  setLoading]  = useState(false);
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
 
   const pickImage = useCallback(() =>
     launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, res => {
@@ -97,7 +100,7 @@ const ArtMatchScreen = ({ navigation }: ScreenProps<'ArtMatch'>) => {
     } catch (e: any) {
       Alert.alert(
         t('common.error', lang),
-        e?.response?.data?.detail || t('common.generic_error', lang),
+        getErrorMessage(e),
       );
     } finally {
       setLoading(false);

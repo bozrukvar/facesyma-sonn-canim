@@ -22,6 +22,7 @@ import { markModuleUsed } from '../store/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ScreenProps } from '../navigation/types';
 import type { AnalysisResult } from '../types/api';
+import { useOfflineError } from '../hooks/useOfflineError';
 
 // Hex → Türkçe renk adı (yaklaşık eşleşme)
 const HEX_COLOR_NAMES: Record<string, string> = {
@@ -117,6 +118,8 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
   const dispatch      = useDispatch<AppDispatch>();
   const analysisResult = route.params?.analysisResult ?? {};
   const { lang } = useLanguage();
+  const getErrorMessage = useOfflineError();
+
   const MEVSIMLER = useMemo(() => getSeasons(lang), [lang]);
   const KATEGORILER = useMemo(() => getCategories(lang), [lang]);
 
@@ -143,7 +146,7 @@ const FashionScreen = ({ navigation, route }: ScreenProps<'Fashion'>) => {
       setData(response);
       dispatch(markModuleUsed('fashion'));
     } catch (error: any) {
-      Alert.alert(t('common.error', lang), error.response?.data?.detail || t('common.generic_error', lang));
+      Alert.alert(t('common.error', lang), getErrorMessage(error));
     } finally {
       setLoading(false);
     }
